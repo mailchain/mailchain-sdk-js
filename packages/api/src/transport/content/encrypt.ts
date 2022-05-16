@@ -1,0 +1,65 @@
+import { PrivateKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
+import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
+import { DeriveHardenedKey } from '@mailchain/crypto/ed25519';
+import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
+import { chunkBuffer, CHUNK_LENGTH_1MB } from './chunk';
+import { SerializablePayloadHeaders } from './headers';
+import { EncryptedPayload, Payload } from './payload';
+
+/**
+ * Encrypts a payload
+ *
+ * @param input
+ * @param payloadRootKey is used to derive a separate key for the headers and each part of the message
+ * @param chunkSize approx 1mb
+ * @returns
+ */
+export async function encryptPayload(
+	input: Payload,
+	payloadRootKey: ED25519ExtendedPrivateKey,
+	chunkSize: number = CHUNK_LENGTH_1MB,
+	rand: RandomFunction = SecureRandom,
+): Promise<EncryptedPayload> {
+	const chunks = chunkBuffer(input.Content, chunkSize);
+	const encryptedContentChunks = await encryptChunks(chunks, payloadRootKey, rand);
+
+	const serializedHeaders = new SerializablePayloadHeaders(input.Headers).ToBuffer();
+	const headersEncryptionKey = DeriveHardenedKey(payloadRootKey, 'headers');
+	const encryptedHeaders = await encryptBuffer(serializedHeaders, headersEncryptionKey.PrivateKey, rand);
+
+	return {
+		EncryptedHeaders: encryptedHeaders,
+		EncryptedContentChunks: encryptedContentChunks,
+	};
+}
+
+/**
+ * Encrypts each chunk with a different key derived from payloadRootKey
+ * @param chunks chunks of max 1mb to encrypt
+ * @param payloadRootKey root key used to derive encryption keys for each chunk
+ * @returns list of encrypted chunks
+ */
+export async function encryptChunks(
+	chunks: Buffer[],
+	payloadRootKey: ED25519ExtendedPrivateKey,
+	rand: RandomFunction = SecureRandom,
+): Promise<Buffer[]> {
+	const encryptedChunks = new Array<Buffer>(chunks.length);
+
+	const contentRootKey = DeriveHardenedKey(payloadRootKey, 'content');
+	for (let i = 0; i < chunks.length; i++) {
+		const chunkKey = DeriveHardenedKey(contentRootKey, i);
+		encryptedChunks[i] = await encryptBuffer(chunks[i], chunkKey.PrivateKey, rand);
+	}
+
+	return encryptedChunks;
+}
+
+export async function encryptBuffer(
+	buffer: Buffer,
+	key: PrivateKey,
+	rand: RandomFunction = SecureRandom,
+): Promise<Buffer> {
+	const encrypted = await PrivateKeyEncrypter.FromPrivateKey(key, rand).Encrypt(buffer);
+	return Buffer.from(encrypted);
+}

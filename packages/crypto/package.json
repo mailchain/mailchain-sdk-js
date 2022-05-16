@@ -1,0 +1,28 @@
+{
+	"name": "@mailchain/crypto",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"version": "0.1.0",
+	"dependencies": {
+		"@mailchain/encoding": "0.1.0",
+		"@noble/hashes": "^1.0.0",
+		"@polkadot/util-crypto": "^8.7.1",
+		"@types/bn.js": "^5.1.0",
+		"@types/elliptic": "^6.4.14",
+		"@types/secp256k1": "^4.0.2",
+		"@types/sha256": "^0.2.0",
+		"bn.js": "^5.2.0",
+		"elliptic": "^6.5.4",
+		"ethereumjs-util": "^7.1.4",
+		"ethers": "^5.6.2",
+		"secp256k1": "^4.0.2",
+		"tweetnacl": "^1.0.3",
+		"tweetnacl-util": "^0.15.1"
+	},
+	"scripts": {
+		"test": "jest",
+		"lint:test": "yarn eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+	}
+}

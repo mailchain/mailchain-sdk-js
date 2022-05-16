@@ -1,0 +1,15 @@
+{
+	"name": "@mailchain/types",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"version": "0.1.0",
+	"dependencies": {
+		"mimetext": "^2.0.7"
+	},
+	"scripts": {
+		"test": "jest --passWithNoTests",
+		"lint:test": "yarn eslint --ext js,ts,tsx .",
+		"lint:fix": "yarn eslint --fix --ext js,ts,tsx ."
+	}
+}

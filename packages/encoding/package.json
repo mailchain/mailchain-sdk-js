@@ -1,0 +1,16 @@
+{
+	"name": "@mailchain/encoding",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"version": "0.1.0",
+	"dependencies": {
+		"@polkadot/util-crypto": "^8.7.1"
+	},
+	"scripts": {
+		"build": "echo 'built'",
+		"test": "jest",
+		"lint:test": "yarn eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+	}
+}

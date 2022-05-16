@@ -1,0 +1,17 @@
+{
+	"name": "@mailchain/protobuf",
+	"private": true,
+	"sideEffects": false,
+	"type": "module",
+	"version": "0.1.0",
+	"dependencies": {},
+	"scripts": {
+		"codegen": "./node_modules/.bin/pbjs -t static-module -w commonjs -o ./src/generated/protocol.js ./src/protos/protocol.proto; ./node_modules/.bin/pbts -o ./src/generated/protocol.d.ts ./src/generated/protocol.js",
+		"test": "jest --passWithNoTests",
+		"lint:test": "yarn eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+	},
+	"devDependencies": {
+		"protobufjs": "^6.11.2"
+	}
+}
