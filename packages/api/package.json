@@ -11,7 +11,7 @@
 		"axios": "^0.26.1"
 	},
 	"scripts": {
-		"test": "jest --passWithNoTests --runInBand",
+		"test": "jest --passWithNoTests --runInBand --testPathIgnorePatterns=/integration_tests/",
 		"generate": "rm -rf ./src/axios; openapi-generator-cli generate -i ../../docs/openapi/api.json -o ./src/api -g typescript-axios --additional-properties=paramNaming=PascalCase,legacyDiscriminatorBehavior=false",
 		"swagger-ui": "swagger-ui ./api.json",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",

@@ -3,6 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { EncodeBase64 } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { getToken, initializeHeader } from './jwt';
+import { KeyRing } from '@mailchain/keyring';
 
 const payload = {
 	m: 'GET',
@@ -23,7 +24,7 @@ describe('JWT tokens()', () => {
 
 	it('verify signing', async () => {
 		expect.assertions(1);
-		const jwtTokenForAlice = await getToken(AliceED25519PrivateKey.Bytes, payload, MS_IN_DATE);
+		const jwtTokenForAlice = await getToken(new KeyRing(AliceED25519PrivateKey), payload, MS_IN_DATE);
 
 		expect(jwtTokenForAlice).toEqual(expectedTokenForAlice);
 	});
@@ -32,7 +33,8 @@ describe('JWT tokens()', () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
-		initializeHeader(AliceED25519PrivateKey);
+		const kr = new KeyRing(AliceED25519PrivateKey);
+		initializeHeader(kr);
 
 		const payloadGet = {
 			m: 'GET',
@@ -41,7 +43,7 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(AliceED25519PrivateKey.KeyPair.secretKey, payloadGet, time);
+		const token = await getToken(kr, payloadGet, time);
 		mock.onGet(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } }).reply((conf) => [
 			200,
 			conf.headers,
@@ -51,7 +53,7 @@ describe('JWT tokens()', () => {
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(AliceED25519PrivateKey.KeyPair.publicKey)}`,
+					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});
@@ -59,7 +61,8 @@ describe('JWT tokens()', () => {
 	it('verify axios request POST', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
-		initializeHeader(AliceED25519PrivateKey);
+		const kr = new KeyRing(AliceED25519PrivateKey);
+		initializeHeader(kr);
 
 		const postBody = { scripts: { test: 'jest --passWithNoTests' } };
 		const len = Buffer.byteLength(JSON.stringify(postBody), 'ascii');
@@ -71,12 +74,12 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(AliceED25519PrivateKey.KeyPair.secretKey, payloadPost, time);
+		const token = await getToken(kr, payloadPost, time);
 		mock.onPost(`https://${payloadPost.aud}${payloadPost.url}`).reply((conf) => [200, conf.headers]);
 
 		return axios.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody).then((response) => {
 			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64(AliceED25519PrivateKey.KeyPair.publicKey)}`,
+				`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
 			);
 		});
 	});
@@ -85,7 +88,8 @@ describe('JWT tokens()', () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
-		initializeHeader(AliceED25519PrivateKey);
+		const kr = new KeyRing(AliceED25519PrivateKey);
+		initializeHeader(kr);
 
 		const putBody = { dependencies: { axios: '^0.26.1' } };
 		const len = Buffer.byteLength(JSON.stringify(putBody), 'ascii');
@@ -97,7 +101,7 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(AliceED25519PrivateKey.KeyPair.secretKey, payloadPut, time);
+		const token = await getToken(kr, payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
 		return axios
@@ -106,7 +110,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(AliceED25519PrivateKey.KeyPair.publicKey)}`,
+					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});
@@ -115,7 +119,8 @@ describe('JWT tokens()', () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
-		initializeHeader(AliceED25519PrivateKey);
+		const kr = new KeyRing(AliceED25519PrivateKey);
+		initializeHeader(kr);
 
 		const patchBody = { dependencies: { axios: '^0.9.1' } };
 		const len = Buffer.byteLength(JSON.stringify(patchBody), 'ascii');
@@ -127,7 +132,7 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(AliceED25519PrivateKey.KeyPair.secretKey, payloadPatch, time);
+		const token = await getToken(kr, payloadPatch, time);
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);
 
 		return axios
@@ -136,7 +141,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(AliceED25519PrivateKey.KeyPair.publicKey)}`,
+					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});
