@@ -1,19 +1,18 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { ExtendedPrivateKey, PublicKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
 
-import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
-import { protocol } from '@mailchain/protobuf';
+import { protocol } from '../../protobuf/protocol';
 import { createEnvelope } from './envelope';
 
 export async function createDelivery(
-	recipientDestinationKey: PublicKey,
-	recipientIdentityKey: PublicKey,
-	messageKey: ExtendedPrivateKey,
+	recipientMessagingKey: PublicKey,
+	messageRootEncryptionKey: ExtendedPrivateKey,
 	messageURI: string,
 	rand: RandomFunction = SecureRandom,
 ): Promise<protocol.Delivery> {
 	const payload = {
-		destinationIdentity: EncodePublicKey(recipientDestinationKey),
-		envelope: await createEnvelope(recipientIdentityKey, messageKey, messageURI, rand),
+		envelope: await createEnvelope(recipientMessagingKey, messageRootEncryptionKey, messageURI, rand),
 	} as protocol.IDelivery;
 
 	var errMsg = protocol.Delivery.verify(payload);

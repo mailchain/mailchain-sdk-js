@@ -1,1 +1,3 @@
 src/api
+src/protobuf
+openapitools.json

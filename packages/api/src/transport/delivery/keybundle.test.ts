@@ -18,7 +18,7 @@ describe('createECDHKeyBundle', () => {
 					198, 194, 42, 114, 157, 74, 227, 142, 35,
 				]),
 				keyBundle: {
-					publicIdentityKey: new Uint8Array([
+					publicMessagingKey: new Uint8Array([
 						226, 114, 60, 170, 35, 165, 181, 17, 175, 90, 215, 183, 239, 96, 118, 228, 20, 171, 126, 117,
 						169, 220, 145, 14, 166, 14, 65, 122, 43, 119, 10, 86, 113,
 					]),
@@ -45,7 +45,7 @@ describe('createECDHKeyBundle', () => {
 					90, 112, 132, 248, 5, 53, 202, 70, 77, 0, 47,
 				]),
 				keyBundle: {
-					publicIdentityKey: new Uint8Array([
+					publicMessagingKey: new Uint8Array([
 						226, 46, 50, 47, 135, 64, 198, 1, 114, 17, 26, 200, 234, 220, 221, 162, 81, 47, 144, 208, 109,
 						14, 80, 62, 241, 137, 151, 154, 21, 155, 236, 225, 232,
 					]),

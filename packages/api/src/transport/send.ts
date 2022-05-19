@@ -1,7 +1,7 @@
 import { PublicKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase64, EncodeHex } from '@mailchain/encoding';
-import { protocol } from '@mailchain/protobuf/generated/protocol';
+import { protocol } from '../protobuf/protocol';
 import { Configuration, TransportApi } from '../api';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
@@ -11,13 +11,9 @@ import { createDelivery } from './delivery/delivery';
 
 export interface Recipient {
 	/**
-	 * key that resolves to an address on a blockchain
+	 * key that is used for messaging
 	 */
-	destinationKey: PublicKey;
-	/**
-	 * Mailchain identity key
-	 */
-	identityKey: PublicKey;
+	messagingKey: PublicKey;
 }
 
 /**
@@ -55,8 +51,7 @@ export const sendPayload = async (
 	for (let i = 0; i < recipients.length; i++) {
 		// TODO: decide key exchange
 		const delivery = await createDelivery(
-			recipients[i].destinationKey,
-			recipients[i].identityKey,
+			recipients[i].messagingKey,
 			payloadRootEncryptionKey,
 			messageURI,
 			rand,
@@ -69,7 +64,7 @@ export const sendPayload = async (
 	encodedDeliveries.forEach((value: Uint8Array, index: number) => {
 		api.postDeliveryRequest({
 			encryptedDeliveryRequest: EncodeBase64(value),
-			recipientMessagingKey: EncodeHex(recipients[index].destinationKey.Bytes),
+			recipientMessagingKey: EncodeHex(recipients[index].messagingKey.Bytes),
 		});
 	});
 };

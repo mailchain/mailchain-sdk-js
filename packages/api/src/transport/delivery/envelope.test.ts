@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519/private';
 import { DecodeHex } from '@mailchain/encoding';
-import { protocol } from '@mailchain/protobuf';
+import { protocol } from '../../protobuf/protocol';
 import { createEnvelope } from './envelope';
 
 describe('createEnvelope', () => {
@@ -36,7 +37,7 @@ describe('createEnvelope', () => {
 					213, 97, 196, 127, 58, 189, 90, 173,
 				]),
 				ecdhKeyBundle: {
-					publicIdentityKey: new Uint8Array([
+					publicMessagingKey: new Uint8Array([
 						226, 114, 60, 170, 35, 165, 181, 17, 175, 90, 215, 183, 239, 96, 118, 228, 20, 171, 126, 117,
 						169, 220, 145, 14, 166, 14, 65, 122, 43, 119, 10, 86, 113,
 					]),
