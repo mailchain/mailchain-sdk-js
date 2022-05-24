@@ -50,12 +50,7 @@ export const sendPayload = async (
 	const encodedDeliveries = Array<Uint8Array>(recipients.length);
 	for (let i = 0; i < recipients.length; i++) {
 		// TODO: decide key exchange
-		const delivery = await createDelivery(
-			recipients[i].messagingKey,
-			payloadRootEncryptionKey,
-			messageURI,
-			rand,
-		);
+		const delivery = await createDelivery(recipients[i].messagingKey, payloadRootEncryptionKey, messageURI, rand);
 		const encodedDelivery = protocol.Delivery.encode(delivery).finish();
 		// TODO: prepend encoding ID.
 		encodedDeliveries[i] = encodedDelivery;
