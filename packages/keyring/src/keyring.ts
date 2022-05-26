@@ -64,13 +64,13 @@ export class KeyRing {
 	}
 
 	EncodedAddress(): string {
-		if (this._accountKey) {
-			return EncodeBase58(this._accountKey.PublicKey.Bytes);
+		if (this._mainIdentityKey) {
+			return EncodeBase58(this._mainIdentityKey.PrivateKey.PublicKey.Bytes);
 		}
 		return '';
 	}
 
-	async SignWithIdentityKey(payload: string): Promise<string> {
-		return EncodeBase64UrlSafe(await this._accountKey.Sign(Buffer.from(payload)));
+	async SignWithIdentityKey(payload: string): Promise<Uint8Array> {
+		return this._mainIdentityKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
 	}
 }

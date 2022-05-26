@@ -21,7 +21,7 @@ describe('accounts', () => {
 		return response;
 	});
 
-	const apiConfig = new Configuration({ basePath: 'http://localhost:7005' } as ConfigurationParameters);
+	const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as ConfigurationParameters);
 	const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
 	console.log(params);
 

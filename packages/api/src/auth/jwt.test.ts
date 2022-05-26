@@ -1,24 +1,24 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { EncodeBase64 } from '@mailchain/encoding';
+import { EncodeBase64, EncodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { getToken, initializeHeader } from './jwt';
 import { KeyRing } from '@mailchain/keyring';
 
 const payload = {
 	m: 'GET',
-	url: '/user/settings',
+	url: '/users?id=1234',
 	len: 0,
-	aud: 'localhost:7006',
+	aud: 'example.com',
 };
 
 const expectedTokenForAlice =
-	'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXIvc2V0dGluZ3MiLCJsZW4iOjAsImF1ZCI6ImxvY2FsaG9zdDo3MDA2IiwiZXhwIjoxOTY2NDkxOTAzfQ.ECwd4VQhV2AsUY5v1vt5xeQ6l92Toh4u7nhKZqXKsr9TMZNyzxnbzEmOkCuNvVjEHLm-pqAvHCGUCEAtJW6uAw';
+	'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXJzP2lkPTEyMzQiLCJsZW4iOjAsImF1ZCI6ImV4YW1wbGUuY29tIiwiZXhwIjoxNTc3ODM2ODAwfQ.CHnGh7f9K6cnmKqgZ2CsXqNEZvcRElIBGDo3qfJGuxKtC1pxgN9yx06twVe9vXeKkRwiCb5rDiSA7CyL9ub3Bw';
 
 describe('JWT tokens()', () => {
 	afterAll(() => jest.resetAllMocks());
 
-	const MS_IN_DATE = 1966491903;
+	const MS_IN_DATE = 1577836800;
 	Date.now = jest.fn(() => MS_IN_DATE);
 	const time = Math.floor(MS_IN_DATE * 0.001 + 86400);
 
@@ -53,7 +53,7 @@ describe('JWT tokens()', () => {
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});
@@ -79,7 +79,7 @@ describe('JWT tokens()', () => {
 
 		return axios.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody).then((response) => {
 			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
+				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
 			);
 		});
 	});
@@ -110,7 +110,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});
@@ -141,7 +141,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
 				);
 			});
 	});

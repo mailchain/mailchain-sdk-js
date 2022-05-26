@@ -1,4 +1,4 @@
-import { BASE58, Encodings, HEX, HEX_0X_PREFIX } from './consts';
+import { BASE58, BASE64, BASE64URL, Encodings, HEX, HEX_0X_PREFIX } from './consts';
 import { Decode, Encode } from './encoding';
 
 describe('Encode', () => {
@@ -32,6 +32,16 @@ describe('Encode', () => {
 				0x3f, 0x1c,
 			]),
 			expected: '5CLmNK8f16nagFeF2h3iNeeChaxPiAsJu7piNYJgdPpmaRzPD',
+			shouldThrow: false,
+		},
+		{
+			name: 'base64-url',
+			encoding: BASE64URL,
+			input: new Uint8Array([
+				0x72, 0x3c, 0xaa, 0x23, 0xa5, 0xb5, 0x11, 0xaf, 0x5a, 0xd7, 0xb7, 0xef, 0x60, 0x76, 0xe4, 0x14, 0xab,
+				0x7e, 0x75, 0xa9, 0xdc, 0x91, 0xe, 0xa6, 0xe, 0x41, 0x7a, 0x2b, 0x77, 0xa, 0x56, 0x71,
+			]),
+			expected: 'cjyqI6W1Ea9a17fvYHbkFKt-danckQ6mDkF6K3cKVnE',
 			shouldThrow: false,
 		},
 		{

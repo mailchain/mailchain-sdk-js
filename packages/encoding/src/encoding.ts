@@ -1,5 +1,6 @@
 import { DecodeBase58, EncodeBase58 } from './base58';
-import { BASE58, Encodings, HEX, HEX_0X_PREFIX } from './consts';
+import { EncodeBase64UrlSafe } from './base64';
+import { BASE58, BASE64, BASE64URL, Encodings, HEX, HEX_0X_PREFIX } from './consts';
 import { DecodeHex, DecodeHexZeroX, EncodeHex, EncodeHexZeroX } from './hex';
 
 const errUnsupportedEncoding = new Error('encoding not supported');
@@ -40,6 +41,8 @@ export function Encode(encoding: Encodings, src: Uint8Array): string {
 			return EncodeHex(src);
 		case HEX_0X_PREFIX:
 			return EncodeHexZeroX(src);
+		case BASE64URL:
+			return EncodeBase64UrlSafe(src);
 		default:
 			throw errUnsupportedEncoding;
 	}

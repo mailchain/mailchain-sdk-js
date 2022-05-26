@@ -8,7 +8,7 @@ export const getToken = async (kr: KeyRing, payload: any, exp: number) => {
 	)}.${EncodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })))}`;
 	const signature = await kr.SignWithIdentityKey(key);
 
-	return `${key}.${signature}`;
+	return `${key}.${EncodeBase64UrlSafe(signature)}`;
 };
 
 export const initializeHeader = (kr: KeyRing) => {
@@ -27,9 +27,10 @@ export const initializeHeader = (kr: KeyRing) => {
 		};
 		const token = await getToken(kr, payload, expires);
 		if (request.headers) {
-			request.headers.Authorization = `vapid t=${token}, k=${EncodeBase64(kr.rootIdentityPublicKey().Bytes)}`;
+			request.headers.Authorization = `vapid t=${token}, k=${EncodeBase64UrlSafe(
+				kr.rootIdentityPublicKey().Bytes,
+			)}`;
 		}
-
 		return request;
 	});
 };
