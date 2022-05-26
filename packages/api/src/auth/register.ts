@@ -15,6 +15,7 @@ export async function Register(
 	identityKeySeed: Uint8Array,
 	username: string,
 	password: string,
+	captchaResponse: string,
 	apiConfig: Configuration,
 	opaqueConfig: OpaqueConfig = DefaultConfig,
 ): Promise<AuthenticatedResponse> {
@@ -29,6 +30,7 @@ export async function Register(
 		identityKey,
 		username,
 		password,
+		captchaResponse,
 	);
 	const registerCreateResponse = await AccountRegisterCreate(
 		apiConfig,
@@ -60,6 +62,7 @@ async function AccountRegisterInit(
 	identityKey: PrivateKey,
 	username: string,
 	password: string,
+	captchaResponse: string,
 ): Promise<{
 	registrationSession: Uint8Array;
 	registrationResponse: RegistrationResponse;
@@ -77,6 +80,7 @@ async function AccountRegisterInit(
 		signature: EncodeBase64(signature),
 		username,
 		registerInitParams: EncodeBase64(Uint8Array.from(serializedRequest)),
+		captchaResponse,
 	});
 
 	if (response.status !== 200) {

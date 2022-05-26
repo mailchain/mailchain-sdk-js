@@ -12,12 +12,20 @@ import { DefaultConfig } from './config';
 export async function Login(
 	username: string,
 	password: string,
+	captchaResponse: string,
 	apiConfig: Configuration,
 	opaqueConfig: OpaqueConfig = DefaultConfig,
 ): Promise<AuthenticatedResponse> {
 	const authClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
 
-	const authInitResponse = await AccountAuthInit(apiConfig, opaqueConfig, authClient, username, password);
+	const authInitResponse = await AccountAuthInit(
+		apiConfig,
+		opaqueConfig,
+		authClient,
+		username,
+		password,
+		captchaResponse,
+	);
 	const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authInitResponse.keyExchange2));
 	return AccountAuthFinalize(apiConfig, opaqueConfig, authClient, username, keyExchange2, authInitResponse.state);
 }
@@ -28,6 +36,7 @@ async function AccountAuthInit(
 	opaqueClient: AuthClient,
 	username: string,
 	password: string,
+	captchaResponse: string,
 ): Promise<{
 	state: Uint8Array;
 	keyExchange2: Uint8Array;
@@ -39,6 +48,7 @@ async function AccountAuthInit(
 	const response = await AuthApiFactory(apiConfig).accountAuthInit({
 		username,
 		params: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
+		captchaResponse,
 	});
 
 	if (response.status !== 200) {
