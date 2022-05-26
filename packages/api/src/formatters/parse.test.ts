@@ -131,9 +131,9 @@ ${HTML_TEXT}`,
 	});
 
 	it('verify image email', async () => {
-		const mimeDetails = parseMimeText(emailWithImage);
-		expect(mimeDetails.childNodes[0].header[0]).toContain('Content-Type: multipart/alternative;');
-		expect(mimeDetails.childNodes[1].header[0]).toContain('Content-Type: image/png;');
+		const verifyMimeDetails = parseMimeText(emailWithImage);
+		expect(verifyMimeDetails.childNodes[0].header[0]).toContain('Content-Type: multipart/alternative;');
+		expect(verifyMimeDetails.childNodes[1].header[0]).toContain('Content-Type: image/png;');
 	});
 });
 

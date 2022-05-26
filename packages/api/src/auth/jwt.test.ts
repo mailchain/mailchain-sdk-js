@@ -2,8 +2,8 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { EncodeBase64, EncodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { getToken, initializeHeader } from './jwt';
 import { KeyRing } from '@mailchain/keyring';
+import { getToken, initializeHeader } from './jwt';
 
 const payload = {
 	m: 'GET',
