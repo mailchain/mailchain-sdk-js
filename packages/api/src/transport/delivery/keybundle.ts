@@ -2,7 +2,7 @@
 import { PublicKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
 import { ED25519KeyExchange } from '@mailchain/crypto/cipher/ecdh';
 import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
-import { protocol } from '../../protobuf/protocol';
+import { protocol } from '../../protobuf/protocol/protocol';
 
 export async function createECDHKeyBundle(
 	recipientMessagingKey: PublicKey,
