@@ -1,4 +1,4 @@
-import { EncodeBase64, EncodeBase64UrlSafe } from '@mailchain/encoding';
+import { EncodeBase64UrlSafe } from '@mailchain/encoding';
 import axios from 'axios';
 import { KeyRing } from '@mailchain/keyring';
 
@@ -11,9 +11,15 @@ export const getToken = async (kr: KeyRing, payload: any, exp: number) => {
 	return `${key}.${EncodeBase64UrlSafe(signature)}`;
 };
 
+let initializedInterceptorId: number | undefined = undefined;
+
 export const initializeHeader = (kr: KeyRing) => {
+	if (initializedInterceptorId != null) {
+		console.warn('Header interceptor already initialized. Will do re-initialization. This should not be the case.');
+		teardownHeaderInitialization();
+	}
 	const expires = Math.floor(Date.now() * 0.001 + 86400);
-	axios.interceptors.request.use(async (request) => {
+	initializedInterceptorId = axios.interceptors.request.use(async (request) => {
 		const url = new URL(request?.url ?? '');
 		const len = !['POST', 'PUT', 'PATCH'].some((m) => m === request.method?.toUpperCase())
 			? 0
@@ -33,4 +39,10 @@ export const initializeHeader = (kr: KeyRing) => {
 		}
 		return request;
 	});
+};
+
+export const teardownHeaderInitialization = () => {
+	if (initializedInterceptorId != null) {
+		axios.interceptors.request.eject(initializedInterceptorId);
+	}
 };
