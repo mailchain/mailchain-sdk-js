@@ -20,6 +20,6 @@ describe('Settings', () => {
 		const date = `${Date.now()}`;
 		setSetting('lastTestDate', date, apiConfig);
 		const data = await getSettings(apiConfig, kr);
-		expect(data['lastTestDate']).toEqual(date);
+		expect(data!['lastTestDate']).toEqual(date);
 	});
 });

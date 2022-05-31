@@ -6,15 +6,20 @@ import {
 	AsED25519PrivateKey,
 } from '@mailchain/crypto/ed25519';
 import { EncodeBase58 } from '@mailchain/encoding/base58';
-import { PublicKey as IPublicKey } from '@mailchain/crypto';
-import { EncodeBase64UrlSafe, EncodeHexZeroX } from '@mailchain/encoding';
-import { DERIVATION_PATH_ENCRYPTION_KEY_ROOT, DERIVATION_PATH_IDENTITY_KEY_ROOT } from './constants';
+import { PublicKey, PrivateKey } from '@mailchain/crypto';
+import { EncodeHexZeroX } from '@mailchain/encoding';
+import {
+	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
+	DERIVATION_PATH_IDENTITY_KEY_ROOT,
+	DERIVATION_PATH_INBOX_ROOT,
+} from './constants';
 
 export class KeyRing {
 	private readonly _accountKey: ED25519PrivateKey;
 	// TODO: this can be removed as a property soon
 	private readonly _mainIdentityKey: ED25519ExtendedPrivateKey;
 	private readonly _rootEncryptionKey: ED25519ExtendedPrivateKey;
+	private readonly _rootInboxKey: ED25519ExtendedPrivateKey;
 	constructor(accountKey: ED25519PrivateKey) {
 		this._accountKey = accountKey;
 		this._mainIdentityKey = DeriveHardenedKey(
@@ -24,6 +29,10 @@ export class KeyRing {
 		this._rootEncryptionKey = DeriveHardenedKey(
 			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
 			DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
+		);
+		this._rootInboxKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
+			DERIVATION_PATH_INBOX_ROOT,
 		);
 	}
 	static async Generate(): Promise<KeyRing> {
@@ -39,7 +48,7 @@ export class KeyRing {
 		return new this(key);
 	}
 
-	createIdentityKeyForPublicKey(key: IPublicKey): ED25519PrivateKey {
+	createIdentityKeyForPublicKey(key: PublicKey): ED25519PrivateKey {
 		return AsED25519PrivateKey(DeriveHardenedKey(this._mainIdentityKey, key.Bytes).PrivateKey);
 	}
 
@@ -55,12 +64,16 @@ export class KeyRing {
 		);
 	}
 
-	rootIdentityPublicKey(): IPublicKey {
+	rootIdentityPublicKey(): PublicKey {
 		return AsED25519PublicKey(this._mainIdentityKey.PrivateKey.PublicKey);
 	}
 
-	rootEncryptionPublicKey(): IPublicKey {
+	rootEncryptionPublicKey(): PublicKey {
 		return AsED25519PublicKey(this._rootEncryptionKey.PrivateKey.PublicKey);
+	}
+
+	rootInboxKey(): PrivateKey {
+		return this._rootInboxKey.PrivateKey;
 	}
 
 	EncodedAddress(): string {

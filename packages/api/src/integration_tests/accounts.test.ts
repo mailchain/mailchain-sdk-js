@@ -35,14 +35,14 @@ describe('accounts', () => {
 		const seed = SecureRandom(32);
 
 		const identityKey = ED25519PrivateKey.FromSeed(seed);
-		const registrationResponse = await Register(seed, username, 'qwerty', apiConfig, config);
-		const loginResponse = await Login(username, 'qwerty', apiConfig, config);
+		const registrationResponse = await Register(seed, username, 'qwerty', 'captcha', apiConfig, config);
+		const loginResponse = await Login(username, 'qwerty', 'captcha', apiConfig, config);
 
 		expect(registrationResponse.clientSecretKey).toEqual(loginResponse.clientSecretKey);
 		expect(identityKey).toEqual(loginResponse.identityKey);
 
 		// login again
-		const secondLoginResponse = await Login(username, 'qwerty', apiConfig, config);
+		const secondLoginResponse = await Login(username, 'qwerty', 'catpcha', apiConfig, config);
 		expect(registrationResponse.clientSecretKey).toEqual(secondLoginResponse.clientSecretKey);
 		expect(identityKey).toEqual(secondLoginResponse.identityKey);
 	});
