@@ -3,3 +3,4 @@ export * from './public';
 export * from './private';
 export * from './rand';
 export * from './hd';
+export * from './cipher';
