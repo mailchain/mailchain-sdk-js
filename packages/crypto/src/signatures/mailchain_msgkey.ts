@@ -3,7 +3,7 @@ import { PublicKey } from '../public';
 import { ED25519PublicKey } from '../ed25519/public';
 import { EncodeHexZeroX } from '@mailchain/encoding';
 import { PrivateKey } from '../private';
-import { ErrorUnsupportedKey } from './errors';
+import { ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 
 function DescriptiveBytesFromPublicKey(key: PublicKey) {
 	const idByte = IdFromPublicKey(key);
@@ -11,8 +11,8 @@ function DescriptiveBytesFromPublicKey(key: PublicKey) {
 }
 
 export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address: string, protocol: string) {
-	if (address.length === 0) return null;
-	if (protocol.length === 0) return null;
+	if (address.length === 0) throw new ErrorAddressIsEmpty();
+	if (protocol.length === 0) throw new ErrorProtocolIsEmpty();
 	let descriptiveKey: Buffer | null = null;
 	// check for type ed25519.PublicKey
 
@@ -23,7 +23,7 @@ export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address:
 		}
 
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 	const encodedKey = EncodeHexZeroX(descriptiveKey);
 
@@ -46,7 +46,7 @@ export function SignMailchainProvidedMessagingKey(
 		}
 
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 	const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
 	return key.Sign(msg as Uint8Array);
@@ -65,7 +65,7 @@ export function VerifyMailchainProvidedMessagingKey(
 		}
 
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 	switch (key.constructor) {
 		case ED25519PublicKey: {
@@ -73,7 +73,7 @@ export function VerifyMailchainProvidedMessagingKey(
 		}
 
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 	const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
 	return key.Verify(msg as Uint8Array, signature);

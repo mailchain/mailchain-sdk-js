@@ -21,7 +21,7 @@
 		"tweetnacl-util": "^0.15.1"
 	},
 	"scripts": {
-		"test": "jest",
+		"test": "jest --runInBand",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
 	}

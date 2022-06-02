@@ -15,6 +15,6 @@ export function VerifyEthereumPersonalMessage(key: PublicKey, message: Buffer, s
 			return ecdsaVerify(signature, Uint8Array.from(personalMessage), key.Bytes);
 
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 }

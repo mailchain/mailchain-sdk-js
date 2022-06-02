@@ -8,9 +8,10 @@ import {
 } from './mailchain_msgkey';
 import { ED25519PrivateKey } from '../ed25519';
 import { EthereumAlice, EthereumBob } from '../../../internal/src/adressing/test.constants';
+import { ErrorUnsupportedKey } from './errors';
 
 describe('TestSignMailchainProvidedMessagingKey()', () => {
-	const key = ED25519PrivateKey.Generate(() =>
+	const key = ED25519PrivateKey.FromSeed(
 		Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32),
 	);
 
@@ -75,7 +76,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 						test.args.address,
 						test.args.protocol,
 					);
-				}).rejects.toThrow('unsupported key');
+				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
 				expect(
 					await SignMailchainProvidedMessagingKey(
@@ -91,7 +92,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 });
 
 describe('TestVerifyMailchainProvidedMessagingKey()', () => {
-	const key = ED25519PrivateKey.Generate(() =>
+	const key = ED25519PrivateKey.FromSeed(
 		Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32),
 	);
 
@@ -182,7 +183,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 
 						test.args.protocol,
 					);
-				}).rejects.toThrow('unsupported key');
+				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
 				expect(
 					await VerifyMailchainProvidedMessagingKey(
@@ -223,7 +224,7 @@ describe('Test_mailchainProvidedMessagingKeyMessage()', () => {
 			if (test.shouldThrow) {
 				expect(async () => {
 					await mailchainProvidedMessagingKeyMessage(test.args.msgKey, test.args.address, test.args.protocol);
-				}).rejects.toThrow('unsupported key');
+				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
 				expect(
 					await mailchainProvidedMessagingKeyMessage(test.args.msgKey, test.args.address, test.args.protocol),

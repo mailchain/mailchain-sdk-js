@@ -18,7 +18,7 @@ export async function SignMailchainUsername(key: PrivateKey, username: Uint8Arra
 			const msg = mailchainUsernameMessage(username);
 			return key.Sign(msg);
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 }
 
@@ -35,6 +35,6 @@ export async function VerifyMailchainUsername(key: PublicKey, username, signatur
 			const msg = mailchainUsernameMessage(username);
 			return key.Verify(msg, signature);
 		default:
-			throw ErrorUnsupportedKey;
+			throw new ErrorUnsupportedKey();
 	}
 }

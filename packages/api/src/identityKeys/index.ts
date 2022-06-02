@@ -1,3 +1,4 @@
 import { claimAddress } from './claimAddress';
+import { verify } from './verify';
 
-export { claimAddress };
+export { claimAddress, verify };
