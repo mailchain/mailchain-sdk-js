@@ -1,4 +1,4 @@
-import { BASE32, BASE58, Encodings, HEX_0X_PREFIX } from '@mailchain/encoding/consts';
+import { EncodingTypes, EncodingType } from '@mailchain/encoding';
 import { Encode } from '@mailchain/encoding/encoding';
 import { Algorand, Ethereum, Substrate } from '../protocols';
 
@@ -21,14 +21,14 @@ export function EncodeAddressByProtocol(address: Uint8Array, protocol: string): 
  * EncodingByProtocol returns the relevant encoding method the protocol commonly uses.
  */
 //
-export function EncodingByProtocol(protocol: string): Encodings {
+export function EncodingByProtocol(protocol: string): EncodingType {
 	switch (protocol) {
 		case Algorand:
-			return BASE32;
+			return EncodingTypes.Base32;
 		case Ethereum:
-			return HEX_0X_PREFIX;
+			return EncodingTypes.Hex0xPrefix;
 		case Substrate:
-			return BASE58;
+			return EncodingTypes.Base58;
 		default:
 			throw new Error('unknown address encoding');
 	}

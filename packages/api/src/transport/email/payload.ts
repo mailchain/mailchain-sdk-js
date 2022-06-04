@@ -1,8 +1,7 @@
 import { MIMEMessage } from 'mimetext';
-import { DecodeBase64 } from '@mailchain/encoding';
+import { DecodeBase64, EncodingTypes } from '@mailchain/encoding';
 import { PrivateKey } from '@mailchain/crypto';
 import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
-import { BASE64 } from '@mailchain/encoding/consts';
 import { PayloadHeaders } from '../content/headers';
 import { Payload } from '../content/payload';
 
@@ -18,7 +17,7 @@ export class EncryptedEmail implements Payload {
 		const raw = DecodeBase64(message.asEncoded());
 
 		const headers: PayloadHeaders = {
-			ContentEncoding: BASE64,
+			ContentEncoding: EncodingTypes.Base64,
 			ContentEncryption: KindNaClSecretKey,
 			ContentLength: raw.length,
 			ContentSignature: await senderIdentityKey.Sign(raw),

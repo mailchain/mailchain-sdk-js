@@ -12,6 +12,7 @@ import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
 	DERIVATION_PATH_INBOX_ROOT,
+	DERIVATION_PATH_MESSAGING_KEY,
 } from './constants';
 
 export class KeyRing {
@@ -20,6 +21,7 @@ export class KeyRing {
 	private readonly _mainIdentityKey: ED25519ExtendedPrivateKey;
 	private readonly _rootEncryptionKey: ED25519ExtendedPrivateKey;
 	private readonly _rootInboxKey: ED25519ExtendedPrivateKey;
+	private readonly _messagingKey: ED25519ExtendedPrivateKey;
 	constructor(accountKey: ED25519PrivateKey) {
 		this._accountKey = accountKey;
 		this._mainIdentityKey = DeriveHardenedKey(
@@ -33,6 +35,10 @@ export class KeyRing {
 		this._rootInboxKey = DeriveHardenedKey(
 			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
 			DERIVATION_PATH_INBOX_ROOT,
+		);
+		this._messagingKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
+			DERIVATION_PATH_MESSAGING_KEY,
 		);
 	}
 	static async Generate(): Promise<KeyRing> {
@@ -70,6 +76,10 @@ export class KeyRing {
 
 	rootEncryptionPublicKey(): PublicKey {
 		return AsED25519PublicKey(this._rootEncryptionKey.PrivateKey.PublicKey);
+	}
+
+	messagingPublicKey(): PublicKey {
+		return AsED25519PublicKey(this._messagingKey.PrivateKey.PublicKey);
 	}
 
 	rootInboxKey(): PrivateKey {

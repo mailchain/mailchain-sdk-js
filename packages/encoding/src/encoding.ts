@@ -1,9 +1,14 @@
 import { DecodeBase58, EncodeBase58 } from './base58';
 import { EncodeBase64UrlSafe } from './base64';
-import { BASE58, BASE64, BASE64URL, Encodings, HEX, HEX_0X_PREFIX } from './consts';
+import { EncodingTypes, EncodingType } from './consts';
 import { DecodeHex, DecodeHexZeroX, EncodeHex, EncodeHexZeroX } from './hex';
+import { DecodeUtf8, EncodeUtf8 } from './utf8';
 
-const errUnsupportedEncoding = new Error('encoding not supported');
+class UnsupportedEncodingError extends Error {
+	constructor(encoding: string) {
+		super(`Encoding [${encoding}] not supported`);
+	}
+}
 
 /**
  * Decode returns the bytes represented by the decoded string src.
@@ -14,16 +19,18 @@ const errUnsupportedEncoding = new Error('encoding not supported');
  * @param src
  * @returns
  */
-export function Decode(encoding: Encodings, src: string): Uint8Array {
+export function Decode(encoding: EncodingType, src: string): Uint8Array {
 	switch (encoding.toLowerCase()) {
-		case BASE58:
+		case EncodingTypes.Base58:
 			return DecodeBase58(src);
-		case HEX:
+		case EncodingTypes.Hex:
 			return DecodeHex(src);
-		case HEX_0X_PREFIX:
+		case EncodingTypes.Hex0xPrefix:
 			return DecodeHexZeroX(src);
+		case EncodingTypes.Utf8:
+			return DecodeUtf8(src);
 		default:
-			throw errUnsupportedEncoding;
+			throw new UnsupportedEncodingError(encoding);
 	}
 }
 
@@ -33,17 +40,19 @@ export function Decode(encoding: Encodings, src: string): Uint8Array {
  * @param src
  * @returns encoded value
  */
-export function Encode(encoding: Encodings, src: Uint8Array): string {
+export function Encode(encoding: EncodingType, src: Uint8Array): string {
 	switch (encoding.toLowerCase()) {
-		case BASE58:
+		case EncodingTypes.Base58:
 			return EncodeBase58(src);
-		case HEX:
+		case EncodingTypes.Hex:
 			return EncodeHex(src);
-		case HEX_0X_PREFIX:
+		case EncodingTypes.Hex0xPrefix:
 			return EncodeHexZeroX(src);
-		case BASE64URL:
+		case EncodingTypes.Base64:
 			return EncodeBase64UrlSafe(src);
+		case EncodingTypes.Utf8:
+			return EncodeUtf8(src);
 		default:
-			throw errUnsupportedEncoding;
+			throw new UnsupportedEncodingError(encoding);
 	}
 }

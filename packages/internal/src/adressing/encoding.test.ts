@@ -1,5 +1,5 @@
 import { DecodeBase58 } from '@mailchain/encoding/base58';
-import { BASE32, BASE58, HEX_0X_PREFIX } from '@mailchain/encoding/consts';
+import { EncodingTypes } from '@mailchain/encoding/consts';
 import { DecodeHex } from '@mailchain/encoding/hex';
 import { EncodeAddressByProtocol, EncodingByProtocol } from './encoding';
 
@@ -10,7 +10,7 @@ describe('EncodingByProtocol', () => {
 			args: {
 				protocol: 'algorand',
 			},
-			expected: BASE32,
+			expected: EncodingTypes.Base32,
 			shouldThrow: false,
 		},
 		{
@@ -18,7 +18,7 @@ describe('EncodingByProtocol', () => {
 			args: {
 				protocol: 'ethereum',
 			},
-			expected: HEX_0X_PREFIX,
+			expected: EncodingTypes.Hex0xPrefix,
 			shouldThrow: false,
 		},
 		{
@@ -26,7 +26,7 @@ describe('EncodingByProtocol', () => {
 			args: {
 				protocol: 'substrate',
 			},
-			expected: BASE58,
+			expected: EncodingTypes.Base58,
 			shouldThrow: false,
 		},
 		{
@@ -60,7 +60,7 @@ describe('EncodeAddressByProtocol', () => {
 				protocol: 'ethereum',
 			},
 			expected: {
-				encoding: HEX_0X_PREFIX,
+				encoding: EncodingTypes.Hex0xPrefix,
 				encoded: '0x5602ea95540bee46d03ba335eed6f49d117eab95c8ab8b71bae2cdd1e564a761',
 			},
 			shouldThrow: false,
@@ -72,7 +72,7 @@ describe('EncodeAddressByProtocol', () => {
 				protocol: 'substrate',
 			},
 			expected: {
-				encoding: BASE58,
+				encoding: EncodingTypes.Base58,
 				encoded: '5DJJhV3tVzsWG1jZfL157azn8iRyDC7HyNG1yh8v2nQYd994',
 			},
 			shouldThrow: false,

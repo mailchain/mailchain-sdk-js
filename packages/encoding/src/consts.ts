@@ -1,16 +1,19 @@
-/**
- * Plain hex encoding value.
- */
-export const HEX = 'hex/plain';
+export const EncodingTypes = {
+	/**
+	 * Plain hex encoding value.
+	 */
+	Hex: 'hex/plain',
+	/**
+	 * 0x prefixed hex encoding
+	 */
+	Hex0xPrefix: 'hex/0x-prefix',
+	Base32: 'base32/plain',
+	Base58: 'base58/plain',
+	Base64: 'base64/plain',
+	Base62Url: 'base64/url',
+	Base58SubstrateAddress: 'base58/ss58-address',
+	MnemonicAlgorand: 'mnemonic/algorand',
+	Utf8: 'text/utf-8',
+} as const;
 
-/**
- * 0x prefixed hex encoding
- */
-export const HEX_0X_PREFIX = 'hex/0x-prefix';
-
-export const BASE32 = 'base32/plain';
-export const BASE58 = 'base58/plain';
-export const BASE64 = 'base64/plain';
-export const BASE64URL = 'base64/url';
-
-export type Encodings = typeof HEX | typeof HEX_0X_PREFIX | typeof BASE32 | typeof BASE58 | typeof BASE64;
+export type EncodingType = typeof EncodingTypes[keyof typeof EncodingTypes];

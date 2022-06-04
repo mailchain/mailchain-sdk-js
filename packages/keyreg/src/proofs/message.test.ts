@@ -1,5 +1,5 @@
 import { PublicKey } from '@mailchain/crypto/public';
-import { Encodings, HEX_0X_PREFIX } from '@mailchain/encoding/consts';
+import { EncodingType, EncodingTypes } from '@mailchain/encoding';
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { CreateProofMessage } from './message';
 import { ProofParams } from './params';
@@ -10,8 +10,8 @@ describe('CreateProofMessage', () => {
 			name: 'simple-v1-en_US',
 			args: {
 				params: {
-					AddressEncoding: HEX_0X_PREFIX,
-					PublicKeyEncoding: HEX_0X_PREFIX,
+					AddressEncoding: EncodingTypes.Hex0xPrefix,
+					PublicKeyEncoding: EncodingTypes.Hex0xPrefix,
 					Locale: 'en_US',
 					Variant: 'simple-v1',
 				} as ProofParams,
@@ -27,8 +27,8 @@ describe('CreateProofMessage', () => {
 			name: 'template-not-found',
 			args: {
 				params: {
-					AddressEncoding: HEX_0X_PREFIX,
-					PublicKeyEncoding: HEX_0X_PREFIX,
+					AddressEncoding: EncodingTypes.Hex0xPrefix,
+					PublicKeyEncoding: EncodingTypes.Hex0xPrefix,
 					Locale: 'en_US',
 					Variant: 'unknown',
 				} as ProofParams,
@@ -43,8 +43,8 @@ describe('CreateProofMessage', () => {
 			name: 'invalid-address-encoding',
 			args: {
 				params: {
-					AddressEncoding: 'invalid' as Encodings,
-					PublicKeyEncoding: HEX_0X_PREFIX,
+					AddressEncoding: 'invalid' as EncodingType,
+					PublicKeyEncoding: EncodingTypes.Hex0xPrefix,
 					Locale: 'en_US',
 					Variant: 'simple-v1',
 				} as ProofParams,
@@ -59,8 +59,8 @@ describe('CreateProofMessage', () => {
 			name: 'invalid-public-key-encoding',
 			args: {
 				params: {
-					AddressEncoding: HEX_0X_PREFIX,
-					PublicKeyEncoding: 'invalid' as Encodings,
+					AddressEncoding: EncodingTypes.Hex0xPrefix,
+					PublicKeyEncoding: 'invalid' as EncodingType,
 					Locale: 'en_US',
 					Variant: 'simple-v1',
 				} as ProofParams,
@@ -75,8 +75,8 @@ describe('CreateProofMessage', () => {
 			name: 'err-public-key',
 			args: {
 				params: {
-					AddressEncoding: HEX_0X_PREFIX,
-					PublicKeyEncoding: HEX_0X_PREFIX,
+					AddressEncoding: EncodingTypes.Hex0xPrefix,
+					PublicKeyEncoding: EncodingTypes.Hex0xPrefix,
 					Locale: 'en_US',
 					Variant: 'simple-v1',
 				} as ProofParams,

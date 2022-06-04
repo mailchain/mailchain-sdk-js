@@ -1,15 +1,15 @@
-import { Encodings, HEX_0X_PREFIX } from '@mailchain/encoding/consts';
+import { EncodingType, EncodingTypes } from '@mailchain/encoding';
 import { EncodingByProtocol } from '@mailchain/internal/adressing/encoding';
 import { Ethereum } from '@mailchain/internal/protocols';
 
 export interface ProofParams {
-	AddressEncoding: Encodings;
-	PublicKeyEncoding: Encodings;
+	AddressEncoding: EncodingType;
+	PublicKeyEncoding: EncodingType;
 	Locale: string;
 	Variant: string;
 }
 
-export function GetLatestProofParams(protocol: string, network: string, locale: string): ProofParams {
+export function getLatestProofParams(protocol: string, network: string, locale: string): ProofParams {
 	const addressEncoding = EncodingByProtocol(protocol);
 
 	if (protocol !== Ethereum) {
@@ -19,8 +19,17 @@ export function GetLatestProofParams(protocol: string, network: string, locale: 
 
 	return {
 		AddressEncoding: addressEncoding,
-		PublicKeyEncoding: HEX_0X_PREFIX, // TODO: create MsgKey encoding
+		PublicKeyEncoding: EncodingTypes.Hex0xPrefix, // TODO: create MsgKey encoding
 		Locale: locale,
 		Variant: 'simple-v1', // TODO: needs to be based on protocol
-	} as ProofParams;
+	};
+}
+
+export function getMailchianUsernameParams(): ProofParams {
+	return {
+		AddressEncoding: EncodingTypes.Utf8,
+		PublicKeyEncoding: EncodingTypes.Hex0xPrefix,
+		Locale: 'en',
+		Variant: 'mailchain-username',
+	};
 }

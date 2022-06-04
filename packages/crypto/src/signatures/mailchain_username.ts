@@ -1,6 +1,5 @@
 import { PrivateKey, PublicKey } from '../';
-import { ED25519PrivateKey, ED25519PublicKey } from '../ed25519';
-import { ErrorUnsupportedKey } from './errors';
+import { signRawEd25519, verifyRawEd25519 } from './raw_ed25119';
 
 const mailchainUsernameMessage = function (message) {
 	const prefix = Buffer.from(`\u0011Mailchain username ownership:\n${message.length}\n`, 'utf-8');
@@ -13,13 +12,7 @@ const mailchainUsernameMessage = function (message) {
  * @param username
  */
 export async function SignMailchainUsername(key: PrivateKey, username: Uint8Array): Promise<Uint8Array> {
-	switch (key.constructor) {
-		case ED25519PrivateKey:
-			const msg = mailchainUsernameMessage(username);
-			return key.Sign(msg);
-		default:
-			throw new ErrorUnsupportedKey();
-	}
+	return signRawEd25519(key, mailchainUsernameMessage(username));
 }
 
 /**
@@ -29,12 +22,10 @@ export async function SignMailchainUsername(key: PrivateKey, username: Uint8Arra
  * @param signature
  * @returns
  */
-export async function VerifyMailchainUsername(key: PublicKey, username, signature: Uint8Array): Promise<boolean> {
-	switch (key.constructor) {
-		case ED25519PublicKey:
-			const msg = mailchainUsernameMessage(username);
-			return key.Verify(msg, signature);
-		default:
-			throw new ErrorUnsupportedKey();
-	}
+export async function VerifyMailchainUsername(
+	key: PublicKey,
+	username: Uint8Array,
+	signature: Uint8Array,
+): Promise<boolean> {
+	return verifyRawEd25519(key, mailchainUsernameMessage(username), signature);
 }
