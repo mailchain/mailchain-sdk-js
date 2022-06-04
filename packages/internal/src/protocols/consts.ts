@@ -10,3 +10,9 @@ export const Ethereum = 'ethereum';
  * Substrate protocol name.
  */
 export const Substrate = 'substrate';
+
+export enum Protocols {
+	Algorand,
+	Ethereum,
+	Substrate,
+}

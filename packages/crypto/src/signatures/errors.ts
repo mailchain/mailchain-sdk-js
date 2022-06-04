@@ -1,15 +1,21 @@
 export class ErrorUnsupportedKey extends Error {
 	constructor() {
-		super('Unsupported key');
+		super('unsupported key');
 	}
 }
 export class ErrorProtocolIsEmpty extends Error {
 	constructor() {
-		super('Protocol Is Empty');
+		super('protocol is empty');
 	}
 }
 export class ErrorAddressIsEmpty extends Error {
 	constructor() {
-		super('Address Is Empty');
+		super('address is empty');
+	}
+}
+
+export class AddressVerificationFailed extends Error {
+	constructor() {
+		super('address verification failed');
 	}
 }
