@@ -2,12 +2,13 @@
 	"name": "@mailchain/api",
 	"private": true,
 	"sideEffects": false,
-	"type": "module",
 	"version": "0.1.0",
+	"type": "module",
 	"dependencies": {
 		"@mailchain/types": "0.1.0",
+		"axios": "^0.26.1",
 		"mimetext": "^2.0.7",
-		"axios": "^0.26.1"
+		"protobufjs": "^6.11.3"
 	},
 	"scripts": {
 		"test": "jest --passWithNoTests --runInBand --testPathIgnorePatterns=/integration_tests/",
@@ -18,7 +19,6 @@
 	},
 	"devDependencies": {
 		"axios-mock-adapter": "^1.20.0",
-		"jest-mock-axios": "^4.6.1",
-		"protobufjs": "^6.11.2"
+		"jest-mock-axios": "^4.6.1"
 	}
 }
