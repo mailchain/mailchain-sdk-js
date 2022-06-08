@@ -1,14 +1,15 @@
 import { EncodeHexZeroX } from '@mailchain/encoding/hex';
 import { BobSECP256K1PublicKey } from '../secp256k1/test.const';
 import { AliceED25519PublicKey, BobED25519PublicKey } from '../ed25519/test.const';
+import { ED25519PrivateKey } from '../ed25519';
+import { EthereumAlice, EthereumBob } from '../../../internal/src/addressing/test.constants';
 import {
 	mailchainProvidedMessagingKeyMessage,
 	SignMailchainProvidedMessagingKey,
 	VerifyMailchainProvidedMessagingKey,
 } from './mailchain_msgkey';
-import { ED25519PrivateKey } from '../ed25519';
-import { EthereumAlice, EthereumBob } from '../../../internal/src/adressing/test.constants';
 import { ErrorUnsupportedKey } from './errors';
+import { protocols } from '@mailchain/internal';
 
 describe('TestSignMailchainProvidedMessagingKey()', () => {
 	const key = ED25519PrivateKey.FromSeed(
@@ -74,7 +75,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 						test.args.key,
 						test.args.msgKey,
 						test.args.address,
-						test.args.protocol,
+						test.args.protocol as protocols.ProtocolType,
 					);
 				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
@@ -83,7 +84,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 						test.args.key,
 						test.args.msgKey,
 						test.args.address,
-						test.args.protocol,
+						test.args.protocol as protocols.ProtocolType,
 					),
 				).toEqual(test.expected);
 			}
@@ -181,7 +182,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 						test.args.signature,
 						test.args.address,
 
-						test.args.protocol,
+						test.args.protocol as protocols.ProtocolType,
 					);
 				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
@@ -192,7 +193,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 						test.args.signature,
 						test.args.address,
 
-						test.args.protocol,
+						test.args.protocol as protocols.ProtocolType,
 					),
 				).toEqual(test.expected);
 			}
@@ -223,11 +224,19 @@ describe('Test_mailchainProvidedMessagingKeyMessage()', () => {
 		it(test.name, async () => {
 			if (test.shouldThrow) {
 				expect(async () => {
-					await mailchainProvidedMessagingKeyMessage(test.args.msgKey, test.args.address, test.args.protocol);
+					await mailchainProvidedMessagingKeyMessage(
+						test.args.msgKey,
+						test.args.address,
+						test.args.protocol as protocols.ProtocolType,
+					);
 				}).rejects.toThrow(new ErrorUnsupportedKey());
 			} else {
 				expect(
-					await mailchainProvidedMessagingKeyMessage(test.args.msgKey, test.args.address, test.args.protocol),
+					await mailchainProvidedMessagingKeyMessage(
+						test.args.msgKey,
+						test.args.address,
+						test.args.protocol as protocols.ProtocolType,
+					),
 				).toEqual(test.expected);
 			}
 		});

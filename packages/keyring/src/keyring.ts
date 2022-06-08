@@ -8,6 +8,7 @@ import {
 import { EncodeBase58 } from '@mailchain/encoding/base58';
 import { PublicKey, PrivateKey } from '@mailchain/crypto';
 import { EncodeHexZeroX } from '@mailchain/encoding';
+import { protocols } from '@mailchain/internal';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
@@ -60,7 +61,7 @@ export class KeyRing {
 
 	createIdentityKeyForAddress(
 		address: Uint8Array,
-		protocol: string,
+		protocol: protocols.ProtocolType,
 		network: string,
 		version = 1,
 	): ED25519PrivateKey {

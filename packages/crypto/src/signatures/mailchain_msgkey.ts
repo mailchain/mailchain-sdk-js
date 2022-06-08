@@ -1,7 +1,8 @@
+import { protocols } from '@mailchain/internal';
+import { EncodeHexZeroX } from '@mailchain/encoding';
 import { IdFromPublicKey } from '../multikey';
 import { PublicKey } from '../public';
 import { ED25519PublicKey } from '../ed25519/public';
-import { EncodeHexZeroX } from '@mailchain/encoding';
 import { PrivateKey } from '../private';
 import { ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 
@@ -10,7 +11,11 @@ function DescriptiveBytesFromPublicKey(key: PublicKey) {
 	return Buffer.from([idByte, ...key.Bytes]);
 }
 
-export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address: string, protocol: string) {
+export function mailchainProvidedMessagingKeyMessage(
+	msgKey: PublicKey,
+	address: string,
+	protocol: protocols.ProtocolType,
+) {
 	if (address.length === 0) throw new ErrorAddressIsEmpty();
 	if (protocol.length === 0) throw new ErrorProtocolIsEmpty();
 	let descriptiveKey: Buffer | null = null;
@@ -38,7 +43,7 @@ export function SignMailchainProvidedMessagingKey(
 	key: PrivateKey,
 	msgKey: PublicKey,
 	address: string,
-	protocol: string,
+	protocol: protocols.ProtocolType,
 ): Promise<Uint8Array> {
 	switch (msgKey.constructor) {
 		case ED25519PublicKey: {
@@ -57,7 +62,7 @@ export function VerifyMailchainProvidedMessagingKey(
 	msgKey: PublicKey,
 	signature: Uint8Array,
 	address: string,
-	protocol: string,
+	protocol: protocols.ProtocolType,
 ): Promise<boolean> {
 	switch (msgKey.constructor) {
 		case ED25519PublicKey: {

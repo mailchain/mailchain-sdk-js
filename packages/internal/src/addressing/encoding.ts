@@ -1,6 +1,6 @@
 import { EncodingTypes, EncodingType } from '@mailchain/encoding';
 import { Encode } from '@mailchain/encoding/encoding';
-import { Algorand, Ethereum, Substrate } from '../protocols';
+import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, ProtocolType, SUBSTRATE } from '../protocols';
 
 /**
  * EncodeAddressByProtocol takes an address as an Uint8Array then selects the relevant encoding method to encode it as string.
@@ -10,7 +10,10 @@ import { Algorand, Ethereum, Substrate } from '../protocols';
  * @param protocol
  * @param string
  */
-export function EncodeAddressByProtocol(address: Uint8Array, protocol: string): { encoded: string; encoding: string } {
+export function EncodeAddressByProtocol(
+	address: Uint8Array,
+	protocol: ProtocolType,
+): { encoded: string; encoding: string } {
 	const encoding = EncodingByProtocol(protocol);
 	const encoded = Encode(encoding, address);
 
@@ -21,15 +24,15 @@ export function EncodeAddressByProtocol(address: Uint8Array, protocol: string): 
  * EncodingByProtocol returns the relevant encoding method the protocol commonly uses.
  */
 //
-export function EncodingByProtocol(protocol: string): EncodingType {
+export function EncodingByProtocol(protocol: ProtocolType): EncodingType {
 	switch (protocol) {
-		case Algorand:
+		case ALGORAND:
 			return EncodingTypes.Base32;
-		case Ethereum:
+		case ETHEREUM:
 			return EncodingTypes.Hex0xPrefix;
-		case Substrate:
+		case SUBSTRATE:
 			return EncodingTypes.Base58;
 		default:
-			throw new Error('unknown address encoding');
+			throw new Error(`unknown address encoding of [${protocol}]. Supported ${ALL_PROTOCOLS}.`);
 	}
 }

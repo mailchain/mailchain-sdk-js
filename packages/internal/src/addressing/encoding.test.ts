@@ -1,6 +1,7 @@
 import { DecodeBase58 } from '@mailchain/encoding/base58';
 import { EncodingTypes } from '@mailchain/encoding/consts';
 import { DecodeHex } from '@mailchain/encoding/hex';
+import { ProtocolType } from '../protocols';
 import { EncodeAddressByProtocol, EncodingByProtocol } from './encoding';
 
 describe('EncodingByProtocol', () => {
@@ -42,10 +43,10 @@ describe('EncodingByProtocol', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					EncodingByProtocol(test.args.protocol);
+					EncodingByProtocol(test.args.protocol as ProtocolType);
 				}).toThrow();
 			} else {
-				expect(EncodingByProtocol(test.args.protocol)).toEqual(test.expected);
+				expect(EncodingByProtocol(test.args.protocol as ProtocolType)).toEqual(test.expected);
 			}
 		});
 	});
@@ -94,10 +95,12 @@ describe('EncodeAddressByProtocol', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					EncodeAddressByProtocol(test.args.address, test.args.protocol);
+					EncodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType);
 				}).toThrow();
 			} else {
-				expect(EncodeAddressByProtocol(test.args.address, test.args.protocol)).toEqual(test.expected);
+				expect(EncodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType)).toEqual(
+					test.expected,
+				);
 			}
 		});
 	});

@@ -1,6 +1,6 @@
 import { EncodingType, EncodingTypes } from '@mailchain/encoding';
-import { EncodingByProtocol } from '@mailchain/internal/adressing/encoding';
-import { Ethereum } from '@mailchain/internal/protocols';
+import { EncodingByProtocol } from '@mailchain/internal/addressing/encoding';
+import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
 
 export interface ProofParams {
 	AddressEncoding: EncodingType;
@@ -9,10 +9,10 @@ export interface ProofParams {
 	Variant: string;
 }
 
-export function getLatestProofParams(protocol: string, network: string, locale: string): ProofParams {
+export function getLatestProofParams(protocol: ProtocolType, network: string, locale: string): ProofParams {
 	const addressEncoding = EncodingByProtocol(protocol);
 
-	if (protocol !== Ethereum) {
+	if (protocol !== ETHEREUM) {
 		// TODO: implement other protocols
 		throw new Error('must be ethereum');
 	}
@@ -25,7 +25,7 @@ export function getLatestProofParams(protocol: string, network: string, locale: 
 	};
 }
 
-export function getMailchianUsernameParams(): ProofParams {
+export function getMailchainUsernameParams(): ProofParams {
 	return {
 		AddressEncoding: EncodingTypes.Utf8,
 		PublicKeyEncoding: EncodingTypes.Hex0xPrefix,

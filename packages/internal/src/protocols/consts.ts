@@ -1,18 +1,17 @@
+// WARNING: CAREFUL WHEN CHANGING THE VALUES OF THIS CONSTANTS, THEY MIGHT BE ALREADY LINKED TO KEY PATHS
+
 /**
  * Algorand protocol name.
  */
-export const Algorand = 'algorand';
+export const ALGORAND = 'algorand' as const;
 /**
  * Ethereum protocol name.
  */
-export const Ethereum = 'ethereum';
+export const ETHEREUM = 'ethereum' as const;
 /**
  * Substrate protocol name.
  */
-export const Substrate = 'substrate';
+export const SUBSTRATE = 'substrate' as const;
 
-export enum Protocols {
-	Algorand,
-	Ethereum,
-	Substrate,
-}
+export const ALL_PROTOCOLS = [ALGORAND, ETHEREUM, SUBSTRATE] as const;
+export type ProtocolType = typeof ALL_PROTOCOLS[number];

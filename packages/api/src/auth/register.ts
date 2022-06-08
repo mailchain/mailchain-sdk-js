@@ -6,7 +6,7 @@ import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
 import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { DecodeBase64, EncodeBase64, EncodeHexZeroX } from '@mailchain/encoding';
-import { getMailchianUsernameParams, CreateProofMessage } from '@mailchain/keyreg';
+import { getMailchainUsernameParams, CreateProofMessage } from '@mailchain/keyreg';
 import { signRawEd25519 } from '@mailchain/crypto/signatures/raw_ed25119';
 import { DecodeUtf8 } from '@mailchain/encoding/utf8';
 import { AuthApiFactory, Configuration } from '../api';
@@ -183,7 +183,7 @@ async function AccountRegisterFinalize(
 	const encryptionKey = ED25519PrivateKey.FromSeed(seed);
 	const encrypter = PrivateKeyEncrypter.FromPrivateKey(encryptionKey);
 
-	const usernameParams = getMailchianUsernameParams();
+	const usernameParams = getMailchainUsernameParams();
 	const usernameProofMessage = CreateProofMessage(
 		usernameParams,
 		DecodeUtf8(username),
