@@ -7,28 +7,56 @@ import {
 } from '@mailchain/crypto/ed25519';
 import { EncodeBase58 } from '@mailchain/encoding/base58';
 import { PublicKey, PrivateKey } from '@mailchain/crypto';
-import { EncodeHexZeroX } from '@mailchain/encoding';
+import { EncodeHex, EncodeHexZeroX } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
 	DERIVATION_PATH_INBOX_ROOT,
-	DERIVATION_PATH_MESSAGING_KEY,
+	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 } from './constants';
+import { EncodeAddressByProtocol } from '@mailchain/internal/addressing';
 
 export class KeyRing {
-	private readonly _accountKey: ED25519PrivateKey;
-	// TODO: this can be removed as a property soon
-	private readonly _mainIdentityKey: ED25519ExtendedPrivateKey;
+	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
 	private readonly _rootEncryptionKey: ED25519ExtendedPrivateKey;
 	private readonly _rootInboxKey: ED25519ExtendedPrivateKey;
-	private readonly _messagingKey: ED25519ExtendedPrivateKey;
+	// used to derive messaging keys for all protocol addresses
+	private readonly _protocolAddressRootMessagingKey: ED25519ExtendedPrivateKey;
+	private readonly _accountMessagingKey: ED25519ExtendedPrivateKey;
+	/**
+	 *
+	 * @param accountKey This key is never stored in the key chain only used to derive other keys.
+	 */
 	constructor(accountKey: ED25519PrivateKey) {
-		this._accountKey = accountKey;
-		this._mainIdentityKey = DeriveHardenedKey(
+		this._accountIdentityKey = DeriveHardenedKey(
 			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
 			DERIVATION_PATH_IDENTITY_KEY_ROOT,
 		);
+
+		// used to derive all messaging keys
+		const rootMessagingKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
+			DERIVATION_PATH_MESSAGING_KEY_ROOT,
+		);
+
+		this._protocolAddressRootMessagingKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(rootMessagingKey.PrivateKey),
+			1,
+		);
+
+		// e.g. bob@mailchain
+		const rootAccountMessagingKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(rootMessagingKey.PrivateKey),
+			'protocol=mailchain',
+		);
+
+		// default to nonce of 1 for now
+		this._accountMessagingKey = DeriveHardenedKey(
+			ED25519ExtendedPrivateKey.FromPrivateKey(rootAccountMessagingKey.PrivateKey),
+			1,
+		);
+
 		this._rootEncryptionKey = DeriveHardenedKey(
 			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
 			DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
@@ -36,10 +64,6 @@ export class KeyRing {
 		this._rootInboxKey = DeriveHardenedKey(
 			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
 			DERIVATION_PATH_INBOX_ROOT,
-		);
-		this._messagingKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
-			DERIVATION_PATH_MESSAGING_KEY,
 		);
 	}
 	static async Generate(): Promise<KeyRing> {
@@ -56,31 +80,34 @@ export class KeyRing {
 	}
 
 	createIdentityKeyForPublicKey(key: PublicKey): ED25519PrivateKey {
-		return AsED25519PrivateKey(DeriveHardenedKey(this._mainIdentityKey, key.Bytes).PrivateKey);
+		return AsED25519PrivateKey(DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey);
 	}
 
-	createIdentityKeyForAddress(
+	createMessagingKeyForAddress(
 		address: Uint8Array,
 		protocol: protocols.ProtocolType,
-		network: string,
-		version = 1,
+		nonce: number,
 	): ED25519PrivateKey {
-		return AsED25519PrivateKey(
-			DeriveHardenedKey(this._mainIdentityKey, `${protocol}.${network}.${EncodeHexZeroX(address)} v${version}`)
-				.PrivateKey,
+		// all addresses are encoded with hex regardless of protocol to ensure consistency
+		const addressKeyRoot = DeriveHardenedKey(
+			this._protocolAddressRootMessagingKey,
+			`protocol=${protocol},address=${EncodeHex(address)}`,
 		);
+
+		// specific for the nonce
+		return DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey;
 	}
 
 	rootIdentityPublicKey(): PublicKey {
-		return AsED25519PublicKey(this._mainIdentityKey.PrivateKey.PublicKey);
+		return AsED25519PublicKey(this._accountIdentityKey.PrivateKey.PublicKey);
 	}
 
 	rootEncryptionPublicKey(): PublicKey {
 		return AsED25519PublicKey(this._rootEncryptionKey.PrivateKey.PublicKey);
 	}
 
-	messagingPublicKey(): PublicKey {
-		return AsED25519PublicKey(this._messagingKey.PrivateKey.PublicKey);
+	accountMessagingPublicKey(): PublicKey {
+		return AsED25519PublicKey(this._accountMessagingKey.PrivateKey.PublicKey);
 	}
 
 	rootInboxKey(): PrivateKey {
@@ -88,13 +115,13 @@ export class KeyRing {
 	}
 
 	EncodedAddress(): string {
-		if (this._mainIdentityKey) {
-			return EncodeBase58(this._mainIdentityKey.PrivateKey.PublicKey.Bytes);
+		if (this._accountIdentityKey) {
+			return EncodeBase58(this._accountIdentityKey.PrivateKey.PublicKey.Bytes);
 		}
 		return '';
 	}
 
 	async SignWithIdentityKey(payload: string): Promise<Uint8Array> {
-		return this._mainIdentityKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
+		return this._accountIdentityKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
 	}
 }
