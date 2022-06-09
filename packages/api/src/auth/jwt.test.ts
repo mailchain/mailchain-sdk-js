@@ -65,7 +65,7 @@ describe('JWT tokens()', () => {
 		initializeHeader(kr);
 
 		const postBody = { scripts: { test: 'jest --passWithNoTests' } };
-		const len = Buffer.byteLength(JSON.stringify(postBody), 'ascii');
+		const len = Buffer.byteLength(JSON.stringify(postBody));
 
 		const payloadPost = {
 			m: 'POST',

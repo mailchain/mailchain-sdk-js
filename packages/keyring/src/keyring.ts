@@ -72,7 +72,7 @@ export class KeyRing {
 		);
 	}
 	static async Generate(): Promise<KeyRing> {
-		// TODO: tempory for testing
+		// TODO: temporary for testing
 		return new this(await ED25519PrivateKey.Generate());
 	}
 

@@ -10,13 +10,12 @@ export interface ProofParams {
 }
 
 export function getLatestProofParams(protocol: ProtocolType, network: string, locale: string): ProofParams {
-	const addressEncoding = encodingByProtocol(protocol);
-
 	if (protocol !== ETHEREUM) {
 		// TODO: implement other protocols
 		throw new Error('must be ethereum');
 	}
 
+	const addressEncoding = encodingByProtocol(protocol);
 	return {
 		AddressEncoding: addressEncoding,
 		PublicKeyEncoding: EncodingTypes.Hex0xPrefix, // TODO: create MsgKey encoding

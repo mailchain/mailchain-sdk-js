@@ -1,5 +1,6 @@
 import { EncodeBase64UrlSafe } from '@mailchain/encoding';
 import axios from 'axios';
+import utils from 'axios/lib/utils';
 import { KeyRing } from '@mailchain/keyring';
 
 export const getToken = async (kr: KeyRing, payload: any, exp: number) => {
@@ -21,9 +22,21 @@ export const initializeHeader = (kr: KeyRing) => {
 	const expires = Math.floor(Date.now() * 0.001 + 86400);
 	initializedInterceptorId = axios.interceptors.request.use(async (request) => {
 		const url = new URL(request?.url ?? '');
-		const len = !['POST', 'PUT', 'PATCH'].some((m) => m === request.method?.toUpperCase())
-			? 0
-			: Buffer.byteLength(JSON.stringify(request.data), 'utf8');
+		let len: number;
+		// Taking code from https://github.com/axios/axios/blob/main/lib/adapters/http.js#L186-L198 to calculate content length how axios does it
+		if (['POST', 'PUT', 'PATCH'].some((m) => m === request.method?.toUpperCase())) {
+			if (Buffer.isBuffer(request.data)) {
+				len = request.data.length;
+			} else if (utils.isArrayBuffer(request.data)) {
+				len = Buffer.byteLength(new Uint8Array(request.data));
+			} else if (utils.isString(request.data)) {
+				len = Buffer.byteLength(request.data, 'utf-8');
+			} else {
+				len = Buffer.byteLength(JSON.stringify(request.data));
+			}
+		} else {
+			len = 0;
+		}
 
 		const payload = {
 			m: request.method?.toUpperCase(),
