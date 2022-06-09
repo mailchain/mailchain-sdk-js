@@ -1,5 +1,5 @@
 import { EncodingType, EncodingTypes } from '@mailchain/encoding';
-import { EncodingByProtocol } from '@mailchain/internal/addressing/encoding';
+import { encodingByProtocol } from '@mailchain/internal/addressing/encoding';
 import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
 
 export interface ProofParams {
@@ -10,7 +10,7 @@ export interface ProofParams {
 }
 
 export function getLatestProofParams(protocol: ProtocolType, network: string, locale: string): ProofParams {
-	const addressEncoding = EncodingByProtocol(protocol);
+	const addressEncoding = encodingByProtocol(protocol);
 
 	if (protocol !== ETHEREUM) {
 		// TODO: implement other protocols

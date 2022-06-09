@@ -2,7 +2,7 @@ import { DecodeBase58 } from '@mailchain/encoding/base58';
 import { EncodingTypes } from '@mailchain/encoding/consts';
 import { DecodeHex } from '@mailchain/encoding/hex';
 import { ProtocolType } from '../protocols';
-import { EncodeAddressByProtocol, EncodingByProtocol } from './encoding';
+import { encodeAddressByProtocol, encodingByProtocol } from './encoding';
 
 describe('EncodingByProtocol', () => {
 	const tests = [
@@ -43,10 +43,10 @@ describe('EncodingByProtocol', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					EncodingByProtocol(test.args.protocol as ProtocolType);
+					encodingByProtocol(test.args.protocol as ProtocolType);
 				}).toThrow();
 			} else {
-				expect(EncodingByProtocol(test.args.protocol as ProtocolType)).toEqual(test.expected);
+				expect(encodingByProtocol(test.args.protocol as ProtocolType)).toEqual(test.expected);
 			}
 		});
 	});
@@ -95,10 +95,10 @@ describe('EncodeAddressByProtocol', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					EncodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType);
+					encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType);
 				}).toThrow();
 			} else {
-				expect(EncodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType)).toEqual(
+				expect(encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType)).toEqual(
 					test.expected,
 				);
 			}

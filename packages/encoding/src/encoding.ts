@@ -1,3 +1,4 @@
+import { DecodeBase32, EncodeBase32 } from './base32';
 import { DecodeBase58, EncodeBase58 } from './base58';
 import { EncodeBase64UrlSafe } from './base64';
 import { EncodingTypes, EncodingType } from './consts';
@@ -29,6 +30,8 @@ export function Decode(encoding: EncodingType, src: string): Uint8Array {
 			return DecodeHexZeroX(src);
 		case EncodingTypes.Utf8:
 			return DecodeUtf8(src);
+		case EncodingTypes.Base32:
+			return DecodeBase32(src);
 		default:
 			throw new UnsupportedEncodingError(encoding);
 	}
@@ -52,6 +55,8 @@ export function Encode(encoding: EncodingType, src: Uint8Array): string {
 			return EncodeBase64UrlSafe(src);
 		case EncodingTypes.Utf8:
 			return EncodeUtf8(src);
+		case EncodingTypes.Base32:
+			return EncodeBase32(src);
 		default:
 			throw new UnsupportedEncodingError(encoding);
 	}

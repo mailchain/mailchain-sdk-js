@@ -1,30 +1,38 @@
 import { EncodingTypes, EncodingType } from '@mailchain/encoding';
-import { Encode } from '@mailchain/encoding/encoding';
+import { Decode, Encode } from '@mailchain/encoding/encoding';
 import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, ProtocolType, SUBSTRATE } from '../protocols';
 
 /**
- * EncodeAddressByProtocol takes an address as an Uint8Array then selects the relevant encoding method to encode it as string.
- * @param address
- * @param param1
- * @param byte
- * @param protocol
- * @param string
+ * Convert address from Uint8Array, selects the relevant encoding method and encodes it as string.
  */
-export function EncodeAddressByProtocol(
+export function encodeAddressByProtocol(
 	address: Uint8Array,
 	protocol: ProtocolType,
 ): { encoded: string; encoding: string } {
-	const encoding = EncodingByProtocol(protocol);
+	const encoding = encodingByProtocol(protocol);
 	const encoded = Encode(encoding, address);
 
 	return { encoded, encoding };
 }
 
 /**
+ * Convert address from string, selects the relevant encoding method and decodes it as Uint8Array.
+ */
+export function decodeAddressByProtocol(
+	address: string,
+	protocol: ProtocolType,
+): { decoded: Uint8Array; encoding: string } {
+	const encoding = encodingByProtocol(protocol);
+	const decoded = Decode(encoding, address);
+
+	return { decoded, encoding };
+}
+
+/**
  * EncodingByProtocol returns the relevant encoding method the protocol commonly uses.
  */
 //
-export function EncodingByProtocol(protocol: ProtocolType): EncodingType {
+export function encodingByProtocol(protocol: ProtocolType): EncodingType {
 	switch (protocol) {
 		case ALGORAND:
 			return EncodingTypes.Base32;

@@ -1,5 +1,5 @@
 import { ProtocolType } from '../protocols';
-import { EncodeAddressByProtocol } from './encoding';
+import { encodeAddressByProtocol } from './encoding';
 
 /**
  * @param address the wallet address in raw non-encoded format
@@ -18,7 +18,7 @@ export function formatMailLike(
 	const encodedAddress =
 		typeof maybeEncodedAddress === 'string'
 			? maybeEncodedAddress
-			: EncodeAddressByProtocol(maybeEncodedAddress, protocol).encoded;
+			: encodeAddressByProtocol(maybeEncodedAddress, protocol).encoded;
 	if (network) {
 		return `${encodedAddress}@${network}.${protocol}.mailchain`;
 	}
