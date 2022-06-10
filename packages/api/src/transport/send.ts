@@ -1,35 +1,61 @@
-import { PublicKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
+import { RandomFunction, SecureRandom } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase64, EncodeHex } from '@mailchain/encoding';
-import { protocol } from '../protobuf/protocol';
-import { Configuration, TransportApi } from '../api';
+import { protocol } from '../protobuf/protocol/protocol';
+import { Configuration, PublicKey, TransportApi } from '../api';
+import { getPublicKeyFromApiResponse, lookupMessageKey } from '../identityKeys';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
 import { Payload } from './content/payload';
 import { Serialize } from './content/serialization';
 import { createDelivery } from './delivery/delivery';
+import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
 
-export interface Recipient {
+interface RecipientByKey {
 	/**
 	 * key that is used for messaging
 	 */
 	messagingKey: PublicKey;
 }
 
-/**
- * Sends a message to multiple recipients
- */
+interface RecipientByAddress {
+	/**
+	 * key that is used for messaging
+	 */
+	address: string;
+	protocol: string;
+}
+
+export type Recipient = RecipientByKey | RecipientByAddress;
 export const sendPayload = async (
+	apiConfiguration: Configuration,
 	payload: Payload,
 	recipients: Recipient[],
 	// senderIdentityKey: PrivateKey,
 	rand: RandomFunction = SecureRandom,
 ) => {
-	const api = new TransportApi(
-		new Configuration({
-			// basePath: staticConfig.url,
-		}),
-	);
+	const recipientsList: RecipientByKey[] = (
+		await Promise.all(
+			recipients.map((r) => {
+				return 'address' in r ? lookupMessageKey(apiConfiguration, r.address) : r.messagingKey;
+			}),
+		)
+	).map<RecipientByKey>((messagingKey) => ({ messagingKey: messagingKey as PublicKey }));
+
+	return sendPayloadInternal(apiConfiguration, payload, recipientsList, rand);
+};
+
+/**
+ * Sends a message to multiple recipients
+ */
+const sendPayloadInternal = async (
+	apiConfiguration: Configuration,
+	payload: Payload,
+	recipients: RecipientByKey[],
+	// senderIdentityKey: PrivateKey,
+	rand: RandomFunction = SecureRandom,
+) => {
+	const api = new TransportApi(apiConfiguration);
 
 	// const payload = await prepareMessage(subject, senderIdentityKey); TODO: move somewhere
 
@@ -41,25 +67,32 @@ export const sendPayload = async (
 	const serializedContent = Serialize(encryptedPayload);
 
 	const postMessageResponse = await api.postPayload(Array.from(serializedContent));
-	// const now = new Date(Date.now());
-	// expires: new Date(now.setMonth(now.getMonth() + 8)).toISOString(),
-	// });
 
-	const messageURI = postMessageResponse.headers['messageLocation'];
+	const messageURI = postMessageResponse.headers['location'];
+	if (!messageURI) throw new Error();
+	return Promise.all(
+		recipients.map(({ messagingKey }) => {
+			return createDelivery(
+				getPublicKeyFromApiResponse(messagingKey),
+				payloadRootEncryptionKey,
+				messageURI,
+				rand,
+			).then(async (deliveryCreated) => {
+				// TODO: prepend messaging key ID.
 
-	const encodedDeliveries = Array<Uint8Array>(recipients.length);
-	for (let i = 0; i < recipients.length; i++) {
-		// TODO: decide key exchange
-		const delivery = await createDelivery(recipients[i].messagingKey, payloadRootEncryptionKey, messageURI, rand);
-		const encodedDelivery = protocol.Delivery.encode(delivery).finish();
-		// TODO: prepend encoding ID.
-		encodedDeliveries[i] = encodedDelivery;
-	}
-	// TODO: more robust
-	encodedDeliveries.forEach((value: Uint8Array, index: number) => {
-		api.postDeliveryRequest({
-			encryptedDeliveryRequest: EncodeBase64(value),
-			recipientMessagingKey: EncodeHex(recipients[index].messagingKey.Bytes),
-		});
-	});
+				const encodedDelivery = protocol.Delivery.encode(deliveryCreated).finish();
+
+				await api
+					.postDeliveryRequest({
+						encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
+						recipientMessagingKey: EncodeHex(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
+					})
+					.catch((err) => ({
+						status: 'error',
+						err,
+					}));
+				return deliveryCreated;
+			});
+		}),
+	);
 };

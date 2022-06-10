@@ -13,7 +13,7 @@ import { protocols } from '@mailchain/internal';
 
 describe('TestSignMailchainProvidedMessagingKey()', () => {
 	const key = ED25519PrivateKey.FromSeed(
-		Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32),
+		new Uint8Array(Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32)),
 	);
 
 	const tests = [
@@ -94,7 +94,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 
 describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 	const key = ED25519PrivateKey.FromSeed(
-		Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32),
+		new Uint8Array(Buffer.from('master-key-rand-func-0123456789-0123456789', 'utf-8').slice(0, 32)),
 	);
 
 	const tests = [

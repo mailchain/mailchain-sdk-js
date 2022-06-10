@@ -1,4 +1,6 @@
+import { KindNaClSecretKey } from '@mailchain/crypto';
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
+import { EncodingTypes } from '@mailchain/encoding';
 import { PayloadHeaders, SerializablePayloadHeaders } from './headers';
 
 describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
@@ -11,8 +13,8 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 				Created: new Date(1000),
 				ContentLength: 5000,
 				ContentType: 'message/x.mailchain',
-				ContentEncoding: 'base64/plain',
-				ContentEncryption: 'nacl-secret-key',
+				ContentEncoding: EncodingTypes.Base64,
+				ContentEncryption: KindNaClSecretKey,
 			} as PayloadHeaders,
 			expected: {
 				headers: {
@@ -21,8 +23,8 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 					Created: new Date(1000),
 					ContentLength: 5000,
 					ContentType: 'message/x.mailchain',
-					ContentEncoding: 'base64/plain',
-					ContentEncryption: 'nacl-secret-key',
+					ContentEncoding: EncodingTypes.Base64,
+					ContentEncryption: KindNaClSecretKey,
 				},
 			},
 			shouldThrow: false,
@@ -53,8 +55,8 @@ describe('SerializablePayloadHeaders.ToBuffer', () => {
 				Created: new Date(1000),
 				ContentLength: 5000,
 				ContentType: 'message/x.mailchain',
-				ContentEncoding: 'base64/plain',
-				ContentEncryption: 'nacl-secret-key',
+				ContentEncoding: EncodingTypes.Base64,
+				ContentEncryption: KindNaClSecretKey,
 			} as PayloadHeaders),
 			expected: `Content-Encoding: base64/plain\r\nContent-Encryption: nacl-secret-key\r\nContent-Length: 5000\r\nContent-Signature: data=AAECAwQFBgcI; alg=ed25519\r\nContent-Type: message/x.mailchain\r\nCreated: 1970-01-01T00:00:01.000Z\r\nOrigin: data=cjyqI6W1Ea9a17fvYHbkFKt+danckQ6mDkF6K3cKVnE=; alg=ed25519`,
 			shouldThrow: false,
@@ -86,8 +88,8 @@ describe('SerializablePayloadHeaders.FromBuffer', () => {
 				Created: new Date(1000),
 				ContentLength: 5000,
 				ContentType: 'message/x.mailchain',
-				ContentEncoding: 'base64/plain',
-				ContentEncryption: 'nacl-secret-key',
+				ContentEncoding: EncodingTypes.Base64,
+				ContentEncryption: KindNaClSecretKey,
 			} as PayloadHeaders),
 			shouldThrow: false,
 		},

@@ -8,7 +8,6 @@ export function CreateProofMessage(params: ProofParams, address: Uint8Array, msg
 	const encodedAddress = Encode(params.AddressEncoding, address);
 	const descriptivePublicKey = EncodePublicKey(msgKey);
 	const encodedPublicKey = Encode(params.PublicKeyEncoding, descriptivePublicKey);
-
 	const templateMessageFunc = getTemplate(params);
 
 	return templateMessageFunc(encodedAddress, encodedPublicKey, nonce);

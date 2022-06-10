@@ -19,3 +19,9 @@ export class AddressVerificationFailed extends Error {
 		super('address verification failed');
 	}
 }
+
+export class PublicKeyNotFoundFailed extends Error {
+	constructor() {
+		super('mailchain public key not found');
+	}
+}

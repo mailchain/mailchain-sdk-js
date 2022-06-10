@@ -6,7 +6,7 @@ export interface Address {
 	value: string;
 }
 export interface NewMessageFormValues {
-	type: 'reply' | 'reply-all' | 'forward';
+	type?: 'reply' | 'reply-all' | 'forward';
 	from: Address;
 	recipients: Address[];
 	carbonCopyRecipients: Address[];
@@ -15,14 +15,14 @@ export interface NewMessageFormValues {
 	subject: string;
 }
 
-export const getMimeMessage = async (values: NewMessageFormValues) => {
+export const getMimeMessage = (values: NewMessageFormValues): string => {
 	const msg = createMimeMessage();
 	msg.setSender({ name: values.from.label, addr: values.from.value });
 	values.recipients.forEach((rec) => {
 		msg.setRecipient({ name: rec.label, addr: rec.value });
 	});
-	msg.setSubject(values.type);
+	msg.setSubject(values.subject);
 	msg.setMessage('text/plain', values.message.map((n) => Node.string(n)).join('\n'));
 
-	return msg;
+	return msg.asRaw();
 };

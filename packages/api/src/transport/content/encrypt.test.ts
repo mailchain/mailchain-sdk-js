@@ -1,3 +1,4 @@
+import { KindNaClSecretKey } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { encryptBuffer, encryptChunks, encryptPayload } from './encrypt';
@@ -97,7 +98,7 @@ describe('encryptPayload', () => {
 					ContentLength: 5000,
 					ContentType: 'message/x.mailchain',
 					ContentEncoding: 'base64/plain',
-					ContentEncryption: 'nacl-secret-key',
+					ContentEncryption: KindNaClSecretKey,
 				} as PayloadHeaders,
 			} as Payload,
 			privateKey: ED25519ExtendedPrivateKey.FromPrivateKey(AliceED25519PrivateKey),

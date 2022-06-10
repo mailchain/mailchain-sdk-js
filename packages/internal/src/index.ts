@@ -1,4 +1,2 @@
-import * as protocols from './protocols';
-import * as addressing from './addressing';
-
-export { protocols, addressing };
+export * as protocols from './protocols';
+export * as addressing from './addressing';

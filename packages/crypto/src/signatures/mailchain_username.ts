@@ -2,7 +2,7 @@ import { PrivateKey, PublicKey } from '../';
 import { signRawEd25519, verifyRawEd25519 } from './raw_ed25119';
 
 const mailchainUsernameMessage = function (message) {
-	const prefix = Buffer.from(`\u0011Mailchain username ownership:\n${message.length}\n`, 'utf-8');
+	const prefix = Buffer.from(`\x11Mailchain username ownership:\n${message.length}\n`, 'utf-8');
 	return Buffer.concat([prefix, message]);
 };
 

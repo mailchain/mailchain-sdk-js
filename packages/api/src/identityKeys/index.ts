@@ -1,5 +1,4 @@
-import { claimAddress } from './claimAddress';
-import { verify } from './verify';
-
-export { getAddressNonce } from './addressNonce';
-export { claimAddress, verify };
+export * from './claimAddress';
+export * from './verify';
+export * from './lookup';
+export * from './addressNonce';

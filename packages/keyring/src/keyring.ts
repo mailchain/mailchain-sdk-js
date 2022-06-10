@@ -141,4 +141,8 @@ export class KeyRing {
 	async SignWithIdentityKey(payload: string): Promise<Uint8Array> {
 		return this._accountIdentityKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
 	}
+
+	async SignWithMessageKey(payload: string): Promise<Uint8Array> {
+		return this._accountMessagingKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
+	}
 }
