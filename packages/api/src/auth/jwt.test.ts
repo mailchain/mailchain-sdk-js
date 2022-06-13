@@ -3,7 +3,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { EncodeBase64, EncodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { getToken, initializeHeader } from './jwt';
+import { getAxiosWithSigner, getToken } from './jwt';
 
 const payload = {
 	m: 'GET',
@@ -38,7 +38,6 @@ describe('JWT tokens()', () => {
 		const mock = new MockAdapter(axios);
 
 		const kr = new KeyRing(AliceED25519PrivateKey);
-		initializeHeader(kr);
 
 		const payloadGet = {
 			m: 'GET',
@@ -53,7 +52,7 @@ describe('JWT tokens()', () => {
 			conf.headers,
 		]);
 
-		return axios
+		return getAxiosWithSigner(kr.accountMessagingKey())
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
@@ -66,7 +65,6 @@ describe('JWT tokens()', () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 		const kr = new KeyRing(AliceED25519PrivateKey);
-		initializeHeader(kr);
 
 		const postBody = { scripts: { test: 'jest --passWithNoTests' } };
 		const len = Buffer.byteLength(JSON.stringify(postBody));
@@ -81,11 +79,13 @@ describe('JWT tokens()', () => {
 		const token = await getToken(kr.accountMessagingKey(), payloadPost, time);
 		mock.onPost(`https://${payloadPost.aud}${payloadPost.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody).then((response) => {
-			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
-			);
-		});
+		return getAxiosWithSigner(kr.accountMessagingKey())
+			.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody)
+			.then((response) => {
+				expect(response.data.Authorization).toEqual(
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+				);
+			});
 	});
 
 	it('verify axios request signed with message key', async () => {
@@ -93,7 +93,6 @@ describe('JWT tokens()', () => {
 		const mock = new MockAdapter(axios);
 
 		const kr = new KeyRing(AliceED25519PrivateKey);
-		initializeHeader(kr);
 
 		const putBody = { dependencies: { axios: '^0.26.1' } };
 		const len = Buffer.byteLength(JSON.stringify(putBody), 'ascii');
@@ -108,7 +107,7 @@ describe('JWT tokens()', () => {
 		const token = await getToken(kr.accountMessagingKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios
+		return getAxiosWithSigner(kr.accountMessagingKey())
 			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody, {
 				params: { searchText: 'id=23&topic=main' },
 			})
@@ -124,7 +123,6 @@ describe('JWT tokens()', () => {
 		const mock = new MockAdapter(axios);
 
 		const kr = new KeyRing(AliceED25519PrivateKey);
-		initializeHeader(kr);
 
 		const putBody = { dependencies: { axios: '^0.26.1' } };
 		const len = Buffer.byteLength(JSON.stringify(putBody), 'ascii');
@@ -139,11 +137,13 @@ describe('JWT tokens()', () => {
 		const token = await getToken(kr.accountIdentityKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody).then((response) => {
-			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
-			);
-		});
+		return getAxiosWithSigner(kr.accountMessagingKey())
+			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody)
+			.then((response) => {
+				expect(response.data.Authorization).toEqual(
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+				);
+			});
 	});
 
 	it('verify axios request PATCH', async () => {
@@ -151,7 +151,6 @@ describe('JWT tokens()', () => {
 		const mock = new MockAdapter(axios);
 
 		const kr = new KeyRing(AliceED25519PrivateKey);
-		initializeHeader(kr);
 
 		const patchBody = { dependencies: { axios: '^0.9.1' } };
 		const len = Buffer.byteLength(JSON.stringify(patchBody), 'ascii');
@@ -166,10 +165,12 @@ describe('JWT tokens()', () => {
 		const token = await getToken(kr.accountMessagingKey(), payloadPatch, time);
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody).then((response) => {
-			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
-			);
-		});
+		return getAxiosWithSigner(kr.accountMessagingKey())
+			.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody)
+			.then((response) => {
+				expect(response.data.Authorization).toEqual(
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+				);
+			});
 	});
 });

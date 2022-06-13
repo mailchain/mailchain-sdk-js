@@ -1,25 +1,24 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { EncodeBase64 } from '@mailchain/encoding';
-import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
 import { getSettings, setSetting } from '../user/settings';
 import { Configuration, ConfigurationParameters } from '../api';
+import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 
 const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as ConfigurationParameters);
-const kr = new KeyRing(AliceED25519PrivateKey);
+
 describe('Settings', () => {
 	afterAll(() => jest.resetAllMocks());
-
+	const kr = new KeyRing(ED25519PrivateKey.Generate());
 	it('get settings', async () => {
 		const data = await getSettings(apiConfig, kr);
 		expect(data).toBeDefined();
+		expect(data!['theme'].value).toEqual('system');
+		expect(data!['theme'].isSet).toBeFalsy();
 	});
 
 	it('set settings', async () => {
-		const date = `${Date.now()}`;
-		setSetting('lastTestDate', date, apiConfig);
+		setSetting('theme', 'dark', apiConfig, kr);
 		const data = await getSettings(apiConfig, kr);
-		expect(data!['lastTestDate']).toEqual(date);
+		expect(data!['theme'].value).toEqual('dark');
+		expect(data!['theme'].isSet).toBeTruthy();
 	});
 });
