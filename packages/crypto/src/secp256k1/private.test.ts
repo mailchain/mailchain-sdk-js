@@ -43,7 +43,7 @@ describe('new()', () => {
 					new SECP256K1PrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(new SECP256K1PrivateKey(test.arg)).toEqual(test.expected);
+				expect(new SECP256K1PrivateKey(test.arg)).toEqual(test.expected!);
 			}
 		});
 	});
@@ -141,7 +141,7 @@ describe('generate', () => {
 					SECP256K1PrivateKey.Generate(test.rand);
 				}).toThrow();
 			} else {
-				expect(SECP256K1PrivateKey.Generate(test.rand)).toEqual(test.expected);
+				expect(SECP256K1PrivateKey.Generate(test.rand)).toEqual(test.expected!);
 			}
 		});
 	});

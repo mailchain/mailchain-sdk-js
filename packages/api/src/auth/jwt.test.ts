@@ -24,7 +24,11 @@ describe('JWT tokens()', () => {
 
 	it('verify signing', async () => {
 		expect.assertions(1);
-		const jwtTokenForAlice = await getToken(new KeyRing(AliceED25519PrivateKey), payload, MS_IN_DATE);
+		const jwtTokenForAlice = await getToken(
+			new KeyRing(AliceED25519PrivateKey).accountIdentityKey(),
+			payload,
+			MS_IN_DATE,
+		);
 
 		expect(jwtTokenForAlice).toEqual(expectedTokenForAlice);
 	});
@@ -43,7 +47,7 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr, payloadGet, time);
+		const token = await getToken(kr.accountMessagingKey(), payloadGet, time);
 		mock.onGet(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } }).reply((conf) => [
 			200,
 			conf.headers,
@@ -53,7 +57,7 @@ describe('JWT tokens()', () => {
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
 				);
 			});
 	});
@@ -69,19 +73,50 @@ describe('JWT tokens()', () => {
 
 		const payloadPost = {
 			m: 'POST',
-			url: '/posts/1/comments/23',
+			url: '/user/1/comments/23',
 			len,
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr, payloadPost, time);
+		const token = await getToken(kr.accountMessagingKey(), payloadPost, time);
 		mock.onPost(`https://${payloadPost.aud}${payloadPost.url}`).reply((conf) => [200, conf.headers]);
 
 		return axios.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody).then((response) => {
 			expect(response.data.Authorization).toEqual(
-				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
+				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
 			);
 		});
+	});
+
+	it('verify axios request signed with message key', async () => {
+		expect.assertions(1);
+		const mock = new MockAdapter(axios);
+
+		const kr = new KeyRing(AliceED25519PrivateKey);
+		initializeHeader(kr);
+
+		const putBody = { dependencies: { axios: '^0.26.1' } };
+		const len = Buffer.byteLength(JSON.stringify(putBody), 'ascii');
+
+		const payloadPut = {
+			m: 'PUT',
+			url: '/transport/delivery-requests',
+			len,
+			aud: 'google.com',
+		};
+
+		const token = await getToken(kr.accountMessagingKey(), payloadPut, time);
+		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
+
+		return axios
+			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody, {
+				params: { searchText: 'id=23&topic=main' },
+			})
+			.then((response) => {
+				expect(response.data.Authorization).toEqual(
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountMessagingKey().publicKey.Bytes)}`,
+				);
+			});
 	});
 
 	it('verify axios request PUT', async () => {
@@ -96,23 +131,19 @@ describe('JWT tokens()', () => {
 
 		const payloadPut = {
 			m: 'PUT',
-			url: '/posts/1/comments/23',
+			url: '/user/1/comments/23',
 			len,
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr, payloadPut, time);
+		const token = await getToken(kr.accountIdentityKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios
-			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody, {
-				params: { searchText: 'id=23&topic=main' },
-			})
-			.then((response) => {
-				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
-				);
-			});
+		return axios.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody).then((response) => {
+			expect(response.data.Authorization).toEqual(
+				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+			);
+		});
 	});
 
 	it('verify axios request PATCH', async () => {
@@ -127,22 +158,18 @@ describe('JWT tokens()', () => {
 
 		const payloadPatch = {
 			m: 'PATCH',
-			url: '/posts/1/comments/23/reactions/likes',
+			url: '/user/1/comments/23/reactions/likes',
 			len,
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr, payloadPatch, time);
+		const token = await getToken(kr.accountMessagingKey(), payloadPatch, time);
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);
 
-		return axios
-			.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody, {
-				params: { searchText: 'count=55' },
-			})
-			.then((response) => {
-				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.rootIdentityPublicKey().Bytes)}`,
-				);
-			});
+		return axios.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody).then((response) => {
+			expect(response.data.Authorization).toEqual(
+				`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+			);
+		});
 	});
 });

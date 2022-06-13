@@ -54,7 +54,9 @@ describe('fromSeed()', () => {
 					ED25519PrivateKey.FromSeed(test.arg);
 				}).toThrow();
 			} else {
-				expect(ED25519PrivateKey.FromSeed(test.arg)).toEqual(test.expected);
+				const { ...expected } = test.expected!;
+
+				expect(ED25519PrivateKey.FromSeed(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});
@@ -102,7 +104,9 @@ describe('fromSeed()', () => {
 					ED25519PrivateKey.FromSecretKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(ED25519PrivateKey.FromSecretKey(test.arg)).toEqual(test.expected);
+				const { ...expected } = test.expected!;
+
+				expect(ED25519PrivateKey.FromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});
@@ -159,7 +163,8 @@ describe('new()', () => {
 					new ED25519PrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(new ED25519PrivateKey(test.arg)).toEqual(test.expected);
+				const { ...expected } = test.expected!;
+				expect(new ED25519PrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});
@@ -220,7 +225,8 @@ describe('public-key', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			expect(test.privKey.PublicKey).toEqual(test.expected);
+			const { ...expected } = test.expected!;
+			expect(test.privKey.PublicKey).toEqual(expect.objectContaining(expected));
 		});
 	});
 });
@@ -261,7 +267,8 @@ describe('generate', () => {
 				}).toThrow();
 			} else {
 				const actual = ED25519PrivateKey.Generate(test.rand);
-				expect(actual).toEqual(test.expected);
+				const { Sign, ...expected } = test.expected!;
+				expect(actual).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});

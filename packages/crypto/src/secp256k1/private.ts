@@ -22,7 +22,6 @@ export class SECP256K1PrivateKey implements PrivateKey {
 	static Generate(rand: RandomFunction = SecureRandom): SECP256K1PrivateKey {
 		return new this(rand(PrivateKeyLen));
 	}
-
 	async Sign(message: Uint8Array): Promise<Uint8Array> {
 		// sign as an ethereum personal message
 		const messageToVerify = DecodeHexZeroX(hashMessage(message));

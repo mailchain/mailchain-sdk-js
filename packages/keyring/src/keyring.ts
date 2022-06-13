@@ -1,10 +1,4 @@
-import {
-	ED25519PrivateKey,
-	DeriveHardenedKey,
-	ED25519ExtendedPrivateKey,
-	AsED25519PublicKey,
-	AsED25519PrivateKey,
-} from '@mailchain/crypto/ed25519';
+import { ED25519PrivateKey, DeriveHardenedKey, ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase58 } from '@mailchain/encoding/base58';
 import { PublicKey, PrivateKey, Encrypter, Decrypter, PublicKeyEncrypter, PublicKeyDecrypter } from '@mailchain/crypto';
 import { EncodeHex } from '@mailchain/encoding';
@@ -16,6 +10,7 @@ import {
 	DERIVATION_PATH_USER_PROFILE,
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 } from './constants';
+import { KeyFunctions } from './address';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -85,7 +80,7 @@ export class KeyRing {
 	}
 
 	createIdentityKeyForPublicKey(key: PublicKey): ED25519PrivateKey {
-		return AsED25519PrivateKey(DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey);
+		return DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey;
 	}
 
 	createMessagingKeyForAddress(
@@ -103,16 +98,8 @@ export class KeyRing {
 		return DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey;
 	}
 
-	rootIdentityPublicKey(): PublicKey {
-		return AsED25519PublicKey(this._accountIdentityKey.PrivateKey.PublicKey);
-	}
-
 	rootEncryptionPublicKey(): PublicKey {
-		return AsED25519PublicKey(this._rootEncryptionKey.PrivateKey.PublicKey);
-	}
-
-	accountMessagingPublicKey(): PublicKey {
-		return AsED25519PublicKey(this._accountMessagingKey.PrivateKey.PublicKey);
+		return this._rootEncryptionKey.PrivateKey.PublicKey;
 	}
 
 	rootInboxKey(): PrivateKey {
@@ -138,11 +125,19 @@ export class KeyRing {
 		};
 	}
 
-	async SignWithIdentityKey(payload: string): Promise<Uint8Array> {
-		return this._accountIdentityKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
-	}
+	accountMessagingKey = (): KeyFunctions => {
+		const key = this._accountIdentityKey.PrivateKey;
+		return {
+			sign: key.Sign.bind(this),
+			publicKey: key.PublicKey,
+		};
+	};
 
-	async SignWithMessageKey(payload: string): Promise<Uint8Array> {
-		return this._accountMessagingKey.PrivateKey.Sign(Buffer.from(payload, 'utf8'));
-	}
+	accountIdentityKey = (): KeyFunctions => {
+		const key = this._accountIdentityKey.PrivateKey;
+		return {
+			sign: key.Sign.bind(this),
+			publicKey: key.PublicKey,
+		};
+	};
 }

@@ -67,7 +67,7 @@ describe('DecodePublicKey()', () => {
 					DecodePublicKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(DecodePublicKey(test.arg)).toEqual(test.expected);
+				expect(DecodePublicKey(test.arg)).toEqual(test.expected!);
 			}
 		});
 	});
@@ -135,7 +135,9 @@ describe('DecodePrivateKey()', () => {
 					DecodePrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(DecodePrivateKey(test.arg)).toEqual(test.expected);
+				const { Sign, ...expected } = test.expected!;
+
+				expect(DecodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});

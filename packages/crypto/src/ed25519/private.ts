@@ -41,9 +41,9 @@ export class ED25519PrivateKey implements PrivateKey {
 		return this.FromSeed(rand(SeedLength));
 	}
 
-	async Sign(message: Uint8Array): Promise<Uint8Array> {
+	Sign = async (message: Uint8Array): Promise<Uint8Array> => {
 		return ed25519Sign(message, this.KeyPair);
-	}
+	};
 }
 
 export function AsED25519PrivateKey(key: PrivateKey): ED25519PrivateKey {

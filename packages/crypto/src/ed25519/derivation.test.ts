@@ -115,7 +115,9 @@ describe('Derive()', () => {
 			for (const path of test.args.path) {
 				extendedKey = DeriveHardenedKey(extendedKey, path);
 			}
-			expect(extendedKey.PrivateKey).toEqual(test.expected);
+			const { Sign, ...expected } = test.expected!;
+
+			expect(extendedKey.PrivateKey).toEqual(expect.objectContaining(expected));
 		});
 	});
 });
