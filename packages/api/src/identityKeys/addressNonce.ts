@@ -30,7 +30,7 @@ export async function _getAddressNonce(
 	try {
 		const { identityKey } = await identityKeysApi.getIdentityKey(address, protocol).then((res) => res.data);
 
-		return await messagingKeysApi.getIdentityKeyNonce('0x' + identityKey!).then((res) => res.data.nonce ?? 0);
+		return await messagingKeysApi.getIdentityKeyNonce(identityKey!).then((res) => res.data.nonce ?? 0);
 	} catch (e) {
 		if (axios.isAxiosError(e)) {
 			if (e.response?.status === 404) return 0; // in case of 404 for identity key, current nonce of 0 is expected

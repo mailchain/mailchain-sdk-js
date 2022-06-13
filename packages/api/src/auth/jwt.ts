@@ -24,7 +24,7 @@ export const initializeHeader = (keyRing: KeyRing) => {
 	initializedInterceptorId = axios.interceptors.request.use(async (request) => {
 		const requestKey = getKeyFromRequest(request, keyRing);
 		if (!requestKey) {
-			console.log('no requrest key');
+			// No signing of request required, returning unmodified request
 			return request;
 		}
 

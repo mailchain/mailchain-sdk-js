@@ -33,7 +33,7 @@ describe('getAddressNonce', () => {
 	});
 
 	it('should return nonce based on the returned identity key', async () => {
-		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.resolve({ data: { identityKey: 'IdentityKey' } }));
+		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.resolve({ data: { identityKey: '0xIdentityKey' } }));
 		mockMessagingKeysApi.getIdentityKeyNonce.mockReturnValue(Promise.resolve({ data: { nonce: 9 } }));
 
 		const resultNonce = await _getAddressNonce(
