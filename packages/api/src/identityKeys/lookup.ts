@@ -8,7 +8,11 @@ import { CreateProofMessage } from '@mailchain/keyreg/proofs/message';
 import { ProofParams } from '@mailchain/keyreg/proofs/params';
 
 import { ED25519PublicKey } from '@mailchain/crypto/ed25519';
-import { DecodeHex, DecodeHexZeroX } from '@mailchain/encoding';
+import { DecodeHexZeroX } from '@mailchain/encoding';
+import { ProtocolType } from '@mailchain/internal/protocols';
+import { Verify } from '@mailchain/crypto/signatures/verify';
+import { Decode } from '@mailchain/encoding/encoding';
+import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
 import {
 	AddressesApiFactory,
 	PublicKeyCurveEnum,
@@ -17,15 +21,14 @@ import {
 	PublicKey,
 	Address,
 } from '../api';
-import { ProtocolType } from '@mailchain/internal/protocols';
-import { Verify } from '@mailchain/crypto/signatures/verify';
-import { Decode } from '@mailchain/encoding/encoding';
 
 // ToDo: move somewhere to generic
 export const getPublicKeyFromApiResponse = (key: PublicKey) => {
 	switch (key.curve) {
 		case PublicKeyCurveEnum.Ed25519:
 			return new ED25519PublicKey(Decode(key.encoding, key.value));
+		case PublicKeyCurveEnum.Secp256k1:
+			return new SECP256K1PublicKey(Decode(key.encoding, key.value));
 		default:
 			throw new ErrorUnsupportedKey();
 	}
@@ -51,10 +54,9 @@ export async function lookupMessageKey(apiConfig: Configuration, address: string
 		const isKeyValid = await VerifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,
 			getPublicKeyFromApiResponse(result.data.messagingKey),
-			new Uint8Array(DecodeHexZeroX(result.data.providedKeyProof?.signature)),
+			DecodeHexZeroX(result.data.providedKeyProof?.signature),
 			address,
 			providedKeyProof.protocol as ProtocolType,
-			registeredKeyProof,
 		);
 
 		if (!isKeyValid) throw new AddressVerificationFailed();

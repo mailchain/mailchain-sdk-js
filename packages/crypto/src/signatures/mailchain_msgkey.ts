@@ -68,7 +68,6 @@ export function VerifyMailchainProvidedMessagingKey(
 	signature: Uint8Array,
 	address: string,
 	protocol: protocols.ProtocolType,
-	keyProof?: RegisteredKeyProof,
 ): Promise<boolean> {
 	switch (msgKey.constructor) {
 		case ED25519PublicKey: {
@@ -85,23 +84,6 @@ export function VerifyMailchainProvidedMessagingKey(
 
 		default:
 			throw new ErrorUnsupportedKey();
-	}
-	if (keyProof) {
-		const proofMessage = CreateProofMessage(
-			{
-				AddressEncoding: keyProof?.address.encoding! as EncodingType,
-				PublicKeyEncoding: keyProof?.messagingKeyEncoding! as EncodingType,
-				Locale: keyProof?.locale!,
-				Variant: keyProof?.variant!,
-			},
-			new Uint8Array(Buffer.from(keyProof?.address.value)),
-			msgKey,
-			1,
-		);
-		if (keyProof.signingMethod === RegisteredKeyProofSigningMethodEnum.RawEd25519) {
-			return verifyRawEd25519(key, new Uint8Array(Buffer.from(proofMessage)), signature);
-		}
-		return key.Verify(new Uint8Array(Buffer.from(proofMessage)), signature);
 	}
 	const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
 
