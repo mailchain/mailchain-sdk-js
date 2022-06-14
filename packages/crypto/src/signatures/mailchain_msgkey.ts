@@ -1,12 +1,14 @@
 import { protocols } from '@mailchain/internal';
-import { DecodeHexZeroX, EncodeHexZeroX, EncodingType, EncodingTypes } from '@mailchain/encoding';
+import { EncodeHexZeroX, EncodingType } from '@mailchain/encoding';
+
+import { RegisteredKeyProof, RegisteredKeyProofSigningMethodEnum } from '@mailchain/api/api/api';
+
+import { CreateProofMessage } from '@mailchain/keyreg/proofs/message';
 import { IdFromPublicKey } from '../multikey';
 import { PublicKey } from '../public';
 import { ED25519PublicKey } from '../ed25519/public';
 import { PrivateKey } from '../private';
 import { ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
-import { RegisteredKeyProof, RegisteredKeyProofSigningMethodEnum } from '@mailchain/api/api';
-import { CreateProofMessage } from '@mailchain/keyreg/proofs/message';
 import { verifyRawEd25519 } from './raw_ed25119';
 
 function DescriptiveBytesFromPublicKey(key: PublicKey) {

@@ -9,6 +9,7 @@ import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Login } from '../auth/login';
 import { Register } from '../auth/register';
+import { KeyRing } from '@mailchain/keyring';
 
 describe('accounts', () => {
 	axios.interceptors.request.use((request) => {
@@ -35,7 +36,17 @@ describe('accounts', () => {
 		const seed = SecureRandom(32);
 
 		const identityKey = ED25519PrivateKey.FromSeed(seed);
-		const registrationResponse = await Register(seed, username, 'qwerty', 'captcha', apiConfig, config);
+		const keyRing = KeyRing.FromPrivateKey(identityKey);
+
+		const registrationResponse = await Register({
+			identityKeySeed: seed,
+			username,
+			password: 'qwerty',
+			captchaResponse: 'captcha',
+			messagingPublicKey: keyRing.accountMessagingKey().publicKey,
+			apiConfig,
+			opaqueConfig: config,
+		});
 		const loginResponse = await Login(username, 'qwerty', 'captcha', apiConfig, config);
 
 		expect(registrationResponse.clientSecretKey).toEqual(loginResponse.clientSecretKey);

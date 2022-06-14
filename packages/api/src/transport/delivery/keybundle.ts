@@ -30,22 +30,3 @@ export async function createECDHKeyBundle(
 		keyBundle: protocol.ECDHKeyBundle.create(payload),
 	};
 }
-
-/**
- *
- * @param keyBundle from the delivery request
- * @param myMessagingKey users private message key
- * @param rand
- * @returns the shared secret that is used to decrypt the message
- */
-export async function getSharedSecretFromECDHKeyBundle(
-	keyBundle: protocol.ECDHKeyBundle,
-	myMessagingKey: PrivateKey,
-	rand: RandomFunction = SecureRandom,
-): Promise<Uint8Array> {
-	const keyEx = new ED25519KeyExchange(rand);
-
-	const publicEphemeralKey = DecodePublicKey(keyBundle.publicEphemeralKey);
-
-	return await keyEx.SharedSecret(myMessagingKey, publicEphemeralKey);
-}

@@ -19,6 +19,7 @@ export class ED25519PrivateKey implements PrivateKey {
 		this.Bytes = this.KeyPair.secretKey;
 		this.PublicKey = new ED25519PublicKey(this.KeyPair.publicKey);
 	}
+
 	static FromSeed(seed: Uint8Array): ED25519PrivateKey {
 		if (seed.length !== SeedLength) {
 			throw Error('seed must be 32 bytes');
@@ -41,9 +42,9 @@ export class ED25519PrivateKey implements PrivateKey {
 		return this.FromSeed(rand(SeedLength));
 	}
 
-	Sign = async (message: Uint8Array): Promise<Uint8Array> => {
+	async Sign(message: Uint8Array): Promise<Uint8Array> {
 		return ed25519Sign(message, this.KeyPair);
-	};
+	}
 }
 
 export function AsED25519PrivateKey(key: PrivateKey): ED25519PrivateKey {

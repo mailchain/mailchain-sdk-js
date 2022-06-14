@@ -8,9 +8,9 @@ describe('keyring', () => {
 
 		expect(kr.createIdentityKeyForPublicKey(BobED25519PublicKey)).toMatchSnapshot();
 		expect(kr.createMessagingKeyForAddress(Buffer.from('123'), ETHEREUM, 1)).toMatchSnapshot();
-		expect(kr.rootIdentityPublicKey()).toMatchSnapshot();
+		expect(kr.rootInboxKey()).toMatchSnapshot();
 		expect(kr.rootEncryptionPublicKey()).toMatchSnapshot();
-		expect(kr.accountMessagingPublicKey()).toMatchSnapshot();
+		expect(kr.accountMessagingKey()).toMatchSnapshot();
 		expect(kr.rootInboxKey()).toMatchSnapshot();
 	});
 });

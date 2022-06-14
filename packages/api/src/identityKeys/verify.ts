@@ -3,10 +3,10 @@ import { VerifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signature
 import { DecodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { formatMailLike } from '@mailchain/internal/addressing';
-import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
-import { getPublicKeyFromApiResponse } from './lookup';
 import { VerifyMailchainUsername } from '@mailchain/crypto/signatures/mailchain_username';
 import { AddressVerificationFailed } from '@mailchain/crypto/signatures/errors';
+import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
+import { getPublicKeyFromApiResponse } from './lookup';
 
 export async function verify(apiConfig: Configuration, address: string, protocol: ProtocolType): Promise<Boolean> {
 	const addressApi = AddressesApiFactory(apiConfig);

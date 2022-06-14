@@ -1,4 +1,5 @@
 import { EncodeHexZeroX } from '@mailchain/encoding/hex';
+import { protocols } from '@mailchain/internal';
 import { BobSECP256K1PublicKey } from '../secp256k1/test.const';
 import { AliceED25519PublicKey, BobED25519PublicKey } from '../ed25519/test.const';
 import { ED25519PrivateKey } from '../ed25519';
@@ -9,7 +10,6 @@ import {
 	VerifyMailchainProvidedMessagingKey,
 } from './mailchain_msgkey';
 import { ErrorUnsupportedKey } from './errors';
-import { protocols } from '@mailchain/internal';
 
 describe('TestSignMailchainProvidedMessagingKey()', () => {
 	const key = ED25519PrivateKey.FromSeed(

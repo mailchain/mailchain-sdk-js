@@ -41,18 +41,18 @@ describe('JWT tokens()', () => {
 
 		const payloadGet = {
 			m: 'GET',
-			url: '/users',
+			url: '/users/settings',
 			len: 0,
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr.accountMessagingKey(), payloadGet, time);
+		const token = await getToken(kr.accountIdentityKey(), payloadGet, time);
 		mock.onGet(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } }).reply((conf) => [
 			200,
 			conf.headers,
 		]);
 
-		return getAxiosWithSigner(kr.accountMessagingKey())
+		return getAxiosWithSigner(kr.accountIdentityKey())
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
@@ -71,15 +71,15 @@ describe('JWT tokens()', () => {
 
 		const payloadPost = {
 			m: 'POST',
-			url: '/user/1/comments/23',
+			url: '/users/settings',
 			len,
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr.accountMessagingKey(), payloadPost, time);
+		const token = await getToken(kr.accountIdentityKey(), payloadPost, time);
 		mock.onPost(`https://${payloadPost.aud}${payloadPost.url}`).reply((conf) => [200, conf.headers]);
 
-		return getAxiosWithSigner(kr.accountMessagingKey())
+		return getAxiosWithSigner(kr.accountIdentityKey())
 			.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
@@ -137,7 +137,7 @@ describe('JWT tokens()', () => {
 		const token = await getToken(kr.accountIdentityKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
-		return getAxiosWithSigner(kr.accountMessagingKey())
+		return getAxiosWithSigner(kr.accountIdentityKey())
 			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
@@ -162,10 +162,10 @@ describe('JWT tokens()', () => {
 			aud: 'google.com',
 		};
 
-		const token = await getToken(kr.accountMessagingKey(), payloadPatch, time);
+		const token = await getToken(kr.accountIdentityKey(), payloadPatch, time);
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);
 
-		return getAxiosWithSigner(kr.accountMessagingKey())
+		return getAxiosWithSigner(kr.accountIdentityKey())
 			.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(

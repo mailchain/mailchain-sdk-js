@@ -35,7 +35,7 @@ export const getPublicKeyFromApiResponse = (key: PublicKey) => {
 };
 
 export const getAddressFromApiResponse = (address: Address) => {
-	return Decode(address.encoding, address.value);
+	return Decode(address.encoding!, address.value);
 };
 
 export async function lookupMessageKey(apiConfig: Configuration, address: string): Promise<PublicKey> {

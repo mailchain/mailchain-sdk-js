@@ -1,6 +1,19 @@
-import { ED25519PrivateKey, DeriveHardenedKey, ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
-import { EncodeBase58 } from '@mailchain/encoding/base58';
-import { PublicKey, PrivateKey, Encrypter, Decrypter, PublicKeyEncrypter, PublicKeyDecrypter } from '@mailchain/crypto';
+import {
+	ED25519PrivateKey,
+	DeriveHardenedKey,
+	ED25519ExtendedPrivateKey,
+	ED25519PublicKey,
+} from '@mailchain/crypto/ed25519';
+import {
+	PublicKey,
+	PrivateKey,
+	Encrypter,
+	Decrypter,
+	PublicKeyEncrypter,
+	PublicKeyDecrypter,
+	ED25519KeyExchange,
+	PrivateKeyDecrypter,
+} from '@mailchain/crypto';
 import { EncodeHex } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
 import {
@@ -66,10 +79,6 @@ export class KeyRing {
 			DERIVATION_PATH_INBOX_ROOT,
 		);
 	}
-	static async Generate(): Promise<KeyRing> {
-		// TODO: temporary for testing
-		return new this(await ED25519PrivateKey.Generate());
-	}
 
 	static FromMnemonic(mnemonic: string, password?: string): KeyRing {
 		return new this(ED25519PrivateKey.FromMnemonicPhrase(mnemonic, password));
@@ -83,11 +92,26 @@ export class KeyRing {
 		return DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey;
 	}
 
+	async accountMessagingKeyECDHDecrypter(
+		bundleEphemeralKey: PublicKey,
+		recipientMessagingKey: PublicKey,
+	): Promise<Decrypter['Decrypt']> {
+		if (EncodeHex(recipientMessagingKey.Bytes) != EncodeHex(this._accountMessagingKey.PrivateKey.PublicKey.Bytes)) {
+			throw new Error('invalid recipient messaging key');
+		}
+
+		const keyEx = new ED25519KeyExchange();
+		const sharedSecret = await keyEx.SharedSecret(this._accountMessagingKey.PrivateKey, bundleEphemeralKey);
+		const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
+
+		return (input) => decrypter.Decrypt(input);
+	}
+
 	createMessagingKeyForAddress(
 		address: Uint8Array,
 		protocol: protocols.ProtocolType,
 		nonce: number,
-	): ED25519PrivateKey {
+	): ED25519PublicKey {
 		// all addresses are encoded with hex regardless of protocol to ensure consistency
 		const addressKeyRoot = DeriveHardenedKey(
 			this._protocolAddressRootMessagingKey,
@@ -95,7 +119,7 @@ export class KeyRing {
 		);
 
 		// specific for the nonce
-		return DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey;
+		return DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey.PublicKey;
 	}
 
 	rootEncryptionPublicKey(): PublicKey {
@@ -104,13 +128,6 @@ export class KeyRing {
 
 	rootInboxKey(): PrivateKey {
 		return this._rootInboxKey.PrivateKey;
-	}
-
-	EncodedAddress(): string {
-		if (this._accountIdentityKey) {
-			return EncodeBase58(this._accountIdentityKey.PrivateKey.PublicKey.Bytes);
-		}
-		return '';
 	}
 
 	userProfileCrypto(): {
@@ -126,9 +143,9 @@ export class KeyRing {
 	}
 
 	accountMessagingKey = (): KeyFunctions => {
-		const key = this._accountIdentityKey.PrivateKey;
+		const key = this._accountMessagingKey.PrivateKey;
 		return {
-			sign: key.Sign.bind(this),
+			sign: (input) => key.Sign(input),
 			publicKey: key.PublicKey,
 		};
 	};
@@ -136,7 +153,7 @@ export class KeyRing {
 	accountIdentityKey = (): KeyFunctions => {
 		const key = this._accountIdentityKey.PrivateKey;
 		return {
-			sign: key.Sign.bind(this),
+			sign: (input) => key.Sign(input),
 			publicKey: key.PublicKey,
 		};
 	};
