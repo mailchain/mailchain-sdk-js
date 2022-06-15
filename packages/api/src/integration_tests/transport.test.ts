@@ -102,9 +102,9 @@ describe('SendAndReceiveMessage', () => {
 	it('receive message from user 2 to user 1', async () => {
 		// expect.assertions(3);
 		const payload = Buffer.from(message);
-		const receiver = new Receiver(apiConfig, users[1].keyRing);
+		const receiver = new Receiver(apiConfig);
 
-		const results = await receiver.pullNewMessages();
+		const results = await receiver.pullNewMessages(users[1].keyRing.accountMessagingKey());
 
 		expect(results[0]).toBeDefined();
 		expect(results[0]!.Content).toEqual(payload);

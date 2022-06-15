@@ -11,45 +11,52 @@ import { decryptPayload } from './content/decrypt';
 import { Deserialize } from './content/serialization';
 import { Payload } from './content/payload';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { protocols } from '@mailchain/internal';
+import { KeyRingDecrypter } from '@mailchain/keyring/address';
+
+export type Address = {
+	address: string;
+	nonce: number;
+	protocol: protocols.ProtocolType;
+	network: string;
+};
 
 export class Receiver {
-	constructor(private readonly configuration: Configuration, private readonly keyRing: KeyRing) {}
+	constructor(private readonly configuration: Configuration) {}
 
-	async pullNewMessages() {
-		const transportApi = TransportApiFactory(
-			this.configuration,
-			undefined,
-			getAxiosWithSigner(this.keyRing.accountMessagingKey()),
-		);
+	async pullNewMessages(messagingKey: KeyRingDecrypter) {
+		const transportApi = TransportApiFactory(this.configuration, undefined, getAxiosWithSigner(messagingKey));
 		return transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
 			return Promise.all(
 				deliveryRequests.map((dr) =>
-					processDeliveryRequest(this.keyRing, protocol.Delivery.decode(DecodeBase64(dr.data ?? ''))),
+					processDeliveryRequest(messagingKey, protocol.Delivery.decode(DecodeBase64(dr.data ?? ''))),
 				),
 			);
 		});
 	}
 }
 
-async function processDeliveryRequest(keyRing: KeyRing, incomingDeliveryRequest: protocol.Delivery) {
+async function processDeliveryRequest(messagingKey: KeyRingDecrypter, incomingDeliveryRequest: protocol.Delivery) {
 	const envelope = incomingDeliveryRequest.envelope!;
 	if (!envelope.ecdhKeyBundle) {
 		throw new Error('envelope does not contain ECDH key bundle');
 	}
 
 	const bundle = envelope.ecdhKeyBundle as protocol.ECDHKeyBundle;
-	const decryptFn = await keyRing.accountMessagingKeyECDHDecrypter(
-		DecodePublicKey(bundle.publicEphemeralKey),
-		DecodePublicKey(bundle.publicMessagingKey),
-	);
 
-	const payloadRootEncryptionKey = await decryptFn(envelope.encryptedMessageKey!);
+	const payloadRootEncryptionKey = await messagingKey.ecdhDecrypt(
+		DecodePublicKey(bundle.publicEphemeralKey),
+		envelope.encryptedMessageKey!,
+	);
 
 	if (payloadRootEncryptionKey.length === 0) {
 		throw new Error('payloadRootEncryptionKey is empty');
 	}
 
-	const messageUri = await decryptFn(envelope.encryptedMessageUri!);
+	const messageUri = await messagingKey.ecdhDecrypt(
+		DecodePublicKey(bundle.publicEphemeralKey),
+		envelope.encryptedMessageUri!,
+	);
 	let url = EncodeUtf8(messageUri);
 	if (url.startsWith(':8080')) {
 		// Temporary fix for messages

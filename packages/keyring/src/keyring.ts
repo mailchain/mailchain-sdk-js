@@ -23,7 +23,7 @@ import {
 	DERIVATION_PATH_USER_PROFILE,
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 } from './constants';
-import { KeyFunctions } from './address';
+import { KeyRingDecrypter, KeyRingSigner } from './address';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -92,21 +92,6 @@ export class KeyRing {
 		return DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey;
 	}
 
-	async accountMessagingKeyECDHDecrypter(
-		bundleEphemeralKey: PublicKey,
-		recipientMessagingKey: PublicKey,
-	): Promise<Decrypter['Decrypt']> {
-		if (EncodeHex(recipientMessagingKey.Bytes) != EncodeHex(this._accountMessagingKey.PrivateKey.PublicKey.Bytes)) {
-			throw new Error('invalid recipient messaging key');
-		}
-
-		const keyEx = new ED25519KeyExchange();
-		const sharedSecret = await keyEx.SharedSecret(this._accountMessagingKey.PrivateKey, bundleEphemeralKey);
-		const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
-
-		return (input) => decrypter.Decrypt(input);
-	}
-
 	createMessagingKeyForAddress(
 		address: Uint8Array,
 		protocol: protocols.ProtocolType,
@@ -142,15 +127,23 @@ export class KeyRing {
 		};
 	}
 
-	accountMessagingKey = (): KeyFunctions => {
+	accountMessagingKey = (): KeyRingDecrypter => {
 		const key = this._accountMessagingKey.PrivateKey;
+		const keyEx = new ED25519KeyExchange();
+
 		return {
 			sign: (input) => key.Sign(input),
 			publicKey: key.PublicKey,
+			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
+				const sharedSecret = await keyEx.SharedSecret(key, bundleEphemeralKey);
+				const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
+
+				return decrypter.Decrypt(input);
+			},
 		};
 	};
 
-	accountIdentityKey = (): KeyFunctions => {
+	accountIdentityKey = (): KeyRingSigner => {
 		const key = this._accountIdentityKey.PrivateKey;
 		return {
 			sign: (input) => key.Sign(input),
