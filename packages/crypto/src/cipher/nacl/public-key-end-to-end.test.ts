@@ -64,15 +64,13 @@ describe('encrypt-then-decrypt', () => {
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			const encrypter = new PublicKeyEncrypter(test.keyEx, test.recipientPublicKey);
-			const encrypted = await encrypter.Encrypt(test.message);
+	test.each(tests)('%p', async (test) => {
+		const encrypter = new PublicKeyEncrypter(test.keyEx, test.recipientPublicKey);
+		const encrypted = await encrypter.Encrypt(test.message);
 
-			const decrypter = new PublicKeyDecrypter(test.keyEx, test.recipientPrivateKey);
-			const decrypted = await decrypter.Decrypt(encrypted);
+		const decrypter = new PublicKeyDecrypter(test.keyEx, test.recipientPrivateKey);
+		const decrypted = await decrypter.Decrypt(encrypted);
 
-			expect(decrypted).toEqual(test.message);
-		});
+		expect(decrypted).toEqual(test.message);
 	});
 });
