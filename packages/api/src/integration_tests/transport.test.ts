@@ -100,7 +100,6 @@ describe('SendAndReceiveMessage', () => {
 	});
 
 	it('receive message from user 2 to user 1', async () => {
-		// expect.assertions(3);
 		const payload = Buffer.from(message);
 		const receiver = new Receiver(apiConfig);
 

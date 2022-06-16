@@ -46,6 +46,8 @@ export function createPayload(
 			len = Buffer.byteLength(new Uint8Array(data));
 		} else if (utils.isString(data)) {
 			len = Buffer.byteLength(data, 'utf-8');
+		} else if (toString.call(data) === '[object Uint8Array]') {
+			len = data.length;
 		} else {
 			len = Buffer.byteLength(JSON.stringify(data));
 		}

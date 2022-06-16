@@ -23,7 +23,6 @@ export const sendPayload = async (
 	apiConfiguration: Configuration,
 	payload: Payload,
 	recipients: Recipient[],
-	// senderIdentityKey: PrivateKey,
 	rand: RandomFunction = SecureRandom,
 ) => {
 	const recipientKeys = await Promise.all(recipients.map((r) => lookupMessageKey(apiConfiguration, r.address)));
@@ -52,17 +51,14 @@ const sendPayloadInternal = async (
 	const encryptedPayload = await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB, rand);
 	const serializedContent = Serialize(encryptedPayload);
 
-	const postMessageResponse = await transportApi.postPayload(Array.from(serializedContent));
-
-	const messageUri = postMessageResponse.headers['location'];
-	if (!messageUri) throw new Error('Invalid header value for messageUri (location).');
+	const postMessageResponse = await transportApi.postPayload(serializedContent);
 
 	return Promise.all(
 		recipients.map(async (messagingKey) => {
 			const deliveryCreated = await createDelivery(
 				getPublicKeyFromApiResponse(messagingKey),
 				payloadRootEncryptionKey,
-				messageUri,
+				postMessageResponse.data.uri,
 				rand,
 			);
 			const encodedDelivery = protocol.Delivery.encode(deliveryCreated).finish();
