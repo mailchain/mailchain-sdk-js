@@ -46,7 +46,7 @@ const sendPayloadInternal = async (
 	const encryptedPayload = await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB, rand);
 	const serializedContent = Serialize(encryptedPayload);
 
-	const postMessageResponse = await transportApi.postPayload(serializedContent);
+	const postMessageResponse = await transportApi.postEncryptedPayload(serializedContent);
 
 	return Promise.all(
 		recipients.map(async (messagingKey) => {
