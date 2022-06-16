@@ -12,7 +12,9 @@ import { EncodeHexZeroX, EncodeHex } from '../../../encoding/src/hex';
 import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
-jest.setTimeout(60000);
+import { acknowledgeReceiving } from '../transport/aknowledge';
+
+jest.setTimeout(30000);
 
 const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
 
@@ -101,7 +103,17 @@ describe('SendAndReceiveMessage', () => {
 		const results = await receiver.pullNewMessages(users[1].keyRing.accountMessagingKey());
 
 		expect(results[0]).toBeDefined();
-		expect(results[0]!.Content).toEqual(payload);
-		expect(results[0]!.Headers).toEqual(headers);
+		expect(results[0].payload!.Content).toEqual(payload);
+		expect(results[0].payload!.Headers).toEqual(headers);
+	});
+
+	it('receive message from user 2 to user 1 and acknowledge receiving', async () => {
+		const receiver = new Receiver(apiConfig);
+
+		let results = await receiver.pullNewMessages(users[1].keyRing.accountMessagingKey());
+		await acknowledgeReceiving(apiConfig, users[1].keyRing.accountMessagingKey(), results[0].hash);
+
+		results = await receiver.pullNewMessages(users[1].keyRing.accountMessagingKey());
+		expect(results[0]).toBeUndefined();
 	});
 });

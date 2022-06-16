@@ -5,6 +5,7 @@ import { EncodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { protocols } from '@mailchain/internal';
 import { KeyRingDecrypter } from '@mailchain/keyring/address';
+
 import { protocol } from '../protobuf/protocol/protocol';
 import { Configuration } from '../api/configuration';
 import { TransportApiFactory } from '../api';
@@ -27,14 +28,18 @@ export class Receiver {
 		return transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
 			return Promise.all(
 				deliveryRequests.map((dr) =>
-					processDeliveryRequest(messagingKey, protocol.Delivery.decode(DecodeBase64(dr.data ?? ''))),
+					processDeliveryRequest(messagingKey, protocol.Delivery.decode(DecodeBase64(dr.data)), dr.hash),
 				),
 			);
 		});
 	}
 }
 
-async function processDeliveryRequest(messagingKey: KeyRingDecrypter, incomingDeliveryRequest: protocol.Delivery) {
+async function processDeliveryRequest(
+	messagingKey: KeyRingDecrypter,
+	incomingDeliveryRequest: protocol.Delivery,
+	hash: string,
+) {
 	const envelope = incomingDeliveryRequest.envelope!;
 	if (!envelope.ecdhKeyBundle) {
 		throw new Error('envelope does not contain ECDH key bundle');
@@ -69,5 +74,8 @@ async function processDeliveryRequest(messagingKey: KeyRingDecrypter, incomingDe
 		ED25519ExtendedPrivateKey.FromPrivateKey(DecodePrivateKey(payloadRootEncryptionKey)),
 	);
 
-	return decryptedPayload;
+	return {
+		payload: decryptedPayload,
+		hash,
+	};
 }
