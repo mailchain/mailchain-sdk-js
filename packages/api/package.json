@@ -18,6 +18,7 @@
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
 	},
 	"devDependencies": {
+		"@peculiar/webcrypto": "^1.4.0",
 		"@types/mimetext": "^2.0.0",
 		"axios-mock-adapter": "^1.20.0",
 		"jest-mock-axios": "^4.6.1"

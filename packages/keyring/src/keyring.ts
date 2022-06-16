@@ -127,7 +127,7 @@ export class KeyRing {
 		};
 	}
 
-	accountMessagingKey = (): KeyRingDecrypter => {
+	accountMessagingKey(): KeyRingDecrypter {
 		const key = this._accountMessagingKey.PrivateKey;
 		const keyEx = new ED25519KeyExchange();
 
@@ -141,13 +141,13 @@ export class KeyRing {
 				return decrypter.Decrypt(input);
 			},
 		};
-	};
+	}
 
-	accountIdentityKey = (): KeyRingSigner => {
+	accountIdentityKey(): KeyRingSigner {
 		const key = this._accountIdentityKey.PrivateKey;
 		return {
 			sign: (input) => key.Sign(input),
 			publicKey: key.PublicKey,
 		};
-	};
+	}
 }

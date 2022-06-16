@@ -13,19 +13,14 @@ import { Payload } from './content/payload';
 import { Serialize } from './content/serialization';
 import { createDelivery } from './delivery/delivery';
 
-export type Recipient = {
-	address: string;
-	protocol: string;
-};
-
 export const sendPayload = async (
 	keyRing: KeyRing,
 	apiConfiguration: Configuration,
 	payload: Payload,
-	recipients: Recipient[],
+	recipients: string[],
 	rand: RandomFunction = SecureRandom,
 ) => {
-	const recipientKeys = await Promise.all(recipients.map((r) => lookupMessageKey(apiConfiguration, r.address)));
+	const recipientKeys = await Promise.all(recipients.map((address) => lookupMessageKey(apiConfiguration, address)));
 	return sendPayloadInternal(keyRing, apiConfiguration, payload, recipientKeys, rand);
 };
 
@@ -67,9 +62,15 @@ const sendPayloadInternal = async (
 					encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
 					recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
 				})
-				.catch((err) => ({
-					status: 'error',
-					err,
+				.then(({ headers }) => ({
+					status: 'success' as const,
+					recipient: messagingKey,
+					deliveryRequestID: headers['deliveryRequestID'],
+				}))
+				.catch((err: Error) => ({
+					status: 'error' as const,
+					recipient: messagingKey,
+					cause: err,
 				}));
 		}),
 	);

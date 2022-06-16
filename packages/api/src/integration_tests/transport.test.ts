@@ -1,20 +1,15 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { EncodeBase58, EncodeBase64, EncodingTypes } from '@mailchain/encoding';
-import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
+import { EncodeBase58, EncodingTypes } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
-import { getSettings, setSetting } from '../user/settings';
-import { Configuration, ConfigurationParameters } from '../api';
-import { BobED25519PrivateKey } from '../../../crypto/src/ed25519/test.const';
-import { SecureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { SecureRandom } from '@mailchain/crypto';
 import { getOpaqueConfig, OpaqueID } from '@cloudflare/opaque-ts';
+import { lookupMessageKey } from '@mailchain/api/identityKeys';
+import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
+import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Register } from '../auth/register';
-import { lookupMessageKey } from '@mailchain/api/identityKeys';
 import { EncodeHexZeroX, EncodeHex } from '../../../encoding/src/hex';
 import { sendPayload } from '../transport/send';
-import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
 jest.setTimeout(60000);
@@ -95,7 +90,7 @@ describe('SendAndReceiveMessage', () => {
 				Headers: headers,
 				Content: payload,
 			},
-			[{ address: `${users[1].username}@mailchain.local`, protocol: 'mailchain' }],
+			[`${users[1].username}@mailchain.local`],
 		);
 	});
 

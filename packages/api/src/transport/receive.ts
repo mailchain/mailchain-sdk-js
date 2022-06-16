@@ -1,18 +1,16 @@
-import { KeyRing } from '@mailchain/keyring';
 import { DecodeBase64 } from '@mailchain/encoding';
 import { DecodePrivateKey, DecodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import axios from 'axios';
-import { EncodeUtf8, DecodeUtf8 } from '@mailchain/encoding/utf8';
-import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { EncodeUtf8 } from '@mailchain/encoding/utf8';
+import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
+import { protocols } from '@mailchain/internal';
+import { KeyRingDecrypter } from '@mailchain/keyring/address';
 import { protocol } from '../protobuf/protocol/protocol';
 import { Configuration } from '../api/configuration';
 import { TransportApiFactory } from '../api';
+import { getAxiosWithSigner } from '../auth/jwt';
 import { decryptPayload } from './content/decrypt';
 import { Deserialize } from './content/serialization';
-import { Payload } from './content/payload';
-import { getAxiosWithSigner } from '../auth/jwt';
-import { protocols } from '@mailchain/internal';
-import { KeyRingDecrypter } from '@mailchain/keyring/address';
 
 export type Address = {
 	address: string;
