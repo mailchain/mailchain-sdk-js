@@ -6,7 +6,7 @@ export const mailchainDeliveryConfirmationMessage = (deliveryRequestID: Uint8Arr
 };
 
 export const signMailchainDeliveryConfirmation = (pk: KeyRingDecrypter, deliveryRequestID: Uint8Array) => {
-	let msg: Uint8Array = mailchainDeliveryConfirmationMessage(deliveryRequestID);
+	const msg: Uint8Array = mailchainDeliveryConfirmationMessage(deliveryRequestID);
 
 	return pk.sign(msg);
 };

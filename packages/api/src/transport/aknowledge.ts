@@ -1,8 +1,8 @@
 import { KeyRingDecrypter } from '@mailchain/keyring/address';
-import { Configuration, TransportApiFactory } from '../api';
-import { getAxiosWithSigner } from '../auth/jwt';
 import { EncodeHexZeroX, DecodeHexZeroX } from '@mailchain/encoding/hex';
 import { signMailchainDeliveryConfirmation } from '@mailchain/crypto/signatures/mailchain_message_confirmation';
+import { Configuration, TransportApiFactory } from '../api';
+import { getAxiosWithSigner } from '../auth/jwt';
 
 export const acknowledgeReceiving = async (
 	configuration: Configuration,

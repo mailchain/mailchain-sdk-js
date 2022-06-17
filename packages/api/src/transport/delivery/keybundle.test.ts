@@ -1,10 +1,4 @@
-import { protocol } from '@mailchain/api/protobuf/protocol/protocol';
-import {
-	AliceED25519PrivateKey,
-	AliceED25519PublicKey,
-	BobED25519PrivateKey,
-	BobED25519PublicKey,
-} from '@mailchain/crypto/ed25519/test.const';
+import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 
 import { createECDHKeyBundle } from './keybundle';
 

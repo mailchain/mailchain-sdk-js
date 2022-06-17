@@ -3,27 +3,22 @@ import { DecodePrivateKey, DecodePublicKey } from '@mailchain/crypto/multikey/en
 import axios from 'axios';
 import { EncodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
-import { protocols } from '@mailchain/internal';
 import { KeyRingDecrypter } from '@mailchain/keyring/address';
 
 import { protocol } from '../protobuf/protocol/protocol';
 import { Configuration } from '../api/configuration';
-import { TransportApiFactory } from '../api';
+import { TransportApiFactory } from '../api/api';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { decryptPayload } from './content/decrypt';
 import { Deserialize } from './content/serialization';
 
-export type Address = {
-	address: string;
-	nonce: number;
-	protocol: protocols.ProtocolType;
-	network: string;
-};
-
 export class Receiver {
 	constructor(private readonly configuration: Configuration) {}
 
-	async pullNewMessages(messagingKey: KeyRingDecrypter) {
+	async pullNewMessages(messagingKeys: KeyRingDecrypter[]) {
+		return Promise.all(messagingKeys.map((it) => this._getDeliveryRequests(it)));
+	}
+	async _getDeliveryRequests(messagingKey: KeyRingDecrypter) {
 		const transportApi = TransportApiFactory(this.configuration, undefined, getAxiosWithSigner(messagingKey));
 		return transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
 			return Promise.all(
@@ -60,7 +55,7 @@ async function processDeliveryRequest(
 		DecodePublicKey(bundle.publicEphemeralKey),
 		envelope.encryptedMessageUri!,
 	);
-	let url = EncodeUtf8(messageUri);
+	const url = EncodeUtf8(messageUri);
 
 	const encryptedMessageBodyResponse = await axios.get(url, {
 		responseType: 'arraybuffer',

@@ -1,5 +1,5 @@
 import { EncodeBase64UrlSafe } from '@mailchain/encoding';
-import axios, { Axios, AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import utils from 'axios/lib/utils';
 import { KeyRingSigner } from '@mailchain/keyring/address';
 

@@ -1,7 +1,7 @@
 import { KeyRing } from '@mailchain/keyring';
+import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { getSettings, setSetting } from '../user/settings';
 import { Configuration, ConfigurationParameters } from '../api';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 
 const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as ConfigurationParameters);
 

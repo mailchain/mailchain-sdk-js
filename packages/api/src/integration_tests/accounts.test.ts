@@ -5,11 +5,11 @@ import { SecureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase58 } from '@mailchain/encoding';
 import axios from 'axios';
+import { KeyRing } from '@mailchain/keyring';
 import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Login } from '../auth/login';
 import { Register } from '../auth/register';
-import { KeyRing } from '@mailchain/keyring';
 
 describe('accounts', () => {
 	axios.interceptors.request.use((request) => {

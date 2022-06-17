@@ -1,14 +1,14 @@
 import { DecodeHex, EncodeHex } from '@mailchain/encoding';
+import { KeyRing } from '@mailchain/keyring/keyring';
 import { SecureRandom } from '../rand';
+import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../ed25519/test.const';
+import { AliceSECP256K1PrivateKey } from '../secp256k1/test.const';
 import {
 	mailchainDeliveryConfirmationMessage,
 	signMailchainDeliveryConfirmation,
 } from './mailchain_message_confirmation';
 
 import { ErrorUnsupportedKey } from './errors';
-import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../ed25519/test.const';
-import { AliceSECP256K1PrivateKey } from '../secp256k1/test.const';
-import { KeyRing } from '@mailchain/keyring/keyring';
 
 describe('aknowledge receiving message', () => {
 	test('message formatted properly', () => {
