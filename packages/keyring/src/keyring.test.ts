@@ -6,9 +6,8 @@ describe('keyring', () => {
 	it('should assert against previous snapshot outputs from keyring', async () => {
 		const kr = KeyRing.FromPrivateKey(AliceED25519PrivateKey);
 
-		expect(kr.createIdentityKeyForPublicKey(BobED25519PublicKey)).toMatchSnapshot('createIdentityKeyForPublicKey');
-		expect(kr.createMessagingKeyForAddress(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
-			'createMessagingKeyForAddress',
+		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
+			'addressMessagingKey',
 		);
 		expect(kr.rootInboxKey()).toMatchSnapshot('rootInboxKey');
 		expect(kr.rootEncryptionPublicKey()).toMatchSnapshot('rootEncryptionPublicKey');

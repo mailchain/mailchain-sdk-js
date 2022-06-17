@@ -88,25 +88,6 @@ export class KeyRing {
 		return new this(key);
 	}
 
-	createIdentityKeyForPublicKey(key: PublicKey): ED25519PrivateKey {
-		return DeriveHardenedKey(this._accountIdentityKey, key.Bytes).PrivateKey;
-	}
-
-	createMessagingKeyForAddress(
-		address: Uint8Array,
-		protocol: protocols.ProtocolType,
-		nonce: number,
-	): ED25519PublicKey {
-		// all addresses are encoded with hex regardless of protocol to ensure consistency
-		const addressKeyRoot = DeriveHardenedKey(
-			this._protocolAddressRootMessagingKey,
-			`protocol=${protocol},address=${EncodeHex(address)}`,
-		);
-
-		// specific for the nonce
-		return DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey.PublicKey;
-	}
-
 	rootEncryptionPublicKey(): PublicKey {
 		return this._rootEncryptionKey.PrivateKey.PublicKey;
 	}
@@ -124,6 +105,29 @@ export class KeyRing {
 				PublicKeyEncrypter.FromPublicKey(this._userProfileEncryptionKey.PrivateKey.PublicKey).Encrypt(input),
 			decrypter: (input) =>
 				PublicKeyDecrypter.FromPrivateKey(this._userProfileEncryptionKey.PrivateKey).Decrypt(input),
+		};
+	}
+
+	addressMessagingKey(address: Uint8Array, protocol: protocols.ProtocolType, nonce: number): KeyRingDecrypter {
+		// all addresses are encoded with hex regardless of protocol to ensure consistency
+		const addressKeyRoot = DeriveHardenedKey(
+			this._protocolAddressRootMessagingKey,
+			`protocol=${protocol},address=${EncodeHex(address)}`,
+		);
+
+		// specific for the nonce
+		const addressKey = DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey;
+		const keyEx = new ED25519KeyExchange();
+
+		return {
+			sign: (input) => addressKey.Sign(input),
+			publicKey: addressKey.PublicKey,
+			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
+				const sharedSecret = await keyEx.SharedSecret(addressKey, bundleEphemeralKey);
+				const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
+
+				return decrypter.Decrypt(input);
+			},
 		};
 	}
 
