@@ -13,6 +13,24 @@ import { Payload } from './content/payload';
 import { Serialize } from './content/serialization';
 import { createDelivery } from './delivery/delivery';
 
+type SendPayloadResult = {
+	deliveries: PayloadRecipientDelivery[];
+};
+
+type SuccessPayloadRecipientDelivery = {
+	status: 'success';
+	deliveryRequestId: string;
+	recipient: PublicKey;
+};
+
+type FailPayloadRecipientDelivery = {
+	status: 'fail';
+	cause: Error;
+	recipient: PublicKey;
+};
+
+type PayloadRecipientDelivery = SuccessPayloadRecipientDelivery | FailPayloadRecipientDelivery;
+
 export const sendPayload = async (
 	keyRing: KeyRing,
 	apiConfiguration: Configuration,
@@ -27,13 +45,13 @@ export const sendPayload = async (
 /**
  * Sends a message to multiple recipients
  */
-const sendPayloadInternal = async (
+async function sendPayloadInternal(
 	keyRing: KeyRing,
 	apiConfiguration: Configuration,
 	payload: Payload,
 	recipients: PublicKey[],
 	rand: RandomFunction = SecureRandom,
-) => {
+): Promise<SendPayloadResult> {
 	const transportApi = TransportApiFactory(
 		apiConfiguration,
 		undefined,
@@ -46,32 +64,35 @@ const sendPayloadInternal = async (
 	const encryptedPayload = await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB, rand);
 	const serializedContent = Serialize(encryptedPayload);
 
-	const postMessageResponse = await transportApi.postEncryptedPayload(serializedContent);
+	const { uri: messageUri } = await transportApi.postEncryptedPayload(serializedContent).then((r) => r.data);
 
-	return Promise.all(
+	const deliveries: PayloadRecipientDelivery[] = await Promise.all(
 		recipients.map(async (messagingKey) => {
 			const deliveryCreated = await createDelivery(
 				getPublicKeyFromApiResponse(messagingKey),
 				payloadRootEncryptionKey,
-				postMessageResponse.data.uri,
+				messageUri,
 				rand,
 			);
 			const encodedDelivery = protocol.Delivery.encode(deliveryCreated).finish();
-			return await transportApi
-				.postDeliveryRequest({
+			try {
+				const res = await transportApi.postDeliveryRequest({
 					encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
 					recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
-				})
-				.then(({ headers }) => ({
-					status: 'success' as const,
+				});
+				return {
+					status: 'success',
 					recipient: messagingKey,
-					deliveryRequestID: headers['deliveryRequestID'],
-				}))
-				.catch((err: Error) => ({
-					status: 'error' as const,
+					deliveryRequestId: res.headers['deliveryRequestID'],
+				};
+			} catch (e) {
+				return {
+					status: 'fail',
+					cause: e as Error,
 					recipient: messagingKey,
-					cause: err,
-				}));
+				};
+			}
 		}),
 	);
-};
+	return { deliveries };
+}
