@@ -82,58 +82,33 @@ Date: Wed, 18 May 2022 15:47:49 +0400
 Message-ID: <CADW5KMzntJ_tAY18bkLakwCgJea7tc=Fu_DF5+cR0-k66sF3VQ@mail.gmail.com>
 Subject: ${SUBJECT}
 To: ${TO_NAME} <${TO_EMAIL}>
-Content-Type: multipart/alternative; boundary="00000000000042fb8505df47d4a0"
-Bcc: ${TO_EMAIL}
-
---00000000000042fb8505df47d4a0
 Content-Type: text/plain; charset="UTF-8"
 
-${RAW_TEXT}
---00000000000042fb8505df47d4a0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-${HTML_TEXT}
---00000000000042fb8505df47d4a0--`;
+${RAW_TEXT}`;
 
 describe('mime text parser)', () => {
 	afterAll(() => jest.resetAllMocks());
 	const mimeDetails = parseMimeText(testMime);
 	it('verify details', async () => {
-		expect(mimeDetails.from).toEqual([
+		expect(mimeDetails.from).toEqual({
+			value: FROM_EMAIL,
+			label: FROM_NAME,
+		});
+		expect(mimeDetails.recipients).toEqual([
 			{
-				address: FROM_EMAIL,
-				name: FROM_NAME,
-			},
-		]);
-		expect(mimeDetails.to).toEqual([
-			{
-				address: TO_EMAIL,
-				name: TO_NAME,
+				value: TO_EMAIL,
+				label: TO_NAME,
 			},
 		]);
 		expect(mimeDetails.subject).toEqual(SUBJECT);
-		expect(mimeDetails.childNodes).toEqual([
-			{
-				header: ['Content-Type: text/plain; charset="UTF-8"'],
-				raw: `
-
-${RAW_TEXT}`,
-			},
-			{
-				header: ['Content-Type: text/html; charset="UTF-8"', 'Content-Transfer-Encoding: quoted-printable'],
-				raw: `
-
-
-${HTML_TEXT}`,
-			},
+		expect(mimeDetails.message).toEqual([
+			{ text: 'Good afternoon everyone' },
+			{ text: '' },
+			{ text: 'As you will know, this is the test.' },
+			{ text: '' },
+			{ text: '' },
+			{ text: 'from_name' },
 		]);
-	});
-
-	it('verify image email', async () => {
-		const verifyMimeDetails = parseMimeText(emailWithImage);
-		expect(verifyMimeDetails.childNodes[0].header[0]).toContain('Content-Type: multipart/alternative;');
-		expect(verifyMimeDetails.childNodes[1].header[0]).toContain('Content-Type: image/png;');
 	});
 });
 

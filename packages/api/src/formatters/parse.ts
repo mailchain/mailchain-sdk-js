@@ -1,21 +1,24 @@
 import parse from 'emailjs-mime-parser';
+import { NewMessageFormValues } from './generate';
 
-export function parseMimeText(text) {
+export function parseMimeText(text: string): NewMessageFormValues {
 	const {
-		childNodes,
+		content,
 		headers,
 		headers: { from, to },
 	} = parse(text);
 
 	return {
-		from: from.map((it) => it.value[0]),
-		to: to.map((it) => it.value[0]),
+		from: { label: from[0].value[0].name, value: from[0].value[0].address },
+		recipients: to.map((it) => ({ label: it.value[0].name, value: it.value[0].address })),
+		carbonCopyRecipients: [],
+		blindCarbonCopyRecipients: [],
 		subject: headers['subject']?.[0].value,
-		childNodes: childNodes.map((it) => ({
-			raw: it.header.reduce((acc, rec) => {
-				return acc.replace(rec, '');
-			}, it.raw),
-			header: it.header,
-		})),
+		message: Buffer.from(content)
+			.toString()
+			.split('\n')
+			.map((it) => ({
+				text: it,
+			})),
 	};
 }
