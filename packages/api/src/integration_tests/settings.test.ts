@@ -9,15 +9,15 @@ describe('Settings', () => {
 	afterAll(() => jest.resetAllMocks());
 	const kr = new KeyRing(ED25519PrivateKey.Generate());
 	it('get settings', async () => {
-		const data = await getSettings(apiConfig, kr);
+		const data = await getSettings(apiConfig, kr.accountIdentityKey());
 		expect(data).toBeDefined();
 		expect(data!['theme'].value).toEqual('system');
 		expect(data!['theme'].isSet).toBeFalsy();
 	});
 
 	it('set settings', async () => {
-		setSetting('theme', 'dark', apiConfig, kr);
-		const data = await getSettings(apiConfig, kr);
+		setSetting('theme', 'dark', apiConfig, kr.accountIdentityKey());
+		const data = await getSettings(apiConfig, kr.accountIdentityKey());
 		expect(data!['theme'].value).toEqual('dark');
 		expect(data!['theme'].isSet).toBeTruthy();
 	});

@@ -13,7 +13,7 @@ import { EncodeHexZeroX, EncodeHex, DecodeHexZeroX } from '../../../encoding/src
 import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
-import { acknowledgeReceiving } from '../transport/aknowledge';
+import { confirmDelivery } from '../transport/confirmations';
 import * as identityKeysApi from '@mailchain/api/identityKeys';
 import { protocols } from '@mailchain/internal';
 import { ethers } from 'ethers';
@@ -26,7 +26,7 @@ jest.setTimeout(30000);
 
 const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
 
-const claimAddress = async (user) => {
+const registerAddress = async (user) => {
 	const walletPrivateKey = SECP256K1PrivateKey.Generate();
 	const wallet = new ethers.Wallet(walletPrivateKey.Bytes);
 	const address = wallet.address;
@@ -39,7 +39,7 @@ const claimAddress = async (user) => {
 
 	const signature = SignEthereumPersonalMessage(walletPrivateKey, Buffer.from(DecodeUtf8(proofMessage)));
 
-	await identityKeysApi.claimAddress(apiConfig, {
+	await identityKeysApi.registerAddress(apiConfig, {
 		signature: EncodeHexZeroX(signature),
 		signatureMethod: 'ethereum_personal_message',
 		address: {
@@ -116,7 +116,7 @@ describe('SendAndReceiveMessage', () => {
 			EncodeHex(SecureRandom(32)),
 			EncodeHex(SecureRandom(32)),
 		].join('\n');
-		etherAddresses = await Promise.all([claimAddress(users[1]), claimAddress(users[1])]);
+		etherAddresses = await Promise.all([registerAddress(users[1]), registerAddress(users[1])]);
 	});
 	afterAll(() => jest.resetAllMocks());
 
@@ -149,21 +149,21 @@ describe('SendAndReceiveMessage', () => {
 		const payload = Buffer.from(message);
 		const receiver = new Receiver(apiConfig);
 
-		const results = await receiver.pullNewMessages([users[1].keyRing.accountMessagingKey()]);
+		const results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
 
-		expect(results[0][0]).toBeDefined();
-		expect(results[0][0].payload!.Content).toEqual(payload);
-		expect(results[0][0].payload!.Headers).toEqual(headers);
+		expect(results[0]).toBeDefined();
+		expect(results[0].payload!.Content).toEqual(payload);
+		expect(results[0].payload!.Headers).toEqual(headers);
 	});
 
 	it('receive message from user 2 to user 1 and acknowledge receiving', async () => {
 		const receiver = new Receiver(apiConfig);
 
-		let results = await receiver.pullNewMessages([users[1].keyRing.accountMessagingKey()]);
-		await acknowledgeReceiving(apiConfig, users[1].keyRing.accountMessagingKey(), results[0][0].hash);
+		let results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		await confirmDelivery(apiConfig, users[1].keyRing.accountMessagingKey(), results[0].hash);
 
-		results = await receiver.pullNewMessages([users[1].keyRing.accountMessagingKey()]);
-		expect(results[0][0]).toBeUndefined();
+		results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		expect(results[0]).toBeUndefined();
 	});
 
 	it('send ethereum  message from user 1 to user 2', async () => {
@@ -193,15 +193,15 @@ describe('SendAndReceiveMessage', () => {
 			protocols.ETHEREUM,
 			1,
 		);
-		let results = await receiver.pullNewMessages([etherAccountMessageKey]);
+		let results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
 
-		expect(results[0][0]).toBeDefined();
-		expect(results[0][0].payload!.Content).toEqual(payload);
-		expect(results[0][0].payload!.Headers).toEqual(headers);
-		await acknowledgeReceiving(apiConfig, etherAccountMessageKey, results[0][0].hash);
+		expect(results[0]).toBeDefined();
+		expect(results[0].payload!.Content).toEqual(payload);
+		expect(results[0].payload!.Headers).toEqual(headers);
+		await confirmDelivery(apiConfig, etherAccountMessageKey, results[0].hash);
 
-		results = await receiver.pullNewMessages([etherAccountMessageKey]);
-		expect(results[0][0]).toBeUndefined();
+		results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
+		expect(results[0]).toBeUndefined();
 	});
 
 	it('send multiple ethereum messages from user 1 to user 2', async () => {
@@ -233,28 +233,24 @@ describe('SendAndReceiveMessage', () => {
 
 	it('receive multiple ethereum messages from user 1 to user 2 on different ether addresses', async () => {
 		const receiver = new Receiver(apiConfig);
-		const etherAccountMessageKeys = etherAddresses.map((it) =>
-			users[1].keyRing.addressMessagingKey(it.addressBytes, protocols.ETHEREUM, 1),
-		);
 
-		let results = await receiver.pullNewMessages(etherAccountMessageKeys);
-
-		expect(results.length).toEqual(etherAccountMessageKeys.length);
-		etherAddresses.forEach(async (it, index) => {
+		etherAddresses.map(async (it, index) => {
+			const messagingKey = users[1].keyRing.addressMessagingKey(it.addressBytes, protocols.ETHEREUM, 1);
+			let results = await receiver.getUndeliveredMessages(messagingKey);
 			expect(results[index][0]).toBeDefined();
 			expect(results[index][0].payload!.Content).toEqual(
 				Buffer.from(`from ${users[0].username} to ${it.address}`),
 			);
 			expect(results[index][0].payload!.Headers).toEqual(headersMultiple[index]);
-		});
-		await Promise.all(
-			etherAccountMessageKeys.map(async (it, index) => {
-				await acknowledgeReceiving(apiConfig, it, results[index][0].hash);
-			}),
-		);
-		results = await receiver.pullNewMessages(etherAccountMessageKeys);
-		etherAddresses.forEach(async (it, index) => {
-			expect(results[index].length).toEqual(0);
+
+			await Promise.all(
+				results.map(async (it, index) => {
+					await confirmDelivery(apiConfig, messagingKey, it.hash);
+				}),
+			);
+
+			const postConfirmedUndelivered = await receiver.getUndeliveredMessages(messagingKey);
+			expect(postConfirmedUndelivered.length).toEqual(0);
 		});
 	});
 });

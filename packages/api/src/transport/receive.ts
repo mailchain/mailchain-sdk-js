@@ -15,10 +15,7 @@ import { Deserialize } from './content/serialization';
 export class Receiver {
 	constructor(private readonly configuration: Configuration) {}
 
-	async pullNewMessages(messagingKeys: KeyRingDecrypter[]) {
-		return Promise.all(messagingKeys.map((it) => this._getDeliveryRequests(it)));
-	}
-	async _getDeliveryRequests(messagingKey: KeyRingDecrypter) {
+	async getUndeliveredMessages(messagingKey: KeyRingDecrypter) {
 		const transportApi = TransportApiFactory(this.configuration, undefined, getAxiosWithSigner(messagingKey));
 		return transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
 			return Promise.all(
