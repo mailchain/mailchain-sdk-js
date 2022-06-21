@@ -31,3 +31,10 @@ export function DecodeHex(input: string): Uint8Array {
 	}
 	return output;
 }
+
+export function isAnyHex(address: string): boolean {
+	if (address.startsWith('0x')) {
+		address = address.substring(2);
+	}
+	return new RegExp('^[a-fA-F0-9]+$').test(address);
+}
