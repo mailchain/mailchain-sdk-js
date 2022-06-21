@@ -4,10 +4,17 @@ import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
 import { DecodeBase64, EncodeBase64 } from '@mailchain/encoding';
+import Axios from 'axios';
 import { AuthApiFactory, Configuration } from '../api';
 import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
 import { DefaultConfig } from './config';
+
+export class LoginError extends Error {
+	constructor(public readonly kind: 'invalid-username' | 'failed-auth' | 'network-error', details: string) {
+		super(`${kind} - ${details}`);
+	}
+}
 
 export async function Login(
 	username: string,
@@ -16,18 +23,25 @@ export async function Login(
 	apiConfig: Configuration,
 	opaqueConfig: OpaqueConfig = DefaultConfig,
 ): Promise<AuthenticatedResponse> {
-	const authClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
+	try {
+		const authClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
 
-	const authInitResponse = await AccountAuthInit(
-		apiConfig,
-		opaqueConfig,
-		authClient,
-		username,
-		password,
-		captchaResponse,
-	);
-	const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authInitResponse.keyExchange2));
-	return AccountAuthFinalize(apiConfig, opaqueConfig, authClient, username, keyExchange2, authInitResponse.state);
+		const authInitResponse = await AccountAuthInit(
+			apiConfig,
+			opaqueConfig,
+			authClient,
+			username,
+			password,
+			captchaResponse,
+		);
+		const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authInitResponse.keyExchange2));
+		return AccountAuthFinalize(apiConfig, opaqueConfig, authClient, username, keyExchange2, authInitResponse.state);
+	} catch (e) {
+		if (Axios.isAxiosError(e)) {
+			throw new LoginError('network-error', 'axios network error');
+		}
+		throw e;
+	}
 }
 
 async function AccountAuthInit(
@@ -43,16 +57,24 @@ async function AccountAuthInit(
 }> {
 	const keyExchange1 = await opaqueClient.authInit(password);
 	if (keyExchange1 instanceof Error) {
-		throw new Error(`client failed to authInit: ${keyExchange1}`);
+		throw new LoginError('failed-auth', 'failed keyExchange1');
 	}
-	const response = await AuthApiFactory(apiConfig).accountAuthInit({
-		username,
-		params: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
-		captchaResponse,
-	});
+
+	const response = await AuthApiFactory(apiConfig)
+		.accountAuthInit({
+			username,
+			params: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
+			captchaResponse,
+		})
+		.catch((e) => {
+			if (Axios.isAxiosError(e) && e.response?.data?.message === 'username not found') {
+				throw new LoginError('invalid-username', 'auth init');
+			}
+			throw e;
+		});
 
 	if (response.status !== 200) {
-		throw new Error('failed to intialize authentication');
+		throw new LoginError('failed-auth', 'non 200 response status');
 	}
 
 	return {
@@ -80,7 +102,7 @@ async function AccountAuthFinalize(
 		opaqueConfig.context,
 	);
 	if (authFinishResponse instanceof Error) {
-		throw new Error(`client failed to authenticate: ${authFinishResponse}`);
+		throw new LoginError('failed-auth', 'failed authFinish');
 	}
 
 	const response = await AuthApiFactory(apiConfig).accountAuthFinalize({
@@ -89,7 +111,7 @@ async function AccountAuthFinalize(
 	});
 
 	if (response.status !== 200) {
-		throw new Error('failed to finalize authentication');
+		throw new LoginError('failed-auth', 'failed authFinish, non 200 status');
 	}
 
 	// TODO: this is not the production key create but will do for testing
