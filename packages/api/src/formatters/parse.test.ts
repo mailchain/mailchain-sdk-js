@@ -88,8 +88,8 @@ ${RAW_TEXT}`;
 
 describe('mime text parser)', () => {
 	afterAll(() => jest.resetAllMocks());
-	const mimeDetails = parseMimeText(testMime);
 	it('verify details', async () => {
+		const mimeDetails = await parseMimeText(testMime);
 		expect(mimeDetails.from).toEqual({
 			value: FROM_EMAIL,
 			label: FROM_NAME,

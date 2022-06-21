@@ -25,10 +25,9 @@ export interface NewMessageFormValues {
 export const getMimeMessage = (values: NewMessageFormValues): string => {
 	const msg = createMimeMessage();
 	msg.setSender({ name: values.from.label, addr: values.from.value });
-	values.recipients.forEach((rec) => {
-		msg.setRecipient({ name: rec.label, addr: rec.value });
-	});
+	msg.setRecipient(values.recipients.map((rec) => ({ name: rec.label, addr: rec.value })));
 	msg.setSubject(values.subject);
+
 	msg.setMessage('text/plain', values.message.map((n) => Node.string(n)).join('\n'));
 
 	return msg.asRaw();
