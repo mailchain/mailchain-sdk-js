@@ -5,8 +5,15 @@ export interface Address {
 	label: string;
 	value: string;
 }
+
+export enum MessageType {
+	NEW,
+	REPLY,
+	REPLY_ALL,
+	FORWARD,
+}
 export interface NewMessageFormValues {
-	type?: 'reply' | 'reply-all' | 'forward';
+	type: MessageType;
 	from: Address;
 	recipients: Address[];
 	carbonCopyRecipients: Address[];

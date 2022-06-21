@@ -1,5 +1,5 @@
 import parse from 'emailjs-mime-parser';
-import { NewMessageFormValues } from './generate';
+import { MessageType, NewMessageFormValues } from './generate';
 
 export function parseMimeText(text: string): NewMessageFormValues {
 	const {
@@ -11,6 +11,7 @@ export function parseMimeText(text: string): NewMessageFormValues {
 	return {
 		from: { label: from[0].value[0].name, value: from[0].value[0].address },
 		recipients: to.map((it) => ({ label: it.value[0].name, value: it.value[0].address })),
+		type: MessageType.NEW,
 		carbonCopyRecipients: [],
 		blindCarbonCopyRecipients: [],
 		subject: headers['subject']?.[0].value,
