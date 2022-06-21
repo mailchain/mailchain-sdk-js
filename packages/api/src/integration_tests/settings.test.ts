@@ -16,7 +16,8 @@ describe('Settings', () => {
 	});
 
 	it('set settings', async () => {
-		setSetting('theme', 'dark', apiConfig, kr.accountIdentityKey());
+		const response = await setSetting('theme', 'dark', apiConfig, kr.accountIdentityKey());
+		expect(response.status).toEqual(200);
 		const data = await getSettings(apiConfig, kr.accountIdentityKey());
 		expect(data!['theme'].value).toEqual('dark');
 		expect(data!['theme'].isSet).toBeTruthy();
