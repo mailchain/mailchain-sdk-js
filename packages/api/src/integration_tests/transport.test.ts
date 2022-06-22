@@ -6,6 +6,12 @@ import { SecureRandom } from '@mailchain/crypto';
 import { getOpaqueConfig, OpaqueID } from '@cloudflare/opaque-ts';
 import { lookupMessageKey } from '@mailchain/api/identityKeys';
 import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
+import * as identityKeysApi from '@mailchain/api/identityKeys';
+import { protocols } from '@mailchain/internal';
+import { ethers } from 'ethers';
+import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
+import { DecodeUtf8 } from '@mailchain/encoding/utf8';
+import { SignEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Register } from '../auth/register';
@@ -14,13 +20,7 @@ import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
-import * as identityKeysApi from '@mailchain/api/identityKeys';
-import { protocols } from '@mailchain/internal';
-import { ethers } from 'ethers';
-import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
-import { DecodeUtf8 } from '@mailchain/encoding/utf8';
 import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
-import { SignEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 
 jest.setTimeout(30000);
 
@@ -29,7 +29,7 @@ const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
 const registerAddress = async (user) => {
 	const walletPrivateKey = SECP256K1PrivateKey.Generate();
 	const wallet = new ethers.Wallet(walletPrivateKey.Bytes);
-	const address = wallet.address;
+	const { address } = wallet;
 
 	const addressBytes = DecodeHexZeroX(address);
 	const nonce = 1;
@@ -103,7 +103,7 @@ describe('SendAndReceiveMessage', () => {
 	}[];
 	let message: string;
 	let headers: PayloadHeaders;
-	let headersMultiple: PayloadHeaders[] = [];
+	const headersMultiple: PayloadHeaders[] = [];
 
 	let etherAddresses: { address: string; addressBytes: Uint8Array }[];
 
@@ -236,7 +236,7 @@ describe('SendAndReceiveMessage', () => {
 
 		etherAddresses.map(async (it, index) => {
 			const messagingKey = users[1].keyRing.addressMessagingKey(it.addressBytes, protocols.ETHEREUM, 1);
-			let results = await receiver.getUndeliveredMessages(messagingKey);
+			const results = await receiver.getUndeliveredMessages(messagingKey);
 			expect(results[index][0]).toBeDefined();
 			expect(results[index][0].payload!.Content).toEqual(
 				Buffer.from(`from ${users[0].username} to ${it.address}`),
@@ -244,8 +244,8 @@ describe('SendAndReceiveMessage', () => {
 			expect(results[index][0].payload!.Headers).toEqual(headersMultiple[index]);
 
 			await Promise.all(
-				results.map(async (it, index) => {
-					await confirmDelivery(apiConfig, messagingKey, it.hash);
+				results.map(async (d) => {
+					await confirmDelivery(apiConfig, messagingKey, d.hash);
 				}),
 			);
 

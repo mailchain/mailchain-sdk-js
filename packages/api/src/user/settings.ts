@@ -1,8 +1,8 @@
 import { KeyRing } from '@mailchain/keyring';
+import { KeyRingSigner } from '@mailchain/keyring/address';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Configuration } from '../api/configuration';
 import { UserApiFactory } from '../api';
-import { KeyRingSigner } from '@mailchain/keyring/address';
 
 export async function getSettings(apiConfig: Configuration, signer: KeyRingSigner) {
 	const settingsFactory = UserApiFactory(apiConfig, undefined, getAxiosWithSigner(signer));

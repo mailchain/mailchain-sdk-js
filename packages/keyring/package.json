@@ -11,6 +11,7 @@
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
 	},
 	"devDependencies": {
-		"protobufjs": "^6.11.2"
+		"protobufjs": "^6.11.3",
+		"estraverse": "^5.1.0"
 	}
 }

@@ -3,8 +3,8 @@ import { ecdsaSign, ecdsaVerify } from 'secp256k1';
 import { SECP256K1PublicKey } from '../secp256k1/public';
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
-import { ErrorUnsupportedKey } from './errors';
 import { SECP256K1PrivateKey } from '../secp256k1';
+import { ErrorUnsupportedKey } from './errors';
 
 export function VerifyEthereumPersonalMessage(key: PublicKey, message: Buffer, signature: Uint8Array): boolean {
 	switch (key.constructor) {
