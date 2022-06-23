@@ -1,5 +1,5 @@
 import { EncryptedContent, Encrypter, KeyExchange } from '..';
-import { PublicKey, RandomFunction, SecureRandom } from '../..';
+import { PublicKey, RandomFunction, secureRandom } from '../..';
 import { FromPublicKey } from '../ecdh/ecdh';
 import { easySeal } from './secretbox';
 import { serializePublicKeyEncryptedContent } from './serialization';
@@ -9,7 +9,7 @@ export class PublicKeyEncrypter implements Encrypter {
 	private _pubKey: PublicKey;
 	private _rand: RandomFunction;
 
-	constructor(keyEx: KeyExchange, pubKey: PublicKey, rand: RandomFunction = SecureRandom) {
+	constructor(keyEx: KeyExchange, pubKey: PublicKey, rand: RandomFunction = secureRandom) {
 		this._rand = rand;
 		this._keyEx = keyEx;
 		this._pubKey = pubKey;
@@ -23,6 +23,6 @@ export class PublicKeyEncrypter implements Encrypter {
 		const sharedSecret = await this._keyEx.SharedSecret(ephemeralPrvKey, this._pubKey);
 		const sealedBox = easySeal(input, sharedSecret, this._rand);
 
-		return serializePublicKeyEncryptedContent(sealedBox, ephemeralPrvKey.PublicKey);
+		return serializePublicKeyEncryptedContent(sealedBox, ephemeralPrvKey.publicKey);
 	}
 }

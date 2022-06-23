@@ -55,7 +55,7 @@ describe('encryptChunks', () => {
 					'hex',
 				),
 			],
-			privateKey: ED25519ExtendedPrivateKey.FromPrivateKey(AliceED25519PrivateKey),
+			privateKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
 			expected: [Buffer.from([0, 1, 2, 3]), Buffer.from([4, 5, 6, 7]), Buffer.from([8, 9, 10])],
 			shouldThrow: false,
 		},
@@ -107,7 +107,7 @@ describe('decryptPayload', () => {
 					'hex',
 				),
 			} as EncryptedPayload,
-			privateKey: ED25519ExtendedPrivateKey.FromPrivateKey(AliceED25519PrivateKey),
+			privateKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
 			expected: {
 				Content: Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
 				Headers: {

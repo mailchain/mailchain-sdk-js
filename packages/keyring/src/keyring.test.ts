@@ -4,7 +4,7 @@ import { KeyRing } from './keyring';
 
 describe('keyring', () => {
 	it('should assert against previous snapshot outputs from keyring', async () => {
-		const kr = KeyRing.FromPrivateKey(AliceED25519PrivateKey);
+		const kr = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 
 		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
 			'addressMessagingKey',
@@ -18,7 +18,7 @@ describe('keyring', () => {
 	});
 
 	it('should encrypt and decrypt for user profile data', async () => {
-		const kr = KeyRing.FromPrivateKey(AliceED25519PrivateKey);
+		const kr = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 		const userProfileCrypto = kr.userProfileCrypto();
 		const input = new Uint8Array([1, 3, 3, 7]);
 

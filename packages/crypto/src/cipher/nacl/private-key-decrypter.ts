@@ -17,10 +17,10 @@ export class PrivateKeyDecrypter implements Decrypter {
 
 		switch (privateKey.constructor) {
 			case ED25519PrivateKey:
-				this._secretKey = convertSecretKeyToCurve25519(privateKey.Bytes);
+				this._secretKey = convertSecretKeyToCurve25519(privateKey.bytes);
 				break;
 			case SECP256K1PrivateKey:
-				this._secretKey = privateKey.Bytes;
+				this._secretKey = privateKey.bytes;
 				break;
 			case SR25519PrivateKey:
 				throw RangeError('sr25519 key not supported'); // need to convert key to 32 bytes
@@ -28,7 +28,7 @@ export class PrivateKeyDecrypter implements Decrypter {
 				throw RangeError('unknown private key type');
 		}
 	}
-	static FromPrivateKey(key: PrivateKey): PrivateKeyDecrypter {
+	static fromPrivateKey(key: PrivateKey): PrivateKeyDecrypter {
 		return new this(key);
 	}
 

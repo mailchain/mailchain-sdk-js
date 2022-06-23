@@ -1,6 +1,6 @@
 import { PrivateKey } from '@mailchain/crypto';
 import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
-import { DeriveHardenedKey } from '@mailchain/crypto/ed25519';
+import { deriveHardenedKey } from '@mailchain/crypto/ed25519';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
 import { SerializablePayloadHeaders } from './headers';
 import { EncryptedPayload, Payload } from './payload';
@@ -18,8 +18,8 @@ export async function decryptPayload(
 ): Promise<Payload> {
 	const decryptedContentChunks = await decryptChunks(input.EncryptedContentChunks, payloadRootKey);
 
-	const headersEncryptionKey = DeriveHardenedKey(payloadRootKey, 'headers');
-	const decryptedHeaders = await decryptBuffer(input.EncryptedHeaders, headersEncryptionKey.PrivateKey);
+	const headersEncryptionKey = deriveHardenedKey(payloadRootKey, 'headers');
+	const decryptedHeaders = await decryptBuffer(input.EncryptedHeaders, headersEncryptionKey.privateKey);
 
 	const headers = SerializablePayloadHeaders.FromBuffer(decryptedHeaders);
 
@@ -38,11 +38,11 @@ export async function decryptPayload(
 export async function decryptChunks(chunks: Buffer[], payloadRootKey: ED25519ExtendedPrivateKey): Promise<Buffer[]> {
 	const decryptedChunks = new Array<Buffer>(chunks.length);
 
-	const contentRootKey = DeriveHardenedKey(payloadRootKey, 'content');
+	const contentRootKey = deriveHardenedKey(payloadRootKey, 'content');
 
 	for (let i = 0; i < chunks.length; i++) {
-		const chunkKey = DeriveHardenedKey(contentRootKey, i);
-		decryptedChunks[i] = await decryptBuffer(chunks[i], chunkKey.PrivateKey);
+		const chunkKey = deriveHardenedKey(contentRootKey, i);
+		decryptedChunks[i] = await decryptBuffer(chunks[i], chunkKey.privateKey);
 	}
 
 	return decryptedChunks;
@@ -52,6 +52,6 @@ export async function decryptBuffer(buffer: Buffer, key: PrivateKey): Promise<Bu
 	if (buffer.length === 0) {
 		throw new Error('can not decrypt empty data');
 	}
-	const decrypted = await PrivateKeyDecrypter.FromPrivateKey(key).Decrypt(buffer);
+	const decrypted = await PrivateKeyDecrypter.fromPrivateKey(key).Decrypt(buffer);
 	return Buffer.from(decrypted);
 }

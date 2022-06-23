@@ -92,17 +92,17 @@ describe('shared-secret-wasm-compatibility', () => {
 			return new Uint8Array([]);
 		});
 
-		const self = await SR25519PrivateKey.FromSeed(
+		const self = await SR25519PrivateKey.fromSeed(
 			DecodeHex('98b3d305d5a5eace562387e47e59badd4d77e3f72cabfb10a60f8a197059f0a8'),
 		);
-		const other = await SR25519PrivateKey.FromSeed(
+		const other = await SR25519PrivateKey.fromSeed(
 			DecodeHex('9732eea001851ff862d949a1699c9971f3a26edbede2ad7922cbbe9a0701f366'),
 		);
 
 		const expected = DecodeHex('b03a0b198c34c16f35cae933d88b16341b4cef3e84e851f20e664c6a30527f4e');
 
-		expect(await target.SharedSecret(self, other.PublicKey)).toEqual(expected);
-		expect(await target.SharedSecret(other, self.PublicKey)).toEqual(expected);
+		expect(await target.SharedSecret(self, other.publicKey)).toEqual(expected);
+		expect(await target.SharedSecret(other, self.publicKey)).toEqual(expected);
 	});
 
 	it('key-agreement-random-keys', async () => {
@@ -110,11 +110,11 @@ describe('shared-secret-wasm-compatibility', () => {
 			return new Uint8Array([]);
 		});
 
-		const self = await SR25519PrivateKey.Generate();
-		const other = await SR25519PrivateKey.Generate();
+		const self = await SR25519PrivateKey.generate();
+		const other = await SR25519PrivateKey.generate();
 
-		expect(await target.SharedSecret(self, other.PublicKey)).toEqual(
-			await target.SharedSecret(other, self.PublicKey),
+		expect(await target.SharedSecret(self, other.publicKey)).toEqual(
+			await target.SharedSecret(other, self.publicKey),
 		);
 	});
 });

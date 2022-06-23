@@ -12,16 +12,18 @@ describe('new()', () => {
 			name: 'alice',
 			arg: AliceED25519PublicKeyBytes,
 			expected: {
-				Bytes: AliceED25519PublicKeyBytes,
-			},
+				curve: 'ed25519',
+				bytes: AliceED25519PublicKeyBytes,
+			} as ED25519PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-uncompressed',
 			arg: BobED25519PublicKeyBytes,
 			expected: {
-				Bytes: BobED25519PublicKeyBytes,
-			},
+				curve: 'ed25519',
+				bytes: BobED25519PublicKeyBytes,
+			} as ED25519PublicKey,
 			shouldThrow: false,
 		},
 		{
@@ -111,9 +113,9 @@ describe('verify()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return test.pubKey.Verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
+				return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
 			}
-			return test.pubKey.Verify(test.message, test.sig).then((actual) => {
+			return test.pubKey.verify(test.message, test.sig).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});

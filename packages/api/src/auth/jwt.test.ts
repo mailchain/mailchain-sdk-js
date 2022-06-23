@@ -56,7 +56,7 @@ describe('JWT tokens()', () => {
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -83,7 +83,7 @@ describe('JWT tokens()', () => {
 			.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -113,7 +113,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountMessagingKey().publicKey.Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountMessagingKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -141,7 +141,7 @@ describe('JWT tokens()', () => {
 			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -169,7 +169,7 @@ describe('JWT tokens()', () => {
 			.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.Bytes)}`,
+					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});

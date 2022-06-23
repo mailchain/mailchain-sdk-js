@@ -8,18 +8,18 @@ describe('FromPrivateKey()', () => {
 			name: 'alice',
 			arg: AliceSR25519PrivateKey,
 			expected: {
-				Bytes: AliceSR25519PrivateKey.Bytes,
-				PrivateKey: AliceSR25519PrivateKey,
-			},
+				bytes: AliceSR25519PrivateKey.bytes,
+				privateKey: AliceSR25519PrivateKey,
+			} as SR25519ExtendedPrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			arg: BobSR25519PrivateKey,
 			expected: {
-				Bytes: BobSR25519PrivateKey.Bytes,
-				PrivateKey: BobSR25519PrivateKey,
-			},
+				bytes: BobSR25519PrivateKey.bytes,
+				privateKey: BobSR25519PrivateKey,
+			} as SR25519ExtendedPrivateKey,
 			shouldThrow: false,
 		},
 		{

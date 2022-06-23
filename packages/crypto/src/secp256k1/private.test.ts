@@ -15,8 +15,9 @@ describe('new()', () => {
 			name: 'alice',
 			arg: AliceSECP256K1PrivateKeyBytes,
 			expected: {
-				Bytes: AliceSECP256K1PrivateKeyBytes,
-				PublicKey: AliceSECP256K1PublicKey,
+				curve: 'secp256k1',
+				bytes: AliceSECP256K1PrivateKeyBytes,
+				publicKey: AliceSECP256K1PublicKey,
 			},
 			shouldThrow: false,
 		},
@@ -24,8 +25,9 @@ describe('new()', () => {
 			name: 'bob',
 			arg: BobSECP256K1PrivateKeyBytes,
 			expected: {
-				Bytes: BobSECP256K1PrivateKeyBytes,
-				PublicKey: BobSECP256K1PublicKey,
+				curve: 'secp256k1',
+				bytes: BobSECP256K1PrivateKeyBytes,
+				publicKey: BobSECP256K1PublicKey,
 			},
 			shouldThrow: false,
 		},
@@ -80,9 +82,9 @@ describe('sign()', () => {
 		it(test.name, async () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return test.privKey.Sign(test.message).catch((e) => expect(e).toBeDefined());
+				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
 			}
-			return test.privKey.Sign(test.message).then((actual) => {
+			return test.privKey.sign(test.message).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});
@@ -103,7 +105,7 @@ describe('public-key', () => {
 		},
 	];
 	tests.forEach((test) => {
-		expect(test.privKey.PublicKey).toEqual(test.expected);
+		expect(test.privKey.publicKey).toEqual(test.expected);
 	});
 });
 
@@ -138,10 +140,10 @@ describe('generate', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					SECP256K1PrivateKey.Generate(test.rand);
+					SECP256K1PrivateKey.generate(test.rand);
 				}).toThrow();
 			} else {
-				expect(SECP256K1PrivateKey.Generate(test.rand)).toEqual(test.expected!);
+				expect(SECP256K1PrivateKey.generate(test.rand)).toEqual(test.expected!);
 			}
 		});
 	});

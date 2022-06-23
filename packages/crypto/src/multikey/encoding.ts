@@ -2,10 +2,10 @@ import { PrivateKey, PublicKey } from '..';
 import { IdFromPrivateKey, IdFromPublicKey, PrivateKeyFromId, PublicKeyFromId } from './ids';
 
 export function EncodePublicKey(key: PublicKey): Uint8Array {
-	const out = new Uint8Array(key.Bytes.length + 1);
+	const out = new Uint8Array(key.bytes.length + 1);
 
 	out[0] = IdFromPublicKey(key);
-	out.set(key.Bytes, 1);
+	out.set(key.bytes, 1);
 
 	return out;
 }
@@ -18,10 +18,10 @@ export function DecodePublicKey(encoded: Uint8Array): PublicKey {
 }
 
 export function EncodePrivateKey(key: PrivateKey): Uint8Array {
-	const out = new Uint8Array(key.Bytes.length + 1);
+	const out = new Uint8Array(key.bytes.length + 1);
 
 	out[0] = IdFromPrivateKey(key);
-	out.set(key.Bytes, 1);
+	out.set(key.bytes, 1);
 
 	return out;
 }

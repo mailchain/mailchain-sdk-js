@@ -172,7 +172,7 @@ function parseOriginHeader(input: string): PublicKey {
 
 function createOriginHeader(signer: PublicKey): string {
 	const values: string[] = [];
-	values.push(`data=${EncodeBase64(signer.Bytes)}`);
+	values.push(`data=${EncodeBase64(signer.bytes)}`);
 	values.push(`alg=${KindFromPublicKey(signer)}`);
 
 	return values.join('; ').trimEnd();

@@ -24,7 +24,7 @@ export const AliceED25519PrivateKeyBytes = new Uint8Array([
 	0x41, 0x7a, 0x2b, 0x77, 0xa, 0x56, 0x71,
 ]);
 export const AliceED25519PrivateKey = new ED25519PrivateKey({
-	publicKey: AliceED25519PublicKey.Bytes,
+	publicKey: AliceED25519PublicKey.bytes,
 	secretKey: AliceED25519PrivateKeyBytes,
 });
 
@@ -36,6 +36,6 @@ export const BobED25519PrivateKeyBytes = new Uint8Array([
 	0x97, 0x9a, 0x15, 0x9b, 0xec, 0xe1, 0xe8,
 ]);
 export const BobED25519PrivateKey = new ED25519PrivateKey({
-	publicKey: BobED25519PublicKey.Bytes,
+	publicKey: BobED25519PublicKey.bytes,
 	secretKey: BobED25519PrivateKeyBytes,
 });

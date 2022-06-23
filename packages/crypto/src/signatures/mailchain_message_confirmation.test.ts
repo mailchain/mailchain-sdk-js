@@ -1,6 +1,6 @@
 import { DecodeHex, EncodeHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring/keyring';
-import { SecureRandom } from '../rand';
+import { secureRandom } from '../rand';
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../ed25519/test.const';
 import { AliceSECP256K1PrivateKey } from '../secp256k1/test.const';
 import {
@@ -10,14 +10,14 @@ import {
 
 import { ErrorUnsupportedKey } from './errors';
 
-describe('aknowledge receiving message', () => {
+describe('acknowledge receiving message', () => {
 	test('message formatted properly', () => {
 		const arrays = [
 			new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7]),
-			SecureRandom(),
-			SecureRandom(),
-			SecureRandom(),
-			SecureRandom(),
+			secureRandom(),
+			secureRandom(),
+			secureRandom(),
+			secureRandom(),
 		];
 		arrays.forEach((arr) => {
 			expect(mailchainDeliveryConfirmationMessage(arr)).toEqual(
@@ -31,7 +31,7 @@ describe('signing is correct', () => {
 		{
 			name: `alice-ed25519`,
 			args: {
-				keyRing: KeyRing.FromPrivateKey(AliceED25519PrivateKey),
+				keyRing: KeyRing.fromPrivateKey(AliceED25519PrivateKey),
 				signature: DecodeHex(
 					'1a8cb54a9fd44f18e0799b081fb725b54409e46f9d6ddb2c2e720de1c60c66030a9038c28a2d0c5a68def8fcb5359ca7bceb5afe943424d610fa91cda27cf1221c',
 				),
@@ -46,7 +46,7 @@ describe('signing is correct', () => {
 		{
 			name: `bob-ed25519`,
 			args: {
-				keyRing: KeyRing.FromPrivateKey(BobED25519PrivateKey),
+				keyRing: KeyRing.fromPrivateKey(BobED25519PrivateKey),
 				signature: DecodeHex(
 					'1a8cb54a9fd44f18e0799b081fb725b54409e46f9d6ddb2c2e720de1c60c66030a9038c28a2d0c5a68def8fcb5359ca7bceb5afe943424d610fa91cda27cf1221c',
 				),

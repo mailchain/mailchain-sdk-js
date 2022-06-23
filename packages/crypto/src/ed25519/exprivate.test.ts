@@ -8,18 +8,18 @@ describe('FromPrivateKey()', () => {
 			name: 'alice',
 			arg: AliceED25519PrivateKey,
 			expected: {
-				Bytes: AliceED25519PrivateKey.Bytes,
-				PrivateKey: AliceED25519PrivateKey,
-			},
+				bytes: AliceED25519PrivateKey.bytes,
+				privateKey: AliceED25519PrivateKey,
+			} as ED25519ExtendedPrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			arg: BobED25519PrivateKey,
 			expected: {
-				Bytes: BobED25519PrivateKey.Bytes,
-				PrivateKey: BobED25519PrivateKey,
-			},
+				bytes: BobED25519PrivateKey.bytes,
+				privateKey: BobED25519PrivateKey,
+			} as ED25519ExtendedPrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -33,10 +33,10 @@ describe('FromPrivateKey()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					ED25519ExtendedPrivateKey.FromPrivateKey(test.arg);
+					ED25519ExtendedPrivateKey.fromPrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(ED25519ExtendedPrivateKey.FromPrivateKey(test.arg)).toEqual(test.expected);
+				expect(ED25519ExtendedPrivateKey.fromPrivateKey(test.arg)).toEqual(test.expected);
 			}
 		});
 	});

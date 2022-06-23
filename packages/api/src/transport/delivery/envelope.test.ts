@@ -11,8 +11,8 @@ describe('createEnvelope', () => {
 		{
 			name: 'alice',
 			pubKey: AliceED25519PublicKey,
-			messageKey: ED25519ExtendedPrivateKey.FromPrivateKey(
-				ED25519PrivateKey.FromSeed(
+			messageKey: ED25519ExtendedPrivateKey.fromPrivateKey(
+				ED25519PrivateKey.fromSeed(
 					DecodeHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
 				),
 			),

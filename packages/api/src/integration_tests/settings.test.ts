@@ -7,7 +7,7 @@ const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as Con
 
 describe('Settings', () => {
 	afterAll(() => jest.resetAllMocks());
-	const kr = new KeyRing(ED25519PrivateKey.Generate());
+	const kr = new KeyRing(ED25519PrivateKey.generate());
 	it('get settings', async () => {
 		const data = await getSettings(apiConfig, kr.accountIdentityKey());
 		expect(data).toBeDefined();

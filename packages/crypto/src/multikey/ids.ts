@@ -47,9 +47,9 @@ export function PrivateKeyFromId(id: number, data: Uint8Array): PrivateKey {
 		case IdSECP256K1:
 			return new SECP256K1PrivateKey(data);
 		case IdED25519:
-			return ED25519PrivateKey.FromSecretKey(data);
+			return ED25519PrivateKey.fromSecretKey(data);
 		case IdSR25519:
-			return SR25519PrivateKey.FromBytes(data);
+			return SR25519PrivateKey.fromBytes(data);
 		default:
 			throw RangeError('unknown private key id');
 	}

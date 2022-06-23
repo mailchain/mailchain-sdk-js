@@ -18,26 +18,28 @@ describe('fromSeed()', () => {
 			name: 'alice-seed',
 			arg: AliceED25519Seed,
 			expected: {
-				KeyPair: {
-					publicKey: AliceED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: AliceED25519PublicKey.bytes,
 					secretKey: AliceED25519PrivateKeyBytes,
 				},
-				Bytes: AliceED25519PrivateKeyBytes,
-				PublicKey: AliceED25519PublicKey,
-			},
+				bytes: AliceED25519PrivateKeyBytes,
+				publicKey: AliceED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-seed',
 			arg: BobED25519Seed,
 			expected: {
-				KeyPair: {
-					publicKey: BobED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: BobED25519PublicKey.bytes,
 					secretKey: BobED25519PrivateKeyBytes,
 				},
-				Bytes: BobED25519PrivateKeyBytes,
-				PublicKey: BobED25519PublicKey,
-			},
+				bytes: BobED25519PrivateKeyBytes,
+				publicKey: BobED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -51,12 +53,12 @@ describe('fromSeed()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					ED25519PrivateKey.FromSeed(test.arg);
+					ED25519PrivateKey.fromSeed(test.arg);
 				}).toThrow();
 			} else {
 				const { ...expected } = test.expected!;
 
-				expect(ED25519PrivateKey.FromSeed(test.arg)).toEqual(expect.objectContaining(expected));
+				expect(ED25519PrivateKey.fromSeed(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});
@@ -68,26 +70,28 @@ describe('fromSeed()', () => {
 			name: 'alice',
 			arg: AliceED25519PrivateKeyBytes,
 			expected: {
-				KeyPair: {
-					publicKey: AliceED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: AliceED25519PublicKey.bytes,
 					secretKey: AliceED25519PrivateKeyBytes,
 				},
-				Bytes: AliceED25519PrivateKeyBytes,
-				PublicKey: AliceED25519PublicKey,
-			},
+				bytes: AliceED25519PrivateKeyBytes,
+				publicKey: AliceED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			arg: BobED25519PrivateKeyBytes,
 			expected: {
-				KeyPair: {
-					publicKey: BobED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: BobED25519PublicKey.bytes,
 					secretKey: BobED25519PrivateKeyBytes,
 				},
-				Bytes: BobED25519PrivateKeyBytes,
-				PublicKey: BobED25519PublicKey,
-			},
+				bytes: BobED25519PrivateKeyBytes,
+				publicKey: BobED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -101,12 +105,12 @@ describe('fromSeed()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					ED25519PrivateKey.FromSecretKey(test.arg);
+					ED25519PrivateKey.fromSecretKey(test.arg);
 				}).toThrow();
 			} else {
 				const { ...expected } = test.expected!;
 
-				expect(ED25519PrivateKey.FromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
+				expect(ED25519PrivateKey.fromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
 			}
 		});
 	});
@@ -117,33 +121,35 @@ describe('new()', () => {
 		{
 			name: 'alice',
 			arg: {
-				publicKey: AliceED25519PublicKey.Bytes,
+				publicKey: AliceED25519PublicKey.bytes,
 				secretKey: AliceED25519PrivateKeyBytes,
 			},
 			expected: {
-				KeyPair: {
-					publicKey: AliceED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: AliceED25519PublicKey.bytes,
 					secretKey: AliceED25519PrivateKeyBytes,
 				},
-				Bytes: AliceED25519PrivateKeyBytes,
-				PublicKey: AliceED25519PublicKey,
-			},
+				bytes: AliceED25519PrivateKeyBytes,
+				publicKey: AliceED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			arg: {
-				publicKey: BobED25519PublicKey.Bytes,
+				publicKey: BobED25519PublicKey.bytes,
 				secretKey: BobED25519PrivateKeyBytes,
 			},
 			expected: {
-				KeyPair: {
-					publicKey: BobED25519PublicKey.Bytes,
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: BobED25519PublicKey.bytes,
 					secretKey: BobED25519PrivateKeyBytes,
 				},
-				Bytes: BobED25519PrivateKeyBytes,
-				PublicKey: BobED25519PublicKey,
-			},
+				bytes: BobED25519PrivateKeyBytes,
+				publicKey: BobED25519PublicKey,
+			} as ED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -201,9 +207,9 @@ describe('sign()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return test.privKey.Sign(test.message).catch((e) => expect(e).toBeDefined());
+				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
 			}
-			return test.privKey.Sign(test.message).then((actual) => {
+			return test.privKey.sign(test.message).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});
@@ -226,7 +232,7 @@ describe('public-key', () => {
 	tests.forEach((test) => {
 		it(test.name, () => {
 			const { ...expected } = test.expected!;
-			expect(test.privKey.PublicKey).toEqual(expect.objectContaining(expected));
+			expect(test.privKey.publicKey).toEqual(expect.objectContaining(expected));
 		});
 	});
 });
@@ -263,11 +269,11 @@ describe('generate', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					ED25519PrivateKey.Generate(test.rand);
+					ED25519PrivateKey.generate(test.rand);
 				}).toThrow();
 			} else {
-				const actual = ED25519PrivateKey.Generate(test.rand);
-				const { Sign, ...expected } = test.expected!;
+				const actual = ED25519PrivateKey.generate(test.rand);
+				const { sign, ...expected } = test.expected!;
 				expect(actual).toEqual(expect.objectContaining(expected));
 			}
 		});

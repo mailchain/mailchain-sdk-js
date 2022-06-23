@@ -1,13 +1,14 @@
 import { PublicKey } from '../';
 
 export class UnknownPublicKey implements PublicKey {
-	readonly Bytes: Uint8Array;
+	readonly bytes: Uint8Array;
+	readonly curve: string = 'testcurve';
 
 	constructor() {
-		this.Bytes = new Uint8Array();
+		this.bytes = new Uint8Array();
 	}
 
-	async Verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
+	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
 		return false;
 	}
 }

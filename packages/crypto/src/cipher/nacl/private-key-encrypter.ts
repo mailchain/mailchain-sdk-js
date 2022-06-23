@@ -1,7 +1,7 @@
 import { IdFromPrivateKey } from '@mailchain/crypto/multikey';
 import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto';
 import { EncryptedContent, Encrypter } from '..';
-import { PrivateKey, RandomFunction, SecureRandom } from '../..';
+import { PrivateKey, RandomFunction, secureRandom } from '../..';
 import { SECP256K1PrivateKey } from '../../secp256k1';
 import { ED25519PrivateKey } from '../../ed25519';
 import { SR25519PrivateKey } from '../../sr25519';
@@ -13,16 +13,16 @@ export class PrivateKeyEncrypter implements Encrypter {
 	private _secretKey: Uint8Array;
 	private _keyId: number;
 
-	constructor(privateKey: PrivateKey, rand: RandomFunction = SecureRandom) {
+	constructor(privateKey: PrivateKey, rand: RandomFunction = secureRandom) {
 		this._rand = rand;
 		this._keyId = IdFromPrivateKey(privateKey);
 
 		switch (privateKey.constructor) {
 			case ED25519PrivateKey:
-				this._secretKey = convertSecretKeyToCurve25519(privateKey.Bytes);
+				this._secretKey = convertSecretKeyToCurve25519(privateKey.bytes);
 				break;
 			case SECP256K1PrivateKey:
-				this._secretKey = privateKey.Bytes;
+				this._secretKey = privateKey.bytes;
 				break;
 			case SR25519PrivateKey:
 				throw RangeError('sr25519 key not supported'); // need to convert key to 32 bytes
@@ -30,7 +30,7 @@ export class PrivateKeyEncrypter implements Encrypter {
 				throw RangeError('unknown private key type');
 		}
 	}
-	static FromPrivateKey(key: PrivateKey, rand: RandomFunction = SecureRandom): PrivateKeyEncrypter {
+	static FromPrivateKey(key: PrivateKey, rand: RandomFunction = secureRandom): PrivateKeyEncrypter {
 		return new this(key, rand);
 	}
 

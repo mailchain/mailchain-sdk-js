@@ -1,24 +1,25 @@
 import { ed25519Verify } from '@polkadot/util-crypto';
-import { PublicKey } from '../';
+import { KindED25519, PublicKey } from '../';
 
 export const PublicKeyLen = 32;
 
 export class ED25519PublicKey implements PublicKey {
-	readonly Bytes: Uint8Array;
+	readonly curve: string = KindED25519;
+	readonly bytes: Uint8Array;
 
 	constructor(bytes: Uint8Array) {
 		if (bytes.length !== PublicKeyLen) {
 			throw new RangeError('invalid public key length');
 		}
-		this.Bytes = bytes;
+		this.bytes = bytes;
 	}
 
-	async Verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
-		return ed25519Verify(message, sig, this.Bytes);
+	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
+		return ed25519Verify(message, sig, this.bytes);
 	}
 }
 
-export function AsED25519PublicKey(key: PublicKey): ED25519PublicKey {
+export function asED25519PublicKey(key: PublicKey): ED25519PublicKey {
 	if (key.constructor !== ED25519PublicKey) {
 		throw new Error('key must be ed25519');
 	}

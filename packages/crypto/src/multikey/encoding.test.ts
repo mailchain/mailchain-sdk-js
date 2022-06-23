@@ -10,19 +10,19 @@ describe('EncodePublicKey()', () => {
 		{
 			name: 'sr25519 alice',
 			arg: AliceSR25519PublicKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKey.bytes])),
 			shouldThrow: false,
 		},
 		{
 			name: 'ed25519 alice',
 			arg: AliceED25519PublicKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKey.bytes])),
 			shouldThrow: false,
 		},
 		{
 			name: 'secp256k1 alice',
 			arg: AliceSECP256K1PublicKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PublicKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PublicKey.bytes])),
 			shouldThrow: false,
 		},
 	];
@@ -43,19 +43,19 @@ describe('DecodePublicKey()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKey.bytes])),
 			expected: AliceSR25519PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'ed25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKey.bytes])),
 			expected: AliceED25519PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'secp256k1 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PublicKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PublicKey.bytes])),
 			expected: AliceSECP256K1PublicKey,
 			shouldThrow: false,
 		},
@@ -78,19 +78,19 @@ describe('EncodePrivateKey()', () => {
 		{
 			name: 'sr25519 alice',
 			arg: AliceSR25519PrivateKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKey.bytes])),
 			shouldThrow: false,
 		},
 		{
 			name: 'ed25519 alice',
 			arg: AliceED25519PrivateKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKey.bytes])),
 			shouldThrow: false,
 		},
 		{
 			name: 'secp256k1 alice',
 			arg: AliceSECP256K1PrivateKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PrivateKey.Bytes])),
+			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PrivateKey.bytes])),
 			shouldThrow: false,
 		},
 	];
@@ -111,19 +111,19 @@ describe('DecodePrivateKey()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKey.bytes])),
 			expected: AliceSR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'ed25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKey.bytes])),
 			expected: AliceED25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'secp256k1 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PrivateKey.Bytes])),
+			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceSECP256K1PrivateKey.bytes])),
 			expected: AliceSECP256K1PrivateKey,
 			shouldThrow: false,
 		},
@@ -135,7 +135,7 @@ describe('DecodePrivateKey()', () => {
 					DecodePrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				const { Sign, ...expected } = test.expected!;
+				const { sign, ...expected } = test.expected!;
 
 				expect(DecodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
 			}

@@ -1,15 +1,10 @@
 import { protocols } from '@mailchain/internal';
 import { EncodeHexZeroX } from '@mailchain/encoding';
-import { IdFromPublicKey } from '../multikey';
 import { PublicKey } from '../public';
-import { ED25519PublicKey } from '../ed25519/public';
 import { PrivateKey } from '../private';
 import { ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
-
-function DescriptiveBytesFromPublicKey(key: PublicKey) {
-	const idByte = IdFromPublicKey(key);
-	return Buffer.from([idByte, ...key.Bytes]);
-}
+import { KindED25519 } from '../keys';
+import { EncodePublicKey } from '../multikey/encoding';
 
 export function mailchainProvidedMessagingKeyMessage(
 	msgKey: PublicKey,
@@ -18,27 +13,24 @@ export function mailchainProvidedMessagingKeyMessage(
 ) {
 	if (address.length === 0) throw new ErrorAddressIsEmpty();
 	if (protocol.length === 0) throw new ErrorProtocolIsEmpty();
-	let descriptiveKey: Buffer | null = null;
+	let descriptiveKey: Uint8Array;
 	// check for type ed25519.PublicKey
 
-	switch (msgKey.constructor) {
-		case ED25519PublicKey: {
-			descriptiveKey = DescriptiveBytesFromPublicKey(msgKey);
-			break;
-		}
+	switch (msgKey.curve) {
+		case KindED25519:
+			const encodedKey = EncodeHexZeroX(EncodePublicKey(msgKey));
+
+			return new Uint8Array(
+				Buffer.from(
+					`\x11Mailchain provided messaging key:\nAddress:${
+						address.split('@')[0]
+					}\nProtocol:${protocol}\nKey:${encodedKey}`,
+				),
+			);
 
 		default:
-			throw new ErrorUnsupportedKey();
+			throw new ErrorUnsupportedKey(msgKey.curve);
 	}
-	const encodedKey = EncodeHexZeroX(descriptiveKey);
-
-	return new Uint8Array(
-		Buffer.from(
-			`\x11Mailchain provided messaging key:\nAddress:${
-				address.split('@')[0]
-			}\nProtocol:${protocol}\nKey:${encodedKey}`,
-		),
-	);
 }
 
 export function SignMailchainProvidedMessagingKey(
@@ -47,16 +39,14 @@ export function SignMailchainProvidedMessagingKey(
 	address: string,
 	protocol: protocols.ProtocolType,
 ): Promise<Uint8Array> {
-	switch (msgKey.constructor) {
-		case ED25519PublicKey: {
-			break;
-		}
+	switch (key.curve) {
+		case KindED25519:
+			const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
+			return key.sign(msg as Uint8Array);
 
 		default:
-			throw new ErrorUnsupportedKey();
+			throw new ErrorUnsupportedKey(key.curve);
 	}
-	const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
-	return key.Sign(msg as Uint8Array);
 }
 
 export function VerifyMailchainProvidedMessagingKey(
@@ -66,23 +56,12 @@ export function VerifyMailchainProvidedMessagingKey(
 	address: string,
 	protocol: protocols.ProtocolType,
 ): Promise<boolean> {
-	switch (msgKey.constructor) {
-		case ED25519PublicKey: {
-			break;
-		}
+	switch (key.curve) {
+		case KindED25519:
+			const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
 
+			return key.verify(msg as Uint8Array, signature);
 		default:
-			throw new ErrorUnsupportedKey();
+			throw new ErrorUnsupportedKey(key.curve);
 	}
-	switch (key.constructor) {
-		case ED25519PublicKey: {
-			break;
-		}
-
-		default:
-			throw new ErrorUnsupportedKey();
-	}
-	const msg = mailchainProvidedMessagingKeyMessage(msgKey, address, protocol);
-
-	return key.Verify(msg as Uint8Array, signature);
 }

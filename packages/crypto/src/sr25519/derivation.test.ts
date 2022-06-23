@@ -34,7 +34,7 @@ describe('Derive()', () => {
 		{
 			name: `alice//1://2`,
 			args: {
-				key: SR25519PrivateKey.FromSeed(
+				key: SR25519PrivateKey.fromSeed(
 					DecodeHexZeroX('0x3bda43f87952aed76127e7c632e474ae43e72d9a8bb0208a30e30f6ba514d5b5'),
 				),
 				path: [2],
@@ -72,7 +72,7 @@ describe('Derive()', () => {
 		{
 			name: `bob//1://2`,
 			args: {
-				key: SR25519PrivateKey.FromSeed(
+				key: SR25519PrivateKey.fromSeed(
 					DecodeHexZeroX('0xc2f23fb4aa97ce791ed1c51ea701077a7d0d10c3281be9c47b3a221551fce143'),
 				),
 				path: [2],
@@ -89,7 +89,7 @@ describe('Derive()', () => {
 				extendedKey = await SR25519DeriveHardenedKey(extendedKey, path);
 			}
 
-			expect(extendedKey.PrivateKey).toEqual(await SR25519PrivateKey.FromSeed(test.expectedSeed));
+			expect(extendedKey.privateKey).toEqual(await SR25519PrivateKey.fromSeed(test.expectedSeed));
 		});
 	});
 });

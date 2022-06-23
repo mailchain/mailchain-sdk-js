@@ -1,5 +1,5 @@
 import { OpaqueClient, RegistrationResponse, RegistrationClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
-import { PrivateKey, PublicKey } from '@mailchain/crypto';
+import { PrivateKey, PublicKey, Signer, SignerWithPublicKey } from '@mailchain/crypto';
 import { SignMailchainUsername } from '@mailchain/crypto/signatures/mailchain_username';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
@@ -13,6 +13,7 @@ import { AuthApiFactory, Configuration } from '../api';
 import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
 import { DefaultConfig } from './config';
+import { KeyRing } from '@mailchain/keyring';
 
 export async function Register({
 	identityKeySeed,
@@ -34,7 +35,8 @@ export async function Register({
 	const opaqueRegisterClient: RegistrationClient = new OpaqueClient(opaqueConfig.parameters);
 	const opaqueAuthClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
 
-	const identityKey = ED25519PrivateKey.FromSeed(identityKeySeed);
+	const rootAccountKey = ED25519PrivateKey.fromSeed(identityKeySeed);
+	const identityKey = KeyRing.fromPrivateKey(rootAccountKey).accountIdentityKey();
 	const registerInitResponse = await AccountRegisterInit(
 		apiConfig,
 		opaqueConfig,
@@ -65,6 +67,7 @@ export async function Register({
 		registerCreateResponse.authStartResponse,
 		registerCreateResponse.state,
 		registerInitResponse.registrationSession,
+		rootAccountKey,
 	);
 }
 
@@ -72,7 +75,7 @@ async function AccountRegisterInit(
 	apiConfig: Configuration,
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: RegistrationClient,
-	identityKey: PrivateKey,
+	identityKey: SignerWithPublicKey,
 	username: string,
 	password: string,
 	captchaResponse: string,
@@ -89,7 +92,7 @@ async function AccountRegisterInit(
 	const signature = await SignMailchainUsername(identityKey, Buffer.from(username, 'utf-8'));
 
 	const response = await AuthApiFactory(apiConfig).accountRegisterInit({
-		identityKey: EncodeHexZeroX(EncodePublicKey(identityKey.PublicKey)),
+		identityKey: EncodeHexZeroX(EncodePublicKey(identityKey.publicKey)),
 		signature: EncodeBase64(signature),
 		username,
 		registerInitParams: EncodeBase64(Uint8Array.from(serializedRequest)),
@@ -158,12 +161,13 @@ async function AccountRegisterFinalize(
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: AuthClient,
 	identityKeySeed: Uint8Array,
-	identityKey: PrivateKey,
+	identityKey: Signer,
 	messagingPublicKey: PublicKey,
 	username: string,
 	authStartResponse: Uint8Array,
 	state: Uint8Array,
 	registrationSession: Uint8Array,
+	rootAccountKey: PrivateKey,
 ): Promise<AuthenticatedResponse> {
 	const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authStartResponse));
 
@@ -180,7 +184,7 @@ async function AccountRegisterFinalize(
 
 	// TODO: this is not the production key generation but will be suffient for testing
 	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
-	const encryptionKey = ED25519PrivateKey.FromSeed(seed);
+	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
 	const encrypter = PrivateKeyEncrypter.FromPrivateKey(encryptionKey);
 
 	const usernameParams = getMailchainUsernameParams();
@@ -195,7 +199,7 @@ async function AccountRegisterFinalize(
 	// TODO: this is not the production data type but will be suffient for testing
 	const encryptedAccountSeed = await encrypter.Encrypt(identityKeySeed);
 
-	const signedRegistrationSession = await identityKey.Sign(registrationSession);
+	const signedRegistrationSession = await identityKey.sign(registrationSession);
 
 	const response = await AuthApiFactory(apiConfig).accountRegisterFinalize({
 		username,
@@ -217,6 +221,6 @@ async function AccountRegisterFinalize(
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
 		sessionKey: DecodeBase64(response.data.session),
-		identityKey,
+		rootAccountKey,
 	};
 }

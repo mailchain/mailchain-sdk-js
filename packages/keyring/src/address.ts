@@ -1,11 +1,5 @@
-import { EncryptedContent, PlainContent, PublicKey } from '@mailchain/crypto';
-import { KeyRing } from './keyring';
+import { EncryptedContent, PlainContent, PublicKey, SignerWithPublicKey } from '@mailchain/crypto';
 
-export interface KeyRingDecrypter extends KeyRingSigner {
+export interface KeyRingDecrypter extends SignerWithPublicKey {
 	ecdhDecrypt(bundleEphemeralKey: PublicKey, input: EncryptedContent): Promise<PlainContent>;
-}
-
-export interface KeyRingSigner {
-	sign(message: Uint8Array): Promise<Uint8Array>;
-	publicKey: PublicKey;
 }

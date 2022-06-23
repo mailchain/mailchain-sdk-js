@@ -1,4 +1,4 @@
-import { PrivateKey, PublicKey } from '../';
+import { PublicKey, Signer } from '../';
 import { signRawEd25519, verifyRawEd25519 } from './raw_ed25119';
 
 const mailchainUsernameMessage = function (message) {
@@ -11,8 +11,8 @@ const mailchainUsernameMessage = function (message) {
  * @param key
  * @param username
  */
-export async function SignMailchainUsername(key: PrivateKey, username: Uint8Array): Promise<Uint8Array> {
-	return signRawEd25519(key, mailchainUsernameMessage(username));
+export async function SignMailchainUsername(signer: Signer, username: Uint8Array): Promise<Uint8Array> {
+	return signRawEd25519(signer, mailchainUsernameMessage(username));
 }
 
 /**

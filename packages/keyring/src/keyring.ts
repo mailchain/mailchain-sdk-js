@@ -1,9 +1,4 @@
-import {
-	ED25519PrivateKey,
-	DeriveHardenedKey,
-	ED25519ExtendedPrivateKey,
-	ED25519PublicKey,
-} from '@mailchain/crypto/ed25519';
+import { ED25519PrivateKey, deriveHardenedKey, ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import {
 	PublicKey,
 	PrivateKey,
@@ -13,6 +8,7 @@ import {
 	PublicKeyDecrypter,
 	ED25519KeyExchange,
 	PrivateKeyDecrypter,
+	SignerWithPublicKey,
 } from '@mailchain/crypto';
 import { EncodeHex } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
@@ -23,7 +19,7 @@ import {
 	DERIVATION_PATH_USER_PROFILE,
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 } from './constants';
-import { KeyRingDecrypter, KeyRingSigner } from './address';
+import { KeyRingDecrypter } from './address';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -38,62 +34,62 @@ export class KeyRing {
 	 * @param accountKey This key is never stored in the key chain only used to derive other keys.
 	 */
 	constructor(accountKey: ED25519PrivateKey) {
-		this._accountIdentityKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
+		this._accountIdentityKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(accountKey),
 			DERIVATION_PATH_IDENTITY_KEY_ROOT,
 		);
 
 		// used to derive all messaging keys
-		const rootMessagingKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
+		const rootMessagingKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(accountKey),
 			DERIVATION_PATH_MESSAGING_KEY_ROOT,
 		);
 
-		this._protocolAddressRootMessagingKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(rootMessagingKey.PrivateKey),
+		this._protocolAddressRootMessagingKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(rootMessagingKey.privateKey),
 			1,
 		);
 
 		// e.g. bob@mailchain
-		const rootAccountMessagingKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(rootMessagingKey.PrivateKey),
+		const rootAccountMessagingKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(rootMessagingKey.privateKey),
 			'protocol=mailchain',
 		);
 
 		// default to nonce of 1 for now
-		this._accountMessagingKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(rootAccountMessagingKey.PrivateKey),
+		this._accountMessagingKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(rootAccountMessagingKey.privateKey),
 			1,
 		);
 
-		this._rootEncryptionKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(accountKey),
+		this._rootEncryptionKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(accountKey),
 			DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 		);
-		this._userProfileEncryptionKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
+		this._userProfileEncryptionKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootEncryptionKey.privateKey),
 			DERIVATION_PATH_USER_PROFILE,
 		);
-		this._rootInboxKey = DeriveHardenedKey(
-			ED25519ExtendedPrivateKey.FromPrivateKey(this._rootEncryptionKey.PrivateKey),
+		this._rootInboxKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootEncryptionKey.privateKey),
 			DERIVATION_PATH_INBOX_ROOT,
 		);
 	}
 
-	static FromMnemonic(mnemonic: string, password?: string): KeyRing {
-		return new this(ED25519PrivateKey.FromMnemonicPhrase(mnemonic, password));
+	static fromMnemonic(mnemonic: string, password?: string): KeyRing {
+		return new this(ED25519PrivateKey.fromMnemonicPhrase(mnemonic, password));
 	}
 
-	static FromPrivateKey(key: ED25519PrivateKey): KeyRing {
+	static fromPrivateKey(key: ED25519PrivateKey): KeyRing {
 		return new this(key);
 	}
 
 	rootEncryptionPublicKey(): PublicKey {
-		return this._rootEncryptionKey.PrivateKey.PublicKey;
+		return this._rootEncryptionKey.privateKey.publicKey;
 	}
 
 	rootInboxKey(): PrivateKey {
-		return this._rootInboxKey.PrivateKey;
+		return this._rootInboxKey.privateKey;
 	}
 
 	userProfileCrypto(): {
@@ -102,29 +98,30 @@ export class KeyRing {
 	} {
 		return {
 			encrypter: (input) =>
-				PublicKeyEncrypter.FromPublicKey(this._userProfileEncryptionKey.PrivateKey.PublicKey).Encrypt(input),
+				PublicKeyEncrypter.FromPublicKey(this._userProfileEncryptionKey.privateKey.publicKey).Encrypt(input),
 			decrypter: (input) =>
-				PublicKeyDecrypter.FromPrivateKey(this._userProfileEncryptionKey.PrivateKey).Decrypt(input),
+				PublicKeyDecrypter.FromPrivateKey(this._userProfileEncryptionKey.privateKey).Decrypt(input),
 		};
 	}
 
 	addressMessagingKey(address: Uint8Array, protocol: protocols.ProtocolType, nonce: number): KeyRingDecrypter {
 		// all addresses are encoded with hex regardless of protocol to ensure consistency
-		const addressKeyRoot = DeriveHardenedKey(
+		const addressKeyRoot = deriveHardenedKey(
 			this._protocolAddressRootMessagingKey,
 			`protocol=${protocol},address=${EncodeHex(address)}`,
 		);
 
 		// specific for the nonce
-		const addressKey = DeriveHardenedKey(addressKeyRoot, nonce).PrivateKey;
+		const addressKey = deriveHardenedKey(addressKeyRoot, nonce).privateKey;
 		const keyEx = new ED25519KeyExchange();
 
 		return {
-			sign: (input) => addressKey.Sign(input),
-			publicKey: addressKey.PublicKey,
+			curve: addressKey.curve,
+			sign: (input) => addressKey.sign(input),
+			publicKey: addressKey.publicKey,
 			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
 				const sharedSecret = await keyEx.SharedSecret(addressKey, bundleEphemeralKey);
-				const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
+				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
 
 				return decrypter.Decrypt(input);
 			},
@@ -132,26 +129,28 @@ export class KeyRing {
 	}
 
 	accountMessagingKey(): KeyRingDecrypter {
-		const key = this._accountMessagingKey.PrivateKey;
+		const key = this._accountMessagingKey.privateKey;
 		const keyEx = new ED25519KeyExchange();
 
 		return {
-			sign: (input) => key.Sign(input),
-			publicKey: key.PublicKey,
+			curve: key.curve,
+			sign: (input) => key.sign(input),
+			publicKey: key.publicKey,
 			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
 				const sharedSecret = await keyEx.SharedSecret(key, bundleEphemeralKey);
-				const decrypter = PrivateKeyDecrypter.FromPrivateKey(ED25519PrivateKey.FromSeed(sharedSecret));
+				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
 
 				return decrypter.Decrypt(input);
 			},
 		};
 	}
 
-	accountIdentityKey(): KeyRingSigner {
-		const key = this._accountIdentityKey.PrivateKey;
+	accountIdentityKey(): SignerWithPublicKey {
+		const key = this._accountIdentityKey.privateKey;
 		return {
-			sign: (input) => key.Sign(input),
-			publicKey: key.PublicKey,
+			curve: key.curve,
+			sign: (input) => key.sign(input),
+			publicKey: key.publicKey,
 		};
 	}
 }

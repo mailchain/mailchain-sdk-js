@@ -45,7 +45,7 @@ describe('encryptChunks', () => {
 		{
 			name: 'data',
 			chunks: [Buffer.from([0, 1, 2, 3]), Buffer.from([4, 5, 6, 7]), Buffer.from([8, 9, 10])],
-			privateKey: ED25519ExtendedPrivateKey.FromPrivateKey(AliceED25519PrivateKey),
+			privateKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
 			rand: (num?: number): Uint8Array => {
 				return new Uint8Array(Buffer.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ascii')).slice(0, num);
 			},
@@ -101,7 +101,7 @@ describe('encryptPayload', () => {
 					ContentEncryption: KindNaClSecretKey,
 				} as PayloadHeaders,
 			} as Payload,
-			privateKey: ED25519ExtendedPrivateKey.FromPrivateKey(AliceED25519PrivateKey),
+			privateKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
 			chunkSize: 3,
 			rand: (num?: number): Uint8Array => {
 				return new Uint8Array(Buffer.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ascii')).slice(0, num);

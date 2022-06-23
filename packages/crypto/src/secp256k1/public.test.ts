@@ -15,32 +15,36 @@ describe('new()', () => {
 			name: 'alice-uncompressed',
 			arg: AliceUncompressedSECP256K1PublicKeyBytes,
 			expected: {
-				Bytes: AliceCompressedSECP256K1PublicKeyBytes,
-			},
+				curve: 'secp256k1',
+				bytes: AliceCompressedSECP256K1PublicKeyBytes,
+			} as SECP256K1PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'alice-compressed',
 			arg: AliceCompressedSECP256K1PublicKeyBytes,
 			expected: {
-				Bytes: AliceCompressedSECP256K1PublicKeyBytes,
-			},
+				curve: 'secp256k1',
+				bytes: AliceCompressedSECP256K1PublicKeyBytes,
+			} as SECP256K1PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-uncompressed',
 			arg: BobUncompressedSECP256K1PublicKeyBytes,
 			expected: {
-				Bytes: BobCompressedSECP256K1PublicKeyBytes,
-			},
+				curve: 'secp256k1',
+				bytes: BobCompressedSECP256K1PublicKeyBytes,
+			} as SECP256K1PublicKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-compressed',
 			arg: BobCompressedSECP256K1PublicKeyBytes,
 			expected: {
-				Bytes: BobCompressedSECP256K1PublicKeyBytes,
-			},
+				curve: 'secp256k1',
+				bytes: BobCompressedSECP256K1PublicKeyBytes,
+			} as SECP256K1PublicKey,
 			shouldThrow: false,
 		},
 		{
@@ -156,9 +160,9 @@ describe('verify()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return test.pubKey.Verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
+				return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
 			}
-			return test.pubKey.Verify(test.message, test.sig).then((actual) => {
+			return test.pubKey.verify(test.message, test.sig).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});
@@ -220,11 +224,11 @@ describe('FromSignature', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return SECP256K1PublicKey.FromSignature(test.message, test.signature).catch((e) =>
+				return SECP256K1PublicKey.fromSignature(test.message, test.signature).catch((e) =>
 					expect(e).toBeDefined(),
 				);
 			}
-			return SECP256K1PublicKey.FromSignature(test.message, test.signature).then((actual) => {
+			return SECP256K1PublicKey.fromSignature(test.message, test.signature).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});

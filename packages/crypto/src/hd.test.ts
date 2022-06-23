@@ -1,5 +1,5 @@
 import { DecodeHex } from '@mailchain/encoding/hex';
-import { ChainCodeFromDeriveIndex } from './hd';
+import { chainCodeFromDeriveIndex } from './hd';
 
 describe('ChainCodeFromDeriveIndex()', () => {
 	const tests = [
@@ -53,7 +53,7 @@ describe('ChainCodeFromDeriveIndex()', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			const actual = ChainCodeFromDeriveIndex(test.index);
+			const actual = chainCodeFromDeriveIndex(test.index);
 			expect(actual).toEqual(test.expected);
 		});
 	});

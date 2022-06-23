@@ -10,7 +10,7 @@ import { ProofParams } from '@mailchain/keyreg/proofs/params';
 import { ED25519PublicKey } from '@mailchain/crypto/ed25519';
 import { DecodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
-import { Verify } from '@mailchain/crypto/signatures/verify';
+import { verify } from '@mailchain/crypto/signatures/verify';
 import { Decode } from '@mailchain/encoding/encoding';
 import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
 import {
@@ -30,7 +30,7 @@ export const getPublicKeyFromApiResponse = (key: PublicKey) => {
 		case PublicKeyCurveEnum.Secp256k1:
 			return new SECP256K1PublicKey(Decode(key.encoding, key.value));
 		default:
-			throw new ErrorUnsupportedKey();
+			throw new ErrorUnsupportedKey(key.curve);
 	}
 };
 
@@ -75,7 +75,7 @@ export async function lookupMessageKey(apiConfig: Configuration, address: string
 			result.data.registeredKeyProof?.nonce!,
 		);
 		// verify the proof with the correct signer
-		const isVerified = Verify(
+		const isVerified = verify(
 			result.data.registeredKeyProof?.signingMethod!,
 			getPublicKeyFromApiResponse(result.data.registeredKeyProof?.identityKey!),
 			Buffer.from(message),

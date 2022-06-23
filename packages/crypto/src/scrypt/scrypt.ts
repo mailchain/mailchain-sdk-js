@@ -1,5 +1,5 @@
 import { scrypt } from '@noble/hashes/scrypt';
-import { SecureRandom } from '../rand';
+import { secureRandom } from '../rand';
 
 export type ScryptParams = {
 	N: number;
@@ -28,7 +28,7 @@ interface Result {
 export function deriveSecretFromScrypt(
 	passphrase = '',
 	params: ScryptParams = defaultScryptParams,
-	salt: Uint8Array = SecureRandom(32),
+	salt: Uint8Array = secureRandom(32),
 ): Result {
 	const secret = scrypt(new Uint8Array(Buffer.from(passphrase, 'ascii')), salt, {
 		N: params.N,

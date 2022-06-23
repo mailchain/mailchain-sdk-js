@@ -17,8 +17,8 @@ import { PrivateKey } from '.';
 const CHAIN_CODE_LEN = 32;
 
 export interface ExtendedPrivateKey {
-	readonly Bytes: Uint8Array;
-	readonly PrivateKey: PrivateKey;
+	readonly bytes: Uint8Array;
+	readonly privateKey: PrivateKey;
 }
 
 export type HardenedDerivationFunction = (
@@ -26,15 +26,15 @@ export type HardenedDerivationFunction = (
 	index: string | number | bigint | Uint8Array | BN,
 ) => Promise<ExtendedPrivateKey>;
 
-export function ChainCodeFromDeriveIndex(value: string | number | bigint | Uint8Array | BN): Uint8Array {
+export function chainCodeFromDeriveIndex(value: string | number | bigint | Uint8Array | BN): Uint8Array {
 	if (isNumber(value) || isBn(value) || isBigInt(value)) {
-		return ChainCodeFromDeriveIndex(bnToU8a(value, BN_LE_256_OPTS));
+		return chainCodeFromDeriveIndex(bnToU8a(value, BN_LE_256_OPTS));
 	} else if (isHex(value)) {
-		return ChainCodeFromDeriveIndex(hexToU8a(value));
+		return chainCodeFromDeriveIndex(hexToU8a(value));
 	} else if (isString(value)) {
-		return ChainCodeFromDeriveIndex(compactAddLength(stringToU8a(value)));
+		return chainCodeFromDeriveIndex(compactAddLength(stringToU8a(value)));
 	} else if (value.length > CHAIN_CODE_LEN) {
-		return ChainCodeFromDeriveIndex(blake2AsU8a(value));
+		return chainCodeFromDeriveIndex(blake2AsU8a(value));
 	}
 
 	const chainCode = new Uint8Array(32);

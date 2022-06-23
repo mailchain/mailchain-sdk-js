@@ -2,7 +2,7 @@ import { SECP256K1PrivateKey } from '@mailchain/crypto/secp256k1';
 import { EncodeBase58, EncodingTypes } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { SecureRandom } from '@mailchain/crypto';
+import { secureRandom } from '@mailchain/crypto';
 import { getOpaqueConfig, OpaqueID } from '@cloudflare/opaque-ts';
 import { lookupMessageKey } from '@mailchain/api/identityKeys';
 import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
@@ -11,7 +11,7 @@ import { protocols } from '@mailchain/internal';
 import { ethers } from 'ethers';
 import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
 import { DecodeUtf8 } from '@mailchain/encoding/utf8';
-import { SignEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
+import { signEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Register } from '../auth/register';
@@ -27,8 +27,8 @@ jest.setTimeout(30000);
 const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
 
 const registerAddress = async (user) => {
-	const walletPrivateKey = SECP256K1PrivateKey.Generate();
-	const wallet = new ethers.Wallet(walletPrivateKey.Bytes);
+	const walletPrivateKey = SECP256K1PrivateKey.generate();
+	const wallet = new ethers.Wallet(walletPrivateKey.bytes);
 	const { address } = wallet;
 
 	const addressBytes = DecodeHexZeroX(address);
@@ -37,7 +37,7 @@ const registerAddress = async (user) => {
 	const addressMessagingKey = user.keyRing.addressMessagingKey(addressBytes, protocols.ETHEREUM, nonce);
 	const proofMessage = CreateProofMessage(proofParams, addressBytes, addressMessagingKey.publicKey, nonce);
 
-	const signature = SignEthereumPersonalMessage(walletPrivateKey, Buffer.from(DecodeUtf8(proofMessage)));
+	const signature = signEthereumPersonalMessage(walletPrivateKey, Buffer.from(DecodeUtf8(proofMessage)));
 
 	await identityKeysApi.registerAddress(apiConfig, {
 		signature: EncodeHexZeroX(signature),
@@ -53,10 +53,10 @@ const registerAddress = async (user) => {
 		messagingKey: {
 			curve: 'ed25519',
 			encoding: 'hex/0x-prefix',
-			value: EncodeHexZeroX(addressMessagingKey.publicKey.Bytes),
+			value: EncodeHexZeroX(addressMessagingKey.publicKey.bytes),
 		},
 		nonce,
-		identityKey: EncodeHexZeroX(EncodePublicKey(walletPrivateKey.PublicKey)),
+		identityKey: EncodeHexZeroX(EncodePublicKey(walletPrivateKey.publicKey)),
 	});
 	return { address, addressBytes };
 };
@@ -69,11 +69,11 @@ const config = {
 
 const apiConfig = new Configuration({ basePath: 'http://localhost:8080' });
 const registerRandomUser = async () => {
-	const username = EncodeBase58(SecureRandom(8)).toLowerCase();
-	const seed = SecureRandom(32);
+	const username = EncodeBase58(secureRandom(8)).toLowerCase();
+	const seed = secureRandom(32);
 
-	const identityKey = ED25519PrivateKey.FromSeed(seed);
-	const keyRing = KeyRing.FromPrivateKey(identityKey);
+	const identityKey = ED25519PrivateKey.fromSeed(seed);
+	const keyRing = KeyRing.fromPrivateKey(identityKey);
 
 	await Register({
 		identityKeySeed: seed,
@@ -110,11 +110,11 @@ describe('SendAndReceiveMessage', () => {
 	beforeAll(async () => {
 		users = [await registerRandomUser(), await registerRandomUser()];
 		message = [
-			EncodeHex(SecureRandom(32)),
-			EncodeHex(SecureRandom(32)),
-			EncodeHex(SecureRandom(32)),
-			EncodeHex(SecureRandom(32)),
-			EncodeHex(SecureRandom(32)),
+			EncodeHex(secureRandom(32)),
+			EncodeHex(secureRandom(32)),
+			EncodeHex(secureRandom(32)),
+			EncodeHex(secureRandom(32)),
+			EncodeHex(secureRandom(32)),
 		].join('\n');
 		etherAddresses = await Promise.all([registerAddress(users[1]), registerAddress(users[1])]);
 	});
@@ -126,8 +126,8 @@ describe('SendAndReceiveMessage', () => {
 			await lookupMessageKey(apiConfig, `${users[1].username}@mailchain.local`),
 		];
 
-		expect(data[0].value).toEqual(EncodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.Bytes));
-		expect(data[1].value).toEqual(EncodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.Bytes));
+		expect(data[0].value).toEqual(EncodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.bytes));
+		expect(data[1].value).toEqual(EncodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.bytes));
 	});
 
 	it('send message from user 1 to user 2', async () => {

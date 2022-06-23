@@ -1,9 +1,9 @@
 import { EncodeBase64UrlSafe } from '@mailchain/encoding';
 import axios, { AxiosInstance } from 'axios';
 import utils from 'axios/lib/utils';
-import { KeyRingSigner } from '@mailchain/keyring/address';
+import { SignerWithPublicKey } from '@mailchain/crypto';
 
-export const getToken = async (requestKey: KeyRingSigner, payload: any, exp: number) => {
+export const getToken = async (requestKey: SignerWithPublicKey, payload: any, exp: number) => {
 	const key = `${EncodeBase64UrlSafe(
 		Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })),
 	)}.${EncodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })))}`;
@@ -12,14 +12,14 @@ export const getToken = async (requestKey: KeyRingSigner, payload: any, exp: num
 	return `${key}.${EncodeBase64UrlSafe(signature)}`;
 };
 
-export const getAxiosWithSigner = (requestKey: KeyRingSigner): AxiosInstance => {
+export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstance => {
 	const axiosInstance = axios.create();
 	const expires = Math.floor(Date.now() * 0.001 + 86400);
 	axiosInstance.interceptors.request.use(async (request) => {
 		const payload = createPayload(new URL(request?.url ?? ''), request.method?.toUpperCase(), request.data);
 		const token = await getToken(requestKey, payload, expires);
 		if (request.headers) {
-			request.headers.Authorization = `vapid t=${token}, k=${EncodeBase64UrlSafe(requestKey.publicKey.Bytes)}`;
+			request.headers.Authorization = `vapid t=${token}, k=${EncodeBase64UrlSafe(requestKey.publicKey.bytes)}`;
 		}
 		return request;
 	});

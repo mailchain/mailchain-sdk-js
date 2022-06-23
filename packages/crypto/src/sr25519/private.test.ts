@@ -2,7 +2,7 @@ import { toUtf8Bytes } from 'ethers/lib/utils';
 import { DecodeHex } from '@mailchain/encoding';
 import {
 	AliceSR25519PublicKey,
-	AliceSR25519Keypair,
+	AliceSR25519KeyPair,
 	AliceSR25519Seed,
 	AliceSR25519SecretBytes,
 	AliceSR25519PrivateKeyBytes,
@@ -12,11 +12,11 @@ import {
 	BobSR25519PrivateKeyBytes,
 	BobSR25519PrivateKey,
 	BobSR25519PublicKey,
-	BobSR25519Keypair,
+	BobSR25519KeyPair,
 	EveSR25519Seed,
 	EveSR25519SecretBytes,
 	EveSR25519PrivateKeyBytes,
-	EveSR25519Keypair,
+	EveSR25519KeyPair,
 	EveSR25519PublicKey,
 } from './test.const';
 import { SR25519PrivateKey } from './';
@@ -27,39 +27,42 @@ describe('FromSeed()', () => {
 			name: 'alice-seed',
 			arg: AliceSR25519Seed,
 			expected: {
-				Keypair: {
-					publicKey: AliceSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: AliceSR25519PublicKey.bytes,
 					secretKey: AliceSR25519SecretBytes,
 				},
-				Bytes: AliceSR25519PrivateKeyBytes,
-				PublicKey: AliceSR25519PublicKey,
-			},
+				bytes: AliceSR25519PrivateKeyBytes,
+				publicKey: AliceSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-seed',
 			arg: BobSR25519Seed,
 			expected: {
-				Keypair: {
-					publicKey: BobSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: BobSR25519PublicKey.bytes,
 					secretKey: BobSR25519SecretBytes,
 				},
-				Bytes: BobSR25519PrivateKeyBytes,
-				PublicKey: BobSR25519PublicKey,
-			},
+				bytes: BobSR25519PrivateKeyBytes,
+				publicKey: BobSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'eve-seed',
 			arg: EveSR25519Seed,
 			expected: {
-				Keypair: {
-					publicKey: EveSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: EveSR25519PublicKey.bytes,
 					secretKey: EveSR25519SecretBytes,
 				},
-				Bytes: EveSR25519PrivateKeyBytes,
-				PublicKey: EveSR25519PublicKey,
-			},
+				bytes: EveSR25519PrivateKeyBytes,
+				publicKey: EveSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -73,9 +76,9 @@ describe('FromSeed()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return SR25519PrivateKey.FromSeed(test.arg).catch((e) => expect(e).toBeDefined());
+				return SR25519PrivateKey.fromSeed(test.arg).catch((e) => expect(e).toBeDefined());
 			}
-			return SR25519PrivateKey.FromSeed(test.arg).then((actual) => {
+			return SR25519PrivateKey.fromSeed(test.arg).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});
@@ -88,39 +91,42 @@ describe('FromBytes()', () => {
 			name: 'alice',
 			arg: AliceSR25519PrivateKeyBytes,
 			expected: {
-				Keypair: {
-					publicKey: AliceSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: AliceSR25519PublicKey.bytes,
 					secretKey: AliceSR25519SecretBytes,
 				},
-				Bytes: AliceSR25519PrivateKeyBytes,
-				PublicKey: AliceSR25519PublicKey,
-			},
+				bytes: AliceSR25519PrivateKeyBytes,
+				publicKey: AliceSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			arg: BobSR25519PrivateKeyBytes,
 			expected: {
-				Keypair: {
-					publicKey: BobSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: BobSR25519PublicKey.bytes,
 					secretKey: BobSR25519SecretBytes,
 				},
-				Bytes: BobSR25519PrivateKeyBytes,
-				PublicKey: BobSR25519PublicKey,
-			},
+				bytes: BobSR25519PrivateKeyBytes,
+				publicKey: BobSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'eve',
 			arg: EveSR25519PrivateKeyBytes,
 			expected: {
-				Keypair: {
-					publicKey: EveSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: EveSR25519PublicKey.bytes,
 					secretKey: EveSR25519SecretBytes,
 				},
-				Bytes: EveSR25519PrivateKeyBytes,
-				PublicKey: EveSR25519PublicKey,
-			},
+				bytes: EveSR25519PrivateKeyBytes,
+				publicKey: EveSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -134,10 +140,10 @@ describe('FromBytes()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					SR25519PrivateKey.FromBytes(test.arg);
+					SR25519PrivateKey.fromBytes(test.arg);
 				}).toThrow();
 			} else {
-				expect(SR25519PrivateKey.FromBytes(test.arg)).toEqual(test.expected);
+				expect(SR25519PrivateKey.fromBytes(test.arg)).toEqual(test.expected);
 			}
 		});
 	});
@@ -147,41 +153,44 @@ describe('FromKeyPair()', () => {
 	const tests = [
 		{
 			name: 'alice-keypair',
-			keypair: AliceSR25519Keypair,
+			keypair: AliceSR25519KeyPair,
 			expected: {
-				Keypair: {
-					publicKey: AliceSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: AliceSR25519PublicKey.bytes,
 					secretKey: AliceSR25519SecretBytes,
 				},
-				Bytes: AliceSR25519PrivateKeyBytes,
-				PublicKey: AliceSR25519PublicKey,
-			},
+				bytes: AliceSR25519PrivateKeyBytes,
+				publicKey: AliceSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'bob-keypair',
-			keypair: BobSR25519Keypair,
+			keypair: BobSR25519KeyPair,
 			expected: {
-				Keypair: {
-					publicKey: BobSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: BobSR25519PublicKey.bytes,
 					secretKey: BobSR25519SecretBytes,
 				},
-				Bytes: BobSR25519PrivateKeyBytes,
-				PublicKey: BobSR25519PublicKey,
-			},
+				bytes: BobSR25519PrivateKeyBytes,
+				publicKey: BobSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
 			name: 'eve-keypair',
-			keypair: EveSR25519Keypair,
+			keypair: EveSR25519KeyPair,
 			expected: {
-				Keypair: {
-					publicKey: EveSR25519PublicKey.Bytes,
+				curve: 'sr25519',
+				keyPair: {
+					publicKey: EveSR25519PublicKey.bytes,
 					secretKey: EveSR25519SecretBytes,
 				},
-				Bytes: EveSR25519PrivateKeyBytes,
-				PublicKey: EveSR25519PublicKey,
-			},
+				bytes: EveSR25519PrivateKeyBytes,
+				publicKey: EveSR25519PublicKey,
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -198,10 +207,10 @@ describe('FromKeyPair()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					SR25519PrivateKey.FromKeypair(test.keypair);
+					SR25519PrivateKey.fromKeyPair(test.keypair);
 				}).toThrow();
 			} else {
-				expect(SR25519PrivateKey.FromKeypair(test.keypair)).toEqual(test.expected);
+				expect(SR25519PrivateKey.fromKeyPair(test.keypair)).toEqual(test.expected);
 			}
 		});
 	});
@@ -228,9 +237,9 @@ describe('sign()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return test.privKey.Sign(test.message).catch((e) => expect(e).toBeDefined());
+				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
 			}
-			return test.privKey.Sign(test.message).then((actual) => {
+			return test.privKey.sign(test.message).then((actual) => {
 				expect(actual).toHaveLength(64);
 			});
 		});
@@ -252,7 +261,7 @@ describe('public-key', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			expect(test.privKey.PublicKey).toEqual(test.expected);
+			expect(test.privKey.publicKey).toEqual(test.expected);
 		});
 	});
 });
@@ -268,19 +277,21 @@ describe('generate', () => {
 				]);
 			},
 			expected: {
-				Keypair: {
+				curve: 'sr25519',
+				keyPair: {
 					publicKey: DecodeHex('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c'),
 					secretKey: DecodeHex(
 						'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab',
 					),
 				},
-				Bytes: DecodeHex(
+				bytes: DecodeHex(
 					'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c',
 				),
-				PublicKey: {
-					Bytes: DecodeHex('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c'),
+				publicKey: {
+					curve: 'sr25519',
+					bytes: DecodeHex('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c'),
 				},
-			},
+			} as SR25519PrivateKey,
 			shouldThrow: false,
 		},
 		{
@@ -296,9 +307,9 @@ describe('generate', () => {
 		it(test.name, async () => {
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return SR25519PrivateKey.Generate(test.rand).catch((e) => expect(e).toBeDefined());
+				return SR25519PrivateKey.generate(test.rand).catch((e) => expect(e).toBeDefined());
 			}
-			return SR25519PrivateKey.Generate(test.rand).then((actual) => {
+			return SR25519PrivateKey.generate(test.rand).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});

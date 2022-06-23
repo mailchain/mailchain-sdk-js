@@ -1,4 +1,4 @@
-import { RandomFunction, SecureRandom } from '@mailchain/crypto';
+import { RandomFunction, secureRandom } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase64, EncodeHexZeroX } from '@mailchain/encoding';
 import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
@@ -36,7 +36,7 @@ export const sendPayload = async (
 	apiConfiguration: Configuration,
 	payload: Payload,
 	recipients: string[],
-	rand: RandomFunction = SecureRandom,
+	rand: RandomFunction = secureRandom,
 ) => {
 	const recipientKeys = await Promise.all(recipients.map((address) => lookupMessageKey(apiConfiguration, address)));
 	return sendPayloadInternal(keyRing, apiConfiguration, payload, recipientKeys, rand);
@@ -50,7 +50,7 @@ async function sendPayloadInternal(
 	apiConfiguration: Configuration,
 	payload: Payload,
 	recipients: PublicKey[],
-	rand: RandomFunction = SecureRandom,
+	rand: RandomFunction = secureRandom,
 ): Promise<SendPayloadResult> {
 	const transportApi = TransportApiFactory(
 		apiConfiguration,
@@ -59,7 +59,7 @@ async function sendPayloadInternal(
 	);
 
 	// create root encryption key that will be used to encrypt message content.
-	const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.FromPrivateKey(ED25519PrivateKey.Generate(rand));
+	const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate(rand));
 
 	const encryptedPayload = await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB, rand);
 	const serializedContent = Serialize(encryptedPayload);

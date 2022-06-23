@@ -6,12 +6,12 @@ import { SR25519PublicKey, PublicKeyLen as SR25519PublicKeyLen } from '../../sr2
 import { IdFromPublicKey } from '../../multikey';
 
 export function serializePublicKeyEncryptedContent(sealedBox: EncryptedContent, pubKey: PublicKey): EncryptedContent {
-	const out = new Uint8Array(sealedBox.length + pubKey.Bytes.length + 2);
+	const out = new Uint8Array(sealedBox.length + pubKey.bytes.length + 2);
 
 	out.set(new Uint8Array([NACLECDH]), 0);
 	out.set(new Uint8Array([IdFromPublicKey(pubKey)]), 1);
-	out.set(pubKey.Bytes, 2);
-	out.set(sealedBox, 2 + pubKey.Bytes.length);
+	out.set(pubKey.bytes, 2);
+	out.set(sealedBox, 2 + pubKey.bytes.length);
 
 	return out;
 }

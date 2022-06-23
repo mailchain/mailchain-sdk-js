@@ -1,16 +1,16 @@
 import { cryptoWaitReady, sr25519Agreement } from '@polkadot/util-crypto';
 import { KeyExchange } from '../';
-import { PrivateKey, PublicKey, RandomFunction, SecureRandom } from '../../';
-import { SR25519PrivateKey, AsSR25519PrivateKey } from '../../sr25519';
+import { PrivateKey, PublicKey, RandomFunction, secureRandom } from '../../';
+import { SR25519PrivateKey, asSR25519PrivateKey } from '../../sr25519';
 
 export class SR25519KeyExchange implements KeyExchange {
 	randomFunc: RandomFunction;
-	constructor(randomFunc: RandomFunction = SecureRandom) {
+	constructor(randomFunc: RandomFunction = secureRandom) {
 		this.randomFunc = randomFunc;
 	}
 
 	async EphemeralKey(): Promise<PrivateKey> {
-		return SR25519PrivateKey.Generate(this.randomFunc);
+		return SR25519PrivateKey.generate(this.randomFunc);
 	}
 
 	async SharedSecret(privateKey: PrivateKey, publicKey: PublicKey): Promise<Uint8Array> {
@@ -18,10 +18,10 @@ export class SR25519KeyExchange implements KeyExchange {
 		if (!ready) {
 			throw new Error('crypto libraries could not be initialized');
 		}
-		if (privateKey.PublicKey.Bytes.toString() === publicKey.Bytes.toString()) {
+		if (privateKey.publicKey.bytes.toString() === publicKey.bytes.toString()) {
 			throw new Error('public key can not be from private key');
 		}
 
-		return sr25519Agreement(AsSR25519PrivateKey(privateKey).Keypair.secretKey, publicKey.Bytes);
+		return sr25519Agreement(asSR25519PrivateKey(privateKey).keyPair.secretKey, publicKey.bytes);
 	}
 }

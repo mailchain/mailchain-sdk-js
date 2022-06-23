@@ -3,7 +3,7 @@ import { KindEthereumPersonalMessage, KindRawED25519 } from './consts';
 import { VerifyEthereumPersonalMessage } from './eth_personal';
 import { verifyRawEd25519 } from './raw_ed25119';
 
-export function Verify(
+export function verify(
 	signingMethod: string,
 	verifyingKey: PublicKey,
 	message: Uint8Array,

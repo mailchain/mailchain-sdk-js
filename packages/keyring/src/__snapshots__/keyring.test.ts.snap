@@ -2,8 +2,9 @@
 
 exports[`keyring should assert against previous snapshot outputs from keyring: accountIdentityKey 1`] = `
 Object {
+  "curve": "ed25519",
   "publicKey": ED25519PublicKey {
-    "Bytes": Uint8Array [
+    "bytes": Uint8Array [
       55,
       165,
       208,
@@ -37,6 +38,7 @@ Object {
       77,
       27,
     ],
+    "curve": "ed25519",
   },
   "sign": [Function],
 }
@@ -113,9 +115,10 @@ Uint8Array [
 
 exports[`keyring should assert against previous snapshot outputs from keyring: accountMessagingKey 1`] = `
 Object {
+  "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
-    "Bytes": Uint8Array [
+    "bytes": Uint8Array [
       215,
       190,
       70,
@@ -149,6 +152,7 @@ Object {
       50,
       155,
     ],
+    "curve": "ed25519",
   },
   "sign": [Function],
 }
@@ -158,9 +162,10 @@ exports[`keyring should assert against previous snapshot outputs from keyring: a
 
 exports[`keyring should assert against previous snapshot outputs from keyring: addressMessagingKey 1`] = `
 Object {
+  "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
-    "Bytes": Uint8Array [
+    "bytes": Uint8Array [
       114,
       246,
       75,
@@ -194,6 +199,7 @@ Object {
       30,
       178,
     ],
+    "curve": "ed25519",
   },
   "sign": [Function],
 }
@@ -201,7 +207,7 @@ Object {
 
 exports[`keyring should assert against previous snapshot outputs from keyring: rootEncryptionPublicKey 1`] = `
 ED25519PublicKey {
-  "Bytes": Uint8Array [
+  "bytes": Uint8Array [
     48,
     168,
     244,
@@ -235,12 +241,13 @@ ED25519PublicKey {
     192,
     155,
   ],
+  "curve": "ed25519",
 }
 `;
 
 exports[`keyring should assert against previous snapshot outputs from keyring: rootInboxKey 1`] = `
 ED25519PrivateKey {
-  "Bytes": Uint8Array [
+  "bytes": Uint8Array [
     184,
     127,
     193,
@@ -306,7 +313,8 @@ ED25519PrivateKey {
     40,
     14,
   ],
-  "KeyPair": Object {
+  "curve": "ed25519",
+  "keyPair": Object {
     "publicKey": Uint8Array [
       94,
       48,
@@ -408,8 +416,8 @@ ED25519PrivateKey {
       14,
     ],
   },
-  "PublicKey": ED25519PublicKey {
-    "Bytes": Uint8Array [
+  "publicKey": ED25519PublicKey {
+    "bytes": Uint8Array [
       94,
       48,
       204,
@@ -443,6 +451,7 @@ ED25519PrivateKey {
       40,
       14,
     ],
+    "curve": "ed25519",
   },
 }
 `;

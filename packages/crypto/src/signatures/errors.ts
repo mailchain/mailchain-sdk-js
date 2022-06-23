@@ -1,6 +1,6 @@
 export class ErrorUnsupportedKey extends Error {
-	constructor() {
-		super('unsupported key');
+	constructor(curve: string) {
+		super(`${curve} is not supported`);
 	}
 }
 export class ErrorProtocolIsEmpty extends Error {

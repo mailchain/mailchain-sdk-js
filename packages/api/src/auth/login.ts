@@ -90,11 +90,7 @@ async function AccountAuthFinalize(
 	username: string,
 	keyExchange2: KE2,
 	authState: Uint8Array,
-): Promise<{
-	clientSecretKey: Uint8Array;
-	sessionKey: Uint8Array;
-	identityKey: PrivateKey;
-}> {
+): Promise<AuthenticatedResponse> {
 	const authFinishResponse = await opaqueClient.authFinish(
 		keyExchange2,
 		opaqueConfig.serverIdentity,
@@ -116,8 +112,8 @@ async function AccountAuthFinalize(
 
 	// TODO: this is not the production key create but will do for testing
 	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
-	const encryptionKey = ED25519PrivateKey.FromSeed(seed);
-	const decrypter = PrivateKeyDecrypter.FromPrivateKey(encryptionKey);
+	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
+	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
 	// TODO: this is not the production data type but will be suffient for testing
 
 	const decryptedAccountSeed = await decrypter.Decrypt(
@@ -127,6 +123,6 @@ async function AccountAuthFinalize(
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
 		sessionKey: DecodeBase64(response.data.session),
-		identityKey: ED25519PrivateKey.FromSeed(decryptedAccountSeed),
+		rootAccountKey: ED25519PrivateKey.fromSeed(decryptedAccountSeed),
 	};
 }

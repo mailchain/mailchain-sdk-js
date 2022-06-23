@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { ExtendedPrivateKey, PublicKey, RandomFunction, SecureRandom } from '@mailchain/crypto';
+import { ExtendedPrivateKey, PublicKey, RandomFunction, secureRandom } from '@mailchain/crypto';
 
 import { protocol } from '../../protobuf/protocol/protocol';
 import { createEnvelope } from './envelope';
@@ -9,7 +9,7 @@ export async function createDelivery(
 	recipientMessagingKey: PublicKey,
 	messageRootEncryptionKey: ExtendedPrivateKey,
 	messageURI: string,
-	rand: RandomFunction = SecureRandom,
+	rand: RandomFunction = secureRandom,
 ): Promise<protocol.Delivery> {
 	const payload = {
 		envelope: await createEnvelope(recipientMessagingKey, messageRootEncryptionKey, messageURI, rand),

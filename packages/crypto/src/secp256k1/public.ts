@@ -1,26 +1,27 @@
 import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
 import { DecodeHexZeroX } from '@mailchain/encoding';
 import { hashMessage, recoverPublicKey } from 'ethers/lib/utils';
-import { PublicKey } from '../';
+import { KindSECP256K1, PublicKey } from '../';
 
 export class SECP256K1PublicKey implements PublicKey {
-	readonly Bytes: Uint8Array;
+	readonly bytes: Uint8Array;
+	readonly curve: string = KindSECP256K1;
 
 	constructor(bytes: Uint8Array) {
-		this.Bytes = new Uint8Array();
+		this.bytes = new Uint8Array();
 
 		switch (bytes.length) {
 			case 65:
-				this.Bytes = publicKeyConvert(bytes, true);
+				this.bytes = publicKeyConvert(bytes, true);
 				break;
 			case 33:
-				this.Bytes = bytes;
+				this.bytes = bytes;
 				break;
 			default:
 				throw RangeError('invalid public key length');
 		}
 
-		if (!publicKeyVerify(this.Bytes)) {
+		if (!publicKeyVerify(this.bytes)) {
 			throw RangeError('bytes are not a valid ECDSA public key');
 		}
 	}
@@ -32,7 +33,7 @@ export class SECP256K1PublicKey implements PublicKey {
 	 * @param signature
 	 * @returns
 	 */
-	static async FromSignature(message: Uint8Array, signature: Uint8Array): Promise<SECP256K1PublicKey> {
+	static async fromSignature(message: Uint8Array, signature: Uint8Array): Promise<SECP256K1PublicKey> {
 		// abort if recId is not present
 		if (signature.length !== 65) {
 			throw Error('signature is missing recovery id');
@@ -49,7 +50,7 @@ export class SECP256K1PublicKey implements PublicKey {
 		return pubKey;
 	}
 
-	async Verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
+	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
 		// remove rec id if present
 		if (sig.length === 65) {
 			sig = sig.slice(0, -1);
@@ -58,6 +59,6 @@ export class SECP256K1PublicKey implements PublicKey {
 		// Verify as personal ethereum message
 		const messageToVerify = DecodeHexZeroX(hashMessage(Buffer.from(message)));
 
-		return ecdsaVerify(sig, messageToVerify, this.Bytes);
+		return ecdsaVerify(sig, messageToVerify, this.bytes);
 	}
 }

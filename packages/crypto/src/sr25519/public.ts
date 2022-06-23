@@ -1,25 +1,26 @@
 import { cryptoWaitReady, sr25519Verify } from '@polkadot/util-crypto';
-import { PublicKey } from '../';
+import { KindSR25519, PublicKey } from '../';
 
 export const PublicKeyLen = 32;
 
 export class SR25519PublicKey implements PublicKey {
-	readonly Bytes: Uint8Array;
+	readonly bytes: Uint8Array;
+	readonly curve: string = KindSR25519;
 
 	constructor(bytes: Uint8Array) {
 		if (bytes.length !== PublicKeyLen) {
 			throw new RangeError('invalid public key length');
 		}
-		this.Bytes = bytes;
+		this.bytes = bytes;
 	}
 
-	async Verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
+	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
 		const ready = await cryptoWaitReady(); // needed before calling sr25519Sign
 		if (!ready) {
 			throw new Error('crypto libraries could not be initialized');
 		}
 
-		return sr25519Verify(message, sig, this.Bytes);
+		return sr25519Verify(message, sig, this.bytes);
 	}
 }
 

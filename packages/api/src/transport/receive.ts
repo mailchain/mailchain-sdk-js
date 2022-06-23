@@ -63,7 +63,7 @@ async function processDeliveryRequest(
 	const encryptedPayload = Deserialize(encryptedMessageBody);
 	const decryptedPayload = await decryptPayload(
 		encryptedPayload,
-		ED25519ExtendedPrivateKey.FromPrivateKey(DecodePrivateKey(payloadRootEncryptionKey)),
+		ED25519ExtendedPrivateKey.fromPrivateKey(DecodePrivateKey(payloadRootEncryptionKey)),
 	);
 
 	return {

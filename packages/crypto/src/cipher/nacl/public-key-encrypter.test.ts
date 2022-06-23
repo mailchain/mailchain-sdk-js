@@ -65,7 +65,7 @@ describe('Encrypt', () => {
 			keyExFunc: (): ED25519KeyExchange => {
 				const ex = new ED25519KeyExchange();
 				ex.EphemeralKey = async (): Promise<PrivateKey> => {
-					return ED25519PrivateKey.FromSeed(
+					return ED25519PrivateKey.fromSeed(
 						DecodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
 					);
 				};
@@ -90,7 +90,7 @@ describe('Encrypt', () => {
 			keyExFunc: (): ED25519KeyExchange => {
 				const ex = new ED25519KeyExchange();
 				ex.EphemeralKey = async (): Promise<PrivateKey> => {
-					return ED25519PrivateKey.FromSeed(
+					return ED25519PrivateKey.fromSeed(
 						DecodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
 					);
 				};

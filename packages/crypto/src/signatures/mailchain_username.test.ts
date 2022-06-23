@@ -83,7 +83,7 @@ describe('VerifyMailchainUsername()', () => {
 				]),
 			},
 			expected: false,
-			shouldThrow: new ErrorUnsupportedKey(),
+			shouldThrow: new ErrorUnsupportedKey('secp256k1'),
 		},
 	];
 	tests.forEach((test) => {
@@ -137,7 +137,7 @@ describe('SignMailchainUsername()', () => {
 				message: Buffer.from('alice', 'utf-8'),
 			},
 			expected: null,
-			shouldThrow: new ErrorUnsupportedKey(),
+			shouldThrow: new ErrorUnsupportedKey('secp256k1'),
 		},
 	];
 	tests.forEach((test) => {
