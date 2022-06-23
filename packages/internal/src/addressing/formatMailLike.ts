@@ -19,5 +19,8 @@ export function formatMailLike(
 		typeof maybeEncodedAddress === 'string'
 			? maybeEncodedAddress
 			: encodeAddressByProtocol(maybeEncodedAddress, protocol).encoded;
+	if (protocol === 'mailchain') {
+		return `${encodedAddress}@${mailchainDomain}`;
+	}
 	return `${encodedAddress}@${protocol}.${mailchainDomain}`;
 }

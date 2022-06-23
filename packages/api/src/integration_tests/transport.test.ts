@@ -67,7 +67,7 @@ const config = {
 	context: 'MailchainAuthentication',
 } as OpaqueConfig;
 
-const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as ConfigurationParameters);
+const apiConfig = new Configuration({ basePath: 'http://localhost:8080' });
 const registerRandomUser = async () => {
 	const username = EncodeBase58(SecureRandom(8)).toLowerCase();
 	const seed = SecureRandom(32);
@@ -244,8 +244,8 @@ describe('SendAndReceiveMessage', () => {
 			expect(results[index][0].payload!.Headers).toEqual(headersMultiple[index]);
 
 			await Promise.all(
-				results.map(async (d) => {
-					await confirmDelivery(apiConfig, messagingKey, d.hash);
+				results.map(async (result) => {
+					await confirmDelivery(apiConfig, messagingKey, result.hash);
 				}),
 			);
 

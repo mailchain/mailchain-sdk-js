@@ -6,7 +6,12 @@ import { formatMailLike } from '@mailchain/internal/addressing';
 import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
 import { getPublicKeyFromApiResponse } from './lookup';
 
-export async function verify(apiConfig: Configuration, address: string, protocol: ProtocolType): Promise<Boolean> {
+export async function verify(
+	apiConfig: Configuration,
+	address: string,
+	protocol: ProtocolType,
+	mailchainMailDomain: string,
+): Promise<Boolean> {
 	const addressApi = AddressesApiFactory(apiConfig);
 	const verificationApi = MessagingKeysApiFactory(apiConfig);
 	const mailchainPublicKeyResponse = await verificationApi.getMailchainPublicKey();
@@ -14,7 +19,7 @@ export async function verify(apiConfig: Configuration, address: string, protocol
 
 	const mailchainPublicKey = getPublicKeyFromApiResponse(mailchainPublicKeyResponse.data.key);
 
-	const result = await addressApi.getAddressMessagingKey(formatMailLike(address, protocol, 'mailchain.local')); // TODO: Use correct domain
+	const result = await addressApi.getAddressMessagingKey(formatMailLike(address, protocol, mailchainMailDomain));
 	const { registeredKeyProof, providedKeyProof } = result.data;
 	const keyProof = providedKeyProof ?? registeredKeyProof;
 	if (!result.data.messagingKey?.value || !result.data.providedKeyProof?.signature) return false;
