@@ -39,7 +39,7 @@ export function createPayload(
 } {
 	let len: number;
 	// Taking code from https://github.com/axios/axios/blob/main/lib/adapters/http.js#L186-L198 to calculate content length how axios does it
-	if (['POST', 'PUT', 'PATCH'].some((m) => m === method.toUpperCase())) {
+	if (data != null && ['POST', 'PUT', 'PATCH'].some((m) => m === method.toUpperCase())) {
 		if (Buffer.isBuffer(data)) {
 			len = data.length;
 		} else if (utils.isArrayBuffer(data)) {
