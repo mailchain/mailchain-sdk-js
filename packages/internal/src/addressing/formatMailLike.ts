@@ -1,4 +1,4 @@
-import { ProtocolType } from '../protocols';
+import { MAILCHAIN, ProtocolType } from '../protocols';
 import { encodeAddressByProtocol } from './encoding';
 
 /**
@@ -19,7 +19,7 @@ export function formatMailLike(
 		typeof maybeEncodedAddress === 'string'
 			? maybeEncodedAddress
 			: encodeAddressByProtocol(maybeEncodedAddress, protocol).encoded;
-	if (protocol === 'mailchain') {
+	if (protocol === MAILCHAIN) {
 		return `${encodedAddress}@${mailchainDomain}`;
 	}
 	return `${encodedAddress}@${protocol}.${mailchainDomain}`;

@@ -1,4 +1,4 @@
-import { ETHEREUM, MAILCHAIN } from '../protocols';
+import { ETHEREUM, MAILCHAIN, ProtocolType } from '../protocols';
 import { isAnyHex } from '@mailchain/encoding';
 
 /**
@@ -6,7 +6,7 @@ import { isAnyHex } from '@mailchain/encoding';
  * @param address
  * @returns List of possible protocols. There are no guarantees the address exists on any of the returned protocols.
  */
-export function guessProtocolsFromAddress(address: string): string[] {
+export function guessProtocolsFromAddress(address: string): ProtocolType[] {
 	address = address.trim();
 	const isAddressHex = isAnyHex(address);
 
@@ -19,5 +19,5 @@ export function guessProtocolsFromAddress(address: string): string[] {
 		protocols.add(MAILCHAIN);
 	}
 
-	return Array.from(protocols);
+	return Array.from(protocols) as ProtocolType[];
 }
