@@ -55,7 +55,7 @@ export async function lookupMessageKey(apiConfig: Configuration, address: string
 			mailchainPublicKey,
 			getPublicKeyFromApiResponse(result.data.messagingKey),
 			DecodeHexZeroX(result.data.providedKeyProof?.signature),
-			address,
+			result.data.providedKeyProof.address!,
 			providedKeyProof.protocol as ProtocolType,
 		);
 

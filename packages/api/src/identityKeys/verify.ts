@@ -31,7 +31,7 @@ export async function verify(
 		mailchainPublicKey,
 		userKey,
 		DecodeHexZeroX(result.data.providedKeyProof.signature),
-		address,
+		result.data.providedKeyProof.address!,
 		protocol,
 	);
 }

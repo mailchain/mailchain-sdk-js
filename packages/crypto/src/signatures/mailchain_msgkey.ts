@@ -2,7 +2,7 @@ import { protocols } from '@mailchain/internal';
 import { EncodeHexZeroX } from '@mailchain/encoding';
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
-import { ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
+import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 import { KindED25519 } from '../keys';
 import { EncodePublicKey } from '../multikey/encoding';
 
@@ -13,8 +13,10 @@ export function mailchainProvidedMessagingKeyMessage(
 ) {
 	if (address.length === 0) throw new ErrorAddressIsEmpty();
 	if (protocol.length === 0) throw new ErrorProtocolIsEmpty();
-	let descriptiveKey: Uint8Array;
-	// check for type ed25519.PublicKey
+
+	if (address.includes('@')) {
+		throw new AddressMustBeProtocolAddress();
+	}
 
 	switch (msgKey.curve) {
 		case KindED25519:
@@ -22,9 +24,7 @@ export function mailchainProvidedMessagingKeyMessage(
 
 			return new Uint8Array(
 				Buffer.from(
-					`\x11Mailchain provided messaging key:\nAddress:${
-						address.split('@')[0]
-					}\nProtocol:${protocol}\nKey:${encodedKey}`,
+					`\x11Mailchain provided messaging key:\nAddress:${address}\nProtocol:${protocol}\nKey:${encodedKey}`,
 				),
 			);
 

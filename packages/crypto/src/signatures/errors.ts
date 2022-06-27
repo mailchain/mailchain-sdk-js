@@ -20,6 +20,12 @@ export class AddressVerificationFailed extends Error {
 	}
 }
 
+export class AddressMustBeProtocolAddress extends Error {
+	constructor() {
+		super('address must be a protocol address');
+	}
+}
+
 export class PublicKeyNotFoundFailed extends Error {
 	constructor() {
 		super('mailchain public key not found');
