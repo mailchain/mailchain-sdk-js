@@ -15,5 +15,5 @@ export async function SR25519DeriveHardenedKey(
 	const chainCode = chainCodeFromDeriveIndex(index);
 	const childKeyPair = sr25519DeriveHard(asSR25519PrivateKey(parentKey.privateKey).keyPair, chainCode);
 
-	return SR25519ExtendedPrivateKey.FromPrivateKey(SR25519PrivateKey.fromKeyPair(childKeyPair));
+	return SR25519ExtendedPrivateKey.fromPrivateKey(SR25519PrivateKey.fromKeyPair(childKeyPair));
 }

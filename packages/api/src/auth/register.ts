@@ -185,7 +185,7 @@ async function AccountRegisterFinalize(
 	// TODO: this is not the production key generation but will be suffient for testing
 	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
 	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
-	const encrypter = PrivateKeyEncrypter.FromPrivateKey(encryptionKey);
+	const encrypter = PrivateKeyEncrypter.fromPrivateKey(encryptionKey);
 
 	const usernameParams = getMailchainUsernameParams();
 	const usernameProofMessage = CreateProofMessage(
@@ -197,7 +197,7 @@ async function AccountRegisterFinalize(
 	const signedUsernameProof = await signRawEd25519(identityKey, DecodeUtf8(usernameProofMessage));
 
 	// TODO: this is not the production data type but will be suffient for testing
-	const encryptedAccountSeed = await encrypter.Encrypt(identityKeySeed);
+	const encryptedAccountSeed = await encrypter.encrypt(identityKeySeed);
 
 	const signedRegistrationSession = await identityKey.sign(registrationSession);
 

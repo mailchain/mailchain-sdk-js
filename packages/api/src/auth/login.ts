@@ -116,7 +116,7 @@ async function AccountAuthFinalize(
 	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
 	// TODO: this is not the production data type but will be suffient for testing
 
-	const decryptedAccountSeed = await decrypter.Decrypt(
+	const decryptedAccountSeed = await decrypter.decrypt(
 		DecodeBase64(response.data.encryptedAccountSeed.encryptedAccountSeed),
 	);
 

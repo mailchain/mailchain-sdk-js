@@ -3,7 +3,7 @@ import { DecodePrivateKey, DecodePublicKey } from '@mailchain/crypto/multikey/en
 import axios from 'axios';
 import { EncodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
-import { KeyRingDecrypter } from '@mailchain/keyring/address';
+import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 
 import { protocol } from '../protobuf/protocol/protocol';
 import { Configuration } from '../api/configuration';

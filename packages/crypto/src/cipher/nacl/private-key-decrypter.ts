@@ -32,7 +32,7 @@ export class PrivateKeyDecrypter implements Decrypter {
 		return new this(key);
 	}
 
-	async Decrypt(input: EncryptedContent): Promise<PlainContent> {
+	async decrypt(input: EncryptedContent): Promise<PlainContent> {
 		const secretData = deserializePrivateKeyEncryptedContent(input);
 		if (this._keyId !== secretData.keyId) {
 			throw Error('key id does not match supplied key');

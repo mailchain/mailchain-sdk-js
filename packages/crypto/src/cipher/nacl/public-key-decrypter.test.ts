@@ -99,9 +99,9 @@ describe('Decrypt', () => {
 			const target = new PublicKeyDecrypter(test.keyEx, test.prvKey);
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return target.Decrypt(test.message).catch((e) => expect(e).toBeDefined());
+				return target.decrypt(test.message).catch((e) => expect(e).toBeDefined());
 			}
-			return target.Decrypt(test.message).then((actual) => {
+			return target.decrypt(test.message).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});

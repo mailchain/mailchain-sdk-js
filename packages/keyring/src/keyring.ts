@@ -4,13 +4,12 @@ import {
 	PrivateKey,
 	Encrypter,
 	Decrypter,
-	PublicKeyEncrypter,
-	PublicKeyDecrypter,
 	ED25519KeyExchange,
 	PrivateKeyDecrypter,
 	SignerWithPublicKey,
+	PrivateKeyEncrypter,
 } from '@mailchain/crypto';
-import { EncodeHex } from '@mailchain/encoding';
+import { EncodeHex, EncodeHexZeroX } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
@@ -18,8 +17,9 @@ import {
 	DERIVATION_PATH_INBOX_ROOT,
 	DERIVATION_PATH_USER_PROFILE,
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
+	DERIVATION_PATH_DATE_OFFSET,
 } from './constants';
-import { KeyRingDecrypter } from './address';
+import { InboxKey, KeyRingDecrypter } from './functions';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -92,16 +92,32 @@ export class KeyRing {
 		return this._rootInboxKey.privateKey;
 	}
 
-	userProfileCrypto(): {
-		encrypter: Encrypter['Encrypt'];
-		decrypter: Decrypter['Decrypt'];
-	} {
-		return {
-			encrypter: (input) =>
-				PublicKeyEncrypter.FromPublicKey(this._userProfileEncryptionKey.privateKey.publicKey).Encrypt(input),
-			decrypter: (input) =>
-				PublicKeyDecrypter.FromPrivateKey(this._userProfileEncryptionKey.privateKey).Decrypt(input),
-		};
+	inboxMessageDateOffset(): number {
+		const year2000 = 946684800;
+		const offsetKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootInboxKey.privateKey),
+			DERIVATION_PATH_DATE_OFFSET,
+		);
+
+		const offset = Number(BigInt(EncodeHexZeroX(offsetKey.bytes)) % BigInt(year2000));
+
+		return offset;
+	}
+
+	inboxKey(): InboxKey {
+		const inboxKey = this._rootInboxKey.privateKey;
+		const decrypter = PrivateKeyDecrypter.fromPrivateKey(inboxKey);
+		const encrypter = PrivateKeyEncrypter.fromPrivateKey(inboxKey);
+
+		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
+	}
+
+	userProfileCrypto(): Encrypter & Decrypter {
+		const inboxKey = this._userProfileEncryptionKey.privateKey;
+		const decrypter = PrivateKeyDecrypter.fromPrivateKey(inboxKey);
+		const encrypter = PrivateKeyEncrypter.fromPrivateKey(inboxKey);
+
+		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
 	}
 
 	addressMessagingKey(address: Uint8Array, protocol: protocols.ProtocolType, nonce: number): KeyRingDecrypter {
@@ -123,7 +139,7 @@ export class KeyRing {
 				const sharedSecret = await keyEx.SharedSecret(addressKey, bundleEphemeralKey);
 				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
 
-				return decrypter.Decrypt(input);
+				return decrypter.decrypt(input);
 			},
 		};
 	}
@@ -140,7 +156,7 @@ export class KeyRing {
 				const sharedSecret = await keyEx.SharedSecret(key, bundleEphemeralKey);
 				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
 
-				return decrypter.Decrypt(input);
+				return decrypter.decrypt(input);
 			},
 		};
 	}

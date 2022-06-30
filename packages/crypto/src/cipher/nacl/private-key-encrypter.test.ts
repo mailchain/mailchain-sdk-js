@@ -79,13 +79,13 @@ describe('Encrypt', () => {
 				expect.assertions(1);
 				try {
 					const target = new PrivateKeyEncrypter(test.prvKey, test.rand);
-					target.Encrypt(test.message);
+					target.encrypt(test.message);
 				} catch (e) {
 					expect(e).toBeDefined();
 				}
 			} else {
 				const target = new PrivateKeyEncrypter(test.prvKey, test.rand);
-				return target.Encrypt(test.message).then((actual) => {
+				return target.encrypt(test.message).then((actual) => {
 					expect(actual).toEqual(test.expected);
 				});
 			}

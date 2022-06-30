@@ -1,5 +1,5 @@
 import { EncodeHex } from '@mailchain/encoding';
-import { KeyRingDecrypter } from '../../../keyring/src/address';
+import { KeyRingDecrypter } from '../../../keyring/src/functions';
 
 export const mailchainDeliveryConfirmationMessage = (deliveryRequestID: Uint8Array): Uint8Array => {
 	return Buffer.from(`\x11Mailchain delivery confirmation:\n${EncodeHex(deliveryRequestID)}`, 'utf-8');

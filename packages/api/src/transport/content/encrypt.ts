@@ -60,6 +60,6 @@ export async function encryptBuffer(
 	key: PrivateKey,
 	rand: RandomFunction = secureRandom,
 ): Promise<Buffer> {
-	const encrypted = await PrivateKeyEncrypter.FromPrivateKey(key, rand).Encrypt(buffer);
+	const encrypted = await PrivateKeyEncrypter.fromPrivateKey(key, rand).encrypt(buffer);
 	return Buffer.from(encrypted);
 }

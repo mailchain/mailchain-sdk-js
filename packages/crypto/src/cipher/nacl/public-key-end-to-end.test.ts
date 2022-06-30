@@ -66,10 +66,10 @@ describe('encrypt-then-decrypt', () => {
 	];
 	test.each(tests)('%p', async (test) => {
 		const encrypter = new PublicKeyEncrypter(test.keyEx, test.recipientPublicKey);
-		const encrypted = await encrypter.Encrypt(test.message);
+		const encrypted = await encrypter.encrypt(test.message);
 
 		const decrypter = new PublicKeyDecrypter(test.keyEx, test.recipientPrivateKey);
-		const decrypted = await decrypter.Decrypt(encrypted);
+		const decrypted = await decrypter.decrypt(encrypted);
 
 		expect(decrypted).toEqual(test.message);
 	});

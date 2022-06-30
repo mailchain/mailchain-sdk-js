@@ -16,7 +16,7 @@ export class PublicKeyDecrypter implements Decrypter {
 		return new this(FromPrivateKey(key), key);
 	}
 
-	async Decrypt(input: EncryptedContent): Promise<PlainContent> {
+	async decrypt(input: EncryptedContent): Promise<PlainContent> {
 		const secretData = deserializePublicKeyEncryptedContent(input);
 
 		const sharedSecret = await this._keyEx.SharedSecret(this._prvKey, secretData.pubKey);

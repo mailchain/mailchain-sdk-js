@@ -63,13 +63,13 @@ describe('Decrypt', () => {
 				expect.assertions(1);
 				try {
 					const target = new PrivateKeyDecrypter(test.prvKey);
-					target.Decrypt(test.message);
+					target.decrypt(test.message);
 				} catch (e) {
 					expect(e).toBeDefined();
 				}
 			} else {
 				const target = new PrivateKeyDecrypter(test.prvKey);
-				return target.Decrypt(test.message).then((actual) => {
+				return target.decrypt(test.message).then((actual) => {
 					expect(actual).toEqual(test.expected);
 				});
 			}

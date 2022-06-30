@@ -18,9 +18,9 @@ export async function createEnvelope(
 	rand: RandomFunction = secureRandom,
 ): Promise<protocol.Envelope> {
 	const keyBundle = await createECDHKeyBundle(recipientMessagingKey, rand);
-	const encrypter = PrivateKeyEncrypter.FromPrivateKey(ED25519PrivateKey.fromSeed(keyBundle.secret), rand);
-	const encryptedMessageKey = await encrypter.Encrypt(EncodePrivateKey(messageRootEncryptionKey.privateKey)); //TODO: look into encoding extended keys
-	const encryptedMessageURI = await encrypter.Encrypt(Buffer.from(messageURI, 'utf8'));
+	const encrypter = PrivateKeyEncrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(keyBundle.secret), rand);
+	const encryptedMessageKey = await encrypter.encrypt(EncodePrivateKey(messageRootEncryptionKey.privateKey)); //TODO: look into encoding extended keys
+	const encryptedMessageURI = await encrypter.encrypt(Buffer.from(messageURI, 'utf8'));
 
 	const payload = {
 		encryptedMessageKey,

@@ -154,9 +154,9 @@ describe('Encrypt', () => {
 			const target = new PublicKeyEncrypter(test.keyExFunc(), test.pubKey, test.rand);
 			if (test.shouldThrow) {
 				expect.assertions(1);
-				return target.Encrypt(test.message).catch((e) => expect(e).toBeDefined());
+				return target.encrypt(test.message).catch((e) => expect(e).toBeDefined());
 			}
-			return target.Encrypt(test.message).then((actual) => {
+			return target.encrypt(test.message).then((actual) => {
 				expect(actual).toEqual(test.expected);
 			});
 		});

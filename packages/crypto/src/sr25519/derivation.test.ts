@@ -83,7 +83,7 @@ describe('Derive()', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, async () => {
-			let extendedKey = SR25519ExtendedPrivateKey.FromPrivateKey(await test.args.key);
+			let extendedKey = SR25519ExtendedPrivateKey.fromPrivateKey(await test.args.key);
 
 			for (const path of test.args.path) {
 				extendedKey = await SR25519DeriveHardenedKey(extendedKey, path);

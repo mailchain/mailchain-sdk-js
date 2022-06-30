@@ -33,10 +33,10 @@ describe('FromPrivateKey()', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					SR25519ExtendedPrivateKey.FromPrivateKey(test.arg);
+					SR25519ExtendedPrivateKey.fromPrivateKey(test.arg);
 				}).toThrow();
 			} else {
-				expect(SR25519ExtendedPrivateKey.FromPrivateKey(test.arg)).toEqual(test.expected);
+				expect(SR25519ExtendedPrivateKey.fromPrivateKey(test.arg)).toEqual(test.expected);
 			}
 		});
 	});

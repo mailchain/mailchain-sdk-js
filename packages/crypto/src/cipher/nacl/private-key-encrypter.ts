@@ -30,11 +30,11 @@ export class PrivateKeyEncrypter implements Encrypter {
 				throw RangeError('unknown private key type');
 		}
 	}
-	static FromPrivateKey(key: PrivateKey, rand: RandomFunction = secureRandom): PrivateKeyEncrypter {
+	static fromPrivateKey(key: PrivateKey, rand: RandomFunction = secureRandom): PrivateKeyEncrypter {
 		return new this(key, rand);
 	}
 
-	async Encrypt(input: Uint8Array): Promise<EncryptedContent> {
+	async encrypt(input: Uint8Array): Promise<EncryptedContent> {
 		const sealedBox = easySeal(input, this._secretKey, this._rand);
 
 		return serializePrivateKeyEncryptedContent(sealedBox, this._keyId);

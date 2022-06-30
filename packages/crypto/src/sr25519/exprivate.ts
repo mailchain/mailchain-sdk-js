@@ -9,7 +9,7 @@ export class SR25519ExtendedPrivateKey implements ExtendedPrivateKey {
 		this.privateKey = privateKey;
 		this.bytes = privateKey.bytes;
 	}
-	static FromPrivateKey(privateKey: SR25519PrivateKey): SR25519ExtendedPrivateKey {
+	static fromPrivateKey(privateKey: SR25519PrivateKey): SR25519ExtendedPrivateKey {
 		return new this(asSR25519PrivateKey(privateKey));
 	}
 }

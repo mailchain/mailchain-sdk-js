@@ -18,7 +18,7 @@ export class PublicKeyEncrypter implements Encrypter {
 		return new this(FromPublicKey(key), key);
 	}
 
-	async Encrypt(input: Uint8Array): Promise<EncryptedContent> {
+	async encrypt(input: Uint8Array): Promise<EncryptedContent> {
 		const ephemeralPrvKey = await this._keyEx.EphemeralKey();
 		const sharedSecret = await this._keyEx.SharedSecret(ephemeralPrvKey, this._pubKey);
 		const sealedBox = easySeal(input, sharedSecret, this._rand);

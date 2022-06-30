@@ -52,6 +52,6 @@ export async function decryptBuffer(buffer: Buffer, key: PrivateKey): Promise<Bu
 	if (buffer.length === 0) {
 		throw new Error('can not decrypt empty data');
 	}
-	const decrypted = await PrivateKeyDecrypter.fromPrivateKey(key).Decrypt(buffer);
+	const decrypted = await PrivateKeyDecrypter.fromPrivateKey(key).decrypt(buffer);
 	return Buffer.from(decrypted);
 }
