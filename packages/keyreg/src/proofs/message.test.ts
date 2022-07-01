@@ -19,8 +19,6 @@ describe('CreateProofMessage', () => {
 				publicKey: AliceED25519PublicKey,
 				nonce: 1,
 			},
-			expected:
-				'Welcome to Mailchain!\n\nSign to start using this address for messaging.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nAddress: 0x5602ea95540bee46d03ba335eed6f49d117eab95c8ab8b71bae2cdd1e564a761\nMessaging key: 0xe2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671\nNonce: 1',
 			shouldThrow: false,
 		},
 		{
@@ -36,7 +34,6 @@ describe('CreateProofMessage', () => {
 				publicKey: AliceED25519PublicKey,
 				nonce: 1,
 			},
-			expected: '',
 			shouldThrow: true,
 		},
 		{
@@ -52,7 +49,6 @@ describe('CreateProofMessage', () => {
 				publicKey: AliceED25519PublicKey,
 				nonce: 1,
 			},
-			expected: '',
 			shouldThrow: true,
 		},
 		{
@@ -68,7 +64,6 @@ describe('CreateProofMessage', () => {
 				publicKey: AliceED25519PublicKey,
 				nonce: 1,
 			},
-			expected: '',
 			shouldThrow: true,
 		},
 		{
@@ -84,7 +79,6 @@ describe('CreateProofMessage', () => {
 				publicKey: {} as PublicKey,
 				nonce: 1,
 			},
-			expected: '',
 			shouldThrow: true,
 		},
 	];
@@ -97,7 +91,7 @@ describe('CreateProofMessage', () => {
 			} else {
 				expect(
 					CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce),
-				).toEqual(test.expected);
+				).toMatchSnapshot(test.name);
 			}
 		});
 	});

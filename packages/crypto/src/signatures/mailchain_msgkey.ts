@@ -2,9 +2,9 @@ import { protocols } from '@mailchain/internal';
 import { EncodeHexZeroX } from '@mailchain/encoding';
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
-import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 import { KindED25519 } from '../keys';
 import { EncodePublicKey } from '../multikey/encoding';
+import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 
 export function mailchainProvidedMessagingKeyMessage(
 	msgKey: PublicKey,

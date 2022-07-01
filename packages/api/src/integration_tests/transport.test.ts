@@ -11,7 +11,7 @@ import { protocols } from '@mailchain/internal';
 import { ethers } from 'ethers';
 import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
 import { DecodeUtf8 } from '@mailchain/encoding/utf8';
-import { signEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
+import { signEthereumPersonalMessage, VerifyEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 import { Configuration, ConfigurationParameters } from '../api';
 import { OpaqueConfig } from '../types';
 import { Register } from '../auth/register';
@@ -21,6 +21,7 @@ import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
 import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
+import { findAlarmThresholds } from 'aws-cdk-lib/aws-autoscaling-common';
 
 jest.setTimeout(30000);
 
@@ -36,7 +37,6 @@ const registerAddress = async (user) => {
 	const proofParams = getLatestProofParams(protocols.ETHEREUM, '', 'en');
 	const addressMessagingKey = user.keyRing.addressMessagingKey(addressBytes, protocols.ETHEREUM, nonce);
 	const proofMessage = CreateProofMessage(proofParams, addressBytes, addressMessagingKey.publicKey, nonce);
-
 	const signature = signEthereumPersonalMessage(walletPrivateKey, Buffer.from(DecodeUtf8(proofMessage)));
 
 	await identityKeysApi.registerAddress(apiConfig, {

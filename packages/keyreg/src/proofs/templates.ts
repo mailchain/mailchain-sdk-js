@@ -1,19 +1,21 @@
 import { ProofParams } from './params';
 
 export function simpleV1enUS(encodedAddress: string, encodedMessagingPublicKey: string, nonce: number): string {
-	var lines = Array<string>(9);
+	var lines = Array<string>(11);
 
 	lines[0] = 'Welcome to Mailchain!';
 	lines[1] = '';
-	lines[2] = 'Sign to start using this address for messaging.';
+	lines[2] = `Please sign to start using this address with Mailchain. This will not trigger a blockchain transaction or cost any gas fees.`;
 	lines[3] = '';
-	lines[4] = 'This request will not trigger a blockchain transaction or cost any gas fees.';
-	lines[5] = '';
-	lines[6] = `Address: ${encodedAddress}`;
-	lines[7] = `Messaging key: ${encodedMessagingPublicKey}`;
-	lines[8] = `Nonce: ${nonce}`;
+	lines[4] = `What's happening?`;
+	lines[5] = `A messaging key will be registered with this address and used only for messaging. It will replace any existing registered messaging keys.`;
+	lines[6] = '';
+	lines[7] = 'Technical Details:';
+	lines[8] = `Address: ${encodedAddress}`;
+	lines[9] = `Messaging key: ${encodedMessagingPublicKey}`;
+	lines[10] = `Nonce: ${nonce}`;
 
-	return lines.join('\n');
+	return lines.join('\n').trim();
 }
 
 export function mailchainUsername(encodedAddress: string, encodedMessagingPublicKey: string, nonce: number): string {
@@ -24,7 +26,7 @@ export function mailchainUsername(encodedAddress: string, encodedMessagingPublic
 	lines[2] = `Nonce: ${nonce}`;
 	lines[3] = 'Protocol: mailchain';
 
-	return lines.join('\n');
+	return lines.join('\n').trim();
 }
 
 const templateMessageFunctions = new Map<String, ParseTemplate>([

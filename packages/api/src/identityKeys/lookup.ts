@@ -72,7 +72,7 @@ export async function lookupMessageKey(apiConfig: Configuration, address: string
 			params,
 			getAddressFromApiResponse(registeredKeyProof.address),
 			getPublicKeyFromApiResponse(result.data.messagingKey),
-			result.data.registeredKeyProof?.nonce!,
+			registeredKeyProof.nonce!,
 		);
 		// verify the proof with the correct signer
 		const isVerified = verify(

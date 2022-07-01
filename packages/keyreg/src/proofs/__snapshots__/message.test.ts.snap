@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CreateProofMessage simple-v1-en_US: simple-v1-en_US 1`] = `
+"Welcome to Mailchain!
+
+Please sign to start using this address with Mailchain. This will not trigger a blockchain transaction or cost any gas fees.
+
+What's happening?
+A messaging key will be registered with this address and used only for messaging. It will replace any existing registered messaging keys.
+
+Technical Details:
+Address: 0x5602ea95540bee46d03ba335eed6f49d117eab95c8ab8b71bae2cdd1e564a761
+Messaging key: 0xe2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671
+Nonce: 1"
+`;

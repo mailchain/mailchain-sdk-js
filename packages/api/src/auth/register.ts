@@ -14,6 +14,7 @@ import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
 import { DefaultConfig } from './config';
 import { KeyRing } from '@mailchain/keyring';
+import { MAILCHAIN } from '@mailchain/internal/protocols';
 
 export async function Register({
 	identityKeySeed,
