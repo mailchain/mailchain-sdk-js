@@ -18,7 +18,7 @@ export class Receiver {
 	async getUndeliveredMessages(messagingKey: KeyRingDecrypter) {
 		const transportApi = TransportApiFactory(this.configuration, undefined, getAxiosWithSigner(messagingKey));
 		return transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
-			return Promise.all(
+			return Promise.allSettled(
 				deliveryRequests.map((dr) =>
 					processDeliveryRequest(messagingKey, protocol.Delivery.decode(DecodeBase64(dr.data)), dr.hash),
 				),
