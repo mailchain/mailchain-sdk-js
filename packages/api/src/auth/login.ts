@@ -1,5 +1,4 @@
 import { OpaqueClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
-import { PrivateKey } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
@@ -23,6 +22,7 @@ export async function Login(
 	apiConfig: Configuration,
 	opaqueConfig: OpaqueConfig = DefaultConfig,
 ): Promise<AuthenticatedResponse> {
+	username = username.toLowerCase();
 	try {
 		const authClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
 

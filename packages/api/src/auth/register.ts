@@ -9,12 +9,11 @@ import { DecodeBase64, EncodeBase64, EncodeHexZeroX } from '@mailchain/encoding'
 import { getMailchainUsernameParams, CreateProofMessage } from '@mailchain/keyreg';
 import { signRawEd25519 } from '@mailchain/crypto/signatures/raw_ed25119';
 import { DecodeUtf8 } from '@mailchain/encoding/utf8';
+import { KeyRing } from '@mailchain/keyring';
 import { AuthApiFactory, Configuration } from '../api';
 import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
 import { DefaultConfig } from './config';
-import { KeyRing } from '@mailchain/keyring';
-import { MAILCHAIN } from '@mailchain/internal/protocols';
 
 export async function Register({
 	identityKeySeed,
@@ -33,6 +32,7 @@ export async function Register({
 	apiConfig: Configuration;
 	opaqueConfig?: OpaqueConfig;
 }): Promise<AuthenticatedResponse> {
+	username = username.toLowerCase();
 	const opaqueRegisterClient: RegistrationClient = new OpaqueClient(opaqueConfig.parameters);
 	const opaqueAuthClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
 
