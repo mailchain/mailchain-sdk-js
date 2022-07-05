@@ -1,26 +1,24 @@
 import { DecodeBase64 } from '@mailchain/encoding';
-import { MessageType, NewMessageFormValues } from './generate';
+import { MailData } from './types';
 
-export async function parseMimeText(text: string): Promise<NewMessageFormValues> {
+export async function parseMimeText(text: string): Promise<MailData> {
 	const parse = (await import('emailjs-mime-parser')).default;
 	const {
 		content,
-		headers: { from, to, subject },
+		headers,
+		headers: { from, to, bcc, cc, subject },
 	} = parse(text);
 
 	return {
-		from: { label: from[0].value[0].name, value: from[0].value[0].address },
-		recipients: to[0].value.map((it) => ({ label: it.name, value: it.address })),
-		type: MessageType.NEW,
-		carbonCopyRecipients: [],
-		blindCarbonCopyRecipients: [],
+		id: headers['message-id'][0].value,
+		from: { name: from[0].value[0].name, address: from[0].value[0].address },
+		recipients: to[0].value.map((it: any) => ({ name: it.name, address: it.address })),
+		carbonCopyRecipients: cc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
+		blindCarbonCopyRecipients: bcc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
 		subject: subject?.[0].value.length > 0 ? subject?.[0].value : parseSubjectHeader(subject?.[0].initial),
 		message: Buffer.from(content ?? '')
 			.toString()
-			.split('\n')
-			.map((it) => ({
-				text: it,
-			})),
+			.split('\n'),
 	};
 }
 
