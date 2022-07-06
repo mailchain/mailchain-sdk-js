@@ -3,8 +3,8 @@ import { ecdsaSign, ecdsaVerify } from 'secp256k1';
 import { SECP256K1PublicKey } from '../secp256k1/public';
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
-import { ErrorUnsupportedKey } from './errors';
 import { KindSECP256K1 } from '../keys';
+import { ErrorUnsupportedKey } from './errors';
 
 export function VerifyEthereumPersonalMessage(key: PublicKey, message: Buffer, signature: Uint8Array): boolean {
 	switch (key.constructor) {
@@ -21,10 +21,10 @@ export function VerifyEthereumPersonalMessage(key: PublicKey, message: Buffer, s
 	}
 }
 
-export function signEthereumPersonalMessage(key: PrivateKey, message: Buffer): Uint8Array {
+export function signEthereumPersonalMessage(key: PrivateKey, message: Uint8Array): Uint8Array {
 	switch (key.curve) {
 		case KindSECP256K1:
-			const personalMessage = hashPersonalMessage(message);
+			const personalMessage = new Uint8Array(hashPersonalMessage(Buffer.from(message)));
 
 			const sigObj = ecdsaSign(personalMessage, key.bytes);
 

@@ -11,8 +11,8 @@ import { protocols } from '@mailchain/internal';
 import { ethers } from 'ethers';
 import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
 import { DecodeUtf8 } from '@mailchain/encoding/utf8';
-import { signEthereumPersonalMessage, VerifyEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
-import { Configuration, ConfigurationParameters } from '../api';
+import { signEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
+import { Configuration } from '../api';
 import { OpaqueConfig } from '../types';
 import { Register } from '../auth/register';
 import { EncodeHexZeroX, EncodeHex, DecodeHexZeroX } from '../../../encoding/src/hex';
@@ -21,7 +21,6 @@ import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
 import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
-import { findAlarmThresholds } from 'aws-cdk-lib/aws-autoscaling-common';
 
 jest.setTimeout(30000);
 
@@ -37,7 +36,7 @@ const registerAddress = async (user) => {
 	const proofParams = getLatestProofParams(protocols.ETHEREUM, '', 'en');
 	const addressMessagingKey = user.keyRing.addressMessagingKey(addressBytes, protocols.ETHEREUM, nonce);
 	const proofMessage = CreateProofMessage(proofParams, addressBytes, addressMessagingKey.publicKey, nonce);
-	const signature = signEthereumPersonalMessage(walletPrivateKey, Buffer.from(DecodeUtf8(proofMessage)));
+	const signature = signEthereumPersonalMessage(walletPrivateKey, DecodeUtf8(proofMessage));
 
 	await identityKeysApi.registerAddress(apiConfig, {
 		signature: EncodeHexZeroX(signature),
@@ -79,7 +78,7 @@ const registerRandomUser = async () => {
 		identityKeySeed: seed,
 		username,
 		password: 'qwerty',
-		captchaResponse: 'captcha',
+		captchaResponse: '10000000-aaaa-bbbb-cccc-000000000001',
 		messagingPublicKey: keyRing.accountMessagingKey().publicKey,
 		apiConfig,
 		opaqueConfig: config,
@@ -118,7 +117,7 @@ describe('SendAndReceiveMessage', () => {
 		].join('\n');
 		etherAddresses = await Promise.all([registerAddress(users[1]), registerAddress(users[1])]);
 	});
-	afterAll(() => jest.resetAllMocks());
+	afterEach(() => jest.resetAllMocks());
 
 	it('verify messaging keys is correct', async () => {
 		const data = [
@@ -134,36 +133,37 @@ describe('SendAndReceiveMessage', () => {
 		const payload = Buffer.from(message);
 		headers = await getHeaders({ user: users[0], payload, signingKey: users[1].keyRing.accountMessagingKey() });
 
-		await sendPayload(
-			users[0].keyRing,
-			apiConfig,
+		await sendPayload(users[0].keyRing, apiConfig, [
 			{
-				Headers: headers,
-				Content: payload,
+				recipient: { address: `${users[1].username}@mailchain.local`, name: users[1].username },
+				payload: {
+					Headers: headers,
+					Content: payload,
+				},
 			},
-			[`${users[1].username}@mailchain.local`],
-		);
+		]);
 	});
 
 	it('receive message from user 2 to user 1', async () => {
 		const payload = Buffer.from(message);
 		const receiver = new Receiver(apiConfig);
 
-		const results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		const [delivery] = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
 
-		expect(results[0]).toBeDefined();
-		expect(results[0].payload!.Content).toEqual(payload);
-		expect(results[0].payload!.Headers).toEqual(headers);
+		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
+		expect(delivery.value.payload.Content).toEqual(payload);
+		expect(delivery.value.payload.Headers).toEqual(headers);
 	});
 
 	it('receive message from user 2 to user 1 and acknowledge receiving', async () => {
 		const receiver = new Receiver(apiConfig);
 
-		let results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
-		await confirmDelivery(apiConfig, users[1].keyRing.accountMessagingKey(), results[0].hash);
+		const [delivery] = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
+		await confirmDelivery(apiConfig, users[1].keyRing.accountMessagingKey(), delivery.value.hash);
 
-		results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
-		expect(results[0]).toBeUndefined();
+		const results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		expect(results).toHaveLength(0);
 	});
 
 	it('send ethereum  message from user 1 to user 2', async () => {
@@ -175,15 +175,18 @@ describe('SendAndReceiveMessage', () => {
 		);
 		headers = await getHeaders({ user: users[0], payload, signingKey: etherAccountMessageKey });
 
-		await sendPayload(
-			users[0].keyRing,
-			apiConfig,
+		await sendPayload(users[0].keyRing, apiConfig, [
 			{
-				Headers: headers,
-				Content: payload,
+				recipient: {
+					address: `${etherAddresses[0].address}@ethereum.mailchain.local`,
+					name: etherAddresses[0].address,
+				},
+				payload: {
+					Headers: headers,
+					Content: payload,
+				},
 			},
-			[`${etherAddresses[0].address}@ethereum.mailchain.local`],
-		);
+		]);
 	});
 	it('receive ethereum message by user 2', async () => {
 		const payload = Buffer.from(message);
@@ -193,15 +196,15 @@ describe('SendAndReceiveMessage', () => {
 			protocols.ETHEREUM,
 			1,
 		);
-		let results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
+		const [delivery] = await receiver.getUndeliveredMessages(etherAccountMessageKey);
 
-		expect(results[0]).toBeDefined();
-		expect(results[0].payload!.Content).toEqual(payload);
-		expect(results[0].payload!.Headers).toEqual(headers);
-		await confirmDelivery(apiConfig, etherAccountMessageKey, results[0].hash);
+		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
+		expect(delivery.value.payload.Content).toEqual(payload);
+		expect(delivery.value.payload.Headers).toEqual(headers);
+		await confirmDelivery(apiConfig, etherAccountMessageKey, delivery.value.hash);
 
-		results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
-		expect(results[0]).toBeUndefined();
+		const results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
+		expect(results).toHaveLength(0);
 	});
 
 	it('send multiple ethereum messages from user 1 to user 2', async () => {
@@ -218,15 +221,18 @@ describe('SendAndReceiveMessage', () => {
 					payload,
 					signingKey: etherAccountMessageKey,
 				});
-				return sendPayload(
-					users[0].keyRing,
-					apiConfig,
+				return sendPayload(users[0].keyRing, apiConfig, [
 					{
-						Headers: headersMultiple[index],
-						Content: payload,
+						recipient: {
+							address: `${it.address}@ethereum.mailchain.local`,
+							name: it.address,
+						},
+						payload: {
+							Headers: headersMultiple[index],
+							Content: payload,
+						},
 					},
-					[`${it.address}@ethereum.mailchain.local`],
-				);
+				]);
 			}),
 		);
 	});
@@ -245,7 +251,8 @@ describe('SendAndReceiveMessage', () => {
 
 			await Promise.all(
 				results.map(async (result) => {
-					await confirmDelivery(apiConfig, messagingKey, result.hash);
+					if (result.status === 'rejected') throw new Error('Should be fulfilled');
+					await confirmDelivery(apiConfig, messagingKey, result.value.hash);
 				}),
 			);
 

@@ -7,15 +7,12 @@ import { protocol } from '../protobuf/protocol/protocol';
 import { Configuration, PublicKey, TransportApiFactory } from '../api';
 import { getPublicKeyFromApiResponse, lookupMessageKey } from '../identityKeys';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { MailAddress } from '../formatters/types';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
 import { Payload } from './content/payload';
 import { Serialize } from './content/serialization';
 import { createDelivery } from './delivery/delivery';
-
-type SendPayloadResult = {
-	deliveries: PayloadRecipientDelivery[];
-};
 
 type SuccessPayloadRecipientDelivery = {
 	status: 'success';
@@ -30,17 +27,16 @@ type FailPayloadRecipientDelivery = {
 };
 
 type PayloadRecipientDelivery = SuccessPayloadRecipientDelivery | FailPayloadRecipientDelivery;
+export type PayloadForRecipient = { recipient: MailAddress; payload: Payload };
 
-export const sendPayload = async (
+export async function sendPayload(
 	keyRing: KeyRing,
 	apiConfiguration: Configuration,
-	payload: Payload,
-	recipients: string[],
+	payloads: PayloadForRecipient[],
 	rand: RandomFunction = secureRandom,
-) => {
-	const recipientKeys = await Promise.all(recipients.map((address) => lookupMessageKey(apiConfiguration, address)));
-	return sendPayloadInternal(keyRing, apiConfiguration, payload, recipientKeys, rand);
-};
+): Promise<PayloadRecipientDelivery[]> {
+	return Promise.all(payloads.map((payload) => sendPayloadInternal(keyRing, apiConfiguration, payload, rand)));
+}
 
 /**
  * Sends a message to multiple recipients
@@ -48,10 +44,9 @@ export const sendPayload = async (
 async function sendPayloadInternal(
 	keyRing: KeyRing,
 	apiConfiguration: Configuration,
-	payload: Payload,
-	recipients: PublicKey[],
-	rand: RandomFunction = secureRandom,
-): Promise<SendPayloadResult> {
+	{ payload, recipient }: PayloadForRecipient,
+	rand: RandomFunction,
+): Promise<PayloadRecipientDelivery> {
 	const transportApi = TransportApiFactory(
 		apiConfiguration,
 		undefined,
@@ -66,33 +61,29 @@ async function sendPayloadInternal(
 
 	const { uri: messageUri } = await transportApi.postEncryptedPayload(serializedContent).then((r) => r.data);
 
-	const deliveries: PayloadRecipientDelivery[] = await Promise.all(
-		recipients.map(async (messagingKey) => {
-			const deliveryCreated = await createDelivery(
-				getPublicKeyFromApiResponse(messagingKey),
-				payloadRootEncryptionKey,
-				messageUri,
-				rand,
-			);
-			const encodedDelivery = protocol.Delivery.encode(deliveryCreated).finish();
-			try {
-				const res = await transportApi.postDeliveryRequest({
-					encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
-					recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
-				});
-				return {
-					status: 'success',
-					recipient: messagingKey,
-					deliveryRequestId: res.headers['deliveryRequestID'],
-				};
-			} catch (e) {
-				return {
-					status: 'fail',
-					cause: e as Error,
-					recipient: messagingKey,
-				};
-			}
-		}),
+	const messagingKey = await lookupMessageKey(apiConfiguration, recipient.address);
+	const deliveryCreated = await createDelivery(
+		getPublicKeyFromApiResponse(messagingKey),
+		payloadRootEncryptionKey,
+		messageUri,
+		rand,
 	);
-	return { deliveries };
+	const encodedDelivery = protocol.Delivery.encode(deliveryCreated).finish();
+	try {
+		const res = await transportApi.postDeliveryRequest({
+			encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
+			recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
+		});
+		return {
+			status: 'success',
+			recipient: messagingKey,
+			deliveryRequestId: res.headers['deliveryRequestID'],
+		};
+	} catch (e) {
+		return {
+			status: 'fail',
+			cause: e as Error,
+			recipient: messagingKey,
+		};
+	}
 }
