@@ -61,9 +61,9 @@ async function sendPayloadInternal(
 
 	const { uri: messageUri } = await transportApi.postEncryptedPayload(serializedContent).then((r) => r.data);
 
-	const messagingKey = await lookupMessageKey(apiConfiguration, recipient.address);
+	const { messageKey } = await lookupMessageKey(apiConfiguration, recipient.address);
 	const deliveryCreated = await createDelivery(
-		getPublicKeyFromApiResponse(messagingKey),
+		getPublicKeyFromApiResponse(messageKey),
 		payloadRootEncryptionKey,
 		messageUri,
 		rand,
@@ -72,18 +72,18 @@ async function sendPayloadInternal(
 	try {
 		const res = await transportApi.postDeliveryRequest({
 			encryptedDeliveryRequest: EncodeBase64(encodedDelivery),
-			recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messagingKey))),
+			recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(messageKey))),
 		});
 		return {
 			status: 'success',
-			recipient: messagingKey,
+			recipient: messageKey,
 			deliveryRequestId: res.headers['deliveryRequestID'],
 		};
 	} catch (e) {
 		return {
 			status: 'fail',
 			cause: e as Error,
-			recipient: messagingKey,
+			recipient: messageKey,
 		};
 	}
 }

@@ -13,6 +13,7 @@ import { ProtocolType } from '@mailchain/internal/protocols';
 import { verify } from '@mailchain/crypto/signatures/verify';
 import { Decode } from '@mailchain/encoding/encoding';
 import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
+import { MailchainAddress } from '@mailchain/internal/addressing';
 import {
 	AddressesApiFactory,
 	PublicKeyCurveEnum,
@@ -38,7 +39,9 @@ export const getAddressFromApiResponse = (address: Address) => {
 	return Decode(address.encoding!, address.value);
 };
 
-export async function lookupMessageKey(apiConfig: Configuration, address: string): Promise<PublicKey> {
+type LookupResult = { address: MailchainAddress; messageKey: PublicKey };
+
+export async function lookupMessageKey(apiConfig: Configuration, address: string): Promise<LookupResult> {
 	const addressApi = AddressesApiFactory(apiConfig);
 
 	const result = await addressApi.getAddressMessagingKey(address);
@@ -86,5 +89,12 @@ export async function lookupMessageKey(apiConfig: Configuration, address: string
 		throw new AddressVerificationFailed();
 	}
 
-	return result.data.messagingKey;
+	return {
+		address: {
+			value: result.data.localPart!,
+			protocol: result.data.protocol as ProtocolType,
+			domain: result.data.rootDomain!,
+		},
+		messageKey: result.data.messagingKey,
+	};
 }

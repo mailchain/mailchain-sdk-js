@@ -125,8 +125,12 @@ describe('SendAndReceiveMessage', () => {
 			await lookupMessageKey(apiConfig, `${users[1].username}@mailchain.local`),
 		];
 
-		expect(data[0].value).toEqual(EncodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.bytes));
-		expect(data[1].value).toEqual(EncodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.bytes));
+		expect(data[0].messageKey.value).toEqual(
+			EncodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.bytes),
+		);
+		expect(data[1].messageKey.value).toEqual(
+			EncodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.bytes),
+		);
 	});
 
 	it('send message from user 1 to user 2', async () => {
