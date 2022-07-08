@@ -2,7 +2,7 @@ import { VerifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signature
 
 import { DecodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
-import { formatMailLike } from '@mailchain/internal/addressing';
+import { formatAddress } from '@mailchain/internal/addressing';
 import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
 import { getPublicKeyFromApiResponse } from './lookup';
 
@@ -19,7 +19,9 @@ export async function verify(
 
 	const mailchainPublicKey = getPublicKeyFromApiResponse(mailchainPublicKeyResponse.data.key);
 
-	const result = await addressApi.getAddressMessagingKey(formatMailLike(address, protocol, mailchainMailDomain));
+	const result = await addressApi.getAddressMessagingKey(
+		formatAddress({ value: address, protocol, domain: mailchainMailDomain }, 'mail'),
+	);
 	const { registeredKeyProof, providedKeyProof } = result.data;
 	const keyProof = providedKeyProof ?? registeredKeyProof;
 	if (!result.data.messagingKey?.value || !result.data.providedKeyProof?.signature) return false;
