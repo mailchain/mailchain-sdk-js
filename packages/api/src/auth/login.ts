@@ -110,11 +110,9 @@ async function AccountAuthFinalize(
 		throw new LoginError('failed-auth', 'failed authFinish, non 200 status');
 	}
 
-	// TODO: this is not the production key create but will do for testing
 	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
 	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
 	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
-	// TODO: this is not the production data type but will be suffient for testing
 
 	const decryptedAccountSeed = await decrypter.decrypt(
 		DecodeBase64(response.data.encryptedAccountSeed.encryptedAccountSeed),
