@@ -4,15 +4,10 @@ import { signMailchainDeliveryConfirmation } from '@mailchain/crypto/signatures/
 import { Configuration, TransportApiFactory } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';
 
-export const confirmDelivery = async (configuration: Configuration, messagingKey: KeyRingDecrypter, hash: string) => {
+export async function confirmDelivery(configuration: Configuration, messagingKey: KeyRingDecrypter, hash: string) {
 	const transportApi = TransportApiFactory(configuration, undefined, getAxiosWithSigner(messagingKey));
 	const signature = await signMailchainDeliveryConfirmation(messagingKey, DecodeHexZeroX(hash));
-	return transportApi
-		.putDeliveryRequestConfirmation(hash, {
-			signature: EncodeHexZeroX(signature),
-		})
-		.catch(({ error }) => {
-			console.log(error);
-			return error;
-		});
-};
+	await transportApi.putDeliveryRequestConfirmation(hash, {
+		signature: EncodeHexZeroX(signature),
+	});
+}
