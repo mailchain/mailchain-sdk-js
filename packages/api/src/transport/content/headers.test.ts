@@ -30,18 +30,16 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = SerializablePayloadHeaders;
+	test.each(tests)('$name', async (test) => {
+		const target = SerializablePayloadHeaders;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					new target(test.input);
-				}).toThrow();
-			} else {
-				expect(new target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				new target(test.input);
+			}).toThrow();
+		} else {
+			expect(new target(test.input)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -62,18 +60,16 @@ describe('SerializablePayloadHeaders.ToBuffer', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					test.input.ToBuffer();
-				}).toThrow();
-			} else {
-				const actual = test.input.ToBuffer();
-				expect(actual.toString()).toEqual(test.expected);
-				expect(actual.toString().length).toEqual(test.expected.length);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				test.input.ToBuffer();
+			}).toThrow();
+		} else {
+			const actual = test.input.ToBuffer();
+			expect(actual.toString()).toEqual(test.expected);
+			expect(actual.toString().length).toEqual(test.expected.length);
+		}
 	});
 });
 
@@ -94,15 +90,13 @@ describe('SerializablePayloadHeaders.FromBuffer', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					SerializablePayloadHeaders.FromBuffer(Buffer.from(test.input));
-				}).toThrow();
-			} else {
-				expect(SerializablePayloadHeaders.FromBuffer(Buffer.from(test.input))).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				SerializablePayloadHeaders.FromBuffer(Buffer.from(test.input));
+			}).toThrow();
+		} else {
+			expect(SerializablePayloadHeaders.FromBuffer(Buffer.from(test.input))).toEqual(test.expected);
+		}
 	});
 });

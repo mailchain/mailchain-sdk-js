@@ -27,17 +27,15 @@ describe('chunkBuffer', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = chunkBuffer;
+	test.each(tests)('$name', async (test) => {
+		const target = chunkBuffer;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input, test.size);
-				}).toThrow();
-			} else {
-				expect(target(test.input, test.size)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input, test.size);
+			}).toThrow();
+		} else {
+			expect(target(test.input, test.size)).toEqual(test.expected);
+		}
 	});
 });

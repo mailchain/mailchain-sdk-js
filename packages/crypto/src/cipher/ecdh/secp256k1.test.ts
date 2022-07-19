@@ -43,18 +43,16 @@ describe('shared-secret', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = new SECP256K1KeyExchange((num?: number): Uint8Array => {
-				return new Uint8Array([]);
-			});
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.SharedSecret(test.prvKey, test.pubKey).catch((e) => expect(e).toBeDefined());
-			}
-			return target.SharedSecret(test.prvKey, test.pubKey).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = new SECP256K1KeyExchange((num?: number): Uint8Array => {
+			return new Uint8Array([]);
+		});
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.SharedSecret(test.prvKey, test.pubKey).catch((e) => expect(e).toBeDefined());
+		}
+		return target.SharedSecret(test.prvKey, test.pubKey).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

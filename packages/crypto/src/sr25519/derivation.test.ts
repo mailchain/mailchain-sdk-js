@@ -81,15 +81,13 @@ describe('Derive()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			let extendedKey = SR25519ExtendedPrivateKey.fromPrivateKey(await test.args.key);
+	test.each(tests)('$name', async (test) => {
+		let extendedKey = SR25519ExtendedPrivateKey.fromPrivateKey(await test.args.key);
 
-			for (const path of test.args.path) {
-				extendedKey = await SR25519DeriveHardenedKey(extendedKey, path);
-			}
+		for (const path of test.args.path) {
+			extendedKey = await SR25519DeriveHardenedKey(extendedKey, path);
+		}
 
-			expect(extendedKey.privateKey).toEqual(await SR25519PrivateKey.fromSeed(test.expectedSeed));
-		});
+		expect(extendedKey.privateKey).toEqual(await SR25519PrivateKey.fromSeed(test.expectedSeed));
 	});
 });

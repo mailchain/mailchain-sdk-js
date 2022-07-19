@@ -72,15 +72,13 @@ describe('FromSeed()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return SR25519PrivateKey.fromSeed(test.arg).catch((e) => expect(e).toBeDefined());
-			}
-			return SR25519PrivateKey.fromSeed(test.arg).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return SR25519PrivateKey.fromSeed(test.arg).catch((e) => expect(e).toBeDefined());
+		}
+		return SR25519PrivateKey.fromSeed(test.arg).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -136,16 +134,14 @@ describe('FromBytes()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					SR25519PrivateKey.fromBytes(test.arg);
-				}).toThrow();
-			} else {
-				expect(SR25519PrivateKey.fromBytes(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				SR25519PrivateKey.fromBytes(test.arg);
+			}).toThrow();
+		} else {
+			expect(SR25519PrivateKey.fromBytes(test.arg)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -203,16 +199,14 @@ describe('FromKeyPair()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					SR25519PrivateKey.fromKeyPair(test.keypair);
-				}).toThrow();
-			} else {
-				expect(SR25519PrivateKey.fromKeyPair(test.keypair)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				SR25519PrivateKey.fromKeyPair(test.keypair);
+			}).toThrow();
+		} else {
+			expect(SR25519PrivateKey.fromKeyPair(test.keypair)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -233,15 +227,13 @@ describe('sign()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
-			}
-			return test.privKey.sign(test.message).then((actual) => {
-				expect(actual).toHaveLength(64);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
+		}
+		return test.privKey.sign(test.message).then((actual) => {
+			expect(actual).toHaveLength(64);
 		});
 	});
 });
@@ -259,10 +251,8 @@ describe('public-key', () => {
 			expected: BobSR25519PublicKey,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			expect(test.privKey.publicKey).toEqual(test.expected);
-		});
+	test.each(tests)('$name', async (test) => {
+		expect(test.privKey.publicKey).toEqual(test.expected);
 	});
 });
 
@@ -303,15 +293,13 @@ describe('generate', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return SR25519PrivateKey.generate(test.rand).catch((e) => expect(e).toBeDefined());
-			}
-			return SR25519PrivateKey.generate(test.rand).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return SR25519PrivateKey.generate(test.rand).catch((e) => expect(e).toBeDefined());
+		}
+		return SR25519PrivateKey.generate(test.rand).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

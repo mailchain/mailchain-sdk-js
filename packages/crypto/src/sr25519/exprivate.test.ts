@@ -29,15 +29,13 @@ describe('FromPrivateKey()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					SR25519ExtendedPrivateKey.fromPrivateKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(SR25519ExtendedPrivateKey.fromPrivateKey(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				SR25519ExtendedPrivateKey.fromPrivateKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(SR25519ExtendedPrivateKey.fromPrivateKey(test.arg)).toEqual(test.expected);
+		}
 	});
 });

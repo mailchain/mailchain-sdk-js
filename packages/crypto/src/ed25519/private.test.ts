@@ -49,18 +49,16 @@ describe('fromSeed()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					ED25519PrivateKey.fromSeed(test.arg);
-				}).toThrow();
-			} else {
-				const { ...expected } = test.expected!;
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519PrivateKey.fromSeed(test.arg);
+			}).toThrow();
+		} else {
+			const { ...expected } = test.expected!;
 
-				expect(ED25519PrivateKey.fromSeed(test.arg)).toEqual(expect.objectContaining(expected));
-			}
-		});
+			expect(ED25519PrivateKey.fromSeed(test.arg)).toEqual(expect.objectContaining(expected));
+		}
 	});
 });
 
@@ -101,18 +99,16 @@ describe('fromSeed()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					ED25519PrivateKey.fromSecretKey(test.arg);
-				}).toThrow();
-			} else {
-				const { ...expected } = test.expected!;
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519PrivateKey.fromSecretKey(test.arg);
+			}).toThrow();
+		} else {
+			const { ...expected } = test.expected!;
 
-				expect(ED25519PrivateKey.fromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
-			}
-		});
+			expect(ED25519PrivateKey.fromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
+		}
 	});
 });
 
@@ -162,17 +158,15 @@ describe('new()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					new ED25519PrivateKey(test.arg);
-				}).toThrow();
-			} else {
-				const { ...expected } = test.expected!;
-				expect(new ED25519PrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				new ED25519PrivateKey(test.arg);
+			}).toThrow();
+		} else {
+			const { ...expected } = test.expected!;
+			expect(new ED25519PrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
+		}
 	});
 });
 
@@ -203,15 +197,13 @@ describe('sign()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
-			}
-			return test.privKey.sign(test.message).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
+		}
+		return test.privKey.sign(test.message).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -229,11 +221,9 @@ describe('public-key', () => {
 			expected: BobED25519PublicKey,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const { ...expected } = test.expected!;
-			expect(test.privKey.publicKey).toEqual(expect.objectContaining(expected));
-		});
+	test.each(tests)('$name', async (test) => {
+		const { ...expected } = test.expected!;
+		expect(test.privKey.publicKey).toEqual(expect.objectContaining(expected));
 	});
 });
 
@@ -265,17 +255,15 @@ describe('generate', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					ED25519PrivateKey.generate(test.rand);
-				}).toThrow();
-			} else {
-				const actual = ED25519PrivateKey.generate(test.rand);
-				const { sign, ...expected } = test.expected!;
-				expect(actual).toEqual(expect.objectContaining(expected));
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519PrivateKey.generate(test.rand);
+			}).toThrow();
+		} else {
+			const actual = ED25519PrivateKey.generate(test.rand);
+			const { sign, ...expected } = test.expected!;
+			expect(actual).toEqual(expect.objectContaining(expected));
+		}
 	});
 });

@@ -94,16 +94,14 @@ describe('Decrypt', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = new PublicKeyDecrypter(test.keyEx, test.prvKey);
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.decrypt(test.message).catch((e) => expect(e).toBeDefined());
-			}
-			return target.decrypt(test.message).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = new PublicKeyDecrypter(test.keyEx, test.prvKey);
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.decrypt(test.message).catch((e) => expect(e).toBeDefined());
+		}
+		return target.decrypt(test.message).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

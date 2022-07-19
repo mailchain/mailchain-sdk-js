@@ -31,15 +31,13 @@ describe('FromPublicKey', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					FromPublicKey(test.key);
-				}).toThrow();
-			} else {
-				expect(FromPublicKey(test.key).constructor).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				FromPublicKey(test.key);
+			}).toThrow();
+		} else {
+			expect(FromPublicKey(test.key).constructor).toEqual(test.expected);
+		}
 	});
 });

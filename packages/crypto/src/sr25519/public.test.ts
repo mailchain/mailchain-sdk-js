@@ -44,16 +44,14 @@ describe('new()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					new SR25519PublicKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(new SR25519PublicKey(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				new SR25519PublicKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(new SR25519PublicKey(test.arg)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -108,15 +106,13 @@ describe('verify()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
-			}
-			return test.pubKey.verify(test.message, test.sig).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
+		}
+		return test.pubKey.verify(test.message, test.sig).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

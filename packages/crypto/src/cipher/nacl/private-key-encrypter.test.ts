@@ -73,22 +73,20 @@ describe('Encrypt', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				try {
-					const target = new PrivateKeyEncrypter(test.prvKey, test.rand);
-					target.encrypt(test.message);
-				} catch (e) {
-					expect(e).toBeDefined();
-				}
-			} else {
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			try {
 				const target = new PrivateKeyEncrypter(test.prvKey, test.rand);
-				return target.encrypt(test.message).then((actual) => {
-					expect(actual).toEqual(test.expected);
-				});
+				target.encrypt(test.message);
+			} catch (e) {
+				expect(e).toBeDefined();
 			}
-		});
+		} else {
+			const target = new PrivateKeyEncrypter(test.prvKey, test.rand);
+			return target.encrypt(test.message).then((actual) => {
+				expect(actual).toEqual(test.expected);
+			});
+		}
 	});
 });

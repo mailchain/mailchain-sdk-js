@@ -51,10 +51,8 @@ describe('ChainCodeFromDeriveIndex()', () => {
 			expected: DecodeHex('79a03475da2fcd8d43e22be1f0f15946f171571506008baa381fecc84373ddea'),
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const actual = chainCodeFromDeriveIndex(test.index);
-			expect(actual).toEqual(test.expected);
-		});
+	test.each(tests)('$name', async (test) => {
+		const actual = chainCodeFromDeriveIndex(test.index);
+		expect(actual).toEqual(test.expected);
 	});
 });

@@ -59,23 +59,15 @@ describe('signing is correct', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach(async (test) => {
-		it(test.name, async () => {
-			if (test.shouldThrow) {
-				expect(async () => {
-					await signMailchainDeliveryConfirmation(
-						test.args.keyRing.accountMessagingKey(),
-						test.args.signature,
-					);
-				}).toThrowError(ErrorUnsupportedKey);
-			} else {
-				expect(
-					await signMailchainDeliveryConfirmation(
-						test.args.keyRing.accountMessagingKey(),
-						test.args.signature,
-					),
-				).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(async () => {
+				await signMailchainDeliveryConfirmation(test.args.keyRing.accountMessagingKey(), test.args.signature);
+			}).toThrowError(ErrorUnsupportedKey);
+		} else {
+			expect(
+				await signMailchainDeliveryConfirmation(test.args.keyRing.accountMessagingKey(), test.args.signature),
+			).toEqual(test.expected);
+		}
 	});
 });

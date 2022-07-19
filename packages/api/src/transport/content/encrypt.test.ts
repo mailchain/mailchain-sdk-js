@@ -21,22 +21,20 @@ describe('encryptBuffer', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			const target = encryptBuffer;
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				try {
-					target(test.buffer, test.privateKey, test.rand);
-				} catch (e) {
-					expect(e).toBeDefined();
-				}
-			} else {
-				return target(test.buffer, test.privateKey, test.rand).then((actual) => {
-					expect(actual).toEqual(test.expected);
-				});
+	test.each(tests)('$name', async (test) => {
+		const target = encryptBuffer;
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			try {
+				target(test.buffer, test.privateKey, test.rand);
+			} catch (e) {
+				expect(e).toBeDefined();
 			}
-		});
+		} else {
+			return target(test.buffer, test.privateKey, test.rand).then((actual) => {
+				expect(actual).toEqual(test.expected);
+			});
+		}
 	});
 });
 
@@ -66,22 +64,20 @@ describe('encryptChunks', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			const target = encryptChunks;
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				try {
-					target(test.chunks, test.privateKey, test.rand);
-				} catch (e) {
-					expect(e).toBeDefined();
-				}
-			} else {
-				return target(test.chunks, test.privateKey, test.rand).then((actual) => {
-					expect(actual).toEqual(test.expected);
-				});
+	test.each(tests)('$name', async (test) => {
+		const target = encryptChunks;
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			try {
+				target(test.chunks, test.privateKey, test.rand);
+			} catch (e) {
+				expect(e).toBeDefined();
 			}
-		});
+		} else {
+			return target(test.chunks, test.privateKey, test.rand).then((actual) => {
+				expect(actual).toEqual(test.expected);
+			});
+		}
 	});
 });
 
@@ -133,21 +129,19 @@ describe('encryptPayload', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			const target = encryptPayload;
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				try {
-					target(test.input, test.privateKey, test.chunkSize, test.rand);
-				} catch (e) {
-					expect(e).toBeDefined();
-				}
-			} else {
-				return target(test.input, test.privateKey, test.chunkSize, test.rand).then((actual) => {
-					expect(actual).toEqual(test.expected);
-				});
+	test.each(tests)('$name', async (test) => {
+		const target = encryptPayload;
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			try {
+				target(test.input, test.privateKey, test.chunkSize, test.rand);
+			} catch (e) {
+				expect(e).toBeDefined();
 			}
-		});
+		} else {
+			return target(test.input, test.privateKey, test.chunkSize, test.rand).then((actual) => {
+				expect(actual).toEqual(test.expected);
+			});
+		}
 	});
 });

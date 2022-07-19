@@ -82,17 +82,15 @@ describe('CreateProofMessage', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce);
-				}).toThrow();
-			} else {
-				expect(
-					CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce),
-				).toMatchSnapshot(test.name);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce);
+			}).toThrow();
+		} else {
+			expect(
+				CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce),
+			).toMatchSnapshot(test.name);
+		}
 	});
 });

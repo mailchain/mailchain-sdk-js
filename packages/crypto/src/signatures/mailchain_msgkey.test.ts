@@ -197,25 +197,23 @@ describe('Test_mailchainProvidedMessagingKeyMessage()', () => {
 		},
 	];
 
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					mailchainProvidedMessagingKeyMessage(
-						test.args.msgKey,
-						test.args.address,
-						test.args.protocol as protocols.ProtocolType,
-					);
-				}).rejects.toThrow(new ErrorUnsupportedKey(test.args.msgKey.curve));
-			} else {
-				expect(
-					mailchainProvidedMessagingKeyMessage(
-						test.args.msgKey,
-						test.args.address,
-						test.args.protocol as protocols.ProtocolType,
-					),
-				).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				mailchainProvidedMessagingKeyMessage(
+					test.args.msgKey,
+					test.args.address,
+					test.args.protocol as protocols.ProtocolType,
+				);
+			}).rejects.toThrow(new ErrorUnsupportedKey(test.args.msgKey.curve));
+		} else {
+			expect(
+				mailchainProvidedMessagingKeyMessage(
+					test.args.msgKey,
+					test.args.address,
+					test.args.protocol as protocols.ProtocolType,
+				),
+			).toEqual(test.expected);
+		}
 	});
 });

@@ -114,18 +114,16 @@ describe('serializePublicKeyEncryptedContent', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = serializePublicKeyEncryptedContent;
+	test.each(tests)('$name', async (test) => {
+		const target = serializePublicKeyEncryptedContent;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.sealedBox, test.pubKey);
-				}).toThrow();
-			} else {
-				expect(target(test.sealedBox, test.pubKey)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.sealedBox, test.pubKey);
+			}).toThrow();
+		} else {
+			expect(target(test.sealedBox, test.pubKey)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -177,16 +175,14 @@ describe('serializePrivateKeyEncryptedContent', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					serializePrivateKeyEncryptedContent(test.sealedBox, test.prvKeyId);
-				}).toThrow();
-			} else {
-				expect(serializePrivateKeyEncryptedContent(test.sealedBox, test.prvKeyId)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				serializePrivateKeyEncryptedContent(test.sealedBox, test.prvKeyId);
+			}).toThrow();
+		} else {
+			expect(serializePrivateKeyEncryptedContent(test.sealedBox, test.prvKeyId)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -337,18 +333,16 @@ describe('deserializePublicKeyEncryptedContent', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = deserializePublicKeyEncryptedContent;
+	test.each(tests)('$name', async (test) => {
+		const target = deserializePublicKeyEncryptedContent;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input);
-				}).toThrow();
-			} else {
-				expect(target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input);
+			}).toThrow();
+		} else {
+			expect(target(test.input)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -469,17 +463,15 @@ describe('deserializePrivateKeyEncryptedContent', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = deserializePrivateKeyEncryptedContent;
+	test.each(tests)('$name', async (test) => {
+		const target = deserializePrivateKeyEncryptedContent;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input);
-				}).toThrow();
-			} else {
-				expect(target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input);
+			}).toThrow();
+		} else {
+			expect(target(test.input)).toEqual(test.expected);
+		}
 	});
 });

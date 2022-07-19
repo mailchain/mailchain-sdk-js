@@ -149,16 +149,14 @@ describe('Encrypt', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = new PublicKeyEncrypter(test.keyExFunc(), test.pubKey, test.rand);
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.encrypt(test.message).catch((e) => expect(e).toBeDefined());
-			}
-			return target.encrypt(test.message).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = new PublicKeyEncrypter(test.keyExFunc(), test.pubKey, test.rand);
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.encrypt(test.message).catch((e) => expect(e).toBeDefined());
+		}
+		return target.encrypt(test.message).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

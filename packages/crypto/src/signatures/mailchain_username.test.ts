@@ -86,16 +86,14 @@ describe('VerifyMailchainUsername()', () => {
 			shouldThrow: new ErrorUnsupportedKey('secp256k1'),
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = VerifyMailchainUsername(test.args.key, test.args.message, test.args.signature);
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.catch((e) => expect(e).toEqual(test.shouldThrow));
-			}
-			return target.then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = VerifyMailchainUsername(test.args.key, test.args.message, test.args.signature);
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.catch((e) => expect(e).toEqual(test.shouldThrow));
+		}
+		return target.then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -140,16 +138,14 @@ describe('SignMailchainUsername()', () => {
 			shouldThrow: new ErrorUnsupportedKey('secp256k1'),
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = SignMailchainUsername(test.args.key, test.args.message);
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.catch((e) => expect(e).toEqual(test.shouldThrow));
-			}
-			return target.then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = SignMailchainUsername(test.args.key, test.args.message);
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.catch((e) => expect(e).toEqual(test.shouldThrow));
+		}
+		return target.then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

@@ -43,18 +43,16 @@ describe('shared-secret', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = new ED25519KeyExchange((num?: number): Uint8Array => {
-				return new Uint8Array([]);
-			});
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return target.SharedSecret(test.prvKey, test.pubKey).catch((e) => expect(e).toBeDefined());
-			}
-			return target.SharedSecret(test.prvKey, test.pubKey).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		const target = new ED25519KeyExchange((num?: number): Uint8Array => {
+			return new Uint8Array([]);
+		});
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return target.SharedSecret(test.prvKey, test.pubKey).catch((e) => expect(e).toBeDefined());
+		}
+		return target.SharedSecret(test.prvKey, test.pubKey).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -80,16 +78,14 @@ describe('publicKeyToCurve25519', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					ED25519KeyExchange.publicKeyToCurve25519(test.prvKey);
-				}).toThrow();
-			} else {
-				expect(ED25519KeyExchange.publicKeyToCurve25519(test.prvKey)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519KeyExchange.publicKeyToCurve25519(test.prvKey);
+			}).toThrow();
+		} else {
+			expect(ED25519KeyExchange.publicKeyToCurve25519(test.prvKey)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -114,15 +110,13 @@ describe('privateKeyToCurve25519', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					ED25519KeyExchange.privateKeyToCurve25519(test.prvKey);
-				}).toThrow();
-			} else {
-				expect(ED25519KeyExchange.privateKeyToCurve25519(test.prvKey)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519KeyExchange.privateKeyToCurve25519(test.prvKey);
+			}).toThrow();
+		} else {
+			expect(ED25519KeyExchange.privateKeyToCurve25519(test.prvKey)).toEqual(test.expected);
+		}
 	});
 });

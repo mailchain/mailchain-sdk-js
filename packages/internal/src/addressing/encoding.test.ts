@@ -39,16 +39,14 @@ describe('EncodingByProtocol', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					encodingByProtocol(test.args.protocol as ProtocolType);
-				}).toThrow();
-			} else {
-				expect(encodingByProtocol(test.args.protocol as ProtocolType)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				encodingByProtocol(test.args.protocol as ProtocolType);
+			}).toThrow();
+		} else {
+			expect(encodingByProtocol(test.args.protocol as ProtocolType)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -91,17 +89,15 @@ describe('EncodeAddressByProtocol', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType);
-				}).toThrow();
-			} else {
-				expect(encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType)).toEqual(
-					test.expected,
-				);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType);
+			}).toThrow();
+		} else {
+			expect(encodeAddressByProtocol(test.args.address, test.args.protocol as ProtocolType)).toEqual(
+				test.expected,
+			);
+		}
 	});
 });

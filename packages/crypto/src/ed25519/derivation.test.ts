@@ -108,16 +108,14 @@ describe('Derive()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			let extendedKey = ED25519ExtendedPrivateKey.fromPrivateKey(test.args.key);
+	test.each(tests)('$name', async (test) => {
+		let extendedKey = ED25519ExtendedPrivateKey.fromPrivateKey(test.args.key);
 
-			for (const path of test.args.path) {
-				extendedKey = deriveHardenedKey(extendedKey, path);
-			}
-			const { sign, ...expected } = test.expected!;
+		for (const path of test.args.path) {
+			extendedKey = deriveHardenedKey(extendedKey, path);
+		}
+		const { sign, ...expected } = test.expected!;
 
-			expect(extendedKey.privateKey).toEqual(expect.objectContaining(expected));
-		});
+		expect(extendedKey.privateKey).toEqual(expect.objectContaining(expected));
 	});
 });

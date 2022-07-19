@@ -12,18 +12,16 @@ describe('EncodeHexZeroX', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = EncodeHexZeroX;
+	test.each(tests)('$name', async (test) => {
+		const target = EncodeHexZeroX;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input);
-				}).toThrow();
-			} else {
-				expect(target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input);
+			}).toThrow();
+		} else {
+			expect(target(test.input)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -45,17 +43,15 @@ describe('DecodeHexZeroX', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = DecodeHexZeroX;
+	test.each(tests)('$name', async (test) => {
+		const target = DecodeHexZeroX;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input);
-				}).toThrow();
-			} else {
-				expect(target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input);
+			}).toThrow();
+		} else {
+			expect(target(test.input)).toEqual(test.expected);
+		}
 	});
 });

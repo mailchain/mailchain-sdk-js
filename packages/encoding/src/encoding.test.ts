@@ -56,16 +56,14 @@ describe('Encode', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					Encode(test.encoding as EncodingType, test.input);
-				}).toThrow();
-			} else {
-				expect(Encode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				Encode(test.encoding as EncodingType, test.input);
+			}).toThrow();
+		} else {
+			expect(Encode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -110,15 +108,13 @@ describe('Decode', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					Decode(test.encoding as EncodingType, test.input);
-				}).toThrow();
-			} else {
-				expect(Decode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				Decode(test.encoding as EncodingType, test.input);
+			}).toThrow();
+		} else {
+			expect(Decode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
+		}
 	});
 });

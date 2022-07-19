@@ -26,16 +26,14 @@ describe('EncodePublicKey()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					EncodePublicKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(EncodePublicKey(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				EncodePublicKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(EncodePublicKey(test.arg)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -60,16 +58,14 @@ describe('DecodePublicKey()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					DecodePublicKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(DecodePublicKey(test.arg)).toEqual(test.expected!);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				DecodePublicKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(DecodePublicKey(test.arg)).toEqual(test.expected!);
+		}
 	});
 });
 
@@ -94,16 +90,14 @@ describe('EncodePrivateKey()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					EncodePrivateKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(EncodePrivateKey(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				EncodePrivateKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(EncodePrivateKey(test.arg)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -128,17 +122,15 @@ describe('DecodePrivateKey()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					DecodePrivateKey(test.arg);
-				}).toThrow();
-			} else {
-				const { sign, ...expected } = test.expected!;
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				DecodePrivateKey(test.arg);
+			}).toThrow();
+		} else {
+			const { sign, ...expected } = test.expected!;
 
-				expect(DecodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
-			}
-		});
+			expect(DecodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
+		}
 	});
 });

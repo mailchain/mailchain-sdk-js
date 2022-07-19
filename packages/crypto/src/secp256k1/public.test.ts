@@ -54,16 +54,14 @@ describe('new()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					new SECP256K1PublicKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(new SECP256K1PublicKey(test.arg)).toEqual(test.expected);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				new SECP256K1PublicKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(new SECP256K1PublicKey(test.arg)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -156,15 +154,13 @@ describe('verify()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
-			}
-			return test.pubKey.verify(test.message, test.sig).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
+		}
+		return test.pubKey.verify(test.message, test.sig).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -220,17 +216,13 @@ describe('FromSignature', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return SECP256K1PublicKey.fromSignature(test.message, test.signature).catch((e) =>
-					expect(e).toBeDefined(),
-				);
-			}
-			return SECP256K1PublicKey.fromSignature(test.message, test.signature).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return SECP256K1PublicKey.fromSignature(test.message, test.signature).catch((e) => expect(e).toBeDefined());
+		}
+		return SECP256K1PublicKey.fromSignature(test.message, test.signature).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

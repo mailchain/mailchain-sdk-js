@@ -66,15 +66,13 @@ describe('deriveSecretFromScrypt()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const actual = deriveSecretFromScrypt(test.args.passphrase, test.args.params, test.args.salt);
-			expect(actual).toEqual(test.expected);
-		});
+	test.each(tests)('$name', async (test) => {
+		const actual = deriveSecretFromScrypt(test.args.passphrase, test.args.params, test.args.salt);
+		expect(actual).toEqual(test.expected);
 	});
-	it('with-random-salt', () => {
-		const key1 = deriveSecretFromScrypt('passphrase', defaultScryptParams);
-		const key2 = deriveSecretFromScrypt('passphrase', defaultScryptParams);
-		expect(key1).not.toEqual(key2);
-	});
+});
+it('with-random-salt', () => {
+	const key1 = deriveSecretFromScrypt('passphrase', defaultScryptParams);
+	const key2 = deriveSecretFromScrypt('passphrase', defaultScryptParams);
+	expect(key1).not.toEqual(key2);
 });

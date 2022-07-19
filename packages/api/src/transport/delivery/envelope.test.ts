@@ -50,17 +50,15 @@ describe('createEnvelope', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return createEnvelope(test.pubKey, test.messageKey, test.messageURI, test.rand).catch((e) =>
-					expect(e).toBeDefined(),
-				);
-			}
-			return createEnvelope(test.pubKey, test.messageKey, test.messageURI, test.rand).then((actual) => {
-				expect(actual as protocol.IEnvelope).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return createEnvelope(test.pubKey, test.messageKey, test.messageURI, test.rand).catch((e) =>
+				expect(e).toBeDefined(),
+			);
+		}
+		return createEnvelope(test.pubKey, test.messageKey, test.messageURI, test.rand).then((actual) => {
+			expect(actual as protocol.IEnvelope).toEqual(test.expected);
 		});
 	});
 });

@@ -67,17 +67,15 @@ describe('VerifyEthereumPersonalMessage()', () => {
 			shouldThrow: ErrorUnsupportedKey,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					VerifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature);
-				}).toThrowError(ErrorUnsupportedKey);
-			} else {
-				expect(VerifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature)).toEqual(
-					test.expected,
-				);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				VerifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature);
+			}).toThrowError(ErrorUnsupportedKey);
+		} else {
+			expect(VerifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature)).toEqual(
+				test.expected,
+			);
+		}
 	});
 });

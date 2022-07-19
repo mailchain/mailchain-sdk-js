@@ -39,9 +39,7 @@ describe('guessProtocolsFromAddress', () => {
 			expected: [MAILCHAIN],
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			expect(guessProtocolsFromAddress(test.address)).toEqual(test.expected);
-		});
+	test.each(tests)('$name', async (test) => {
+		expect(guessProtocolsFromAddress(test.address)).toEqual(test.expected);
 	});
 });

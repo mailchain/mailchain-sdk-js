@@ -38,16 +38,14 @@ describe('new()', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					new SECP256K1PrivateKey(test.arg);
-				}).toThrow();
-			} else {
-				expect(new SECP256K1PrivateKey(test.arg)).toEqual(test.expected!);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				new SECP256K1PrivateKey(test.arg);
+			}).toThrow();
+		} else {
+			expect(new SECP256K1PrivateKey(test.arg)).toEqual(test.expected!);
+		}
 	});
 });
 
@@ -78,15 +76,13 @@ describe('sign()', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, async () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
-			}
-			return test.privKey.sign(test.message).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
+		}
+		return test.privKey.sign(test.message).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });
@@ -136,15 +132,13 @@ describe('generate', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect(() => {
-					SECP256K1PrivateKey.generate(test.rand);
-				}).toThrow();
-			} else {
-				expect(SECP256K1PrivateKey.generate(test.rand)).toEqual(test.expected!);
-			}
-		});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				SECP256K1PrivateKey.generate(test.rand);
+			}).toThrow();
+		} else {
+			expect(SECP256K1PrivateKey.generate(test.rand)).toEqual(test.expected!);
+		}
 	});
 });

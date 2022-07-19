@@ -57,15 +57,13 @@ describe('createECDHKeyBundle', () => {
 			},
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			if (test.shouldThrow) {
-				expect.assertions(1);
-				return createECDHKeyBundle(test.pubKey, test.rand).catch((e) => expect(e).toBeDefined());
-			}
-			return createECDHKeyBundle(test.pubKey, test.rand).then((actual) => {
-				expect(actual).toEqual(test.expected);
-			});
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect.assertions(1);
+			return createECDHKeyBundle(test.pubKey, test.rand).catch((e) => expect(e).toBeDefined());
+		}
+		return createECDHKeyBundle(test.pubKey, test.rand).then((actual) => {
+			expect(actual).toEqual(test.expected);
 		});
 	});
 });

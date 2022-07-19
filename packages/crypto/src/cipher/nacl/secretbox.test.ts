@@ -73,18 +73,16 @@ describe('easy-seal', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = easySeal;
+	test.each(tests)('$name', async (test) => {
+		const target = easySeal;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.message, test.secretKey, test.rand as RandomFunction);
-				}).toThrow();
-			} else {
-				expect(target(test.message, test.secretKey, test.rand as RandomFunction)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.message, test.secretKey, test.rand as RandomFunction);
+			}).toThrow();
+		} else {
+			expect(target(test.message, test.secretKey, test.rand as RandomFunction)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -165,17 +163,15 @@ describe('easy-open', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = easyOpen;
+	test.each(tests)('$name', async (test) => {
+		const target = easyOpen;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.sealedBox, test.secretKey);
-				}).toThrow();
-			} else {
-				expect(target(test.sealedBox, test.secretKey)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.sealedBox, test.secretKey);
+			}).toThrow();
+		} else {
+			expect(target(test.sealedBox, test.secretKey)).toEqual(test.expected);
+		}
 	});
 });

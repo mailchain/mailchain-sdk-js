@@ -31,18 +31,16 @@ describe('serializeMessage', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = serializeMessage;
+	test.each(tests)('$name', async (test) => {
+		const target = serializeMessage;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.encryptedMessage, test.messageKind);
-				}).toThrow();
-			} else {
-				expect(target(test.encryptedMessage, test.messageKind)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.encryptedMessage, test.messageKind);
+			}).toThrow();
+		} else {
+			expect(target(test.encryptedMessage, test.messageKind)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -108,18 +106,16 @@ describe('deserializeMessage', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = deserializeMessage;
+	test.each(tests)('$name', async (test) => {
+		const target = deserializeMessage;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.encryptedMessage);
-				}).toThrow();
-			} else {
-				expect(target(test.encryptedMessage)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.encryptedMessage);
+			}).toThrow();
+		} else {
+			expect(target(test.encryptedMessage)).toEqual(test.expected);
+		}
 	});
 });
 
@@ -160,20 +156,18 @@ describe('Serialize', () => {
 			shouldThrow: false,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = Serialize;
+	test.each(tests)('$name', async (test) => {
+		const target = Serialize;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target({ EncryptedHeaders: test.encryptedHeader, EncryptedContentChunks: test.encryptedChunks });
-				}).toThrow();
-			} else {
-				expect(
-					target({ EncryptedHeaders: test.encryptedHeader, EncryptedContentChunks: test.encryptedChunks }),
-				).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target({ EncryptedHeaders: test.encryptedHeader, EncryptedContentChunks: test.encryptedChunks });
+			}).toThrow();
+		} else {
+			expect(
+				target({ EncryptedHeaders: test.encryptedHeader, EncryptedContentChunks: test.encryptedChunks }),
+			).toEqual(test.expected);
+		}
 	});
 });
 
@@ -256,17 +250,15 @@ describe('Deserialize', () => {
 			shouldThrow: true,
 		},
 	];
-	tests.forEach((test) => {
-		it(test.name, () => {
-			const target = Deserialize;
+	test.each(tests)('$name', async (test) => {
+		const target = Deserialize;
 
-			if (test.shouldThrow) {
-				expect(() => {
-					target(test.input);
-				}).toThrow();
-			} else {
-				expect(target(test.input)).toEqual(test.expected);
-			}
-		});
+		if (test.shouldThrow) {
+			expect(() => {
+				target(test.input);
+			}).toThrow();
+		} else {
+			expect(target(test.input)).toEqual(test.expected);
+		}
 	});
 });
