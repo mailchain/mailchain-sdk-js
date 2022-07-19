@@ -1,5 +1,5 @@
 {
-	"name": "@mailchain/api",
+	"name": "@mailchain/sdk",
 	"private": true,
 	"sideEffects": false,
 	"version": "0.1.0",
