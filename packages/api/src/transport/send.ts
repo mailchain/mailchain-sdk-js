@@ -26,7 +26,7 @@ type FailPayloadRecipientDelivery = {
 	recipient: PublicKey;
 };
 
-type PayloadRecipientDelivery = SuccessPayloadRecipientDelivery | FailPayloadRecipientDelivery;
+export type PayloadRecipientDelivery = SuccessPayloadRecipientDelivery | FailPayloadRecipientDelivery;
 export type PayloadForRecipient = { recipient: MailAddress; payload: Payload };
 
 export async function sendPayload(
@@ -77,7 +77,7 @@ async function sendPayloadInternal(
 		return {
 			status: 'success',
 			recipient: messageKey,
-			deliveryRequestId: res.headers['deliveryRequestID'],
+			deliveryRequestId: res.data.deliveryRequestID,
 		};
 	} catch (e) {
 		return {

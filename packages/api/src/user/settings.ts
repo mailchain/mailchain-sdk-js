@@ -1,7 +1,7 @@
+import { SignerWithPublicKey } from '@mailchain/crypto';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Configuration } from '../api/configuration';
 import { UserApiFactory } from '../api';
-import { SignerWithPublicKey } from '@mailchain/crypto';
 
 export async function getSettings(apiConfig: Configuration, signer: SignerWithPublicKey) {
 	const settingsFactory = UserApiFactory(apiConfig, undefined, getAxiosWithSigner(signer));

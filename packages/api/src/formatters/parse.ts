@@ -27,7 +27,7 @@ function parseSubjectHeader(rawSubject: string) {
 	// tl;dr if the subject conitans non ASCII characters, the subject is base64 encoded
 	// Sample value: =?UTF-8?B?ZnVjayDwn5CO?=!
 	// Parts: =?<charset>?<encoding>?<encoded-text>?=
-	const [_, charset, encoding, encodedText] = rawSubject.split('?');
+	const [firstArg, charset, encoding, encodedText] = rawSubject.split('?');
 	if (encoding === 'B') {
 		return Buffer.from(DecodeBase64(encodedText)).toString(charset as BufferEncoding);
 	}
