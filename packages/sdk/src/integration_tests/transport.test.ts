@@ -4,7 +4,7 @@ import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { secureRandom } from '@mailchain/crypto';
 import { getOpaqueConfig, OpaqueID } from '@cloudflare/opaque-ts';
-import { lookupMessageKey } from 'sdk/src/identityKeys';
+import { Lookup } from 'sdk/src/identityKeys';
 import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
 import * as identityKeysApi from 'sdk/src/identityKeys';
 import { protocols } from '@mailchain/internal';
@@ -121,8 +121,8 @@ describe('SendAndReceiveMessage', () => {
 
 	it('verify messaging keys is correct', async () => {
 		const data = [
-			await lookupMessageKey(apiConfig, `${users[0].username}@mailchain.local`),
-			await lookupMessageKey(apiConfig, `${users[1].username}@mailchain.local`),
+			await Lookup.create(apiConfig).messageKey(`${users[0].username}@mailchain.local`),
+			await Lookup.create(apiConfig).messageKey(`${users[1].username}@mailchain.local`),
 		];
 
 		expect(data[0].messageKey.value).toEqual(
@@ -150,9 +150,9 @@ describe('SendAndReceiveMessage', () => {
 
 	it('receive message from user 2 to user 1', async () => {
 		const payload = Buffer.from(message);
-		const receiver = new Receiver(apiConfig);
+		const receiver = Receiver.create(apiConfig, users[1].keyRing.accountMessagingKey());
 
-		const [delivery] = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		const [delivery] = await receiver.getUndeliveredMessages();
 
 		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
 		expect(delivery.value.payload.Content).toEqual(payload);
@@ -160,13 +160,13 @@ describe('SendAndReceiveMessage', () => {
 	});
 
 	it('receive message from user 2 to user 1 and acknowledge receiving', async () => {
-		const receiver = new Receiver(apiConfig);
+		const receiver = Receiver.create(apiConfig, users[1].keyRing.accountMessagingKey());
 
-		const [delivery] = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		const [delivery] = await receiver.getUndeliveredMessages();
 		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
 		await confirmDelivery(apiConfig, users[1].keyRing.accountMessagingKey(), delivery.value.hash);
 
-		const results = await receiver.getUndeliveredMessages(users[1].keyRing.accountMessagingKey());
+		const results = await receiver.getUndeliveredMessages();
 		expect(results).toHaveLength(0);
 	});
 
@@ -194,20 +194,21 @@ describe('SendAndReceiveMessage', () => {
 	});
 	it('receive ethereum message by user 2', async () => {
 		const payload = Buffer.from(message);
-		const receiver = new Receiver(apiConfig);
 		const etherAccountMessageKey = users[1].keyRing.addressMessagingKey(
 			etherAddresses[0].addressBytes,
 			protocols.ETHEREUM,
 			1,
 		);
-		const [delivery] = await receiver.getUndeliveredMessages(etherAccountMessageKey);
+		const receiver = Receiver.create(apiConfig, etherAccountMessageKey);
+
+		const [delivery] = await receiver.getUndeliveredMessages();
 
 		if (delivery.status === 'rejected') throw new Error('Should be fulfilled');
 		expect(delivery.value.payload.Content).toEqual(payload);
 		expect(delivery.value.payload.Headers).toEqual(headers);
 		await confirmDelivery(apiConfig, etherAccountMessageKey, delivery.value.hash);
 
-		const results = await receiver.getUndeliveredMessages(etherAccountMessageKey);
+		const results = await receiver.getUndeliveredMessages();
 		expect(results).toHaveLength(0);
 	});
 
@@ -242,11 +243,11 @@ describe('SendAndReceiveMessage', () => {
 	});
 
 	it('receive multiple ethereum messages from user 1 to user 2 on different ether addresses', async () => {
-		const receiver = new Receiver(apiConfig);
-
 		etherAddresses.map(async (it, index) => {
 			const messagingKey = users[1].keyRing.addressMessagingKey(it.addressBytes, protocols.ETHEREUM, 1);
-			const results = await receiver.getUndeliveredMessages(messagingKey);
+			const receiver = Receiver.create(apiConfig, messagingKey);
+
+			const results = await receiver.getUndeliveredMessages();
 			expect(results[index][0]).toBeDefined();
 			expect(results[index][0].payload!.Content).toEqual(
 				Buffer.from(`from ${users[0].username} to ${it.address}`),
@@ -260,7 +261,7 @@ describe('SendAndReceiveMessage', () => {
 				}),
 			);
 
-			const postConfirmedUndelivered = await receiver.getUndeliveredMessages(messagingKey);
+			const postConfirmedUndelivered = await receiver.getUndeliveredMessages();
 			expect(postConfirmedUndelivered.length).toEqual(0);
 		});
 	});

@@ -43,8 +43,6 @@ const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8080';
 
 const apiConfig = new Configuration({ basePath: SERVER_URL } as ConfigurationParameters);
 
-const VALID_ADDRESS: MailchainAddress = { value: 'alice', protocol: MAILCHAIN, domain: 'mailchain.local' };
-const VALID_ADDRESS_BOB: MailchainAddress = { value: 'bob', protocol: MAILCHAIN, domain: 'mailchain.local' };
 process.env.MAILCHAIN_ADDRESS_DOMAIN_NAME = 'mailchain.local';
 
 const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
@@ -293,13 +291,14 @@ describe('Receiving messages tests', () => {
 		if (test.initMock) {
 			test.initMock();
 		}
-		const receiver = new Receiver(apiConfig);
+		const receiver = Receiver.create(apiConfig, test.keyRing.accountMessagingKey());
 		if (test.shouldThrow) {
 			expect(() => {
-				receiver.getUndeliveredMessages(test.keyRing.accountMessagingKey());
+				receiver.getUndeliveredMessages();
 			}).toThrow();
 		} else {
-			const result = await receiver.getUndeliveredMessages(test.keyRing.accountMessagingKey());
+			const result = await receiver.getUndeliveredMessages();
+
 			expect(result).toEqual(test.expected);
 		}
 	});

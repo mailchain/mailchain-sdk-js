@@ -6,7 +6,7 @@ export const PrivateKeyLen = 32;
 export class UnknownPrivateKey implements PrivateKey {
 	bytes: Uint8Array;
 	publicKey: PublicKey;
-	curve: string = 'testcurve';
+	curve = 'testcurve';
 
 	constructor(bytes?: Uint8Array) {
 		this.bytes = bytes!;
