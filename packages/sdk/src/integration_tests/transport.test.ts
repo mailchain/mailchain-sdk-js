@@ -14,13 +14,13 @@ import { DecodeUtf8 } from '@mailchain/encoding/utf8';
 import { signEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 import { Configuration } from '../api';
 import { OpaqueConfig } from '../types';
-import { Register } from '../auth/register';
 import { EncodeHexZeroX, EncodeHex, DecodeHexZeroX } from '../../../encoding/src/hex';
 import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
 import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
+import { Authentication } from '../auth/auth';
 
 jest.setTimeout(30000);
 
@@ -68,20 +68,18 @@ const config = {
 
 const apiConfig = new Configuration({ basePath: 'http://localhost:8080' });
 const registerRandomUser = async () => {
+	const mailchainAuth = Authentication.create(apiConfig, config);
 	const username = EncodeBase58(secureRandom(8)).toLowerCase();
 	const seed = secureRandom(32);
 
 	const identityKey = ED25519PrivateKey.fromSeed(seed);
 	const keyRing = KeyRing.fromPrivateKey(identityKey);
 
-	await Register({
-		identityKeySeed: seed,
+	await mailchainAuth.register({
 		username,
 		password: 'qwerty',
-		captchaResponse: '10000000-aaaa-bbbb-cccc-000000000001',
-		messagingPublicKey: keyRing.accountMessagingKey().publicKey,
-		apiConfig,
-		opaqueConfig: config,
+		identityKeySeed: seed,
+		captcha: '10000000-aaaa-bbbb-cccc-000000000001',
 	});
 	return { username, keyRing };
 };

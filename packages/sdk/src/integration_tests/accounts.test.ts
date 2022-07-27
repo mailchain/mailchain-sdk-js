@@ -6,11 +6,10 @@ import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EncodeBase58 } from '@mailchain/encoding';
 import axios from 'axios';
 import { KeyRing } from '@mailchain/keyring';
-import { Configuration, ConfigurationParameters, UserApi, UserApiFactory } from '../api';
+import { Configuration, ConfigurationParameters, UserApi } from '../api';
 import { OpaqueConfig } from '../types';
-import { Login } from '../auth/login';
-import { Register } from '../auth/register';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { Authentication } from '../auth/auth';
 
 jest.setTimeout(30000);
 describe('full-auth-flow', () => {
@@ -26,13 +25,13 @@ describe('full-auth-flow', () => {
 
 	const apiConfig = new Configuration({ basePath: 'http://localhost:8080' } as ConfigurationParameters);
 	const params = getOpaqueConfig(OpaqueID.OPAQUE_P256);
-	// console.log(params);
-
-	const config = {
+	const opaqueConfig = {
 		parameters: params,
 		serverIdentity: 'Mailchain',
 		context: 'MailchainAuthentication',
 	} as OpaqueConfig;
+	const mailchainAuth = Authentication.create(apiConfig, opaqueConfig);
+	// console.log(params);
 
 	const username = EncodeBase58(secureRandom(8)).toLowerCase();
 	let registrationResponse;
@@ -41,26 +40,21 @@ describe('full-auth-flow', () => {
 		const seed = secureRandom(32);
 
 		rootAccountKey = ED25519PrivateKey.fromSeed(seed);
-		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
-
-		registrationResponse = await Register({
-			identityKeySeed: seed,
+		registrationResponse = await mailchainAuth.register({
 			username,
 			password: 'qwerty',
-			captchaResponse: 'captcha',
-			messagingPublicKey: keyRing.accountMessagingKey().publicKey,
-			apiConfig,
-			opaqueConfig: config,
+			captcha: 'captcha',
+			identityKeySeed: seed,
 		});
 	});
 	it('login', async () => {
-		const loginResponse = await Login(username, 'qwerty', 'captcha', apiConfig, config);
+		const loginResponse = await mailchainAuth.login({ username, password: 'qwerty', captcha: 'captcha' });
 
 		expect(registrationResponse.clientSecretKey).toEqual(loginResponse.clientSecretKey);
 		expect(rootAccountKey).toEqual(loginResponse.rootAccountKey);
 
 		// login again
-		const secondLoginResponse = await Login(username, 'qwerty', 'catpcha', apiConfig, config);
+		const secondLoginResponse = await mailchainAuth.login({ username, password: 'qwerty', captcha: 'catpcha' });
 		expect(registrationResponse.clientSecretKey).toEqual(secondLoginResponse.clientSecretKey);
 		expect(rootAccountKey).toEqual(secondLoginResponse.rootAccountKey);
 	});

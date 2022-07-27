@@ -1,13 +1,12 @@
-import { OpaqueClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
+import { AuthClient, KE2 } from '@cloudflare/opaque-ts';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
 import { DecodeBase64, EncodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
-import { AuthApiFactory, Configuration } from '../api';
+import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
-import { DefaultConfig } from './config';
 
 export class LoginError extends Error {
 	constructor(public readonly kind: 'invalid-username' | 'failed-auth' | 'network-error', details: string) {
@@ -15,42 +14,12 @@ export class LoginError extends Error {
 	}
 }
 
-export async function Login(
+export async function AccountAuthInit(
 	username: string,
 	password: string,
 	captchaResponse: string,
-	apiConfig: Configuration,
-	opaqueConfig: OpaqueConfig = DefaultConfig,
-): Promise<AuthenticatedResponse> {
-	username = username.toLowerCase();
-	try {
-		const authClient: AuthClient = new OpaqueClient(opaqueConfig.parameters);
-
-		const authInitResponse = await AccountAuthInit(
-			apiConfig,
-			opaqueConfig,
-			authClient,
-			username,
-			password,
-			captchaResponse,
-		);
-		const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authInitResponse.keyExchange2));
-		return AccountAuthFinalize(apiConfig, opaqueConfig, authClient, username, keyExchange2, authInitResponse.state);
-	} catch (e) {
-		if (Axios.isAxiosError(e)) {
-			throw new LoginError('network-error', 'axios network error');
-		}
-		throw e;
-	}
-}
-
-async function AccountAuthInit(
-	apiConfig: Configuration,
-	opaqueConfig: OpaqueConfig,
+	authApi: AuthApiInterface,
 	opaqueClient: AuthClient,
-	username: string,
-	password: string,
-	captchaResponse: string,
 ): Promise<{
 	state: Uint8Array;
 	keyExchange2: Uint8Array;
@@ -60,7 +29,7 @@ async function AccountAuthInit(
 		throw new LoginError('failed-auth', 'failed keyExchange1');
 	}
 
-	const response = await AuthApiFactory(apiConfig)
+	const response = await authApi
 		.accountAuthInit({
 			username,
 			params: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
@@ -83,13 +52,13 @@ async function AccountAuthInit(
 	};
 }
 
-async function AccountAuthFinalize(
-	apiConfig: Configuration,
-	opaqueConfig: OpaqueConfig,
-	opaqueClient: AuthClient,
+export async function AccountAuthFinalize(
 	username: string,
 	keyExchange2: KE2,
 	authState: Uint8Array,
+	authApi: AuthApiInterface,
+	opaqueConfig: OpaqueConfig,
+	opaqueClient: AuthClient,
 ): Promise<AuthenticatedResponse> {
 	const authFinishResponse = await opaqueClient.authFinish(
 		keyExchange2,
@@ -101,7 +70,7 @@ async function AccountAuthFinalize(
 		throw new LoginError('failed-auth', 'failed authFinish');
 	}
 
-	const response = await AuthApiFactory(apiConfig).accountAuthFinalize({
+	const response = await authApi.accountAuthFinalize({
 		params: EncodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
 		authState: EncodeBase64(authState),
 	});
