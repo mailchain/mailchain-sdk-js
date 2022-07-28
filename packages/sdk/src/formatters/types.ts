@@ -10,5 +10,6 @@ export type MailData = {
 	recipients: MailAddress[];
 	carbonCopyRecipients: MailAddress[];
 	blindCarbonCopyRecipients: MailAddress[];
-	message: string[];
+	message: string;
+	plainTextMessage: string;
 };

@@ -10,7 +10,7 @@ Bcc: \\"rec5\\" <rec5@mailchain.local>
 Message-ID: 123@mailchain.local
 Subject: =?utf-8?B?U3ViamVjdA==?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
 
 line 1
 line2
@@ -33,7 +33,7 @@ Bcc: \\"rec6\\" <rec6@mailchain.local>
 Message-ID: 123@mailchain.local
 Subject: =?utf-8?B?U3ViamVjdA==?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
 
 line 1
 line2
@@ -55,7 +55,7 @@ Bcc: \\"rec5\\" <rec5@mailchain.local>, \\"rec6\\" <rec6@mailchain.local>
 Message-ID: 123@mailchain.local
 Subject: =?utf-8?B?U3ViamVjdA==?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
 
 line 1
 line2
@@ -71,7 +71,7 @@ Cc: \\"rec3\\" <rec3@mailchain.local>, \\"rec4\\" <rec4@mailchain.local>
 Message-ID: 123@mailchain.local
 Subject: =?utf-8?B?U3ViamVjdA==?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/html; charset=UTF-8
 
 line 1
 line2

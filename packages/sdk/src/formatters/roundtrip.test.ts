@@ -19,7 +19,8 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 			{ address: 'rec6@mailchain.local', name: 'rec6' },
 		],
 		subject: 'Subject',
-		message: ['line 1', 'line2', '', 'line4'],
+		message: ['line 1', 'line2', '', 'line4'].join('\n'),
+		plainTextMessage: ['line 1', 'line2', '', 'line4'].join('\n'),
 	};
 
 	it('should create ORIGINAL mime mail message and parse it its entirety', async () => {
