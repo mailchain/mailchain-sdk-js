@@ -1,9 +1,15 @@
 import * as mimetext from 'mimetext';
 import { MailAddress, MailData } from './types';
 
+type EncodedMailData = string;
+
 export const createMimeMessage = (
 	mailData: MailData,
-): { original: string; visibleRecipients: string; blindRecipients: { recipient: MailAddress; content: string }[] } => {
+): {
+	original: EncodedMailData;
+	visibleRecipients: EncodedMailData;
+	blindRecipients: { recipient: MailAddress; content: EncodedMailData }[];
+} => {
 	const msg = mimetext.createMimeMessage();
 	msg.setHeader('Message-ID', mailData.id);
 	msg.setHeader('Date', new Date().toISOString());

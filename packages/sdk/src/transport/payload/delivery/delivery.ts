@@ -2,7 +2,7 @@
 
 import { ExtendedPrivateKey, PublicKey, RandomFunction, secureRandom } from '@mailchain/crypto';
 
-import { protocol } from '../../protobuf/protocol/protocol';
+import { protocol } from '../../../protobuf/protocol/protocol';
 import { createEnvelope } from './envelope';
 
 export async function createDelivery(

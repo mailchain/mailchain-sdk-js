@@ -17,7 +17,7 @@ import { OpaqueConfig } from '../types';
 import { EncodeHexZeroX, EncodeHex, DecodeHexZeroX } from '../../../encoding/src/hex';
 import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
-import { PayloadHeaders } from '../transport/content/headers';
+import { PayloadHeaders } from '../transport/payload/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
 import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
 import { Authentication } from '../auth/auth';

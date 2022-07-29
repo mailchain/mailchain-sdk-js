@@ -1,5 +1,5 @@
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { ETHEREUM } from '@mailchain/internal/protocols';
+import { ETHEREUM, MAILCHAIN } from '@mailchain/internal/protocols';
 import { KeyRing } from './keyring';
 
 describe('keyring', () => {
@@ -9,6 +9,9 @@ describe('keyring', () => {
 		expect(kr.inboxMessageDateOffset()).toEqual(204954984);
 		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
 			'addressMessagingKey',
+		);
+		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
+			kr.accountMessagingKey().publicKey,
 		);
 		expect(kr.rootInboxKey()).toMatchSnapshot('rootInboxKey');
 		expect(kr.rootEncryptionPublicKey()).toMatchSnapshot('rootEncryptionPublicKey');
@@ -24,6 +27,9 @@ describe('keyring', () => {
 		expect(kr.inboxMessageDateOffset()).toEqual(635667296);
 		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
 			'addressMessagingKey',
+		);
+		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
+			kr.accountMessagingKey().publicKey,
 		);
 		expect(kr.rootInboxKey()).toMatchSnapshot('rootInboxKey');
 		expect(kr.rootEncryptionPublicKey()).toMatchSnapshot('rootEncryptionPublicKey');

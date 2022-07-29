@@ -5,3 +5,7 @@ export type MailchainAddress = {
 	protocol: ProtocolType;
 	domain: string;
 };
+
+export type OwnedMailchainAddress = MailchainAddress & {
+	nonce: number;
+};

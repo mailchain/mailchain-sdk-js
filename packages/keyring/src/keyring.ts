@@ -20,6 +20,7 @@ import {
 	DERIVATION_PATH_DATE_OFFSET,
 } from './constants';
 import { InboxKey, KeyRingDecrypter } from './functions';
+import { MAILCHAIN } from '@mailchain/internal/protocols';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -121,6 +122,9 @@ export class KeyRing {
 	}
 
 	addressMessagingKey(address: Uint8Array, protocol: protocols.ProtocolType, nonce: number): KeyRingDecrypter {
+		if (protocol === MAILCHAIN) {
+			return this.accountMessagingKey();
+		}
 		// all addresses are encoded with hex regardless of protocol to ensure consistency
 		const addressKeyRoot = deriveHardenedKey(
 			this._protocolAddressRootMessagingKey,
