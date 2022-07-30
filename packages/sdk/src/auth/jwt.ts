@@ -1,15 +1,15 @@
-import { EncodeBase64UrlSafe } from '@mailchain/encoding';
+import { encodeBase64UrlSafe } from '@mailchain/encoding';
 import axios, { AxiosInstance } from 'axios';
 import utils from 'axios/lib/utils';
 import { SignerWithPublicKey } from '@mailchain/crypto';
 
 export const getToken = async (requestKey: SignerWithPublicKey, payload: any, exp: number) => {
-	const key = `${EncodeBase64UrlSafe(
+	const key = `${encodeBase64UrlSafe(
 		Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })),
-	)}.${EncodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })))}`;
+	)}.${encodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })))}`;
 	const signature = await requestKey.sign(Buffer.from(key));
 
-	return `${key}.${EncodeBase64UrlSafe(signature)}`;
+	return `${key}.${encodeBase64UrlSafe(signature)}`;
 };
 
 export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstance => {
@@ -19,7 +19,7 @@ export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstan
 		const payload = createPayload(new URL(request?.url ?? ''), request.method?.toUpperCase(), request.data);
 		const token = await getToken(requestKey, payload, expires);
 		if (request.headers) {
-			request.headers.Authorization = `vapid t=${token}, k=${EncodeBase64UrlSafe(requestKey.publicKey.bytes)}`;
+			request.headers.Authorization = `vapid t=${token}, k=${encodeBase64UrlSafe(requestKey.publicKey.bytes)}`;
 		}
 		return request;
 	});

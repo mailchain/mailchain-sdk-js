@@ -1,4 +1,4 @@
-import { DecodeBase64 } from '@mailchain/encoding';
+import { decodeBase64 } from '@mailchain/encoding';
 import { MailData } from './types';
 
 export async function parseMimeText(text: string): Promise<MailData> {
@@ -29,7 +29,7 @@ function parseSubjectHeader(rawSubject: string) {
 	// Parts: =?<charset>?<encoding>?<encoded-text>?=
 	const [firstArg, charset, encoding, encodedText] = rawSubject.split('?');
 	if (encoding === 'B') {
-		return Buffer.from(DecodeBase64(encodedText)).toString(charset as BufferEncoding);
+		return Buffer.from(decodeBase64(encodedText)).toString(charset as BufferEncoding);
 	}
 	return encodedText;
 }

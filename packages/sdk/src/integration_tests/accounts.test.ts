@@ -3,7 +3,7 @@
 import { OpaqueID, getOpaqueConfig } from '@cloudflare/opaque-ts';
 import { secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { EncodeBase58 } from '@mailchain/encoding';
+import { encodeBase58 } from '@mailchain/encoding';
 import axios from 'axios';
 import { KeyRing } from '@mailchain/keyring';
 import { Configuration, ConfigurationParameters, UserApi } from '../api';
@@ -33,7 +33,7 @@ describe('full-auth-flow', () => {
 	const mailchainAuth = Authentication.create(apiConfig, opaqueConfig);
 	// console.log(params);
 
-	const username = EncodeBase58(secureRandom(8)).toLowerCase();
+	const username = encodeBase58(secureRandom(8)).toLowerCase();
 	let registrationResponse;
 	let rootAccountKey;
 	it('register', async () => {

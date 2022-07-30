@@ -1,9 +1,9 @@
-import { DecodeBase32, EncodeBase32 } from './base32';
-import { DecodeBase58, EncodeBase58 } from './base58';
-import { EncodeBase64UrlSafe } from './base64';
+import { decodeBase32, encodeBase32 } from './base32';
+import { decodeBase58, encodeBase58 } from './base58';
+import { encodeBase64UrlSafe } from './base64';
 import { EncodingTypes, EncodingType } from './consts';
-import { DecodeHex, DecodeHexZeroX, EncodeHex, EncodeHexZeroX } from './hex';
-import { DecodeUtf8, EncodeUtf8 } from './utf8';
+import { decodeHex, decodeHexZeroX, encodeHex, encodeHexZeroX } from './hex';
+import { decodeUtf8, encodeUtf8 } from './utf8';
 
 class UnsupportedEncodingError extends Error {
 	constructor(encoding: string) {
@@ -20,18 +20,18 @@ class UnsupportedEncodingError extends Error {
  * @param src
  * @returns
  */
-export function Decode(encoding: EncodingType, src: string): Uint8Array {
+export function decode(encoding: EncodingType, src: string): Uint8Array {
 	switch (encoding.toLowerCase()) {
 		case EncodingTypes.Base58:
-			return DecodeBase58(src);
+			return decodeBase58(src);
 		case EncodingTypes.Hex:
-			return DecodeHex(src);
+			return decodeHex(src);
 		case EncodingTypes.Hex0xPrefix:
-			return DecodeHexZeroX(src);
+			return decodeHexZeroX(src);
 		case EncodingTypes.Utf8:
-			return DecodeUtf8(src);
+			return decodeUtf8(src);
 		case EncodingTypes.Base32:
-			return DecodeBase32(src);
+			return decodeBase32(src);
 		default:
 			throw new UnsupportedEncodingError(encoding);
 	}
@@ -43,20 +43,20 @@ export function Decode(encoding: EncodingType, src: string): Uint8Array {
  * @param src
  * @returns encoded value
  */
-export function Encode(encoding: EncodingType, src: Uint8Array): string {
+export function encode(encoding: EncodingType, src: Uint8Array): string {
 	switch (encoding.toLowerCase()) {
 		case EncodingTypes.Base58:
-			return EncodeBase58(src);
+			return encodeBase58(src);
 		case EncodingTypes.Hex:
-			return EncodeHex(src);
+			return encodeHex(src);
 		case EncodingTypes.Hex0xPrefix:
-			return EncodeHexZeroX(src);
+			return encodeHexZeroX(src);
 		case EncodingTypes.Base64:
-			return EncodeBase64UrlSafe(src);
+			return encodeBase64UrlSafe(src);
 		case EncodingTypes.Utf8:
-			return EncodeUtf8(src);
+			return encodeUtf8(src);
 		case EncodingTypes.Base32:
-			return EncodeBase32(src);
+			return encodeBase32(src);
 		default:
 			throw new UnsupportedEncodingError(encoding);
 	}

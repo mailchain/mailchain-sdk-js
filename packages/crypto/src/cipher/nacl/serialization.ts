@@ -3,13 +3,13 @@ import { EncryptedContent, NACLECDH, NACLSK } from '..';
 import { SECP256K1PublicKey } from '../../secp256k1';
 import { ED25519PublicKey, PublicKeyLen as ED25519PublicKeyLen } from '../../ed25519';
 import { SR25519PublicKey, PublicKeyLen as SR25519PublicKeyLen } from '../../sr25519';
-import { IdFromPublicKey } from '../../multikey';
+import { idFromPublicKey } from '../../multikey';
 
 export function serializePublicKeyEncryptedContent(sealedBox: EncryptedContent, pubKey: PublicKey): EncryptedContent {
 	const out = new Uint8Array(sealedBox.length + pubKey.bytes.length + 2);
 
 	out.set(new Uint8Array([NACLECDH]), 0);
-	out.set(new Uint8Array([IdFromPublicKey(pubKey)]), 1);
+	out.set(new Uint8Array([idFromPublicKey(pubKey)]), 1);
 	out.set(pubKey.bytes, 2);
 	out.set(sealedBox, 2 + pubKey.bytes.length);
 

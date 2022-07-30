@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import { chainCodeFromDeriveIndex } from '..';
 import { asSR25519PrivateKey, SR25519ExtendedPrivateKey, SR25519PrivateKey } from '.';
 
-export async function SR25519DeriveHardenedKey(
+export async function sr25519DeriveHardenedKey(
 	parentKey: SR25519ExtendedPrivateKey,
 	index: string | number | bigint | Uint8Array | BN,
 ): Promise<SR25519ExtendedPrivateKey> {

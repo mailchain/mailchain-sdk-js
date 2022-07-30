@@ -6,7 +6,7 @@ import { PrivateKey } from '../private';
 import { KindSECP256K1 } from '../keys';
 import { ErrorUnsupportedKey } from './errors';
 
-export function VerifyEthereumPersonalMessage(key: PublicKey, message: Buffer, signature: Uint8Array): boolean {
+export function verifyEthereumPersonalMessage(key: PublicKey, message: Buffer, signature: Uint8Array): boolean {
 	switch (key.constructor) {
 		case SECP256K1PublicKey:
 			// remove rec id if present

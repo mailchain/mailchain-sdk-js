@@ -1,5 +1,5 @@
 import { SECP256K1PrivateKey } from '@mailchain/crypto/secp256k1';
-import { EncodeBase58, EncodingTypes } from '@mailchain/encoding';
+import { encodeBase58, EncodingTypes } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { secureRandom } from '@mailchain/crypto';
@@ -9,17 +9,17 @@ import { KindNaClSecretKey } from '@mailchain/crypto/cipher';
 import * as identityKeysApi from 'sdk/src/identityKeys';
 import { protocols } from '@mailchain/internal';
 import { ethers } from 'ethers';
-import { CreateProofMessage, getLatestProofParams } from '@mailchain/keyreg';
-import { DecodeUtf8 } from '@mailchain/encoding/utf8';
+import { createProofMessage, getLatestProofParams } from '@mailchain/keyreg';
+import { decodeUtf8 } from '@mailchain/encoding/utf8';
 import { signEthereumPersonalMessage } from '@mailchain/crypto/signatures/eth_personal';
 import { Configuration } from '../api';
 import { OpaqueConfig } from '../types';
-import { EncodeHexZeroX, EncodeHex, DecodeHexZeroX } from '../../../encoding/src/hex';
+import { encodeHexZeroX, encodeHex, decodeHexZeroX } from '../../../encoding/src/hex';
 import { sendPayload } from '../transport/send';
 import { Receiver } from '../transport/receive';
 import { PayloadHeaders } from '../transport/payload/content/headers';
 import { confirmDelivery } from '../transport/confirmations';
-import { EncodePublicKey } from '../../../crypto/src/multikey/encoding';
+import { encodePublicKey } from '../../../crypto/src/multikey/encoding';
 import { Authentication } from '../auth/auth';
 
 jest.setTimeout(30000);
@@ -31,15 +31,15 @@ const registerAddress = async (user) => {
 	const wallet = new ethers.Wallet(walletPrivateKey.bytes);
 	const { address } = wallet;
 
-	const addressBytes = DecodeHexZeroX(address);
+	const addressBytes = decodeHexZeroX(address);
 	const nonce = 1;
 	const proofParams = getLatestProofParams(protocols.ETHEREUM, '', 'en');
 	const addressMessagingKey = user.keyRing.addressMessagingKey(addressBytes, protocols.ETHEREUM, nonce);
-	const proofMessage = CreateProofMessage(proofParams, addressBytes, addressMessagingKey.publicKey, nonce);
-	const signature = signEthereumPersonalMessage(walletPrivateKey, DecodeUtf8(proofMessage));
+	const proofMessage = createProofMessage(proofParams, addressBytes, addressMessagingKey.publicKey, nonce);
+	const signature = signEthereumPersonalMessage(walletPrivateKey, decodeUtf8(proofMessage));
 
 	await identityKeysApi.registerAddress(apiConfig, {
-		signature: EncodeHexZeroX(signature),
+		signature: encodeHexZeroX(signature),
 		signatureMethod: 'ethereum_personal_message',
 		address: {
 			encoding: 'hex/0x-prefix',
@@ -52,10 +52,10 @@ const registerAddress = async (user) => {
 		messagingKey: {
 			curve: 'ed25519',
 			encoding: 'hex/0x-prefix',
-			value: EncodeHexZeroX(addressMessagingKey.publicKey.bytes),
+			value: encodeHexZeroX(addressMessagingKey.publicKey.bytes),
 		},
 		nonce,
-		identityKey: EncodeHexZeroX(EncodePublicKey(walletPrivateKey.publicKey)),
+		identityKey: encodeHexZeroX(encodePublicKey(walletPrivateKey.publicKey)),
 	});
 	return { address, addressBytes };
 };
@@ -69,7 +69,7 @@ const config = {
 const apiConfig = new Configuration({ basePath: 'http://localhost:8080' });
 const registerRandomUser = async () => {
 	const mailchainAuth = Authentication.create(apiConfig, config);
-	const username = EncodeBase58(secureRandom(8)).toLowerCase();
+	const username = encodeBase58(secureRandom(8)).toLowerCase();
 	const seed = secureRandom(32);
 
 	const identityKey = ED25519PrivateKey.fromSeed(seed);
@@ -107,11 +107,11 @@ describe('SendAndReceiveMessage', () => {
 	beforeAll(async () => {
 		users = [await registerRandomUser(), await registerRandomUser()];
 		message = [
-			EncodeHex(secureRandom(32)),
-			EncodeHex(secureRandom(32)),
-			EncodeHex(secureRandom(32)),
-			EncodeHex(secureRandom(32)),
-			EncodeHex(secureRandom(32)),
+			encodeHex(secureRandom(32)),
+			encodeHex(secureRandom(32)),
+			encodeHex(secureRandom(32)),
+			encodeHex(secureRandom(32)),
+			encodeHex(secureRandom(32)),
 		].join('\n');
 		etherAddresses = await Promise.all([registerAddress(users[1]), registerAddress(users[1])]);
 	});
@@ -124,10 +124,10 @@ describe('SendAndReceiveMessage', () => {
 		];
 
 		expect(data[0].messageKey.value).toEqual(
-			EncodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.bytes),
+			encodeHexZeroX(users[0].keyRing.accountMessagingKey().publicKey.bytes),
 		);
 		expect(data[1].messageKey.value).toEqual(
-			EncodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.bytes),
+			encodeHexZeroX(users[1].keyRing.accountMessagingKey().publicKey.bytes),
 		);
 	});
 

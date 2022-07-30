@@ -5,7 +5,7 @@ import { ED25519PublicKey, ED25519PrivateKey } from '../../ed25519';
 import { SR25519PublicKey, SR25519PrivateKey } from '../../sr25519';
 import { ED25519KeyExchange, SECP256K1KeyExchange, SR25519KeyExchange } from '.';
 
-export function FromPublicKey(publicKey: PublicKey, rand: RandomFunction = secureRandom): KeyExchange {
+export function fromPublicKey(publicKey: PublicKey, rand: RandomFunction = secureRandom): KeyExchange {
 	switch (publicKey.constructor) {
 		case ED25519PublicKey:
 			return new ED25519KeyExchange(rand);
@@ -18,7 +18,7 @@ export function FromPublicKey(publicKey: PublicKey, rand: RandomFunction = secur
 	}
 }
 
-export function FromPrivateKey(privateKey: PrivateKey, rand: RandomFunction = secureRandom): KeyExchange {
+export function fromPrivateKey(privateKey: PrivateKey, rand: RandomFunction = secureRandom): KeyExchange {
 	switch (privateKey.constructor) {
 		case ED25519PrivateKey:
 			return new ED25519KeyExchange(rand);

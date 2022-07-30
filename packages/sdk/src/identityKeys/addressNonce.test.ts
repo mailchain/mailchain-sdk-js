@@ -1,6 +1,6 @@
 import { ETHEREUM } from '@mailchain/internal/protocols';
 import { AxiosError } from 'axios';
-import { _getAddressNonce } from './addressNonce';
+import { getAddressNonceWithFactories } from './addressNonce';
 
 describe('getAddressNonce', () => {
 	const mockIdentityKeysApi = { getIdentityKey: jest.fn() };
@@ -19,7 +19,7 @@ describe('getAddressNonce', () => {
 			Promise.reject({ isAxiosError: true, response: { status: 404 } } as AxiosError),
 		);
 
-		const resultNonce = await _getAddressNonce(
+		const resultNonce = await getAddressNonceWithFactories(
 			mockIdentityKeysApi as any,
 			mockMessagingKeysApi as any,
 			'0x1337',
@@ -36,7 +36,7 @@ describe('getAddressNonce', () => {
 		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.resolve({ data: { identityKey: '0xIdentityKey' } }));
 		mockMessagingKeysApi.getIdentityKeyNonce.mockReturnValue(Promise.resolve({ data: { nonce: 9 } }));
 
-		const resultNonce = await _getAddressNonce(
+		const resultNonce = await getAddressNonceWithFactories(
 			mockIdentityKeysApi as any,
 			mockMessagingKeysApi as any,
 			'0x1337',
@@ -51,7 +51,7 @@ describe('getAddressNonce', () => {
 		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.reject(new Error('unexpected error')));
 
 		await expect(
-			_getAddressNonce(mockIdentityKeysApi as any, mockMessagingKeysApi as any, '0x1337', ETHEREUM),
+			getAddressNonceWithFactories(mockIdentityKeysApi as any, mockMessagingKeysApi as any, '0x1337', ETHEREUM),
 		).rejects.toThrow();
 	});
 });

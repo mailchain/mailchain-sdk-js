@@ -1,4 +1,4 @@
-import { DecodeHex, DecodeHexZeroX } from '@mailchain/encoding';
+import { decodeHex, decodeHexZeroX } from '@mailchain/encoding';
 import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceSR25519PublicKey, BobSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
@@ -66,7 +66,7 @@ describe('Encrypt', () => {
 				const ex = new ED25519KeyExchange();
 				ex.EphemeralKey = async (): Promise<PrivateKey> => {
 					return ED25519PrivateKey.fromSeed(
-						DecodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
+						decodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
 					);
 				};
 				return ex;
@@ -91,7 +91,7 @@ describe('Encrypt', () => {
 				const ex = new ED25519KeyExchange();
 				ex.EphemeralKey = async (): Promise<PrivateKey> => {
 					return ED25519PrivateKey.fromSeed(
-						DecodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
+						decodeHexZeroX('0x4142434445464748494a4b4c4d4e4f505152535455565758595a414243444546'),
 					);
 				};
 				return ex;
@@ -123,7 +123,7 @@ describe('Encrypt', () => {
 			},
 			pubKey: AliceSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			expected: DecodeHex(
+			expected: decodeHex(
 				'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f5051525354555657581f0eabeba03feeed30b9e1df26e4b66df0d23d34f5ddb3',
 			),
 			shouldThrow: false,
@@ -143,7 +143,7 @@ describe('Encrypt', () => {
 			},
 			pubKey: BobSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			expected: DecodeHex(
+			expected: decodeHex(
 				'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f505152535455565758683bc9bbab763bddf8591aff091dbc998c1fe6dea4ae90',
 			),
 			shouldThrow: false,

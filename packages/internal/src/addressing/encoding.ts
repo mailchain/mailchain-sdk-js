@@ -1,5 +1,5 @@
 import { EncodingTypes, EncodingType } from '@mailchain/encoding';
-import { Decode, Encode } from '@mailchain/encoding/encoding';
+import { decode, encode } from '@mailchain/encoding/encoding';
 import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, ProtocolType, SUBSTRATE } from '../protocols';
 
 /**
@@ -10,7 +10,7 @@ export function encodeAddressByProtocol(
 	protocol: ProtocolType,
 ): { encoded: string; encoding: string } {
 	const encoding = encodingByProtocol(protocol);
-	const encoded = Encode(encoding, address);
+	const encoded = encode(encoding, address);
 
 	return { encoded, encoding };
 }
@@ -23,7 +23,7 @@ export function decodeAddressByProtocol(
 	protocol: ProtocolType,
 ): { decoded: Uint8Array; encoding: string } {
 	const encoding = encodingByProtocol(protocol);
-	const decoded = Decode(encoding, address);
+	const decoded = decode(encoding, address);
 
 	return { decoded, encoding };
 }

@@ -1,6 +1,6 @@
-import { VerifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
+import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
 
-import { DecodeHexZeroX } from '@mailchain/encoding';
+import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { formatAddress } from '@mailchain/internal/addressing';
 import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
@@ -29,10 +29,10 @@ export async function verify(
 	const userKey = getPublicKeyFromApiResponse(result.data.messagingKey);
 	if (!result.data.messagingKey?.value || keyProof?.signature !== undefined) false;
 
-	return VerifyMailchainProvidedMessagingKey(
+	return verifyMailchainProvidedMessagingKey(
 		mailchainPublicKey,
 		userKey,
-		DecodeHexZeroX(result.data.providedKeyProof.signature),
+		decodeHexZeroX(result.data.providedKeyProof.signature),
 		result.data.providedKeyProof.address!,
 		protocol,
 	);

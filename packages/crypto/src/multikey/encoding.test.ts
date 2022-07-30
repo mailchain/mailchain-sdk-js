@@ -3,7 +3,7 @@ import { AliceSR25519PublicKey, AliceSR25519PrivateKey } from '../sr25519/test.c
 import { AliceED25519PublicKey, AliceED25519PrivateKey } from '../ed25519/test.const';
 import { IdED25519, IdSR25519 } from '../keys';
 import { IdSECP256K1 } from '..';
-import { DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey } from './encoding';
+import { decodePrivateKey, decodePublicKey, encodePrivateKey, encodePublicKey } from './encoding';
 
 describe('EncodePublicKey()', () => {
 	const tests = [
@@ -29,10 +29,10 @@ describe('EncodePublicKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				EncodePublicKey(test.arg);
+				encodePublicKey(test.arg);
 			}).toThrow();
 		} else {
-			expect(EncodePublicKey(test.arg)).toEqual(test.expected);
+			expect(encodePublicKey(test.arg)).toEqual(test.expected);
 		}
 	});
 });
@@ -61,10 +61,10 @@ describe('DecodePublicKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				DecodePublicKey(test.arg);
+				decodePublicKey(test.arg);
 			}).toThrow();
 		} else {
-			expect(DecodePublicKey(test.arg)).toEqual(test.expected!);
+			expect(decodePublicKey(test.arg)).toEqual(test.expected!);
 		}
 	});
 });
@@ -93,10 +93,10 @@ describe('EncodePrivateKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				EncodePrivateKey(test.arg);
+				encodePrivateKey(test.arg);
 			}).toThrow();
 		} else {
-			expect(EncodePrivateKey(test.arg)).toEqual(test.expected);
+			expect(encodePrivateKey(test.arg)).toEqual(test.expected);
 		}
 	});
 });
@@ -125,12 +125,12 @@ describe('DecodePrivateKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				DecodePrivateKey(test.arg);
+				decodePrivateKey(test.arg);
 			}).toThrow();
 		} else {
 			const { sign, ...expected } = test.expected!;
 
-			expect(DecodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
+			expect(decodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
 		}
 	});
 });

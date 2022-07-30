@@ -3,7 +3,7 @@ import { SECP256K1PublicKey, SECP256K1PrivateKey } from '../secp256k1';
 import { ED25519PublicKey, ED25519PrivateKey } from '../ed25519';
 import { SR25519PublicKey, SR25519PrivateKey } from '../sr25519';
 
-export function IdFromPublicKey(key: PublicKey): number {
+export function idFromPublicKey(key: PublicKey): number {
 	switch (key.constructor) {
 		case ED25519PublicKey:
 			return IdED25519;
@@ -16,7 +16,7 @@ export function IdFromPublicKey(key: PublicKey): number {
 	}
 }
 
-export function IdFromPrivateKey(key: PrivateKey): number {
+export function idFromPrivateKey(key: PrivateKey): number {
 	switch (key.constructor) {
 		case ED25519PrivateKey:
 			return IdED25519;
@@ -29,7 +29,7 @@ export function IdFromPrivateKey(key: PrivateKey): number {
 	}
 }
 
-export function PublicKeyFromId(id: number, data: Uint8Array): PublicKey {
+export function publicKeyFromId(id: number, data: Uint8Array): PublicKey {
 	switch (id) {
 		case IdSECP256K1:
 			return new SECP256K1PublicKey(data);
@@ -42,7 +42,7 @@ export function PublicKeyFromId(id: number, data: Uint8Array): PublicKey {
 	}
 }
 
-export function PrivateKeyFromId(id: number, data: Uint8Array): PrivateKey {
+export function privateKeyFromId(id: number, data: Uint8Array): PrivateKey {
 	switch (id) {
 		case IdSECP256K1:
 			return new SECP256K1PrivateKey(data);

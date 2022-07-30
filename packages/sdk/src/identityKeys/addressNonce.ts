@@ -12,7 +12,7 @@ export async function getAddressNonce(apiConfig: Configuration, address: string,
 	const identityKeysApi = IdentityKeysApiFactory(apiConfig);
 	const messagingKeysApi = MessagingKeysApiFactory(apiConfig);
 
-	return _getAddressNonce(
+	return getAddressNonceWithFactories(
 		identityKeysApi as IdentityKeysApi,
 		messagingKeysApi as MessagingKeysApi,
 		address,
@@ -20,7 +20,7 @@ export async function getAddressNonce(apiConfig: Configuration, address: string,
 	);
 }
 
-export async function _getAddressNonce(
+export async function getAddressNonceWithFactories(
 	identityKeysApi: IdentityKeysApi,
 	messagingKeysApi: MessagingKeysApi,
 	address: string,

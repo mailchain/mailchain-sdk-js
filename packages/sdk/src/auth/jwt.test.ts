@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { EncodeBase64UrlSafe } from '@mailchain/encoding';
+import { encodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
 import { getAxiosWithSigner, getToken } from './jwt';
@@ -56,7 +56,7 @@ describe('JWT tokens()', () => {
 			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -83,7 +83,7 @@ describe('JWT tokens()', () => {
 			.post(`https://${payloadPost.aud}${payloadPost.url}`, postBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -113,7 +113,7 @@ describe('JWT tokens()', () => {
 			})
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountMessagingKey().publicKey.bytes)}`,
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountMessagingKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -141,7 +141,7 @@ describe('JWT tokens()', () => {
 			.put(`https://${payloadPut.aud}${payloadPut.url}`, putBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});
@@ -169,7 +169,7 @@ describe('JWT tokens()', () => {
 			.patch(`https://${payloadPatch.aud}${payloadPatch.url}`, patchBody)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
-					`vapid t=${token}, k=${EncodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
 				);
 			});
 	});

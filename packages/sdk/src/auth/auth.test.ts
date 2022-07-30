@@ -1,6 +1,6 @@
 import { OpaqueClient } from '@cloudflare/opaque-ts';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { EncodeBase64 } from '@mailchain/encoding';
+import { encodeBase64 } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
@@ -51,10 +51,10 @@ describe('login', () => {
 		// --- Given
 		// authInit
 		const ke1Serialize = secureRandom(32);
-		const testAuthState = EncodeBase64(Buffer.from('state'));
+		const testAuthState = encodeBase64(Buffer.from('state'));
 		const apiAuthInitResponse: AccountAuthInitResponseBody = {
 			state: testAuthState,
-			authStartResponse: EncodeBase64(Buffer.from('authStartResponse')),
+			authStartResponse: encodeBase64(Buffer.from('authStartResponse')),
 		};
 		mockOpaqueClient.authInit.mockResolvedValue({ serialize: () => ke1Serialize } as any);
 		mockAuthApi.accountAuthInit.mockResolvedValue({
@@ -68,11 +68,11 @@ describe('login', () => {
 		const sessionKey = secureRandom(32);
 		const accountAuthFinalizeResponse: AccountAuthFinalizeResponseBody = {
 			encryptedAccountSeed: {
-				encryptedAccountSeed: EncodeBase64(
+				encryptedAccountSeed: encodeBase64(
 					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountSeed),
 				),
 			},
-			session: EncodeBase64(sessionKey),
+			session: encodeBase64(sessionKey),
 		} as any;
 		mockOpaqueClient.authFinish.mockResolvedValue({
 			ke3: { serialize: () => ke3Serialize },
@@ -92,7 +92,7 @@ describe('login', () => {
 		expect(mockOpaqueClient.authInit.mock.calls[0]).toEqual(['password']);
 		expect(mockAuthApi.accountAuthInit.mock.calls[0][0]).toEqual({
 			username: 'username',
-			params: EncodeBase64(ke1Serialize),
+			params: encodeBase64(ke1Serialize),
 			captchaResponse: 'captchaResponse',
 		});
 
@@ -104,7 +104,7 @@ describe('login', () => {
 			testOpaqueConfig.context,
 		]);
 		expect(mockAuthApi.accountAuthFinalize.mock.calls[0][0]).toEqual({
-			params: EncodeBase64(ke3Serialize),
+			params: encodeBase64(ke3Serialize),
 			authState: testAuthState,
 		});
 		// assert final result

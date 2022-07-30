@@ -1,4 +1,3 @@
-import { ED25519PrivateKey, ED25519PublicKey } from '../ed25519';
 import { KindED25519 } from '../keys';
 import { Signer } from '../private';
 import { PublicKey } from '../public';

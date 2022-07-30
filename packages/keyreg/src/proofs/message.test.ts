@@ -1,7 +1,7 @@
 import { PublicKey } from '@mailchain/crypto/public';
 import { EncodingType, EncodingTypes } from '@mailchain/encoding';
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { CreateProofMessage } from './message';
+import { createProofMessage } from './message';
 import { ProofParams } from './params';
 
 describe('CreateProofMessage', () => {
@@ -85,11 +85,11 @@ describe('CreateProofMessage', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce);
+				createProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce);
 			}).toThrow();
 		} else {
 			expect(
-				CreateProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce),
+				createProofMessage(test.args.params, test.args.address, test.args.publicKey, test.args.nonce),
 			).toMatchSnapshot(test.name);
 		}
 	});

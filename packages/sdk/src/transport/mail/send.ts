@@ -95,7 +95,7 @@ export class MailSender {
 		if (failedDistributions.length != 0) {
 			return {
 				status: 'failed-prepare',
-				failedDistributions: failedDistributions,
+				failedDistributions,
 			};
 		}
 
@@ -171,7 +171,7 @@ export class MailSender {
 		});
 
 		return {
-			successfulDistributions: successfulDistributions,
+			successfulDistributions,
 			failedDistributions: distErrors,
 		};
 	}

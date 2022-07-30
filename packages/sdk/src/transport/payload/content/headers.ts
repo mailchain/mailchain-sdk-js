@@ -1,6 +1,6 @@
-import { KindFromPublicKey, PublicKeyFromKind } from '@mailchain/crypto/multikey/names';
+import { kindFromPublicKey, publicKeyFromKind } from '@mailchain/crypto/multikey/names';
 import { PublicKey } from '@mailchain/crypto/public';
-import { DecodeBase64, EncodeBase64 } from '@mailchain/encoding';
+import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 
 type ContentType = 'application/json' | 'message/x.mailchain';
 export type PayloadHeaders = {
@@ -146,7 +146,7 @@ function parseHeaderElements(input: string, requiredKeys: string[]): Map<String,
 function parseSignatureHeader(input: string): Uint8Array {
 	const attributes = parseHeaderElements(input, ['data']);
 
-	const sig = DecodeBase64(attributes.get('data')!.toString());
+	const sig = decodeBase64(attributes.get('data')!.toString());
 
 	if (sig.length === 0) {
 		throw new Error('could not decode signature');
@@ -157,23 +157,23 @@ function parseSignatureHeader(input: string): Uint8Array {
 
 function createSignatureHeader(signature: Uint8Array, signer: PublicKey): string {
 	const values: string[] = [];
-	values.push(`data=${EncodeBase64(signature)}`);
-	values.push(`alg=${KindFromPublicKey(signer)}`);
+	values.push(`data=${encodeBase64(signature)}`);
+	values.push(`alg=${kindFromPublicKey(signer)}`);
 
 	return values.join('; ').trimEnd();
 }
 
 function parseOriginHeader(input: string): PublicKey {
 	const attributes = parseHeaderElements(input, ['data', 'alg']);
-	const bytes = DecodeBase64(attributes.get('data')!.toString());
+	const bytes = decodeBase64(attributes.get('data')!.toString());
 
-	return PublicKeyFromKind(attributes.get('alg')!.toString(), bytes);
+	return publicKeyFromKind(attributes.get('alg')!.toString(), bytes);
 }
 
 function createOriginHeader(signer: PublicKey): string {
 	const values: string[] = [];
-	values.push(`data=${EncodeBase64(signer.bytes)}`);
-	values.push(`alg=${KindFromPublicKey(signer)}`);
+	values.push(`data=${encodeBase64(signer.bytes)}`);
+	values.push(`alg=${kindFromPublicKey(signer)}`);
 
 	return values.join('; ').trimEnd();
 }

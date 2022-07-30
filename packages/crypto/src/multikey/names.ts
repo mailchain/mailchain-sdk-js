@@ -3,7 +3,7 @@ import { SECP256K1PublicKey } from '../secp256k1';
 import { ED25519PublicKey } from '../ed25519';
 import { SR25519PublicKey } from '../sr25519';
 
-export function KindFromPublicKey(key: PublicKey): string {
+export function kindFromPublicKey(key: PublicKey): string {
 	switch (key.constructor) {
 		case SECP256K1PublicKey:
 			return KindSECP256K1;
@@ -16,7 +16,7 @@ export function KindFromPublicKey(key: PublicKey): string {
 	}
 }
 
-export function PublicKeyFromKind(kind: string, data: Uint8Array): PublicKey {
+export function publicKeyFromKind(kind: string, data: Uint8Array): PublicKey {
 	switch (kind) {
 		case KindSECP256K1:
 			return new SECP256K1PublicKey(data);

@@ -1,19 +1,19 @@
 import { RegistrationResponse, RegistrationClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
 import { PrivateKey, PublicKey, Signer, SignerWithPublicKey } from '@mailchain/crypto';
-import { SignMailchainUsername } from '@mailchain/crypto/signatures/mailchain_username';
+import { signMailchainUsername } from '@mailchain/crypto/signatures/mailchain_username';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
-import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
-import { DecodeBase64, EncodeBase64, EncodeHexZeroX } from '@mailchain/encoding';
-import { getMailchainUsernameParams, CreateProofMessage } from '@mailchain/keyreg';
+import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { getMailchainUsernameParams, createProofMessage } from '@mailchain/keyreg';
 import { signRawEd25519 } from '@mailchain/crypto/signatures/raw_ed25119';
-import { DecodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeUtf8 } from '@mailchain/encoding/utf8';
 import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from '../types';
 import { AuthenticatedResponse } from './response';
 
-export async function AccountRegisterInit(
+export async function accountRegisterInit(
 	username: string,
 	password: string,
 	captchaResponse: string,
@@ -31,13 +31,13 @@ export async function AccountRegisterInit(
 	}
 	const serializedRequest = request.serialize();
 
-	const signature = await SignMailchainUsername(identityKey, Buffer.from(username, 'utf-8'));
+	const signature = await signMailchainUsername(identityKey, Buffer.from(username, 'utf-8'));
 
 	const response = await authApi.accountRegisterInit({
-		identityKey: EncodeHexZeroX(EncodePublicKey(identityKey.publicKey)),
-		signature: EncodeBase64(signature),
+		identityKey: encodeHexZeroX(encodePublicKey(identityKey.publicKey)),
+		signature: encodeBase64(signature),
 		username,
-		registerInitParams: EncodeBase64(Uint8Array.from(serializedRequest)),
+		registerInitParams: encodeBase64(Uint8Array.from(serializedRequest)),
 		captchaResponse,
 	});
 
@@ -46,15 +46,15 @@ export async function AccountRegisterInit(
 	}
 
 	return {
-		registrationSession: DecodeBase64(response.data.registrationSession),
+		registrationSession: decodeBase64(response.data.registrationSession),
 		registrationResponse: RegistrationResponse.deserialize(
 			opaqueConfig.parameters,
-			Array.from(DecodeBase64(response.data.registrationResponse)),
+			Array.from(decodeBase64(response.data.registrationResponse)),
 		),
 	};
 }
 
-export async function AccountRegisterCreate(
+export async function accountRegisterCreate(
 	username: string,
 	password: string,
 	registrationResponse: RegistrationResponse,
@@ -82,8 +82,8 @@ export async function AccountRegisterCreate(
 	}
 
 	const response = await authApi.accountRegisterCreate({
-		authInitParams: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
-		registerFinalizeParams: EncodeBase64(Uint8Array.from(registerFinish.record.serialize())),
+		authInitParams: encodeBase64(Uint8Array.from(keyExchange1.serialize())),
+		registerFinalizeParams: encodeBase64(Uint8Array.from(registerFinish.record.serialize())),
 		username,
 	});
 
@@ -93,12 +93,12 @@ export async function AccountRegisterCreate(
 
 	return {
 		secretKey: Uint8Array.from(registerFinish.export_key),
-		authStartResponse: DecodeBase64(response.data.authStartResponse),
-		state: DecodeBase64(response.data.state),
+		authStartResponse: decodeBase64(response.data.authStartResponse),
+		state: decodeBase64(response.data.state),
 	};
 }
 
-export async function AccountRegisterFinalize(
+export async function accountRegisterFinalize(
 	identityKeySeed: Uint8Array,
 	identityKey: Signer,
 	messagingPublicKey: PublicKey,
@@ -129,13 +129,13 @@ export async function AccountRegisterFinalize(
 	const encrypter = PrivateKeyEncrypter.fromPrivateKey(encryptionKey);
 
 	const usernameParams = getMailchainUsernameParams();
-	const usernameProofMessage = CreateProofMessage(
+	const usernameProofMessage = createProofMessage(
 		usernameParams,
-		DecodeUtf8(username),
+		decodeUtf8(username),
 		messagingPublicKey,
 		1 /** TODO: Nonce */,
 	);
-	const signedUsernameProof = await signRawEd25519(identityKey, DecodeUtf8(usernameProofMessage));
+	const signedUsernameProof = await signRawEd25519(identityKey, decodeUtf8(usernameProofMessage));
 
 	const encryptedAccountSeed = await encrypter.encrypt(identityKeySeed);
 
@@ -143,14 +143,14 @@ export async function AccountRegisterFinalize(
 
 	const response = await authApi.accountRegisterFinalize({
 		username,
-		authFinalizeParams: EncodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
-		authState: EncodeBase64(state),
-		encryptedAccountSeed: EncodeBase64(encryptedAccountSeed),
-		session: EncodeBase64(Uint8Array.from(clientSessionKey)),
-		signedRegistrationSession: EncodeBase64(signedRegistrationSession),
+		authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
+		authState: encodeBase64(state),
+		encryptedAccountSeed: encodeBase64(encryptedAccountSeed),
+		session: encodeBase64(Uint8Array.from(clientSessionKey)),
+		signedRegistrationSession: encodeBase64(signedRegistrationSession),
 		messagingKey: {
-			key: EncodeHexZeroX(EncodePublicKey(messagingPublicKey)),
-			signature: EncodeHexZeroX(signedUsernameProof),
+			key: encodeHexZeroX(encodePublicKey(messagingPublicKey)),
+			signature: encodeHexZeroX(signedUsernameProof),
 		},
 	});
 
@@ -160,7 +160,7 @@ export async function AccountRegisterFinalize(
 
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
-		sessionKey: DecodeBase64(response.data.session),
+		sessionKey: decodeBase64(response.data.session),
 		rootAccountKey,
 	};
 }

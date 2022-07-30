@@ -5,7 +5,7 @@ import {
 	AliceED25519PrivateKey,
 	BobED25519PrivateKey,
 } from '../ed25519/test.const';
-import { SignMailchainUsername, VerifyMailchainUsername } from './mailchain_username';
+import { signMailchainUsername, verifyMailchainUsername } from './mailchain_username';
 import { ErrorUnsupportedKey } from './errors';
 
 describe('VerifyMailchainUsername()', () => {
@@ -87,7 +87,7 @@ describe('VerifyMailchainUsername()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = VerifyMailchainUsername(test.args.key, test.args.message, test.args.signature);
+		const target = verifyMailchainUsername(test.args.key, test.args.message, test.args.signature);
 		if (test.shouldThrow) {
 			expect.assertions(1);
 			return target.catch((e) => expect(e).toEqual(test.shouldThrow));
@@ -139,7 +139,7 @@ describe('SignMailchainUsername()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = SignMailchainUsername(test.args.key, test.args.message);
+		const target = signMailchainUsername(test.args.key, test.args.message);
 		if (test.shouldThrow) {
 			expect.assertions(1);
 			return target.catch((e) => expect(e).toEqual(test.shouldThrow));

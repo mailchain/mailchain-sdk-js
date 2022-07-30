@@ -1,4 +1,4 @@
-import { DecodeHex } from '@mailchain/encoding';
+import { decodeHex } from '@mailchain/encoding';
 import { defaultScryptParams, deriveSecretFromScrypt } from './scrypt';
 
 describe('deriveSecretFromScrypt()', () => {
@@ -45,7 +45,7 @@ describe('deriveSecretFromScrypt()', () => {
 				salt: new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]),
 			},
 			expected: {
-				secret: DecodeHex('f49a56ea442c3d1d3faaecabf6d8632226c7d8d0042bcf82a37801ba07ba511e'),
+				secret: decodeHex('f49a56ea442c3d1d3faaecabf6d8632226c7d8d0042bcf82a37801ba07ba511e'),
 				salt: new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]),
 				params: defaultScryptParams,
 			},
@@ -59,7 +59,7 @@ describe('deriveSecretFromScrypt()', () => {
 				salt: new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]),
 			},
 			expected: {
-				secret: DecodeHex('e3760954d3582d597e2a05118d178f6f72866a0e27c8bbd58cf1d1aa266bc925'),
+				secret: decodeHex('e3760954d3582d597e2a05118d178f6f72866a0e27c8bbd58cf1d1aa266bc925'),
 				salt: new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08]),
 				params: defaultScryptParams,
 			},

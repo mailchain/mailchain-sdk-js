@@ -9,8 +9,9 @@ import {
 	SignerWithPublicKey,
 	PrivateKeyEncrypter,
 } from '@mailchain/crypto';
-import { EncodeHex, EncodeHexZeroX } from '@mailchain/encoding';
+import { encodeHex, encodeHexZeroX } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
+import { MAILCHAIN } from '@mailchain/internal/protocols';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
@@ -20,7 +21,6 @@ import {
 	DERIVATION_PATH_DATE_OFFSET,
 } from './constants';
 import { InboxKey, KeyRingDecrypter } from './functions';
-import { MAILCHAIN } from '@mailchain/internal/protocols';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -100,7 +100,7 @@ export class KeyRing {
 			DERIVATION_PATH_DATE_OFFSET,
 		);
 
-		const offset = Number(BigInt(EncodeHexZeroX(offsetKey.bytes)) % BigInt(year2000));
+		const offset = Number(BigInt(encodeHexZeroX(offsetKey.bytes)) % BigInt(year2000));
 
 		return offset;
 	}
@@ -128,7 +128,7 @@ export class KeyRing {
 		// all addresses are encoded with hex regardless of protocol to ensure consistency
 		const addressKeyRoot = deriveHardenedKey(
 			this._protocolAddressRootMessagingKey,
-			`protocol=${protocol},address=${EncodeHex(address)}`,
+			`protocol=${protocol},address=${encodeHex(address)}`,
 		);
 
 		// specific for the nonce

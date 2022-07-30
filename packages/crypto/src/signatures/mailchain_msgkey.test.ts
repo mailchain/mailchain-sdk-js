@@ -1,4 +1,4 @@
-import { EncodeHexZeroX } from '@mailchain/encoding/hex';
+import { encodeHexZeroX } from '@mailchain/encoding/hex';
 import { protocols } from '@mailchain/internal';
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '../secp256k1/test.const';
 import { AliceED25519PublicKey, BobED25519PublicKey } from '../ed25519/test.const';
@@ -6,8 +6,8 @@ import { ED25519PrivateKey } from '../ed25519';
 import { EthereumAlice, EthereumBob } from '../../../internal/src/addressing/test.constants';
 import {
 	mailchainProvidedMessagingKeyMessage,
-	SignMailchainProvidedMessagingKey,
-	VerifyMailchainProvidedMessagingKey,
+	signMailchainProvidedMessagingKey,
+	verifyMailchainProvidedMessagingKey,
 } from './mailchain_msgkey';
 import { ErrorUnsupportedKey } from './errors';
 
@@ -22,7 +22,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: AliceED25519PublicKey,
 				key,
-				address: EncodeHexZeroX(EthereumAlice),
+				address: encodeHexZeroX(EthereumAlice),
 				protocol: 'ethereum',
 			},
 			expected: new Uint8Array([
@@ -38,7 +38,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: BobED25519PublicKey,
 				key,
-				address: EncodeHexZeroX(EthereumBob),
+				address: encodeHexZeroX(EthereumBob),
 				protocol: 'ethereum',
 			},
 			expected: new Uint8Array([
@@ -54,7 +54,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: BobSECP256K1PublicKey,
 				key: ED25519PrivateKey.generate(),
-				address: EncodeHexZeroX(EthereumBob),
+				address: encodeHexZeroX(EthereumBob),
 				protocol: 'ethereum',
 			},
 			expected: new Uint8Array([
@@ -69,7 +69,7 @@ describe('TestSignMailchainProvidedMessagingKey()', () => {
 
 	test.each(tests)('$name', async (test) => {
 		try {
-			await SignMailchainProvidedMessagingKey(
+			await signMailchainProvidedMessagingKey(
 				test.args.key,
 				test.args.msgKey,
 				test.args.address,
@@ -94,7 +94,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: AliceED25519PublicKey,
 				key: key.publicKey,
-				address: EncodeHexZeroX(EthereumAlice),
+				address: encodeHexZeroX(EthereumAlice),
 				protocol: 'ethereum',
 				signature: new Uint8Array([
 					0x73, 0xa5, 0xfd, 0x94, 0x72, 0xcd, 0xe7, 0x55, 0xc8, 0x95, 0x65, 0xad, 0xa0, 0x10, 0xaa, 0xa, 0xe,
@@ -112,7 +112,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: BobED25519PublicKey,
 				key: key.publicKey,
-				address: EncodeHexZeroX(EthereumBob),
+				address: encodeHexZeroX(EthereumBob),
 				protocol: 'ethereum',
 				signature: new Uint8Array([
 					0xfe, 0x84, 0x20, 0x16, 0x7, 0x8a, 0x7b, 0xd1, 0x4, 0x2c, 0x96, 0xd5, 0x87, 0xde, 0xc5, 0x75, 0x69,
@@ -130,7 +130,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: BobSECP256K1PublicKey,
 				key: AliceSECP256K1PublicKey,
-				address: EncodeHexZeroX(EthereumBob),
+				address: encodeHexZeroX(EthereumBob),
 				protocol: 'ethereum',
 				signature: new Uint8Array([
 					0xfe, 0x84, 0x20, 0x16, 0x7, 0x8a, 0x7b, 0xd1, 0x4, 0x2c, 0x96, 0xd5, 0x87, 0xde, 0xc5, 0x75, 0x69,
@@ -148,7 +148,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 			args: {
 				msgKey: BobED25519PublicKey,
 				key: BobSECP256K1PublicKey,
-				address: EncodeHexZeroX(EthereumBob),
+				address: encodeHexZeroX(EthereumBob),
 				protocol: 'ethereum',
 				signature: new Uint8Array([
 					0xfe, 0x84, 0x20, 0x16, 0x7, 0x8a, 0x7b, 0xd1, 0x4, 0x2c, 0x96, 0xd5, 0x87, 0xde, 0xc5, 0x75, 0x69,
@@ -164,7 +164,7 @@ describe('TestVerifyMailchainProvidedMessagingKey()', () => {
 
 	test.each(tests)('$name', async (test) => {
 		try {
-			await VerifyMailchainProvidedMessagingKey(
+			await verifyMailchainProvidedMessagingKey(
 				test.args.key,
 				test.args.msgKey,
 				test.args.signature,
@@ -185,7 +185,7 @@ describe('Test_mailchainProvidedMessagingKeyMessage()', () => {
 			name: `alice-ethereum`,
 			args: {
 				msgKey: AliceED25519PublicKey,
-				address: EncodeHexZeroX(EthereumAlice),
+				address: encodeHexZeroX(EthereumAlice),
 				protocol: 'ethereum',
 			},
 			expected: new Uint8Array(

@@ -2,7 +2,7 @@
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519/private';
-import { DecodeHex } from '@mailchain/encoding';
+import { decodeHex } from '@mailchain/encoding';
 import { protocol } from '../../../protobuf/protocol/protocol';
 import { createEnvelope } from './envelope';
 
@@ -13,7 +13,7 @@ describe('createEnvelope', () => {
 			pubKey: AliceED25519PublicKey,
 			messageKey: ED25519ExtendedPrivateKey.fromPrivateKey(
 				ED25519PrivateKey.fromSeed(
-					DecodeHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
+					decodeHex('000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f'),
 				),
 			),
 			messageURI: 'https://mcx.mx/01234567890123456789',

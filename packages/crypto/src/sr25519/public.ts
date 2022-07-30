@@ -24,7 +24,7 @@ export class SR25519PublicKey implements PublicKey {
 	}
 }
 
-export function AsPublicKey(key: PublicKey): SR25519PublicKey {
+export function asPublicKey(key: PublicKey): SR25519PublicKey {
 	if (key.constructor !== SR25519PublicKey) {
 		throw new Error('key must be sr25519');
 	}

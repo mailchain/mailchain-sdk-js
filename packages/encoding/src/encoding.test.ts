@@ -1,5 +1,5 @@
 import { EncodingType, EncodingTypes } from './consts';
-import { Decode, Encode } from './encoding';
+import { decode, encode } from './encoding';
 
 describe('Encode', () => {
 	const tests = [
@@ -59,10 +59,10 @@ describe('Encode', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				Encode(test.encoding as EncodingType, test.input);
+				encode(test.encoding as EncodingType, test.input);
 			}).toThrow();
 		} else {
-			expect(Encode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
+			expect(encode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
 		}
 	});
 });
@@ -111,10 +111,10 @@ describe('Decode', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				Decode(test.encoding as EncodingType, test.input);
+				decode(test.encoding as EncodingType, test.input);
 			}).toThrow();
 		} else {
-			expect(Decode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
+			expect(decode(test.encoding as EncodingType, test.input)).toEqual(test.expected);
 		}
 	});
 });

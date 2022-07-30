@@ -1,4 +1,4 @@
-import { Deserialize, deserializeMessage, MessageKind, Serialize, serializeMessage } from './serialization';
+import { deserialize, deserializeMessage, MessageKind, serialize, serializeMessage } from './serialization';
 
 describe('serializeMessage', () => {
 	const tests = [
@@ -162,7 +162,7 @@ describe('Serialize', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			const target = Serialize;
+			const target = serialize;
 
 			if (test.shouldThrow) {
 				expect(() => {
@@ -258,7 +258,7 @@ describe('Deserialize', () => {
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			const target = Deserialize;
+			const target = deserialize;
 
 			if (test.shouldThrow) {
 				expect(() => {

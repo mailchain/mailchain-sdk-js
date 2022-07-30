@@ -1,7 +1,7 @@
-import { DecodeBase64 } from '@mailchain/encoding';
-import { DecodePrivateKey, DecodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { decodeBase64 } from '@mailchain/encoding';
+import { decodePrivateKey, decodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import axios from 'axios';
-import { EncodeUtf8 } from '@mailchain/encoding/utf8';
+import { encodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import { protocol } from '../protobuf/protocol/protocol';
@@ -9,7 +9,7 @@ import { Configuration } from '../api/configuration';
 import { TransportApiFactory, TransportApi } from '../api/api';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { decryptPayload } from './payload/content/decrypt';
-import { Deserialize } from './payload/content/serialization';
+import { deserialize } from './payload/content/serialization';
 
 export class Receiver {
 	constructor(private readonly transportApi: TransportApi, private readonly messagingKey: KeyRingDecrypter) {}
@@ -19,7 +19,7 @@ export class Receiver {
 				deliveryRequests.map((dr) =>
 					this.processDeliveryRequest(
 						this.messagingKey,
-						protocol.Delivery.decode(DecodeBase64(dr.data)),
+						protocol.Delivery.decode(decodeBase64(dr.data)),
 						dr.hash,
 					),
 				),
@@ -47,7 +47,7 @@ export class Receiver {
 		const bundle = envelope.ecdhKeyBundle as protocol.ECDHKeyBundle;
 
 		const payloadRootEncryptionKey = await messagingKey.ecdhDecrypt(
-			DecodePublicKey(bundle.publicEphemeralKey),
+			decodePublicKey(bundle.publicEphemeralKey),
 			envelope.encryptedMessageKey!,
 		);
 
@@ -56,21 +56,21 @@ export class Receiver {
 		}
 
 		const messageUri = await messagingKey.ecdhDecrypt(
-			DecodePublicKey(bundle.publicEphemeralKey),
+			decodePublicKey(bundle.publicEphemeralKey),
 			envelope.encryptedMessageUri!,
 		);
-		const url = EncodeUtf8(messageUri);
+		const url = encodeUtf8(messageUri);
 
 		const encryptedMessageBodyResponse = await axios.get(url, {
 			responseType: 'arraybuffer',
 		});
 
-		const encryptedMessageBody = Buffer.from(DecodeBase64(encryptedMessageBodyResponse.data));
+		const encryptedMessageBody = Buffer.from(decodeBase64(encryptedMessageBodyResponse.data));
 
-		const encryptedPayload = Deserialize(encryptedMessageBody);
+		const encryptedPayload = deserialize(encryptedMessageBody);
 		const decryptedPayload = await decryptPayload(
 			encryptedPayload,
-			ED25519ExtendedPrivateKey.fromPrivateKey(DecodePrivateKey(payloadRootEncryptionKey)),
+			ED25519ExtendedPrivateKey.fromPrivateKey(decodePrivateKey(payloadRootEncryptionKey)),
 		);
 
 		return {

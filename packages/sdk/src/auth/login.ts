@@ -2,7 +2,7 @@ import { AuthClient, KE2 } from '@cloudflare/opaque-ts';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
-import { DecodeBase64, EncodeBase64 } from '@mailchain/encoding';
+import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
 import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from '../types';
@@ -14,7 +14,7 @@ export class LoginError extends Error {
 	}
 }
 
-export async function AccountAuthInit(
+export async function accountAuthInit(
 	username: string,
 	password: string,
 	captchaResponse: string,
@@ -32,7 +32,7 @@ export async function AccountAuthInit(
 	const response = await authApi
 		.accountAuthInit({
 			username,
-			params: EncodeBase64(Uint8Array.from(keyExchange1.serialize())),
+			params: encodeBase64(Uint8Array.from(keyExchange1.serialize())),
 			captchaResponse,
 		})
 		.catch((e) => {
@@ -47,12 +47,12 @@ export async function AccountAuthInit(
 	}
 
 	return {
-		state: DecodeBase64(response.data.state),
-		keyExchange2: DecodeBase64(response.data.authStartResponse),
+		state: decodeBase64(response.data.state),
+		keyExchange2: decodeBase64(response.data.authStartResponse),
 	};
 }
 
-export async function AccountAuthFinalize(
+export async function accountAuthFinalize(
 	username: string,
 	keyExchange2: KE2,
 	authState: Uint8Array,
@@ -71,8 +71,8 @@ export async function AccountAuthFinalize(
 	}
 
 	const response = await authApi.accountAuthFinalize({
-		params: EncodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
-		authState: EncodeBase64(authState),
+		params: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
+		authState: encodeBase64(authState),
 	});
 
 	if (response.status !== 200) {
@@ -84,12 +84,12 @@ export async function AccountAuthFinalize(
 	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
 
 	const decryptedAccountSeed = await decrypter.decrypt(
-		DecodeBase64(response.data.encryptedAccountSeed.encryptedAccountSeed),
+		decodeBase64(response.data.encryptedAccountSeed.encryptedAccountSeed),
 	);
 
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
-		sessionKey: DecodeBase64(response.data.session),
+		sessionKey: decodeBase64(response.data.session),
 		rootAccountKey: ED25519PrivateKey.fromSeed(decryptedAccountSeed),
 	};
 }

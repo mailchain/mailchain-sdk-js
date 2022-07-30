@@ -1,7 +1,7 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { EncodeBase64, EncodeHexZeroX } from '@mailchain/encoding';
-import { EncodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { protocol } from '../../protobuf/protocol/protocol';
 import { Configuration, PublicKey, TransportApiInterface, TransportApiFactory } from '../../api';
 import { getPublicKeyFromApiResponse, Lookup } from '../../identityKeys';
@@ -9,7 +9,7 @@ import { getAxiosWithSigner } from '../../auth/jwt';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
 import { Payload } from './content/payload';
-import { Serialize } from './content/serialization';
+import { serialize } from './content/serialization';
 import { createDelivery } from './delivery/delivery';
 
 export type PreparePayloadResult = {
@@ -97,7 +97,7 @@ export class PayloadSender {
 	async prepare(payload: Payload): Promise<PreparePayloadResult> {
 		// create root encryption key that will be used to encrypt message content.
 		const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate());
-		const serializedContent = Serialize(await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB));
+		const serializedContent = serialize(await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB));
 
 		const { uri: payloadUri } = await this.transportApi.postEncryptedPayload(serializedContent).then((r) => r.data);
 
@@ -126,8 +126,8 @@ export class PayloadSender {
 		);
 
 		const res = await this.transportApi.postDeliveryRequest({
-			encryptedDeliveryRequest: EncodeBase64(protocol.Delivery.encode(deliveryCreated).finish()),
-			recipientMessagingKey: EncodeHexZeroX(EncodePublicKey(getPublicKeyFromApiResponse(recipientMessageKey))),
+			encryptedDeliveryRequest: encodeBase64(protocol.Delivery.encode(deliveryCreated).finish()),
+			recipientMessagingKey: encodeHexZeroX(encodePublicKey(getPublicKeyFromApiResponse(recipientMessageKey))),
 		});
 		return res.data.deliveryRequestID;
 	}

@@ -1,4 +1,4 @@
-import { IdFromPrivateKey } from '@mailchain/crypto/multikey';
+import { idFromPrivateKey } from '@mailchain/crypto/multikey';
 import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto';
 import { EncryptedContent, Encrypter } from '..';
 import { PrivateKey, RandomFunction, secureRandom } from '../..';
@@ -15,7 +15,7 @@ export class PrivateKeyEncrypter implements Encrypter {
 
 	constructor(privateKey: PrivateKey, rand: RandomFunction = secureRandom) {
 		this._rand = rand;
-		this._keyId = IdFromPrivateKey(privateKey);
+		this._keyId = idFromPrivateKey(privateKey);
 
 		switch (privateKey.constructor) {
 			case ED25519PrivateKey:

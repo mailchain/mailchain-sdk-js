@@ -1,6 +1,6 @@
 import { EncryptedContent, PlainContent, Decrypter, KeyExchange } from '..';
 import { PrivateKey } from '../..';
-import { FromPrivateKey } from '../ecdh/ecdh';
+import { fromPrivateKey } from '../ecdh/ecdh';
 import { easyOpen } from './secretbox';
 import { deserializePublicKeyEncryptedContent } from './serialization';
 
@@ -13,7 +13,7 @@ export class PublicKeyDecrypter implements Decrypter {
 		this._prvKey = prvKey;
 	}
 	static FromPrivateKey(key: PrivateKey): PublicKeyDecrypter {
-		return new this(FromPrivateKey(key), key);
+		return new this(fromPrivateKey(key), key);
 	}
 
 	async decrypt(input: EncryptedContent): Promise<PlainContent> {

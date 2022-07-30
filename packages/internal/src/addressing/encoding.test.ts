@@ -1,6 +1,6 @@
-import { DecodeBase58 } from '@mailchain/encoding/base58';
+import { decodeBase58 } from '@mailchain/encoding/base58';
 import { EncodingTypes } from '@mailchain/encoding/consts';
-import { DecodeHex } from '@mailchain/encoding/hex';
+import { decodeHex } from '@mailchain/encoding/hex';
 import { ProtocolType } from '../protocols';
 import { encodeAddressByProtocol, encodingByProtocol } from './encoding';
 
@@ -55,7 +55,7 @@ describe('EncodeAddressByProtocol', () => {
 		{
 			name: 'ethereum',
 			args: {
-				address: DecodeHex('5602ea95540bee46d03ba335eed6f49d117eab95c8ab8b71bae2cdd1e564a761'),
+				address: decodeHex('5602ea95540bee46d03ba335eed6f49d117eab95c8ab8b71bae2cdd1e564a761'),
 				protocol: 'ethereum',
 			},
 			expected: {
@@ -67,7 +67,7 @@ describe('EncodeAddressByProtocol', () => {
 		{
 			name: 'substrate',
 			args: {
-				address: DecodeBase58('5DJJhV3tVzsWG1jZfL157azn8iRyDC7HyNG1yh8v2nQYd994'),
+				address: decodeBase58('5DJJhV3tVzsWG1jZfL157azn8iRyDC7HyNG1yh8v2nQYd994'),
 				protocol: 'substrate',
 			},
 			expected: {
@@ -79,7 +79,7 @@ describe('EncodeAddressByProtocol', () => {
 		{
 			name: 'unknown-protocol',
 			args: {
-				address: DecodeBase58('5DJJhV3tVzsWG1jZfL157azn8iRyDC7HyNG1yh8v2nQYd994'),
+				address: decodeBase58('5DJJhV3tVzsWG1jZfL157azn8iRyDC7HyNG1yh8v2nQYd994'),
 				protocol: 'unknown',
 			},
 			expected: {

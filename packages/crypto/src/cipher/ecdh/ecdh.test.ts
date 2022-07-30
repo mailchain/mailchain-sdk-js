@@ -2,7 +2,7 @@ import { AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const'
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { AliceSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
 import { AliceUnknownPublicKey } from '../../testing/public';
-import { ED25519KeyExchange, SECP256K1KeyExchange, FromPublicKey, SR25519KeyExchange } from './';
+import { ED25519KeyExchange, SECP256K1KeyExchange, fromPublicKey, SR25519KeyExchange } from './';
 
 describe('FromPublicKey', () => {
 	const tests = [
@@ -34,10 +34,10 @@ describe('FromPublicKey', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				FromPublicKey(test.key);
+				fromPublicKey(test.key);
 			}).toThrow();
 		} else {
-			expect(FromPublicKey(test.key).constructor).toEqual(test.expected);
+			expect(fromPublicKey(test.key).constructor).toEqual(test.expected);
 		}
 	});
 });

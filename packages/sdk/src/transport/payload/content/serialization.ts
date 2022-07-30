@@ -31,7 +31,7 @@ export function serializeMessage(encryptedMessage: Buffer, messageKind: MessageK
 	return Buffer.concat([metadata, encryptedMessage], encryptedMessageSize);
 }
 
-export function Serialize(input: EncryptedPayload): Buffer {
+export function serialize(input: EncryptedPayload): Buffer {
 	const bufferCollector = new Array<Buffer>(input.EncryptedContentChunks.length + 1 + 1);
 
 	bufferCollector[0] = Buffer.from(new Uint8Array([Version.V1_0_0]));
@@ -85,7 +85,7 @@ export function deserializeMessage(serializedMessage: Buffer): {
 	};
 }
 
-export function Deserialize(serializedData: Buffer): EncryptedPayload {
+export function deserialize(serializedData: Buffer): EncryptedPayload {
 	const version = serializedData[0] as Version;
 	if (version !== Version.V1_0_0) {
 		throw new Error('serialization version not supported');

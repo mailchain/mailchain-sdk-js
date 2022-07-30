@@ -1,4 +1,4 @@
-import { DecodeHexZeroX, EncodeHexZeroX } from './hex';
+import { decodeHexZeroX, encodeHexZeroX } from './hex';
 
 describe('EncodeHexZeroX', () => {
 	const tests = [
@@ -13,7 +13,7 @@ describe('EncodeHexZeroX', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = EncodeHexZeroX;
+		const target = encodeHexZeroX;
 
 		if (test.shouldThrow) {
 			expect(() => {
@@ -44,7 +44,7 @@ describe('DecodeHexZeroX', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = DecodeHexZeroX;
+		const target = decodeHexZeroX;
 
 		if (test.shouldThrow) {
 			expect(() => {

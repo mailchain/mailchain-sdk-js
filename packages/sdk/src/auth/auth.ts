@@ -4,8 +4,8 @@ import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
 import { AuthApiFactory, AuthApiInterface, Configuration } from '../api';
 import { OpaqueConfig } from '../types';
-import { AccountAuthFinalize, AccountAuthInit, LoginError } from './login';
-import { AccountRegisterCreate, AccountRegisterFinalize, AccountRegisterInit } from './register';
+import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
+import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';
 
 type LoginParams = {
 	username: string;
@@ -36,7 +36,7 @@ export class Authentication {
 
 	async login(params: LoginParams) {
 		try {
-			const authInitResponse = await AccountAuthInit(
+			const authInitResponse = await accountAuthInit(
 				params.username,
 				params.password,
 				params.captcha,
@@ -49,7 +49,7 @@ export class Authentication {
 				Array.from(authInitResponse.keyExchange2),
 			);
 
-			return AccountAuthFinalize(
+			return accountAuthFinalize(
 				params.username,
 				keyExchange2,
 				authInitResponse.state,
@@ -70,7 +70,7 @@ export class Authentication {
 		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
 		const identityKey = keyRing.accountIdentityKey();
 		const messagingPublicKey = keyRing.accountMessagingKey().publicKey;
-		const registerInitResponse = await AccountRegisterInit(
+		const registerInitResponse = await accountRegisterInit(
 			params.username.toLowerCase(),
 			params.password,
 			params.captcha,
@@ -79,7 +79,7 @@ export class Authentication {
 			this.opaqueConfig,
 			this.opaqueClient,
 		);
-		const registerCreateResponse = await AccountRegisterCreate(
+		const registerCreateResponse = await accountRegisterCreate(
 			params.username.toLowerCase(),
 			params.password,
 			registerInitResponse.registrationResponse,
@@ -89,7 +89,7 @@ export class Authentication {
 			this.opaqueClient,
 		);
 
-		return AccountRegisterFinalize(
+		return accountRegisterFinalize(
 			params.identityKeySeed,
 			identityKey,
 			messagingPublicKey,

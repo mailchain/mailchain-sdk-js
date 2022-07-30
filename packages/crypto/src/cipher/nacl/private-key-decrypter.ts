@@ -1,4 +1,4 @@
-import { IdFromPrivateKey } from '@mailchain/crypto/multikey/ids';
+import { idFromPrivateKey } from '@mailchain/crypto/multikey/ids';
 import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto/ed25519/convertKey';
 import { EncryptedContent, PlainContent, Decrypter } from '..';
 import { PrivateKey } from '../..';
@@ -13,7 +13,7 @@ export class PrivateKeyDecrypter implements Decrypter {
 	private _keyId: number;
 
 	constructor(privateKey: PrivateKey) {
-		this._keyId = IdFromPrivateKey(privateKey);
+		this._keyId = idFromPrivateKey(privateKey);
 
 		switch (privateKey.constructor) {
 			case ED25519PrivateKey:

@@ -5,17 +5,17 @@ import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { PostDeliveryRequestResponseBody, PublicKey, TransportApiInterface } from '../../api';
-import { EncodeHexZeroX } from '../../../../encoding/src/hex';
+import { encodeHexZeroX } from '../../../../encoding/src/hex';
 import { PayloadSender } from './send';
 import { Payload } from './content/payload';
 import { decryptPayload } from './content/decrypt';
-import { Deserialize } from './content/serialization';
+import { deserialize } from './content/serialization';
 
 const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 
 const aliceMessagingKey = {
-	value: EncodeHexZeroX(aliceKeyRing.accountMessagingKey().publicKey.bytes),
+	value: encodeHexZeroX(aliceKeyRing.accountMessagingKey().publicKey.bytes),
 	encoding: 'hex/0x-prefix',
 	curve: 'ed25519',
 } as PublicKey;
@@ -23,7 +23,7 @@ const aliceMailAddress = { name: 'alice@mailchain', address: 'alice@mailchain.lo
 const bobMessagingKey = {
 	curve: 'ed25519',
 	encoding: 'hex/0x-prefix',
-	value: EncodeHexZeroX(bobKeyRing.accountMessagingKey().publicKey.bytes),
+	value: encodeHexZeroX(bobKeyRing.accountMessagingKey().publicKey.bytes),
 } as PublicKey;
 const bobMailAddress = { name: 'bob@mailchain', address: 'bob@mailchain.local' };
 const payload: Payload = {
@@ -157,7 +157,7 @@ describe('PayloadSender', () => {
 		});
 		expect(mockTransportApi.postEncryptedPayload).toHaveBeenCalledTimes(1);
 		const encryptedPayload = mockTransportApi.postEncryptedPayload.mock.calls[0][0] as Buffer;
-		const decryptedPayload = await decryptPayload(Deserialize(encryptedPayload), result.payloadRootEncryptionKey);
+		const decryptedPayload = await decryptPayload(deserialize(encryptedPayload), result.payloadRootEncryptionKey);
 		expect(decryptedPayload).toEqual(payload);
 	});
 	test('successfully notifies recipients', async () => {

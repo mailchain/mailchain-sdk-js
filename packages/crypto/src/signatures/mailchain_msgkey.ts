@@ -1,9 +1,9 @@
 import { protocols } from '@mailchain/internal';
-import { EncodeHexZeroX } from '@mailchain/encoding';
+import { encodeHexZeroX } from '@mailchain/encoding';
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
 import { KindED25519 } from '../keys';
-import { EncodePublicKey } from '../multikey/encoding';
+import { encodePublicKey } from '../multikey/encoding';
 import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty, ErrorUnsupportedKey } from './errors';
 
 export function mailchainProvidedMessagingKeyMessage(
@@ -20,7 +20,7 @@ export function mailchainProvidedMessagingKeyMessage(
 
 	switch (msgKey.curve) {
 		case KindED25519:
-			const encodedKey = EncodeHexZeroX(EncodePublicKey(msgKey));
+			const encodedKey = encodeHexZeroX(encodePublicKey(msgKey));
 
 			return new Uint8Array(
 				Buffer.from(
@@ -33,7 +33,7 @@ export function mailchainProvidedMessagingKeyMessage(
 	}
 }
 
-export function SignMailchainProvidedMessagingKey(
+export function signMailchainProvidedMessagingKey(
 	key: PrivateKey,
 	msgKey: PublicKey,
 	address: string,
@@ -49,7 +49,7 @@ export function SignMailchainProvidedMessagingKey(
 	}
 }
 
-export function VerifyMailchainProvidedMessagingKey(
+export function verifyMailchainProvidedMessagingKey(
 	key: PublicKey,
 	msgKey: PublicKey,
 	signature: Uint8Array,

@@ -1,17 +1,17 @@
-import { VerifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
+import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
 import {
 	AddressVerificationFailed,
 	ErrorUnsupportedKey,
 	PublicKeyNotFoundFailed,
 } from '@mailchain/crypto/signatures/errors';
-import { CreateProofMessage } from '@mailchain/keyreg/proofs/message';
+import { createProofMessage } from '@mailchain/keyreg/proofs/message';
 import { ProofParams } from '@mailchain/keyreg/proofs/params';
 
 import { ED25519PublicKey } from '@mailchain/crypto/ed25519';
-import { DecodeHexZeroX } from '@mailchain/encoding';
+import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { verify } from '@mailchain/crypto/signatures/verify';
-import { Decode } from '@mailchain/encoding/encoding';
+import { decode } from '@mailchain/encoding/encoding';
 import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
 import { MailchainAddress } from '@mailchain/internal/addressing';
 import { MessagingKeysApi, ProvidedKeyProof, RegisteredKeyProof } from '../api/api';
@@ -29,16 +29,16 @@ import {
 export const getPublicKeyFromApiResponse = (key: PublicKey) => {
 	switch (key.curve) {
 		case PublicKeyCurveEnum.Ed25519:
-			return new ED25519PublicKey(Decode(key.encoding, key.value));
+			return new ED25519PublicKey(decode(key.encoding, key.value));
 		case PublicKeyCurveEnum.Secp256k1:
-			return new SECP256K1PublicKey(Decode(key.encoding, key.value));
+			return new SECP256K1PublicKey(decode(key.encoding, key.value));
 		default:
 			throw new ErrorUnsupportedKey(key.curve);
 	}
 };
 
 export const getAddressFromApiResponse = (address: Address) => {
-	return Decode(address.encoding!, address.value);
+	return decode(address.encoding!, address.value);
 };
 
 export type LookupResult = { address: MailchainAddress; messageKey: PublicKey };
@@ -53,7 +53,7 @@ export class Lookup {
 			Variant: registeredKeyProof?.variant,
 		} as ProofParams;
 
-		const message = CreateProofMessage(
+		const message = createProofMessage(
 			params,
 			getAddressFromApiResponse(registeredKeyProof.address),
 			getPublicKeyFromApiResponse(messagingKey),
@@ -64,7 +64,7 @@ export class Lookup {
 			registeredKeyProof?.signingMethod!,
 			getPublicKeyFromApiResponse(registeredKeyProof?.identityKey!),
 			Buffer.from(message),
-			DecodeHexZeroX(registeredKeyProof?.signature!),
+			decodeHexZeroX(registeredKeyProof?.signature!),
 		);
 		if (!isVerified) throw new AddressVerificationFailed();
 	};
@@ -76,10 +76,10 @@ export class Lookup {
 		const mailchainPublicKey = getPublicKeyFromApiResponse(mailchainPublicKeyResponse.data.key);
 
 		if (!providedKeyProof?.signature) throw new AddressVerificationFailed();
-		const isKeyValid = await VerifyMailchainProvidedMessagingKey(
+		const isKeyValid = await verifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,
 			getPublicKeyFromApiResponse(messagingKey),
-			DecodeHexZeroX(providedKeyProof?.signature),
+			decodeHexZeroX(providedKeyProof?.signature),
 			providedKeyProof.address!,
 			providedKeyProof.protocol as ProtocolType,
 		);

@@ -11,7 +11,7 @@ const mailchainUsernameMessage = function (message) {
  * @param key
  * @param username
  */
-export async function SignMailchainUsername(signer: Signer, username: Uint8Array): Promise<Uint8Array> {
+export async function signMailchainUsername(signer: Signer, username: Uint8Array): Promise<Uint8Array> {
 	return signRawEd25519(signer, mailchainUsernameMessage(username));
 }
 
@@ -22,7 +22,7 @@ export async function SignMailchainUsername(signer: Signer, username: Uint8Array
  * @param signature
  * @returns
  */
-export async function VerifyMailchainUsername(
+export async function verifyMailchainUsername(
 	key: PublicKey,
 	username: Uint8Array,
 	signature: Uint8Array,

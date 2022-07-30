@@ -1,6 +1,6 @@
 import { EncryptedContent, Encrypter, KeyExchange } from '..';
 import { PublicKey, RandomFunction, secureRandom } from '../..';
-import { FromPublicKey } from '../ecdh/ecdh';
+import { fromPublicKey } from '../ecdh/ecdh';
 import { easySeal } from './secretbox';
 import { serializePublicKeyEncryptedContent } from './serialization';
 
@@ -15,7 +15,7 @@ export class PublicKeyEncrypter implements Encrypter {
 		this._pubKey = pubKey;
 	}
 	static FromPublicKey(key: PublicKey): PublicKeyEncrypter {
-		return new this(FromPublicKey(key), key);
+		return new this(fromPublicKey(key), key);
 	}
 
 	async encrypt(input: Uint8Array): Promise<EncryptedContent> {
