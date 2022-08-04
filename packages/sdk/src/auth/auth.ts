@@ -2,8 +2,10 @@ import { OpaqueClient, KE2 } from '@cloudflare/opaque-ts';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
-import { AuthApiFactory, AuthApiInterface, Configuration } from '../api';
-import { OpaqueConfig } from '../types';
+import { AuthApiFactory, AuthApiInterface } from '../api';
+import { createAxiosConfiguration } from '../axios/config';
+import { Configuration } from '../mailchain';
+import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
 import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';
 
@@ -27,8 +29,8 @@ export class Authentication {
 		private readonly opaqueConfig: OpaqueConfig,
 	) {}
 
-	static create(apiConfig: Configuration, opaqueConfig: OpaqueConfig) {
-		const authApi = AuthApiFactory(apiConfig);
+	static create(sdkConfig: Configuration, opaqueConfig: OpaqueConfig) {
+		const authApi = AuthApiFactory(createAxiosConfiguration(sdkConfig));
 		const opaqueClient = new OpaqueClient(opaqueConfig.parameters);
 
 		return new Authentication(authApi, opaqueClient, opaqueConfig);

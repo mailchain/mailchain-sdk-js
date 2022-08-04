@@ -6,7 +6,6 @@ import {
 } from '@mailchain/crypto/signatures/errors';
 import { createProofMessage } from '@mailchain/keyreg/proofs/message';
 import { ProofParams } from '@mailchain/keyreg/proofs/params';
-
 import { ED25519PublicKey } from '@mailchain/crypto/ed25519';
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
@@ -14,16 +13,17 @@ import { verify } from '@mailchain/crypto/signatures/verify';
 import { decode } from '@mailchain/encoding/encoding';
 import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
 import { MailchainAddress } from '@mailchain/internal/addressing';
-import { MessagingKeysApi, ProvidedKeyProof, RegisteredKeyProof } from '../api/api';
+import { MessagingKeysApi, ProvidedKeyProof, RegisteredKeyProof } from '../api';
 import {
 	AddressesApiFactory,
 	PublicKeyCurveEnum,
 	MessagingKeysApiFactory,
-	Configuration,
 	PublicKey,
 	Address,
 	AddressesApi,
 } from '../api';
+import { Configuration } from '../mailchain';
+import { createAxiosConfiguration } from '../axios/config';
 
 // ToDo: move somewhere to generic
 export const getPublicKeyFromApiResponse = (key: PublicKey) => {
@@ -108,10 +108,11 @@ export class Lookup {
 			messageKey: result.data.messagingKey,
 		};
 	};
+
 	static create(configuration: Configuration) {
 		return new Lookup(
-			AddressesApiFactory(configuration) as AddressesApi,
-			MessagingKeysApiFactory(configuration) as MessagingKeysApi,
+			AddressesApiFactory(createAxiosConfiguration(configuration)) as AddressesApi,
+			MessagingKeysApiFactory(createAxiosConfiguration(configuration)) as MessagingKeysApi,
 		);
 	}
 }

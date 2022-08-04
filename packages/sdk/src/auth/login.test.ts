@@ -6,7 +6,7 @@ import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { AuthApiInterface } from '../api';
-import { OpaqueConfig } from '../types';
+import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit } from './login';
 
 describe('isolated login tests', () => {

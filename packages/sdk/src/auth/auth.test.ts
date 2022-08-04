@@ -5,7 +5,7 @@ import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { AccountAuthFinalizeResponseBody, AccountAuthInitResponseBody, AuthApiInterface } from '../api';
-import { OpaqueConfig } from '../types';
+import { OpaqueConfig } from './opaque';
 import { Authentication } from './auth';
 
 const mockedOpaqueClientConstructor = jest.fn();

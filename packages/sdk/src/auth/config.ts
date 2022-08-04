@@ -1,5 +1,5 @@
 import { getOpaqueConfig, OpaqueID } from '@cloudflare/opaque-ts';
-import { OpaqueConfig } from '../types';
+import { OpaqueConfig } from './opaque';
 
 export const defaultOpaqueConfig = () =>
 	({

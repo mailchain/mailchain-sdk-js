@@ -13,8 +13,7 @@
 		"protobufjs": "~6.11.3"
 	},
 	"scripts": {
-		"test": "jest --passWithNoTests --runInBand --testPathIgnorePatterns=/integration_tests/",
-		"test:integration": "jest --passWithNoTests --runInBand integration_tests",
+		"test": "jest --passWithNoTests --runInBand",
 		"swagger-ui": "swagger-ui -p 8081 ../../specs/api/openapi-v2.json",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"

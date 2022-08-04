@@ -1,8 +1,10 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
+import { encodeHex } from '@mailchain/encoding';
 import { PublicKey } from '@mailchain/sdk/api';
-import { Configuration } from '@mailchain/sdk/api/configuration';
-import { MailData } from '@mailchain/sdk/formatters/types';
-import { Lookup, LookupResult } from '@mailchain/sdk/identityKeys';
+import { createAxiosConfiguration } from '@mailchain/sdk/axios/config';
+import { MailAddress, MailData } from '@mailchain/sdk/formatters/types';
+import { getPublicKeyFromApiResponse, Lookup, LookupResult } from '@mailchain/sdk/identityKeys';
+import { Configuration } from '@mailchain/sdk/mailchain';
 import flatten from 'lodash/flatten';
 import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
@@ -13,13 +15,13 @@ export interface SendMailParams {
 	senderMessagingKey: SignerWithPublicKey;
 }
 
-class FailedAddressMessageKeyResolutionError extends Error {
+export class FailedAddressMessageKeyResolutionError extends Error {
 	constructor(readonly address: string, cause: Error) {
 		super(`resoluton for ${address} has failed`, { cause });
 	}
 }
 
-class FailedDistributionError extends Error {
+export class FailedDistributionError extends Error {
 	constructor(readonly distribution: Distribution, cause: Error) {
 		super('distribution has failed', { cause });
 	}
@@ -72,13 +74,29 @@ export class MailSender {
 		private readonly lookupMessageKeyResolver: LookupMessageKeyResolver,
 	) {}
 
-	static create(configuration: Configuration, accountKeySigner: SignerWithPublicKey) {
-		return new MailSender(PayloadSender.create(configuration, accountKeySigner), (address: string) =>
-			Lookup.create(configuration).messageKey(address),
+	static create(configuration: Configuration, signer: SignerWithPublicKey) {
+		return new MailSender(
+			PayloadSender.create(createAxiosConfiguration(configuration), signer),
+			(address: string) => Lookup.create(configuration).messageKey(address),
 		);
 	}
 
+	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey) {
+		const fromPublicKey = await this.lookupMessageKeyResolver(fromAddress.address);
+		const keyBytesMatch =
+			encodeHex(getPublicKeyFromApiResponse(fromPublicKey.messageKey).bytes) ===
+			encodeHex(senderMessagingKey.publicKey.bytes);
+
+		if (!keyBytesMatch) {
+			throw new Error('messaging is not the latest message key for sender address');
+		}
+
+		return;
+	}
+
 	async send(params: SendMailParams): Promise<SendMailResult> {
+		this.verifySender(params.message.from, params.senderMessagingKey);
+
 		const messagePayloads = await createMailPayloads(params.senderMessagingKey, params.message);
 		const resolvedRecipients = await this.resolveRecipientMessagingKeys(messagePayloads.distributions);
 		if (resolvedRecipients.failed.length > 0) {

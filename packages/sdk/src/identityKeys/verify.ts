@@ -3,17 +3,19 @@ import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signature
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { formatAddress } from '@mailchain/internal/addressing';
-import { AddressesApiFactory, MessagingKeysApiFactory, Configuration } from '../api';
+import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
+import { Configuration } from '../mailchain';
+import { createAxiosConfiguration } from '../axios/config';
 import { getPublicKeyFromApiResponse } from './lookup';
 
 export async function verify(
-	apiConfig: Configuration,
+	config: Configuration,
 	address: string,
 	protocol: ProtocolType,
 	mailchainMailDomain: string,
 ): Promise<Boolean> {
-	const addressApi = AddressesApiFactory(apiConfig);
-	const verificationApi = MessagingKeysApiFactory(apiConfig);
+	const addressApi = AddressesApiFactory(createAxiosConfiguration(config));
+	const verificationApi = MessagingKeysApiFactory(createAxiosConfiguration(config));
 	const mailchainPublicKeyResponse = await verificationApi.getMailchainPublicKey();
 	if (!mailchainPublicKeyResponse.data.key?.value) return false;
 

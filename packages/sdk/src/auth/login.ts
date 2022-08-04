@@ -5,7 +5,7 @@ import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-d
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
 import { AuthApiInterface } from '../api';
-import { OpaqueConfig } from '../types';
+import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
 
 export class LoginError extends Error {

@@ -1,11 +1,13 @@
-import { IdentityKeysApiFactory, Configuration, IdentityKeysApi } from '../api';
+import { IdentityKeysApiFactory, IdentityKeysApi } from '../api';
+import { createAxiosConfiguration } from '../axios/config';
+import { Configuration } from '../mailchain';
 
 type RegisterAddressParams = Parameters<IdentityKeysApi['putMsgKeyByIDKey']>[1] & {
 	identityKey: string;
 };
 
-export async function registerAddress(apiConfig: Configuration, params: RegisterAddressParams) {
-	const identityKeysApi = IdentityKeysApiFactory(apiConfig);
+export async function registerAddress(config: Configuration, params: RegisterAddressParams) {
+	const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config));
 
 	return identityKeysApi.putMsgKeyByIDKey(params.identityKey, params);
 }

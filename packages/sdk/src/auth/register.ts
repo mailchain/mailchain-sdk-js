@@ -10,7 +10,7 @@ import { getMailchainUsernameParams, createProofMessage } from '@mailchain/keyre
 import { signRawEd25519 } from '@mailchain/crypto/signatures/raw_ed25119';
 import { decodeUtf8 } from '@mailchain/encoding/utf8';
 import { AuthApiInterface } from '../api';
-import { OpaqueConfig } from '../types';
+import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
 
 export async function accountRegisterInit(

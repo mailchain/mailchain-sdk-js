@@ -145,7 +145,7 @@ export class KeyRing {
 
 				return decrypter.decrypt(input);
 			},
-		};
+		} as KeyRingDecrypter;
 	}
 
 	accountMessagingKey(): KeyRingDecrypter {

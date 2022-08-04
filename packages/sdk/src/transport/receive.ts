@@ -5,9 +5,10 @@ import { encodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import { protocol } from '../protobuf/protocol/protocol';
-import { Configuration } from '../api/configuration';
-import { TransportApiFactory, TransportApi } from '../api/api';
+import { TransportApiFactory, TransportApi } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { Configuration } from '../mailchain';
+import { createAxiosConfiguration } from '../axios/config';
 import { decryptPayload } from './payload/content/decrypt';
 import { deserialize } from './payload/content/serialization';
 
@@ -29,7 +30,11 @@ export class Receiver {
 
 	static create(configuration: Configuration, messagingKeyDecrypter: KeyRingDecrypter) {
 		return new Receiver(
-			TransportApiFactory(configuration, undefined, getAxiosWithSigner(messagingKeyDecrypter)) as TransportApi,
+			TransportApiFactory(
+				createAxiosConfiguration(configuration),
+				undefined,
+				getAxiosWithSigner(messagingKeyDecrypter),
+			) as TransportApi,
 			messagingKeyDecrypter,
 		);
 	}

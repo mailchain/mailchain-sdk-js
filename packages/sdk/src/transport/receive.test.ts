@@ -3,10 +3,7 @@ import globalAxios from 'axios';
 
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { MailchainAddress } from '@mailchain/internal/addressing';
-import { MAILCHAIN } from '@mailchain/internal/protocols';
-import { Configuration } from '../api/configuration';
-import { ConfigurationParameters } from '../api';
+import { Configuration } from '../mailchain';
 import { ED25519PublicKey } from '../../../crypto/src/ed25519/public';
 import { Receiver } from './receive';
 
@@ -41,7 +38,7 @@ interface TestDetails {
 }
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8080';
 
-const apiConfig = new Configuration({ basePath: SERVER_URL } as ConfigurationParameters);
+const apiConfig = { apiPath: SERVER_URL } as Configuration;
 
 process.env.MAILCHAIN_ADDRESS_DOMAIN_NAME = 'mailchain.local';
 
