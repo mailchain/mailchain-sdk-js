@@ -43,17 +43,40 @@ describe('JWT tokens()', () => {
 			m: 'GET',
 			url: '/users/settings',
 			len: 0,
-			aud: 'google.com',
+			aud: 'mailchain.com',
 		};
 
 		const token = await getToken(kr.accountIdentityKey(), payloadGet, time);
-		mock.onGet(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } }).reply((conf) => [
-			200,
-			conf.headers,
-		]);
+		mock.onGet(`https://mailchain.com/users/settings`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
-			.get(`https://${payloadGet.aud}${payloadGet.url}`, { params: { searchText: 'John' } })
+			.get(`https://mailchain.com/users/settings`)
+			.then((response) => {
+				expect(response.data.Authorization).toEqual(
+					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,
+				);
+			});
+	});
+
+	it('verify axios request GET query string', async () => {
+		expect.assertions(1);
+		const mock = new MockAdapter(axios);
+
+		const kr = new KeyRing(AliceED25519PrivateKey);
+
+		const payloadGet = {
+			m: 'GET',
+			url: '/users/settings',
+			len: 0,
+			aud: 'mailchain.com',
+			q: 'visible=false&test=1',
+		};
+
+		const token = await getToken(kr.accountIdentityKey(), payloadGet, time);
+		mock.onGet(`https://mailchain.com/users/settings?visible=false&test=1`).reply((conf) => [200, conf.headers]);
+
+		return getAxiosWithSigner(kr.accountIdentityKey())
+			.get(`https://mailchain.com/users/settings?visible=false&test=1`)
 			.then((response) => {
 				expect(response.data.Authorization).toEqual(
 					`vapid t=${token}, k=${encodeBase64UrlSafe(kr.accountIdentityKey().publicKey.bytes)}`,

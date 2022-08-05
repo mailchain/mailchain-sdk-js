@@ -51,7 +51,7 @@ export class MailchainUserProfile implements UserProfile {
 
 	async getSettings(): Promise<{ [key: string]: Setting }> {
 		const { data } = await this.userApi.getUserSettings();
-		return data.settings;
+		return data.settings ?? {};
 	}
 
 	async addresses(): Promise<Address[]> {

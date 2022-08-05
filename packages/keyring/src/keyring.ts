@@ -20,7 +20,7 @@ import {
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 	DERIVATION_PATH_DATE_OFFSET,
 } from './constants';
-import { InboxKey, KeyRingDecrypter } from './functions';
+import { ecdhKeyRingDecrypter, InboxKey, KeyRingDecrypter } from './functions';
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -133,19 +133,7 @@ export class KeyRing {
 
 		// specific for the nonce
 		const addressKey = deriveHardenedKey(addressKeyRoot, nonce).privateKey;
-		const keyEx = new ED25519KeyExchange();
-
-		return {
-			curve: addressKey.curve,
-			sign: (input) => addressKey.sign(input),
-			publicKey: addressKey.publicKey,
-			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
-				const sharedSecret = await keyEx.SharedSecret(addressKey, bundleEphemeralKey);
-				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
-
-				return decrypter.decrypt(input);
-			},
-		} as KeyRingDecrypter;
+		return ecdhKeyRingDecrypter(addressKey);
 	}
 
 	accountMessagingKey(): KeyRingDecrypter {

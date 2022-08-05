@@ -15,9 +15,9 @@ export type Configuration = {
 const defaultConfiguration = { apiPath: 'https:/api.mailchain.com' };
 
 export class Mailchain {
-	private readonly userProfile: UserProfile;
+	private readonly _userProfile: UserProfile;
 	constructor(private readonly keyRing: KeyRing, private readonly config: Configuration) {
-		this.userProfile = MailchainUserProfile.create(
+		this._userProfile = MailchainUserProfile.create(
 			config,
 			keyRing.accountIdentityKey(),
 			keyRing.userProfileCrypto(),
@@ -58,7 +58,7 @@ export class Mailchain {
 	}
 
 	async self() {
-		return this.userProfile.getUsername();
+		return this._userProfile.getUsername();
 	}
 
 	private async getSenderMessagingKey(

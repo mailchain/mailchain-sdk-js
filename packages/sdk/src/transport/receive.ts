@@ -5,28 +5,19 @@ import { encodeUtf8 } from '@mailchain/encoding/utf8';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import { protocol } from '../protobuf/protocol/protocol';
-import { TransportApiFactory, TransportApi } from '../api';
+import { TransportApiFactory, TransportApiInterface } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Configuration } from '../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
+import { Payload } from './payload/content/payload';
 import { decryptPayload } from './payload/content/decrypt';
 import { deserialize } from './payload/content/serialization';
 
 export class Receiver {
-	constructor(private readonly transportApi: TransportApi, private readonly messagingKey: KeyRingDecrypter) {}
-	getUndeliveredMessages = async () => {
-		return this.transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
-			return Promise.allSettled(
-				deliveryRequests.map((dr) =>
-					this.processDeliveryRequest(
-						this.messagingKey,
-						protocol.Delivery.decode(decodeBase64(dr.data)),
-						dr.hash,
-					),
-				),
-			);
-		});
-	};
+	constructor(
+		private readonly transportApi: TransportApiInterface,
+		private readonly messagingKey: KeyRingDecrypter,
+	) {}
 
 	static create(configuration: Configuration, messagingKeyDecrypter: KeyRingDecrypter) {
 		return new Receiver(
@@ -34,26 +25,50 @@ export class Receiver {
 				createAxiosConfiguration(configuration),
 				undefined,
 				getAxiosWithSigner(messagingKeyDecrypter),
-			) as TransportApi,
+			),
 			messagingKeyDecrypter,
 		);
 	}
 
-	private async processDeliveryRequest(
-		messagingKey: KeyRingDecrypter,
-		incomingDeliveryRequest: protocol.Delivery,
-		hash: string,
-	) {
-		const envelope = incomingDeliveryRequest.envelope!;
-		if (!envelope.ecdhKeyBundle) {
+	async getUndeliveredMessages(): Promise<
+		PromiseSettledResult<{
+			payload: Payload;
+			hash: string;
+		}>[]
+	> {
+		return this.transportApi.getDeliveryRequests().then(({ data: { deliveryRequests } }) => {
+			return Promise.allSettled(
+				deliveryRequests.map((dr) => {
+					const delivery = protocol.Delivery.decode(decodeBase64(dr.data));
+					return this.processDeliveryRequest(this.messagingKey, delivery, dr.hash);
+				}),
+			);
+		});
+	}
+
+	private async processDeliveryRequest(messagingKey: KeyRingDecrypter, delivery: protocol.Delivery, hash: string) {
+		const { envelope } = delivery;
+		if (!envelope) {
+			throw new Error('envelope is undefined');
+		}
+		const { ecdhKeyBundle, encryptedMessageKey, encryptedMessageUri } = envelope;
+		if (!ecdhKeyBundle) {
 			throw new Error('envelope does not contain ECDH key bundle');
 		}
+		if (!encryptedMessageKey) {
+			throw new Error('envelope does not contain encryptedMessageKey');
+		}
+		if (!encryptedMessageUri) {
+			throw new Error('envelope does not contain encryptedMessageUri');
+		}
 
-		const bundle = envelope.ecdhKeyBundle as protocol.ECDHKeyBundle;
+		if (!ecdhKeyBundle.publicEphemeralKey) {
+			throw new Error('ECDH key bundle does not contain publicEphemeralKey');
+		}
 
 		const payloadRootEncryptionKey = await messagingKey.ecdhDecrypt(
-			decodePublicKey(bundle.publicEphemeralKey),
-			envelope.encryptedMessageKey!,
+			decodePublicKey(ecdhKeyBundle.publicEphemeralKey),
+			encryptedMessageKey,
 		);
 
 		if (payloadRootEncryptionKey.length === 0) {
@@ -61,8 +76,8 @@ export class Receiver {
 		}
 
 		const messageUri = await messagingKey.ecdhDecrypt(
-			decodePublicKey(bundle.publicEphemeralKey),
-			envelope.encryptedMessageUri!,
+			decodePublicKey(ecdhKeyBundle.publicEphemeralKey),
+			encryptedMessageUri,
 		);
 		const url = encodeUtf8(messageUri);
 
@@ -78,9 +93,6 @@ export class Receiver {
 			ED25519ExtendedPrivateKey.fromPrivateKey(decodePrivateKey(payloadRootEncryptionKey)),
 		);
 
-		return {
-			payload: decryptedPayload,
-			hash,
-		};
+		return { payload: decryptedPayload, hash };
 	}
 }

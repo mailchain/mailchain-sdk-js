@@ -1,22 +1,18 @@
 import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
-import {
-	AddressVerificationFailed,
-	ErrorUnsupportedKey,
-	PublicKeyNotFoundFailed,
-} from '@mailchain/crypto/signatures/errors';
+import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '@mailchain/crypto/signatures/errors';
 import { createProofMessage } from '@mailchain/keyreg/proofs/message';
 import { ProofParams } from '@mailchain/keyreg/proofs/params';
-import { ED25519PublicKey } from '@mailchain/crypto/ed25519';
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { verify } from '@mailchain/crypto/signatures/verify';
-import { decode } from '@mailchain/encoding/encoding';
-import { SECP256K1PublicKey } from '@mailchain/crypto/secp256k1';
 import { MailchainAddress } from '@mailchain/internal/addressing';
-import { MessagingKeysApi, ProvidedKeyProof, RegisteredKeyProof } from '../api';
+import { decode } from '@mailchain/encoding/encoding';
+import { ApiKeyConvert } from '../apiHelpers';
 import {
+	MessagingKeysApi,
+	ProvidedKeyProof,
+	RegisteredKeyProof,
 	AddressesApiFactory,
-	PublicKeyCurveEnum,
 	MessagingKeysApiFactory,
 	PublicKey,
 	Address,
@@ -24,18 +20,6 @@ import {
 } from '../api';
 import { Configuration } from '../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
-
-// ToDo: move somewhere to generic
-export const getPublicKeyFromApiResponse = (key: PublicKey) => {
-	switch (key.curve) {
-		case PublicKeyCurveEnum.Ed25519:
-			return new ED25519PublicKey(decode(key.encoding, key.value));
-		case PublicKeyCurveEnum.Secp256k1:
-			return new SECP256K1PublicKey(decode(key.encoding, key.value));
-		default:
-			throw new ErrorUnsupportedKey(key.curve);
-	}
-};
 
 export const getAddressFromApiResponse = (address: Address) => {
 	return decode(address.encoding!, address.value);
@@ -56,13 +40,13 @@ export class Lookup {
 		const message = createProofMessage(
 			params,
 			getAddressFromApiResponse(registeredKeyProof.address),
-			getPublicKeyFromApiResponse(messagingKey),
+			ApiKeyConvert.public(messagingKey),
 			registeredKeyProof.nonce!,
 		);
 		// verify the proof with the correct signer
 		const isVerified = verify(
 			registeredKeyProof?.signingMethod!,
-			getPublicKeyFromApiResponse(registeredKeyProof?.identityKey!),
+			ApiKeyConvert.public(registeredKeyProof?.identityKey!),
 			Buffer.from(message),
 			decodeHexZeroX(registeredKeyProof?.signature!),
 		);
@@ -73,12 +57,12 @@ export class Lookup {
 		const mailchainPublicKeyResponse = await this.messagingKeysApi.getMailchainPublicKey();
 
 		if (!mailchainPublicKeyResponse.data.key?.value) throw new PublicKeyNotFoundFailed();
-		const mailchainPublicKey = getPublicKeyFromApiResponse(mailchainPublicKeyResponse.data.key);
+		const mailchainPublicKey = ApiKeyConvert.public(mailchainPublicKeyResponse.data.key);
 
 		if (!providedKeyProof?.signature) throw new AddressVerificationFailed();
 		const isKeyValid = await verifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,
-			getPublicKeyFromApiResponse(messagingKey),
+			ApiKeyConvert.public(messagingKey),
 			decodeHexZeroX(providedKeyProof?.signature),
 			providedKeyProof.address!,
 			providedKeyProof.protocol as ProtocolType,

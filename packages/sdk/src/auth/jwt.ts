@@ -3,22 +3,28 @@ import axios, { AxiosInstance } from 'axios';
 import utils from 'axios/lib/utils';
 import { SignerWithPublicKey } from '@mailchain/crypto';
 
-export const getToken = async (requestKey: SignerWithPublicKey, payload: any, exp: number) => {
-	const key = `${encodeBase64UrlSafe(
-		Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })),
-	)}.${encodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })))}`;
-	const signature = await requestKey.sign(Buffer.from(key));
+export const getToken = async (requestKey: SignerWithPublicKey, payload: TokenPayload, exp: number) => {
+	const headerSegment = encodeBase64UrlSafe(Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })));
+	const payloadSegment = encodeBase64UrlSafe(Buffer.from(JSON.stringify({ ...payload, exp })));
 
-	return `${key}.${encodeBase64UrlSafe(signature)}`;
+	const key = `${headerSegment}.${payloadSegment}`;
+	const signedKey = await requestKey.sign(Buffer.from(key));
+	const signatureSegment = encodeBase64UrlSafe(signedKey);
+
+	return `${key}.${signatureSegment}`;
 };
 
 export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstance => {
 	const axiosInstance = axios.create();
 	axiosInstance.interceptors.request.use(async (request) => {
-		const expires = Math.floor(Date.now() / 1000 + 60 * 60 * 24); // 1 day from now
-		const payload = createPayload(new URL(request?.url ?? ''), request.method?.toUpperCase(), request.data);
-		const token = await getToken(requestKey, payload, expires);
 		if (request.headers) {
+			const expires = Math.floor(Date.now() / 1000 + 60 * 60 * 24); // 1 day from now
+			const tokenPayload = createTokenPayload(
+				new URL(request?.url ?? ''),
+				request.method?.toUpperCase() ?? '',
+				request.data,
+			);
+			const token = await getToken(requestKey, tokenPayload, expires);
 			request.headers.Authorization = `vapid t=${token}, k=${encodeBase64UrlSafe(requestKey.publicKey.bytes)}`;
 		}
 		return request;
@@ -27,16 +33,20 @@ export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstan
 	return axiosInstance;
 };
 
-export function createPayload(
-	url,
-	method,
-	data,
-): {
+type TokenPayload = {
+	/** The HTTP method */
 	m: string;
+	/** pathname */
 	url: string;
+	/** The length of the data payload of the request  */
 	len: number;
+	/** host */
 	aud: string;
-} {
+	/** query params */
+	q?: string;
+};
+
+export function createTokenPayload(url: URL, method: string, data: any): TokenPayload {
 	let len: number;
 	// Taking code from https://github.com/axios/axios/blob/main/lib/adapters/http.js#L186-L198 to calculate content length how axios does it
 	if (data != null && ['POST', 'PUT', 'PATCH'].some((m) => m === method.toUpperCase())) {
@@ -60,5 +70,6 @@ export function createPayload(
 		url: url.pathname,
 		len,
 		aud: url.host,
+		q: url.search.length > 1 ? url.search.replace(/^\?/, '') : undefined,
 	};
 }

@@ -1,9 +1,10 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { encodeHex } from '@mailchain/encoding';
 import { PublicKey } from '@mailchain/sdk/api';
+import { ApiKeyConvert } from '@mailchain/sdk/apiHelpers';
 import { createAxiosConfiguration } from '@mailchain/sdk/axios/config';
 import { MailAddress, MailData } from '@mailchain/sdk/formatters/types';
-import { getPublicKeyFromApiResponse, Lookup, LookupResult } from '@mailchain/sdk/identityKeys';
+import { Lookup, LookupResult } from '@mailchain/sdk/identityKeys';
 import { Configuration } from '@mailchain/sdk/mailchain';
 import flatten from 'lodash/flatten';
 import { Payload } from '../payload/content/payload';
@@ -84,7 +85,7 @@ export class MailSender {
 	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey) {
 		const fromPublicKey = await this.lookupMessageKeyResolver(fromAddress.address);
 		const keyBytesMatch =
-			encodeHex(getPublicKeyFromApiResponse(fromPublicKey.messageKey).bytes) ===
+			encodeHex(ApiKeyConvert.public(fromPublicKey.messageKey).bytes) ===
 			encodeHex(senderMessagingKey.publicKey.bytes);
 
 		if (!keyBytesMatch) {

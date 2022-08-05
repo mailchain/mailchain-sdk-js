@@ -3,10 +3,10 @@ import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signature
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { ProtocolType } from '@mailchain/internal/protocols';
 import { formatAddress } from '@mailchain/internal/addressing';
+import { ApiKeyConvert } from '../apiHelpers';
 import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
 import { Configuration } from '../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
-import { getPublicKeyFromApiResponse } from './lookup';
 
 export async function verify(
 	config: Configuration,
@@ -19,7 +19,7 @@ export async function verify(
 	const mailchainPublicKeyResponse = await verificationApi.getMailchainPublicKey();
 	if (!mailchainPublicKeyResponse.data.key?.value) return false;
 
-	const mailchainPublicKey = getPublicKeyFromApiResponse(mailchainPublicKeyResponse.data.key);
+	const mailchainPublicKey = ApiKeyConvert.public(mailchainPublicKeyResponse.data.key);
 
 	const result = await addressApi.getAddressMessagingKey(
 		formatAddress({ value: address, protocol, domain: mailchainMailDomain }, 'mail'),
@@ -28,8 +28,8 @@ export async function verify(
 	const keyProof = providedKeyProof ?? registeredKeyProof;
 	if (!result.data.messagingKey?.value || !result.data.providedKeyProof?.signature) return false;
 
-	const userKey = getPublicKeyFromApiResponse(result.data.messagingKey);
-	if (!result.data.messagingKey?.value || keyProof?.signature !== undefined) false;
+	const userKey = ApiKeyConvert.public(result.data.messagingKey);
+	if (!result.data.messagingKey?.value || keyProof?.signature !== undefined) return false;
 
 	return verifyMailchainProvidedMessagingKey(
 		mailchainPublicKey,
