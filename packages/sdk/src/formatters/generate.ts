@@ -17,8 +17,8 @@ export const createMimeMessage = (
 	msg.setRecipient(mailData.recipients.map((rec) => ({ name: rec.name, addr: rec.address })));
 	// @ts-ignore - for some reason ts complains about setCc
 	msg.setCc(mailData.carbonCopyRecipients.map((rec) => ({ name: rec.name, addr: rec.address })));
-	msg.setSubject(mailData.subject);
-	msg.setMessage('text/html', mailData.message);
+	msg.setSubject(encodeURIComponent(mailData.subject));
+	msg.setMessage('text/html', encodeURIComponent(mailData.message));
 
 	const visibleRecipients = msg.asRaw();
 	// @ts-ignore - for some reason ts complains about setBcc

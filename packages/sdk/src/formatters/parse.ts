@@ -8,7 +8,7 @@ export async function parseMimeText(text: string): Promise<MailData> {
 		headers,
 		headers: { from, to, bcc, cc, subject },
 	} = parse(text);
-	const contentString = Buffer.from(content ?? '').toString();
+	const contentString = decodeURIComponent(Buffer.from(content ?? '').toString('utf8'));
 
 	return {
 		id: headers['message-id'][0].value,
@@ -16,7 +16,10 @@ export async function parseMimeText(text: string): Promise<MailData> {
 		recipients: to[0].value.map((it: any) => ({ name: it.name, address: it.address })),
 		carbonCopyRecipients: cc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
 		blindCarbonCopyRecipients: bcc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
-		subject: subject?.[0].value.length > 0 ? subject?.[0].value : parseSubjectHeader(subject?.[0].initial),
+		subject:
+			subject?.[0].value.length > 0
+				? decodeURIComponent(subject?.[0].value)
+				: parseSubjectHeader(decodeURIComponent(subject?.[0].initial)),
 		plainTextMessage: new DOMParser().parseFromString(contentString, 'text/html').documentElement.textContent!,
 		message: contentString,
 	};

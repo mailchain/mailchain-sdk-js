@@ -17,8 +17,8 @@ describe('createMimeMessage', () => {
 			{ address: 'rec5@mailchain.local', name: 'rec5' },
 			{ address: 'rec6@mailchain.local', name: 'rec6' },
 		],
-		subject: 'Subject',
-		message: ['line 1', 'line2', '', 'line4'].join('\n'),
+		subject: 'Subject 🤣😲🥳😲🥳🙂 大大大大',
+		message: ['line 1', 'line2', '', 'line4 🤣😲🥳😲🥳🙂'].join('\n'),
 		plainTextMessage: ['line 1', 'line2', '', 'line4'].join('\n'),
 	};
 
