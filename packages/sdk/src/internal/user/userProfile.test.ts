@@ -5,7 +5,7 @@ import { KeyRing } from '@mailchain/keyring';
 import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
 import { encodeAddressByProtocol } from '@mailchain/internal/addressing';
 import { encodeBase64 } from '@mailchain/encoding';
-import { user } from '@mailchain/sdk/protobuf/user/user';
+import { user } from '@mailchain/sdk/internal/protobuf/user/user';
 import { MailchainUserProfile } from './userProfile';
 import { Address } from './address';
 

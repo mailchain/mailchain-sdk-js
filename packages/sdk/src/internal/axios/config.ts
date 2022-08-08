@@ -1,4 +1,4 @@
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { Configuration as APIConfiguration } from '../api/configuration';
 
 export function createAxiosConfiguration(config: Configuration): APIConfiguration {

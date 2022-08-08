@@ -5,7 +5,7 @@ import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { PostDeliveryRequestResponseBody, PublicKey, TransportApiInterface } from '../../api';
-import { encodeHexZeroX } from '../../../../encoding/src/hex';
+import { encodeHexZeroX } from '../../../../../encoding/src/hex';
 import { PayloadSender } from './send';
 import { Payload } from './content/payload';
 import { decryptPayload } from './content/decrypt';

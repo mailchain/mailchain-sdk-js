@@ -2,7 +2,7 @@ import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
 import axios from 'axios';
 import { IdentityKeysApi, IdentityKeysApiFactory, MessagingKeysApi, MessagingKeysApiFactory } from '../api';
 import { createAxiosConfiguration } from '../axios/config';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 
 export async function getAddressNonce(config: Configuration, address: string, protocol: ProtocolType) {
 	const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config));

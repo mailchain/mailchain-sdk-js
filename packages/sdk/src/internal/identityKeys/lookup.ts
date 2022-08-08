@@ -18,7 +18,7 @@ import {
 	Address,
 	AddressesApi,
 } from '../api';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 
 export const getAddressFromApiResponse = (address: Address) => {

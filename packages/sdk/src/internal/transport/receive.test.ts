@@ -3,8 +3,8 @@ import globalAxios from 'axios';
 
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { Configuration } from '../mailchain';
-import { ED25519PublicKey } from '../../../crypto/src/ed25519/public';
+import { Configuration } from '../../mailchain';
+import { ED25519PublicKey } from '../../../../crypto/src/ed25519/public';
 import { Receiver } from './receive';
 
 const passthrough = false;

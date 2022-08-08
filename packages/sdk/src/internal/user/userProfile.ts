@@ -1,11 +1,11 @@
-import { Setting, UserApiFactory, UserApiInterface } from '@mailchain/sdk/api';
-import { Address } from '@mailchain/sdk/user/address';
+import { Setting, UserApiFactory, UserApiInterface } from '@mailchain/sdk/internal/api';
+import { Address } from '@mailchain/sdk/internal/user/address';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { protocols } from '@mailchain/internal';
-import { user } from '@mailchain/sdk/protobuf/user/user';
+import { user } from '@mailchain/sdk/internal/protobuf/user/user';
 import { decodeAddressByProtocol, encodeAddressByProtocol } from '@mailchain/internal/addressing';
 import { Decrypter, Encrypter, SignerWithPublicKey } from '@mailchain/crypto';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
 

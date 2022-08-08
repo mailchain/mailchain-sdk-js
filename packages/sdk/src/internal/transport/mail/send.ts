@@ -1,10 +1,10 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { encodeHex } from '@mailchain/encoding';
-import { PublicKey } from '@mailchain/sdk/api';
-import { ApiKeyConvert } from '@mailchain/sdk/apiHelpers';
-import { createAxiosConfiguration } from '@mailchain/sdk/axios/config';
-import { MailAddress, MailData } from '@mailchain/sdk/formatters/types';
-import { Lookup, LookupResult } from '@mailchain/sdk/identityKeys';
+import { PublicKey } from '@mailchain/sdk/internal/api';
+import { ApiKeyConvert } from '@mailchain/sdk/internal/apiHelpers';
+import { createAxiosConfiguration } from '@mailchain/sdk/internal/axios/config';
+import { MailAddress, MailData } from '@mailchain/sdk/internal/formatters/types';
+import { Lookup, LookupResult } from '@mailchain/sdk/internal/identityKeys';
 import { Configuration } from '@mailchain/sdk/mailchain';
 import flatten from 'lodash/flatten';
 import { Payload } from '../payload/content/payload';

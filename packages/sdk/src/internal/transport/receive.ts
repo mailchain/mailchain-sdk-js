@@ -7,7 +7,7 @@ import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import { protocol } from '../protobuf/protocol/protocol';
 import { TransportApiFactory, TransportApiInterface } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { Payload } from './payload/content/payload';
 import { decryptPayload } from './payload/content/decrypt';

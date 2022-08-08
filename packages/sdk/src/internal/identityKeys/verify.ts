@@ -5,7 +5,7 @@ import { ProtocolType } from '@mailchain/internal/protocols';
 import { formatAddress } from '@mailchain/internal/addressing';
 import { ApiKeyConvert } from '../apiHelpers';
 import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 
 export async function verify(

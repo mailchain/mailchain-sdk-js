@@ -1,6 +1,6 @@
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { MailData } from '@mailchain/sdk/formatters/types';
+import { MailData } from '@mailchain/sdk/internal/formatters/types';
 import { createMailPayloads } from './payload';
 
 const dummyMailData: MailData = {
@@ -31,7 +31,7 @@ const mockMimeMessageResult = {
 	})),
 };
 
-jest.mock('@mailchain/sdk/formatters/generate', () => ({
+jest.mock('@mailchain/sdk/internal/formatters/generate', () => ({
 	createMimeMessage: () => mockMimeMessageResult,
 }));
 

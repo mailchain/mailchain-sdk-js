@@ -1,6 +1,6 @@
 import { IdentityKeysApiFactory, IdentityKeysApi } from '../api';
 import { createAxiosConfiguration } from '../axios/config';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 
 type RegisterAddressParams = Parameters<IdentityKeysApi['putMsgKeyByIDKey']>[1] & {
 	identityKey: string;

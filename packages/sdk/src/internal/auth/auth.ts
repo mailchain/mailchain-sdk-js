@@ -4,7 +4,7 @@ import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
 import { AuthApiFactory, AuthApiInterface } from '../api';
 import { createAxiosConfiguration } from '../axios/config';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../../mailchain';
 import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
 import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';

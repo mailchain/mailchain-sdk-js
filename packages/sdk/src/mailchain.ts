@@ -2,11 +2,11 @@ import { KeyRing } from '@mailchain/keyring';
 import { protocols } from '@mailchain/internal';
 import { decodeAddressByProtocol } from '@mailchain/internal/addressing';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { MailSender } from './transport/mail/send';
-import { MailData } from './formatters/types';
-import { Lookup } from './identityKeys';
-import { MailchainUserProfile, UserProfile } from './user';
-import { toUint8Array } from './formatters/hex';
+import { MailSender } from './internal/transport/mail/send';
+import { MailData } from './internal/formatters/types';
+import { Lookup } from './internal/identityKeys';
+import { MailchainUserProfile, UserProfile } from './internal/user';
+import { toUint8Array } from './internal/formatters/hex';
 
 export type Configuration = {
 	apiPath: string;
