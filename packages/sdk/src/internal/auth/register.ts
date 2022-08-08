@@ -25,6 +25,8 @@ export async function accountRegisterInit(
 	registrationSession: Uint8Array;
 	registrationResponse: RegistrationResponse;
 }> {
+	username = username.trim().toLowerCase();
+
 	const request = await opaqueClient.registerInit(password);
 	if (request instanceof Error) {
 		throw new Error(`failed to initialize registration: ${request}`);
@@ -67,6 +69,7 @@ export async function accountRegisterCreate(
 	authStartResponse: Uint8Array;
 	state: Uint8Array;
 }> {
+	username = username.trim().toLowerCase();
 	const registerFinish = await opaqueRegisterClient.registerFinish(
 		registrationResponse,
 		opaqueConfig.serverIdentity,
@@ -111,6 +114,7 @@ export async function accountRegisterFinalize(
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: AuthClient,
 ): Promise<AuthenticatedResponse> {
+	username = username.trim().toLowerCase();
 	const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authStartResponse));
 
 	const authFinishResponse = await opaqueClient.authFinish(

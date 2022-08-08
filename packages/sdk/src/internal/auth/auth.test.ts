@@ -43,7 +43,7 @@ describe('login', () => {
 		mockedOpaqueClientConstructor.mockReturnValue(mockOpaqueClient);
 		mockKe2Deserialize.mockClear();
 
-		mailchainAuth = new Authentication(mockAuthApi, mockOpaqueClient, testOpaqueConfig);
+		mailchainAuth = new Authentication(mockAuthApi, testOpaqueConfig);
 	});
 	it('should successfully perform auth init and finalize', async () => {
 		// Note: Most of this test is redundant since the individual login steps have been tested as part of 'login.test.ts'

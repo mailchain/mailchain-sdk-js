@@ -24,6 +24,7 @@ export async function accountAuthInit(
 	state: Uint8Array;
 	keyExchange2: Uint8Array;
 }> {
+	username = username.trim().toLowerCase();
 	const keyExchange1 = await opaqueClient.authInit(password);
 	if (keyExchange1 instanceof Error) {
 		throw new LoginError('failed-auth', 'failed keyExchange1');
@@ -60,6 +61,7 @@ export async function accountAuthFinalize(
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: AuthClient,
 ): Promise<AuthenticatedResponse> {
+	username = username.trim().toLowerCase();
 	const authFinishResponse = await opaqueClient.authFinish(
 		keyExchange2,
 		opaqueConfig.serverIdentity,

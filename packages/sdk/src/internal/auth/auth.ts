@@ -23,27 +23,25 @@ type RegisterParams = {
 };
 
 export class Authentication {
-	constructor(
-		private readonly authApi: AuthApiInterface,
-		private readonly opaqueClient: OpaqueClient,
-		private readonly opaqueConfig: OpaqueConfig,
-	) {}
+	constructor(private readonly authApi: AuthApiInterface, private readonly opaqueConfig: OpaqueConfig) {}
 
 	static create(sdkConfig: Configuration, opaqueConfig: OpaqueConfig) {
 		const authApi = AuthApiFactory(createAxiosConfiguration(sdkConfig));
-		const opaqueClient = new OpaqueClient(opaqueConfig.parameters);
 
-		return new Authentication(authApi, opaqueClient, opaqueConfig);
+		return new Authentication(authApi, opaqueConfig);
 	}
 
 	async login(params: LoginParams) {
+		const opaqueClient = new OpaqueClient(this.opaqueConfig.parameters);
+		params.username = params.username.trim().toLowerCase();
+
 		try {
 			const authInitResponse = await accountAuthInit(
 				params.username,
 				params.password,
 				params.captcha,
 				this.authApi,
-				this.opaqueClient,
+				opaqueClient,
 			);
 
 			const keyExchange2 = KE2.deserialize(
@@ -57,7 +55,7 @@ export class Authentication {
 				authInitResponse.state,
 				this.authApi,
 				this.opaqueConfig,
-				this.opaqueClient,
+				opaqueClient,
 			);
 		} catch (e) {
 			if (Axios.isAxiosError(e)) {
@@ -68,27 +66,32 @@ export class Authentication {
 	}
 
 	async register(params: RegisterParams) {
+		params.username = params.username.trim().toLowerCase();
+
+		const opaqueRegisterClient = new OpaqueClient(this.opaqueConfig.parameters);
+		const opaqueLoginClient = new OpaqueClient(this.opaqueConfig.parameters);
+
 		const rootAccountKey = ED25519PrivateKey.fromSeed(params.identityKeySeed);
 		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
 		const identityKey = keyRing.accountIdentityKey();
 		const messagingPublicKey = keyRing.accountMessagingKey().publicKey;
 		const registerInitResponse = await accountRegisterInit(
-			params.username.toLowerCase(),
+			params.username,
 			params.password,
 			params.captcha,
 			identityKey,
 			this.authApi,
 			this.opaqueConfig,
-			this.opaqueClient,
+			opaqueRegisterClient,
 		);
 		const registerCreateResponse = await accountRegisterCreate(
-			params.username.toLowerCase(),
+			params.username,
 			params.password,
 			registerInitResponse.registrationResponse,
 			this.authApi,
 			this.opaqueConfig,
-			this.opaqueClient,
-			this.opaqueClient,
+			opaqueRegisterClient,
+			opaqueLoginClient,
 		);
 
 		return accountRegisterFinalize(
@@ -102,7 +105,7 @@ export class Authentication {
 			rootAccountKey,
 			this.authApi,
 			this.opaqueConfig,
-			this.opaqueClient,
+			opaqueLoginClient,
 		);
 	}
 }
