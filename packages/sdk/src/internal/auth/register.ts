@@ -17,6 +17,7 @@ export async function accountRegisterInit(
 	username: string,
 	password: string,
 	captchaResponse: string,
+	reservedNameSignature: string | undefined,
 	identityKey: SignerWithPublicKey,
 	authApi: AuthApiInterface,
 	opaqueConfig: OpaqueConfig,
@@ -41,6 +42,7 @@ export async function accountRegisterInit(
 		username,
 		registerInitParams: encodeBase64(Uint8Array.from(serializedRequest)),
 		captchaResponse,
+		reservedNameSignature,
 	});
 
 	if (response.status !== 200) {

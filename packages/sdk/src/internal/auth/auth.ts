@@ -20,6 +20,7 @@ type RegisterParams = {
 	password: string;
 	captcha: string;
 	identityKeySeed: Uint8Array;
+	reservedNameSignature: string | undefined;
 };
 
 export class Authentication {
@@ -79,6 +80,7 @@ export class Authentication {
 			params.username,
 			params.password,
 			params.captcha,
+			params.reservedNameSignature,
 			identityKey,
 			this.authApi,
 			this.opaqueConfig,
