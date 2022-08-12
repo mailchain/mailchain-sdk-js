@@ -9,6 +9,8 @@ import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
 
+export type UserSettings = { [key: string]: Setting | undefined };
+
 type NewAddress = Omit<Address, 'id'>;
 export interface UserProfile {
 	addresses(): Promise<Address[]>;
