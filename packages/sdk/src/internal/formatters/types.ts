@@ -7,6 +7,7 @@ export type MailData = {
 	id: string;
 	subject: string;
 	from: MailAddress;
+	date: Date;
 	recipients: MailAddress[];
 	carbonCopyRecipients: MailAddress[];
 	blindCarbonCopyRecipients: MailAddress[];

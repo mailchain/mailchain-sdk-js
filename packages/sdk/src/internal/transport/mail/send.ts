@@ -11,9 +11,14 @@ import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
 import { createMailPayloads, Distribution } from './payload';
 
-export interface SendMailParams {
+export interface PrepareParams {
 	message: MailData;
 	senderMessagingKey: SignerWithPublicKey;
+}
+
+export interface SendParams {
+	distributions: Distribution[];
+	resolvedRecipients: ResolvedRecipientsResult;
 }
 
 export class FailedAddressMessageKeyResolutionError extends Error {
@@ -28,27 +33,34 @@ export class FailedDistributionError extends Error {
 	}
 }
 
-type SendMailResultFailedResolveRecipients = {
+type PrepareResultFailedResolveRecipients = {
 	status: 'failed-resolve-recipients';
 	failedRecipients: FailedAddressMessageKeyResolutionError[];
 };
 
-type SendMailResultFailedPrepare = {
+type PrepareResultSuccess = {
+	status: 'prepare-success';
+	distributions: Distribution[];
+	message: Payload;
+	resolvedRecipients: ResolvedRecipientsResult;
+};
+
+export type PrepareResult = PrepareResultSuccess | PrepareResultFailedResolveRecipients;
+
+type SendResultFailedPrepare = {
 	status: 'failed-prepare';
 	failedDistributions: FailedDistributionError[];
 };
 
-type SendMailResultFullyCompleted = {
+type SendResultFullyCompleted = {
 	status: 'success';
 	deliveries: SendPayloadDeliveryResult[];
-	sentMessage: Payload;
 };
 
-type SendMailResultPartiallyCompleted = {
+type SendResultPartiallyCompleted = {
 	status: 'partially-completed';
 	successfulDeliveries: SendPayloadDeliveryResult[];
 	failedDeliveries: SendPayloadDeliveryResult[];
-	sentMessage: Payload;
 };
 
 type PreparedDistribution = {
@@ -56,11 +68,7 @@ type PreparedDistribution = {
 	preparedPayload: PreparePayloadResult;
 };
 
-type SendMailResult =
-	| SendMailResultFailedPrepare
-	| SendMailResultFullyCompleted
-	| SendMailResultPartiallyCompleted
-	| SendMailResultFailedResolveRecipients;
+export type SendResult = SendResultFailedPrepare | SendResultFullyCompleted | SendResultPartiallyCompleted;
 
 export type LookupMessageKeyResolver = (address: string) => Promise<LookupResult>;
 
@@ -85,7 +93,7 @@ export class MailSender {
 	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey) {
 		const fromPublicKey = await this.lookupMessageKeyResolver(fromAddress.address);
 		const keyBytesMatch =
-			encodeHex(ApiKeyConvert.public(fromPublicKey.messageKey).bytes) ===
+			encodeHex(ApiKeyConvert.public(fromPublicKey.messagingKey).bytes) ===
 			encodeHex(senderMessagingKey.publicKey.bytes);
 
 		if (!keyBytesMatch) {
@@ -95,7 +103,26 @@ export class MailSender {
 		return;
 	}
 
-	async send(params: SendMailParams): Promise<SendMailResult> {
+	async prepare(params: PrepareParams): Promise<PrepareResult> {
+		if (params.message.subject.length === 0) {
+			throw new Error('subject must not be empty');
+		}
+
+		if (params.message.plainTextMessage.length === 0) {
+			throw new Error('content text must not be empty');
+		}
+
+		if (params.message.message.length === 0) {
+			throw new Error('content html must not be empty');
+		}
+
+		if (
+			[params.message.recipients, params.message.blindCarbonCopyRecipients, params.message.carbonCopyRecipients]
+				.length === 0
+		) {
+			throw new Error('at least one of to, cc, or bcc must be set');
+		}
+
 		this.verifySender(params.message.from, params.senderMessagingKey);
 
 		const messagePayloads = await createMailPayloads(params.senderMessagingKey, params.message);
@@ -107,32 +134,37 @@ export class MailSender {
 			};
 		}
 
-		const { successfulDistributions, failedDistributions } = await this.prepareDistributions(
-			messagePayloads.distributions,
-		);
+		return {
+			status: 'prepare-success',
+			distributions: messagePayloads.distributions,
+			message: messagePayloads.original,
+			resolvedRecipients,
+		};
+	}
 
-		if (failedDistributions.length != 0) {
+	async send(params: SendParams): Promise<SendResult> {
+		const { successfulDistributions, failedDistributions } = await this.prepareDistributions(params.distributions);
+
+		if (failedDistributions.length !== 0) {
 			return {
 				status: 'failed-prepare',
 				failedDistributions,
 			};
 		}
 
-		const sendResults = await this.sendPayloads(successfulDistributions, resolvedRecipients);
+		const sendResults = await this.sendPayloads(successfulDistributions, params.resolvedRecipients);
 		const allSucceeded = sendResults.every((x) => x.status === 'success');
 
 		if (allSucceeded) {
 			return {
 				status: 'success',
 				deliveries: sendResults,
-				sentMessage: messagePayloads.original,
 			};
 		}
 		return {
 			status: 'partially-completed',
 			failedDeliveries: sendResults.filter((x) => x.status === 'fail'),
 			successfulDeliveries: sendResults.filter((x) => x.status === 'success'),
-			sentMessage: messagePayloads.original,
 		};
 	}
 
@@ -142,7 +174,7 @@ export class MailSender {
 			recipientAddresses.map(async (address) => ({
 				address,
 				messagingKey: (await this.lookupMessageKeyResolver(address)
-					.then((r) => r.messageKey)
+					.then((r) => r.messagingKey)
 					.catch((e: Error) => {
 						throw new FailedAddressMessageKeyResolutionError(address, e);
 					})) as PublicKey,

@@ -25,7 +25,7 @@ export const getAddressFromApiResponse = (address: Address) => {
 	return decode(address.encoding!, address.value);
 };
 
-export type LookupResult = { address: MailchainAddress; messageKey: PublicKey };
+export type LookupResult = { address: MailchainAddress; messagingKey: PublicKey };
 export class Lookup {
 	constructor(private readonly addressApi: AddressesApi, private readonly messagingKeysApi: MessagingKeysApi) {}
 
@@ -89,7 +89,7 @@ export class Lookup {
 				protocol: result.data.protocol as ProtocolType,
 				domain: result.data.rootDomain!,
 			},
-			messageKey: result.data.messagingKey,
+			messagingKey: result.data.messagingKey,
 		};
 	};
 

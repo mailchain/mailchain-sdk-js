@@ -4,6 +4,7 @@ import { MailData } from '@mailchain/sdk/internal/formatters/types';
 import { createMailPayloads } from './payload';
 
 const dummyMailData: MailData = {
+	date: new Date('2022-06-06'),
 	id: 'id',
 	subject: 'subject',
 	from: { name: 'from', address: 'from@mailchain.co' },

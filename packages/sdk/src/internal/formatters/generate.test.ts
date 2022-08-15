@@ -20,15 +20,8 @@ describe('createMimeMessage', () => {
 		subject: 'Subject 🤣😲🥳😲🥳🙂 大大大大',
 		message: ['line 1', 'line2', '', 'line4 🤣😲🥳😲🥳🙂'].join('\n'),
 		plainTextMessage: ['line 1', 'line2', '', 'line4'].join('\n'),
+		date: new Date('2022-06-06'),
 	};
-
-	beforeAll(() => {
-		jest.useFakeTimers().setSystemTime(new Date('2022-06-06'));
-	});
-
-	afterAll(() => {
-		jest.useRealTimers();
-	});
 
 	it('should ', () => {
 		const messages = createMimeMessage(mailData);

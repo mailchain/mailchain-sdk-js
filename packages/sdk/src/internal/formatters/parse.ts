@@ -12,6 +12,7 @@ export async function parseMimeText(text: string): Promise<MailData> {
 
 	return {
 		id: headers['message-id'][0].value,
+		date: new Date(headers['date'][0].value),
 		from: { name: from[0].value[0].name, address: from[0].value[0].address },
 		recipients: to[0].value.map((it: any) => ({ name: it.name, address: it.address })),
 		carbonCopyRecipients: cc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],

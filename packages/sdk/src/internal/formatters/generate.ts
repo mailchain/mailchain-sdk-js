@@ -12,7 +12,7 @@ export const createMimeMessage = (
 } => {
 	const msg = mimetext.createMimeMessage();
 	msg.setHeader('Message-ID', mailData.id);
-	msg.setHeader('Date', new Date().toISOString());
+	msg.setHeader('Date', mailData.date.toISOString());
 	msg.setSender({ name: mailData.from.name, addr: mailData.from.address });
 	msg.setRecipient(mailData.recipients.map((rec) => ({ name: rec.name, addr: rec.address })));
 	// @ts-ignore - for some reason ts complains about setCc

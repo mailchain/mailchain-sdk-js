@@ -4,6 +4,7 @@ import { MailData } from './types';
 
 describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	const mailData: MailData = {
+		date: new Date('2022-06-06'),
 		id: '123@mailchain.local',
 		from: { address: '1337@mailchain.com', name: '1337' },
 		recipients: [

@@ -40,7 +40,10 @@ export async function createMailPayloads(
 	};
 }
 
-async function createMailPayload(senderMessagingKey: SignerWithPublicKey, contentPayload: string): Promise<Payload> {
+export async function createMailPayload(
+	senderMessagingKey: SignerWithPublicKey,
+	contentPayload: string,
+): Promise<Payload> {
 	const contentBuffer = Buffer.from(contentPayload);
 	return {
 		Headers: {
