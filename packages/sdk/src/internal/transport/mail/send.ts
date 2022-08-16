@@ -1,5 +1,4 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import { encodeHex } from '@mailchain/encoding';
 import { PublicKey } from '@mailchain/sdk/internal/api';
 import { ApiKeyConvert } from '@mailchain/sdk/internal/apiHelpers';
 import { createAxiosConfiguration } from '@mailchain/sdk/internal/axios/config';
@@ -7,6 +6,7 @@ import { MailAddress, MailData } from '@mailchain/sdk/internal/formatters/types'
 import { Lookup, LookupResult } from '@mailchain/sdk/internal/identityKeys';
 import { Configuration } from '@mailchain/sdk/mailchain';
 import flatten from 'lodash/flatten';
+import isEqual from 'lodash/isEqual';
 import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
 import { createMailPayloads, Distribution } from './payload';
@@ -90,42 +90,41 @@ export class MailSender {
 		);
 	}
 
-	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey) {
-		const fromPublicKey = await this.lookupMessageKeyResolver(fromAddress.address);
-		const keyBytesMatch =
-			encodeHex(ApiKeyConvert.public(fromPublicKey.messagingKey).bytes) ===
-			encodeHex(senderMessagingKey.publicKey.bytes);
+	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey): Promise<boolean> {
+		const resolvedMessagingKey = await this.lookupMessageKeyResolver(fromAddress.address);
 
-		if (!keyBytesMatch) {
-			throw new Error('messaging is not the latest message key for sender address');
-		}
+		const resolvedMessagingKeyBytes = ApiKeyConvert.public(resolvedMessagingKey.messagingKey).bytes;
+		const paramsMessagingKey = senderMessagingKey.publicKey.bytes;
 
-		return;
+		return isEqual(paramsMessagingKey, resolvedMessagingKeyBytes);
 	}
 
 	async prepare(params: PrepareParams): Promise<PrepareResult> {
-		if (params.message.subject.length === 0) {
+		const { message } = params;
+		if (message.subject.length === 0) {
 			throw new Error('subject must not be empty');
 		}
 
-		if (params.message.plainTextMessage.length === 0) {
+		if (message.plainTextMessage.length === 0) {
 			throw new Error('content text must not be empty');
 		}
 
-		if (params.message.message.length === 0) {
+		if (message.message.length === 0) {
 			throw new Error('content html must not be empty');
 		}
 
 		if (
-			[params.message.recipients, params.message.blindCarbonCopyRecipients, params.message.carbonCopyRecipients]
-				.length === 0
+			[...message.recipients, ...message.blindCarbonCopyRecipients, ...message.carbonCopyRecipients].length === 0
 		) {
-			throw new Error('at least one of to, cc, or bcc must be set');
+			throw new Error('at least one recipient is required');
 		}
 
-		this.verifySender(params.message.from, params.senderMessagingKey);
+		const isSenderMatching = await this.verifySender(message.from, params.senderMessagingKey);
+		if (!isSenderMatching) {
+			throw new Error('messaging is not the latest message key for sender address');
+		}
 
-		const messagePayloads = await createMailPayloads(params.senderMessagingKey, params.message);
+		const messagePayloads = await createMailPayloads(params.senderMessagingKey, message);
 		const resolvedRecipients = await this.resolveRecipientMessagingKeys(messagePayloads.distributions);
 		if (resolvedRecipients.failed.length > 0) {
 			return {
