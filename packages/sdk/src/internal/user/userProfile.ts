@@ -17,7 +17,7 @@ export interface UserProfile {
 	addAddress(address: NewAddress): Promise<Address>;
 	updateAddress(address: Address, newNonce: number): Promise<Address>;
 	deleteAddress(addressId: string): Promise<void>;
-	getSettings(): Promise<{ [key: string]: Setting }>;
+	getSettings(): Promise<UserSettings>;
 	setSetting(key: string, value: string): Promise<void>;
 	getUsername(): Promise<{ username: string; address: string }>;
 }
@@ -51,7 +51,7 @@ export class MailchainUserProfile implements UserProfile {
 		await this.userApi.putUserSetting(key, { value });
 	}
 
-	async getSettings(): Promise<{ [key: string]: Setting }> {
+	async getSettings(): Promise<UserSettings> {
 		const { data } = await this.userApi.getUserSettings();
 		return data.settings ?? {};
 	}
