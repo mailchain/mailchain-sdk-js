@@ -1,9 +1,7 @@
-import { decodeBase64 } from '@mailchain/encoding';
-import { decodePrivateKey, decodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { decodeBase64, encodeUtf8 } from '@mailchain/encoding';
+import { ED25519ExtendedPrivateKey, decodePrivateKey, decodePublicKey } from '@mailchain/crypto';
+import { KeyRingDecrypter } from '@mailchain/keyring';
 import axios from 'axios';
-import { encodeUtf8 } from '@mailchain/encoding/utf8';
-import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
-import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import { protocol } from '../protobuf/protocol/protocol';
 import { TransportApiFactory, TransportApiInterface } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';

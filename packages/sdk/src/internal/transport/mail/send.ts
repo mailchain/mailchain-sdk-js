@@ -1,12 +1,12 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import { PublicKey } from '@mailchain/sdk/internal/api';
-import { ApiKeyConvert } from '@mailchain/sdk/internal/apiHelpers';
-import { createAxiosConfiguration } from '@mailchain/sdk/internal/axios/config';
-import { MailAddress, MailData } from '@mailchain/sdk/internal/formatters/types';
-import { Lookup, LookupResult } from '@mailchain/sdk/internal/identityKeys';
-import { Configuration } from '@mailchain/sdk/mailchain';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
+import { Configuration } from '../../../';
+import { ApiKeyConvert } from '../../apiHelpers';
+import { createAxiosConfiguration } from '../../axios/config';
+import { MailAddress, MailData } from '../../formatters/types';
+import { Lookup, LookupResult } from '../../identityKeys';
+import { PublicKey } from '../../api';
 import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
 import { createMailPayloads, Distribution } from './payload';
@@ -21,15 +21,21 @@ export interface SendParams {
 	resolvedRecipients: ResolvedRecipientsResult;
 }
 
+export class FailedAddressMessageKeyResolutionsError extends Error {
+	constructor(private readonly failedResolutions: FailedAddressMessageKeyResolutionError[]) {
+		super(`at least one address resoluton has failed`);
+	}
+}
+
 export class FailedAddressMessageKeyResolutionError extends Error {
-	constructor(readonly address: string, cause: Error) {
-		super(`resoluton for ${address} has failed`, { cause });
+	constructor(readonly address: string, readonly cause: Error) {
+		super(`resoluton for ${address} has failed`);
 	}
 }
 
 export class FailedDistributionError extends Error {
-	constructor(readonly distribution: Distribution, cause: Error) {
-		super('distribution has failed', { cause });
+	constructor(readonly distribution: Distribution, readonly cause: Error) {
+		super('distribution has failed');
 	}
 }
 

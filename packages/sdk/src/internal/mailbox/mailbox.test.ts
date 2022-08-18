@@ -1,20 +1,20 @@
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KindNaClSecretKey } from '@mailchain/crypto';
-import * as protoInbox from '@mailchain/sdk/internal/protobuf/inbox/inbox';
 import { decodeBase64, encodeBase64, encodeHex, EncodingTypes } from '@mailchain/encoding';
-import { createMimeMessage } from '@mailchain/sdk/internal/formatters/generate';
-import { Payload } from '@mailchain/sdk/internal/transport/payload/content/payload';
+import { mock } from 'jest-mock-extended';
+import { AxiosResponse } from 'axios';
+import * as protoInbox from '../protobuf/inbox/inbox';
+import { createMimeMessage } from '../formatters/generate';
+import { Payload } from '../transport/payload/content/payload';
 import {
 	GetMessageResponseBody,
 	GetMessagesInViewResponseBody,
 	InboxApi,
 	PostPayloadResponseBody,
 	PutEncryptedMessageRequestBodyFolderEnum,
-} from '@mailchain/sdk/internal/api';
-import { MailData } from '@mailchain/sdk/internal/formatters/types';
-import { mock } from 'jest-mock-extended';
-import { AxiosResponse } from 'axios';
+} from '../api';
+import { MailData } from '../formatters/types';
 import { Mailbox, MailchainMailbox } from './mailbox';
 import { createMailchainMessageCrypto } from './messageCrypto';
 import { AddressesHasher } from './addressHasher';

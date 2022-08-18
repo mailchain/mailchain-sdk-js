@@ -1,13 +1,12 @@
-import { Setting, UserApiFactory, UserApiInterface } from '@mailchain/sdk/internal/api';
-import { Address } from '@mailchain/sdk/internal/user/address';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
-import { protocols } from '@mailchain/internal';
-import { user } from '@mailchain/sdk/internal/protobuf/user/user';
-import { decodeAddressByProtocol, encodeAddressByProtocol } from '@mailchain/internal/addressing';
+import { decodeAddressByProtocol, encodeAddressByProtocol, ProtocolType } from '@mailchain/addressing';
 import { Decrypter, Encrypter, SignerWithPublicKey } from '@mailchain/crypto';
+import { user } from '../protobuf/user/user';
+import { Setting, UserApiFactory, UserApiInterface } from '../api';
 import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { Address } from './address';
 
 export type UserSettings = { [key: string]: Setting | undefined };
 
@@ -65,7 +64,7 @@ export class MailchainUserProfile implements UserProfile {
 					decodeBase64(address.encryptedAddressInformation),
 				);
 				const protoAddress = user.Address.decode(decryptedAddress);
-				const protocol = protoAddress.protocol as protocols.ProtocolType;
+				const protocol = protoAddress.protocol as ProtocolType;
 				resultAddresses.push({
 					id: address.addressId!,
 					address: encodeAddressByProtocol(protoAddress.address!, protocol).encoded,

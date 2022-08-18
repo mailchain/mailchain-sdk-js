@@ -1,9 +1,15 @@
-import { PrivateKey, PublicKey } from '@mailchain/crypto';
-import { ED25519PrivateKey, ED25519PublicKey } from '@mailchain/crypto/ed25519';
-import { SECP256K1PublicKey, SECP256K1PrivateKey } from '@mailchain/crypto/secp256k1';
-import { ErrorUnsupportedKey } from '@mailchain/crypto/signatures/errors';
-import { SR25519PrivateKey, SR25519PublicKey } from '@mailchain/crypto/sr25519';
-import { decode } from '@mailchain/encoding/encoding';
+import {
+	PrivateKey,
+	PublicKey,
+	ED25519PrivateKey,
+	ED25519PublicKey,
+	SECP256K1PublicKey,
+	SECP256K1PrivateKey,
+	SR25519PrivateKey,
+	SR25519PublicKey,
+} from '@mailchain/crypto';
+import { decode } from '@mailchain/encoding';
+import { ErrorUnsupportedKey } from '../signatures/errors';
 import {
 	PrivateKey as ApiPrivateKey,
 	PrivateKeyCurveEnum,

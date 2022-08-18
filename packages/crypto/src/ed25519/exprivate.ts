@@ -1,5 +1,6 @@
 import { ExtendedPrivateKey, PrivateKey } from '..';
-import { asED25519PrivateKey, ED25519PrivateKey } from '.';
+import { asED25519PrivateKey } from './private';
+import { ED25519PrivateKey } from '.';
 
 export class ED25519ExtendedPrivateKey implements ExtendedPrivateKey {
 	bytes: Uint8Array;

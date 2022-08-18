@@ -1,7 +1,7 @@
 import { encodeHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
-import { MailData } from '@mailchain/sdk/internal/formatters/types';
 import { sha3_256 } from '@noble/hashes/sha3';
+import { MailData } from '../formatters/types';
 
 export type MessageIdCreator = (
 	params: { mailData: MailData; type: 'sent' } | { mailData: MailData; type: 'received'; owner: string },

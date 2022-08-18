@@ -1,6 +1,6 @@
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { MailData } from '@mailchain/sdk/internal/formatters/types';
+import { MailData } from '../../formatters/types';
 import { createMailPayloads } from './payload';
 
 const dummyMailData: MailData = {

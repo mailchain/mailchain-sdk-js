@@ -1,14 +1,14 @@
 import { ed25519Verify } from '@polkadot/util-crypto';
 import { KindED25519, PublicKey } from '../';
 
-export const PublicKeyLen = 32;
+export const ED25519PublicKeyLen = 32;
 
 export class ED25519PublicKey implements PublicKey {
 	readonly curve: string = KindED25519;
 	readonly bytes: Uint8Array;
 
 	constructor(bytes: Uint8Array) {
-		if (bytes.length !== PublicKeyLen) {
+		if (bytes.length !== ED25519PublicKeyLen) {
 			throw new RangeError('invalid public key length');
 		}
 		this.bytes = bytes;

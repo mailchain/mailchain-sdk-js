@@ -3,8 +3,8 @@ import {
 	AliceED25519PublicKey,
 	BobED25519PrivateKey,
 	AliceED25519PrivateKey,
-} from '@mailchain/crypto/ed25519/test.const';
-import { ED25519KeyExchange } from './';
+} from '../../ed25519/test.const';
+import { ED25519KeyExchange } from './ed25519';
 
 describe('shared-secret', () => {
 	const tests = [

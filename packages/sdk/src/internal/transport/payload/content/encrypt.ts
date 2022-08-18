@@ -1,7 +1,11 @@
-import { PrivateKey, RandomFunction, secureRandom } from '@mailchain/crypto';
-import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
-import { deriveHardenedKey } from '@mailchain/crypto/ed25519';
-import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
+import {
+	PrivateKey,
+	RandomFunction,
+	secureRandom,
+	deriveHardenedKey,
+	PrivateKeyEncrypter,
+	ED25519ExtendedPrivateKey,
+} from '@mailchain/crypto';
 import { chunkBuffer, CHUNK_LENGTH_1MB } from './chunk';
 import { SerializablePayloadHeaders } from './headers';
 import { EncryptedPayload, Payload } from './payload';

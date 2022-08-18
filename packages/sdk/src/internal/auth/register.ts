@@ -1,14 +1,18 @@
 import { RegistrationResponse, RegistrationClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
-import { PrivateKey, PublicKey, Signer, SignerWithPublicKey } from '@mailchain/crypto';
-import { signMailchainUsername } from '@mailchain/crypto/signatures/mailchain_username';
+import {
+	PrivateKey,
+	PublicKey,
+	Signer,
+	SignerWithPublicKey,
+	ED25519PrivateKey,
+	encodePublicKey,
+	PrivateKeyEncrypter,
+} from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
-import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
-import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
-import { getMailchainUsernameParams, createProofMessage } from '@mailchain/keyreg';
-import { signRawEd25519 } from '@mailchain/crypto/signatures/raw_ed25119';
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeBase64, encodeBase64, encodeHexZeroX, decodeUtf8 } from '@mailchain/encoding';
+import { signMailchainUsername } from '../signatures/mailchain_username';
+import { getMailchainUsernameParams, createProofMessage } from '../keyreg';
+import { signRawEd25519 } from '../signatures/raw_ed25119';
 import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';

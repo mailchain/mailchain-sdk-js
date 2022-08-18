@@ -1,5 +1,4 @@
-import { decodeHex } from '@mailchain/encoding';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { ED25519PrivateKey } from './private';
 import { ED25519PublicKey } from './public';
 
 //// Public
@@ -16,7 +15,9 @@ export const BobED25519PublicKeyBytes = new Uint8Array([
 export const BobED25519PublicKey = new ED25519PublicKey(BobED25519PublicKeyBytes);
 
 //// Private
-export const AliceED25519Seed = decodeHex('0d9b4a3c10721991c6b806f0f343535dc2b46c74bece50a0a0d6b9f0070d3157');
+export const AliceED25519Seed = Uint8Array.from(
+	Buffer.from('0d9b4a3c10721991c6b806f0f343535dc2b46c74bece50a0a0d6b9f0070d3157', 'hex'),
+);
 export const AliceED25519PrivateKeyBytes = new Uint8Array([
 	0xd, 0x9b, 0x4a, 0x3c, 0x10, 0x72, 0x19, 0x91, 0xc6, 0xb8, 0x6, 0xf0, 0xf3, 0x43, 0x53, 0x5d, 0xc2, 0xb4, 0x6c,
 	0x74, 0xbe, 0xce, 0x50, 0xa0, 0xa0, 0xd6, 0xb9, 0xf0, 0x7, 0xd, 0x31, 0x57, 0x72, 0x3c, 0xaa, 0x23, 0xa5, 0xb5,
@@ -28,7 +29,9 @@ export const AliceED25519PrivateKey = new ED25519PrivateKey({
 	secretKey: AliceED25519PrivateKeyBytes,
 });
 
-export const BobED25519Seed = decodeHex('39d4c97d6a7f9e3306a2b5aae604ee67ec8b1387fffb39128fc055656cff05bb');
+export const BobED25519Seed = Uint8Array.from(
+	Buffer.from('39d4c97d6a7f9e3306a2b5aae604ee67ec8b1387fffb39128fc055656cff05bb', 'hex'),
+);
 export const BobED25519PrivateKeyBytes = new Uint8Array([
 	0x39, 0xd4, 0xc9, 0x7d, 0x6a, 0x7f, 0x9e, 0x33, 0x6, 0xa2, 0xb5, 0xaa, 0xe6, 0x4, 0xee, 0x67, 0xec, 0x8b, 0x13,
 	0x87, 0xff, 0xfb, 0x39, 0x12, 0x8f, 0xc0, 0x55, 0x65, 0x6c, 0xff, 0x5, 0xbb, 0x2e, 0x32, 0x2f, 0x87, 0x40, 0xc6,

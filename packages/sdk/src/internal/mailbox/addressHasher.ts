@@ -1,10 +1,9 @@
-import { PublicKey } from '@mailchain/crypto';
-import { decodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { PublicKey, decodePublicKey } from '@mailchain/crypto';
 import { decodeHexZeroX } from '@mailchain/encoding';
-import { ProtocolType } from '@mailchain/internal/protocols';
+import { ProtocolType } from '@mailchain/addressing';
 import { KeyRing } from '@mailchain/keyring';
-import { AddressesApiFactory } from '@mailchain/sdk/internal/api';
 import { sha3_256 } from '@noble/hashes/sha3';
+import { AddressesApiFactory } from '../api';
 
 export type AddressesHasher = (addresses: string[]) => Promise<{ [address: string]: Uint8Array[] | undefined }>;
 

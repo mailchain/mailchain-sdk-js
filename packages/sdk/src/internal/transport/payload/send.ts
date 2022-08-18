@@ -1,8 +1,6 @@
-import { SignerWithPublicKey } from '@mailchain/crypto';
-import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { ED25519ExtendedPrivateKey, ED25519PrivateKey, SignerWithPublicKey, encodePublicKey } from '@mailchain/crypto';
 import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
-import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
-import { ApiKeyConvert } from '@mailchain/sdk/internal/apiHelpers';
+import { ApiKeyConvert } from '../../apiHelpers';
 import { protocol } from '../../protobuf/protocol/protocol';
 import { Configuration, PublicKey, TransportApiInterface, TransportApiFactory } from '../../api';
 import { getAxiosWithSigner } from '../../auth/jwt';

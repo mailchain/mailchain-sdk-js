@@ -8,8 +8,8 @@ import {
 	PrivateKeyDecrypter,
 	PublicKey,
 	SignerWithPublicKey,
+	ED25519PrivateKey,
 } from '@mailchain/crypto';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 
 export interface KeyRingDecrypter extends SignerWithPublicKey {
 	ecdhDecrypt(bundleEphemeralKey: PublicKey, input: EncryptedContent): Promise<PlainContent>;

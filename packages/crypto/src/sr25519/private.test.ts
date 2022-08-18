@@ -1,5 +1,4 @@
 import { toUtf8Bytes } from 'ethers/lib/utils';
-import { decodeHex } from '@mailchain/encoding';
 import {
 	AliceSR25519PublicKey,
 	AliceSR25519KeyPair,
@@ -269,17 +268,27 @@ describe('generate', () => {
 			expected: {
 				curve: 'sr25519',
 				keyPair: {
-					publicKey: decodeHex('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c'),
-					secretKey: decodeHex(
-						'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab',
+					publicKey: Uint8Array.from(
+						Buffer.from('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c', 'hex'),
+					),
+					secretKey: Uint8Array.from(
+						Buffer.from(
+							'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab',
+							'hex',
+						),
 					),
 				},
-				bytes: decodeHex(
-					'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c',
+				bytes: Uint8Array.from(
+					Buffer.from(
+						'f04a61b6cc521c964161ee688893c9c16ee4bb9f6fcb1f35a6b0300b2ff11d76d40a249b14efff20ff035b1cbd58e3366e6a604d99e39990bdb6b779df2329ab62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c',
+						'hex',
+					),
 				),
 				publicKey: {
 					curve: 'sr25519',
-					bytes: decodeHex('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c'),
+					bytes: Uint8Array.from(
+						Buffer.from('62117bbdbafbd9b5f3f66887d97d40eae39dc15c77de66a3ddffb26f5990bf7c', 'hex'),
+					),
 				},
 			} as SR25519PrivateKey,
 			shouldThrow: false,

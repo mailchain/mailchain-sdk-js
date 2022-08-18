@@ -1,7 +1,6 @@
 import { AuthClient, KE2 } from '@cloudflare/opaque-ts';
 import { sha256 } from '@noble/hashes/sha256';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
+import { ED25519PrivateKey, PrivateKeyDecrypter } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
 import { AuthApiInterface } from '../api';

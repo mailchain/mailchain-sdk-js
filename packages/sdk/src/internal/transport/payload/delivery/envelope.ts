@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { ExtendedPrivateKey, PublicKey, RandomFunction, secureRandom } from '@mailchain/crypto';
-import { PrivateKeyEncrypter } from '@mailchain/crypto/cipher/nacl/private-key-encrypter';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { encodePrivateKey } from '@mailchain/crypto/multikey/encoding';
+import {
+	ExtendedPrivateKey,
+	PublicKey,
+	RandomFunction,
+	secureRandom,
+	PrivateKeyEncrypter,
+	ED25519PrivateKey,
+	encodePrivateKey,
+} from '@mailchain/crypto';
 import { protocol } from '../../../protobuf/protocol/protocol';
 import { createECDHKeyBundle } from './keybundle';
 

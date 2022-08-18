@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { PublicKey, RandomFunction, secureRandom } from '@mailchain/crypto';
-import { ED25519KeyExchange } from '@mailchain/crypto/cipher/ecdh';
-import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { PublicKey, RandomFunction, secureRandom, encodePublicKey, ED25519KeyExchange } from '@mailchain/crypto';
 import { protocol } from '../../../protobuf/protocol/protocol';
 
 export async function createECDHKeyBundle(

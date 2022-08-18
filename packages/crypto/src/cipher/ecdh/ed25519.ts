@@ -2,7 +2,8 @@ import { convertSecretKeyToCurve25519, convertPublicKeyToCurve25519 } from '@pol
 import { scalarMult } from 'tweetnacl';
 import { KeyExchange } from '../';
 import { PrivateKey, PublicKey, RandomFunction, secureRandom } from '../../';
-import { ED25519PrivateKey, ED25519PublicKey, asED25519PrivateKey } from '../../ed25519';
+import { ED25519PrivateKey, ED25519PublicKey } from '../../ed25519';
+import { asED25519PrivateKey } from '../../ed25519/private';
 
 export class ED25519KeyExchange implements KeyExchange {
 	randomFunc: RandomFunction;

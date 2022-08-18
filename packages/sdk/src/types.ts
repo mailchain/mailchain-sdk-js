@@ -1,6 +1,6 @@
 // needed for documentation
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-import type { ProtocolType } from '@mailchain/internal/protocols';
+import type { ProtocolType } from '@mailchain/addressing';
 
 /**
  * Mailchain address formatted in mail format.

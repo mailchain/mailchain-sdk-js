@@ -3,11 +3,11 @@ import { Keypair } from '@polkadot/util-crypto/types';
 import { RandomFunction, secureRandom } from '../rand';
 import { KindSR25519, PrivateKey, PublicKey } from '../';
 import { toSeed } from '../mnemonic/mnemonic';
-import { SR25519PublicKey, PublicKeyLen } from './public';
+import { SR25519PublicKey, SR25519PublicKeyLen } from './public';
 
-export const SecretKeyLength = 64;
-export const SerializedPrivateKeyLength = SecretKeyLength + PublicKeyLen;
-export const SeedLength = 32;
+export const SR25519SecretKeyLength = 64;
+export const SR25519SerializedPrivateKeyLength = SR25519SecretKeyLength + SR25519PublicKeyLen;
+export const SR25519SeedLength = 32;
 
 export class SR25519PrivateKey implements PrivateKey {
 	readonly bytes: Uint8Array;
@@ -16,33 +16,33 @@ export class SR25519PrivateKey implements PrivateKey {
 	readonly curve: string = KindSR25519;
 
 	private constructor(keyPair: Keypair) {
-		if (keyPair.publicKey.length !== PublicKeyLen) {
-			throw new Error(`publicKey must be ${PublicKeyLen} bytes`);
+		if (keyPair.publicKey.length !== SR25519PublicKeyLen) {
+			throw new Error(`publicKey must be ${SR25519PublicKeyLen} bytes`);
 		}
 
-		if (keyPair.secretKey.length !== SecretKeyLength) {
-			throw new Error(`secretKey must be ${SecretKeyLength} bytes`);
+		if (keyPair.secretKey.length !== SR25519SecretKeyLength) {
+			throw new Error(`secretKey must be ${SR25519SecretKeyLength} bytes`);
 		}
 
 		this.keyPair = keyPair;
 
 		// set bytes to the full key
-		this.bytes = new Uint8Array(PublicKeyLen + SecretKeyLength);
+		this.bytes = new Uint8Array(SR25519PublicKeyLen + SR25519SecretKeyLength);
 		this.bytes.set(keyPair.secretKey, 0);
-		this.bytes.set(keyPair.publicKey, SecretKeyLength);
+		this.bytes.set(keyPair.publicKey, SR25519SecretKeyLength);
 
 		this.publicKey = new SR25519PublicKey(this.keyPair.publicKey);
 	}
 	static generate(rand: RandomFunction = secureRandom): Promise<PrivateKey> {
-		return this.fromSeed(rand(SeedLength));
+		return this.fromSeed(rand(SR25519SeedLength));
 	}
 
 	static async fromMnemonicPhrase(mnemonic: string, password?: string): Promise<SR25519PrivateKey> {
-		return SR25519PrivateKey.fromSeed(toSeed(mnemonic, password, SeedLength));
+		return SR25519PrivateKey.fromSeed(toSeed(mnemonic, password, SR25519SeedLength));
 	}
 
 	static async fromSeed(bytes: Uint8Array): Promise<SR25519PrivateKey> {
-		if (bytes.length !== SeedLength) {
+		if (bytes.length !== SR25519SeedLength) {
 			throw new Error('seed must be 32 byte');
 		}
 
@@ -61,13 +61,13 @@ export class SR25519PrivateKey implements PrivateKey {
 	}
 
 	static fromBytes(bytes: Uint8Array): SR25519PrivateKey {
-		if (bytes.length !== PublicKeyLen + SecretKeyLength) {
-			throw new Error(`full key must be ${PublicKeyLen + SecretKeyLength} bytes`);
+		if (bytes.length !== SR25519PublicKeyLen + SR25519SecretKeyLength) {
+			throw new Error(`full key must be ${SR25519PublicKeyLen + SR25519SecretKeyLength} bytes`);
 		}
 
 		return new this({
-			secretKey: bytes.slice(0, SecretKeyLength),
-			publicKey: bytes.slice(SecretKeyLength, PublicKeyLen + SecretKeyLength),
+			secretKey: bytes.slice(0, SR25519SecretKeyLength),
+			publicKey: bytes.slice(SR25519SecretKeyLength, SR25519PublicKeyLen + SR25519SecretKeyLength),
 		});
 	}
 

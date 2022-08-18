@@ -3,8 +3,8 @@ import {
 	AliceSECP256K1PublicKey,
 	BobSECP256K1PrivateKey,
 	AliceSECP256K1PrivateKey,
-} from '@mailchain/crypto/secp256k1/test.const';
-import { SECP256K1KeyExchange } from './';
+} from '../../secp256k1/test.const';
+import { SECP256K1KeyExchange } from './secp256k1';
 
 describe('shared-secret', () => {
 	const tests = [

@@ -1,8 +1,9 @@
-import { decodeHex } from '@mailchain/encoding';
-import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { AliceSECP256K1PrivateKey, BobSECP256K1PrivateKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSR25519PrivateKey, BobSR25519PrivateKey } from '@mailchain/crypto/sr25519/test.const';
-import { ED25519KeyExchange, SECP256K1KeyExchange, SR25519KeyExchange } from '../ecdh';
+import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../../ed25519/test.const';
+import { AliceSECP256K1PrivateKey, BobSECP256K1PrivateKey } from '../../secp256k1/test.const';
+import { AliceSR25519PrivateKey, BobSR25519PrivateKey } from '../../sr25519/test.const';
+import { SECP256K1KeyExchange } from '../ecdh/secp256k1';
+import { SR25519KeyExchange } from '../ecdh/sr25519';
+import { ED25519KeyExchange } from '../ecdh/ed25519';
 import { PublicKeyDecrypter } from '.';
 
 describe('Decrypt', () => {
@@ -77,8 +78,11 @@ describe('Decrypt', () => {
 			name: 'sr25519-alice',
 			keyEx: new SR25519KeyExchange(),
 			prvKey: AliceSR25519PrivateKey,
-			message: decodeHex(
-				'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f5051525354555657581f0eabeba03feeed30b9e1df26e4b66df0d23d34f5ddb3',
+			message: Uint8Array.from(
+				Buffer.from(
+					'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f5051525354555657581f0eabeba03feeed30b9e1df26e4b66df0d23d34f5ddb3',
+					'hex',
+				),
 			),
 			expected: new Uint8Array(Buffer.from('message', 'ascii')),
 			shouldThrow: false,
@@ -87,8 +91,11 @@ describe('Decrypt', () => {
 			name: 'sr25519-bob',
 			keyEx: new SR25519KeyExchange(),
 			prvKey: BobSR25519PrivateKey,
-			message: decodeHex(
-				'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f505152535455565758683bc9bbab763bddf8591aff091dbc998c1fe6dea4ae90',
+			message: Uint8Array.from(
+				Buffer.from(
+					'2ae368afbb2795d629ea99e075cb4829ef98aaeafc6087b0a1f065ca1ab23e36425c4142434445464748494a4b4c4d4e4f505152535455565758683bc9bbab763bddf8591aff091dbc998c1fe6dea4ae90',
+					'hex',
+				),
 			),
 			expected: new Uint8Array(Buffer.from('message', 'ascii')),
 			shouldThrow: false,

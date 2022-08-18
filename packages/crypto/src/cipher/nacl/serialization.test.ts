@@ -1,7 +1,7 @@
-import { IdED25519, IdNonSpecified, IdSECP256K1, IdSR25519 } from '@mailchain/crypto';
-import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSR25519PublicKey, BobSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
+import { IdED25519, IdNonSpecified, IdSECP256K1, IdSR25519 } from '../..';
+import { AliceED25519PublicKey, BobED25519PublicKey } from '../../ed25519/test.const';
+import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '../../secp256k1/test.const';
+import { AliceSR25519PublicKey, BobSR25519PublicKey } from '../../sr25519/test.const';
 import {
 	deserializePublicKeyEncryptedContent,
 	deserializePrivateKeyEncryptedContent,

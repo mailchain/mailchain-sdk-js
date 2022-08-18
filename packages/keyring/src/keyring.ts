@@ -1,4 +1,3 @@
-import { ED25519PrivateKey, deriveHardenedKey, ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import {
 	PublicKey,
 	PrivateKey,
@@ -8,10 +7,12 @@ import {
 	PrivateKeyDecrypter,
 	SignerWithPublicKey,
 	PrivateKeyEncrypter,
+	ED25519PrivateKey,
+	deriveHardenedKey,
+	ED25519ExtendedPrivateKey,
 } from '@mailchain/crypto';
 import { encodeHex, encodeHexZeroX } from '@mailchain/encoding';
-import { protocols } from '@mailchain/internal';
-import { MAILCHAIN } from '@mailchain/internal/protocols';
+import { MAILCHAIN, ProtocolType } from '@mailchain/addressing';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
@@ -121,7 +122,7 @@ export class KeyRing {
 		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
 	}
 
-	addressMessagingKey(address: Uint8Array, protocol: protocols.ProtocolType, nonce: number): KeyRingDecrypter {
+	addressMessagingKey(address: Uint8Array, protocol: ProtocolType, nonce: number): KeyRingDecrypter {
 		if (protocol === MAILCHAIN) {
 			return this.accountMessagingKey();
 		}

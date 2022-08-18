@@ -1,5 +1,4 @@
-import { kindFromPublicKey, publicKeyFromKind } from '@mailchain/crypto/multikey/names';
-import { PublicKey } from '@mailchain/crypto/public';
+import { kindFromPublicKey, publicKeyFromKind, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 
 type ContentType = 'application/json' | 'message/x.mailchain';

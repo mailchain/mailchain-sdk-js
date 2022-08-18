@@ -1,10 +1,19 @@
 {
 	"name": "@mailchain/keyring",
-	"private": true,
-	"sideEffects": false,
+	"description": "Mailchain keyring",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Mailchain",
+		"email": "support@mailchain.co",
+		"url": "https://mailchain.com/"
+	},
 	"type": "module",
 	"version": "0.1.0",
-	"dependencies": {},
+	"dependencies": {
+		"@mailchain/addressing": "0.1.0",
+		"@mailchain/crypto": "0.1.0",
+		"@mailchain/encoding": "0.1.0"
+	},
 	"scripts": {
 		"test": "jest --passWithNoTests",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",

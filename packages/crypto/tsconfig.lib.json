@@ -1,9 +1,12 @@
 {
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
-		"outDir": "../../dist/out-tsc",
-		"declaration": true
+		"target": "ES2017",
+		"noEmit": false,
+		"declaration": true,
+		"incremental": false,
+		"lib": ["es2017", "es7", "es6", "dom"]
 	},
-	"include": ["**/*.ts", "jest.config.cjs"],
-	"exclude": ["jest.config.cjs", "**/*.spec.ts"]
+	"include": ["**/*.ts"],
+	"exclude": ["jest.config.cjs", "**/*.test.ts"]
 }

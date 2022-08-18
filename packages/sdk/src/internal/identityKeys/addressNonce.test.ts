@@ -1,4 +1,4 @@
-import { ETHEREUM } from '@mailchain/internal/protocols';
+import { ETHEREUM } from '@mailchain/addressing/protocols';
 import { AxiosError } from 'axios';
 import { getAddressNonceWithFactories } from './addressNonce';
 

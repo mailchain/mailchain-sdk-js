@@ -1,8 +1,8 @@
 import { IdED25519, IdNonSpecified, IdSECP256K1, IdSR25519, PublicKey } from '../..';
 import { EncryptedContent, NACLECDH, NACLSK } from '..';
 import { SECP256K1PublicKey } from '../../secp256k1';
-import { ED25519PublicKey, PublicKeyLen as ED25519PublicKeyLen } from '../../ed25519';
-import { SR25519PublicKey, PublicKeyLen as SR25519PublicKeyLen } from '../../sr25519';
+import { ED25519PublicKey, ED25519PublicKeyLen } from '../../ed25519';
+import { SR25519PublicKey, SR25519PublicKeyLen } from '../../sr25519';
 import { idFromPublicKey } from '../../multikey';
 
 export function serializePublicKeyEncryptedContent(sealedBox: EncryptedContent, pubKey: PublicKey): EncryptedContent {

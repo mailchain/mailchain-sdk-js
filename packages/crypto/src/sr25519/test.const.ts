@@ -1,4 +1,3 @@
-import { decodeHex } from '@mailchain/encoding';
 import { SR25519PublicKey, SR25519PrivateKey } from './';
 
 // Public
@@ -21,12 +20,20 @@ export const EveSR25519PublicKeyBytes = new Uint8Array([
 export const EveSR25519PublicKey = new SR25519PublicKey(EveSR25519PublicKeyBytes);
 
 // Private
-export const AliceSR25519Seed = decodeHex('5c6d7adf75bda1180c225d25f3aa8dc174bbfb3cddee11ae9a85982f6faf791a');
-export const AliceSR25519SecretBytes = decodeHex(
-	'002779c6dac7a3c4a21253f37ef32f6c4ff8cdce7339d0cb2957eacc8cd652657479faa9c416436f20875ef58c43312760948df1bb283a436d1e4f18bffb1d4b',
+export const AliceSR25519Seed = Uint8Array.from(
+	Buffer.from('5c6d7adf75bda1180c225d25f3aa8dc174bbfb3cddee11ae9a85982f6faf791a', 'hex'),
 );
-export const AliceSR25519PrivateKeyBytes = decodeHex(
-	'002779c6dac7a3c4a21253f37ef32f6c4ff8cdce7339d0cb2957eacc8cd652657479faa9c416436f20875ef58c43312760948df1bb283a436d1e4f18bffb1d4b169a11721851f5dff3541dd5c4b0b478ac1cd092c9d5976e83daa0d03f26620c',
+export const AliceSR25519SecretBytes = Uint8Array.from(
+	Buffer.from(
+		'002779c6dac7a3c4a21253f37ef32f6c4ff8cdce7339d0cb2957eacc8cd652657479faa9c416436f20875ef58c43312760948df1bb283a436d1e4f18bffb1d4b',
+		'hex',
+	),
+);
+export const AliceSR25519PrivateKeyBytes = Uint8Array.from(
+	Buffer.from(
+		'002779c6dac7a3c4a21253f37ef32f6c4ff8cdce7339d0cb2957eacc8cd652657479faa9c416436f20875ef58c43312760948df1bb283a436d1e4f18bffb1d4b169a11721851f5dff3541dd5c4b0b478ac1cd092c9d5976e83daa0d03f26620c',
+		'hex',
+	),
 );
 export const AliceSR25519KeyPair = {
 	publicKey: AliceSR25519PublicKey.bytes,
@@ -34,12 +41,20 @@ export const AliceSR25519KeyPair = {
 };
 export const AliceSR25519PrivateKey = SR25519PrivateKey.fromKeyPair(AliceSR25519KeyPair);
 
-export const BobSR25519Seed = decodeHex('23b063a581fd8e5e847c4e2b9c494247298791530f5293be369e8bf23a45d2bd');
-export const BobSR25519SecretBytes = decodeHex(
-	'58618c0d0e5554e15ca74bc251475a4438dae7203dd399419cdf0fe2814fb85287cdfd5e9a6fa4f6ee0f253c0429b4efa83d0614ed848e05bd717004bcd0c263',
+export const BobSR25519Seed = Uint8Array.from(
+	Buffer.from('23b063a581fd8e5e847c4e2b9c494247298791530f5293be369e8bf23a45d2bd', 'hex'),
 );
-export const BobSR25519PrivateKeyBytes = decodeHex(
-	'58618c0d0e5554e15ca74bc251475a4438dae7203dd399419cdf0fe2814fb85287cdfd5e9a6fa4f6ee0f253c0429b4efa83d0614ed848e05bd717004bcd0c26384623e7252e41138af6904e1b02304c941625f39e5762589125dc1a2f2cf2e30',
+export const BobSR25519SecretBytes = Uint8Array.from(
+	Buffer.from(
+		'58618c0d0e5554e15ca74bc251475a4438dae7203dd399419cdf0fe2814fb85287cdfd5e9a6fa4f6ee0f253c0429b4efa83d0614ed848e05bd717004bcd0c263',
+		'hex',
+	),
+);
+export const BobSR25519PrivateKeyBytes = Uint8Array.from(
+	Buffer.from(
+		'58618c0d0e5554e15ca74bc251475a4438dae7203dd399419cdf0fe2814fb85287cdfd5e9a6fa4f6ee0f253c0429b4efa83d0614ed848e05bd717004bcd0c26384623e7252e41138af6904e1b02304c941625f39e5762589125dc1a2f2cf2e30',
+		'hex',
+	),
 );
 export const BobSR25519KeyPair = {
 	publicKey: BobSR25519PublicKey.bytes,
@@ -47,12 +62,20 @@ export const BobSR25519KeyPair = {
 };
 export const BobSR25519PrivateKey = SR25519PrivateKey.fromKeyPair(BobSR25519KeyPair);
 
-export const EveSR25519Seed = decodeHex('000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f');
-export const EveSR25519SecretBytes = decodeHex(
-	'589b458bc1bf4544633cd42533dbcc976f79f70fdc8239d56403fc404a8b777b457617125fea58be97725905fbf6eb91598b6b7c618229e44d87e339bf603364',
+export const EveSR25519Seed = Uint8Array.from(
+	Buffer.from('000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f', 'hex'),
 );
-export const EveSR25519PrivateKeyBytes = decodeHex(
-	'589b458bc1bf4544633cd42533dbcc976f79f70fdc8239d56403fc404a8b777b457617125fea58be97725905fbf6eb91598b6b7c618229e44d87e339bf60336432115619633b1ff15670efc12c48f4747a538dcf758d2de1e3f46f0df8141614',
+export const EveSR25519SecretBytes = Uint8Array.from(
+	Buffer.from(
+		'589b458bc1bf4544633cd42533dbcc976f79f70fdc8239d56403fc404a8b777b457617125fea58be97725905fbf6eb91598b6b7c618229e44d87e339bf603364',
+		'hex',
+	),
+);
+export const EveSR25519PrivateKeyBytes = Uint8Array.from(
+	Buffer.from(
+		'589b458bc1bf4544633cd42533dbcc976f79f70fdc8239d56403fc404a8b777b457617125fea58be97725905fbf6eb91598b6b7c618229e44d87e339bf60336432115619633b1ff15670efc12c48f4747a538dcf758d2de1e3f46f0df8141614',
+		'hex',
+	),
 );
 export const EveSR25519KeyPair = {
 	publicKey: EveSR25519PublicKey.bytes,

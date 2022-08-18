@@ -1,5 +1,5 @@
 import { OpaqueClient, KE2 } from '@cloudflare/opaque-ts';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { ED25519PrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
 import { AuthApiFactory, AuthApiInterface } from '../api';

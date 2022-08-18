@@ -5,8 +5,8 @@ import {
 } from '@mailchain/crypto/ed25519/test.const';
 import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { protocols } from '@mailchain/internal';
 import { KeyRing } from '@mailchain/keyring';
+import { ETHEREUM, MAILCHAIN } from '@mailchain/addressing/protocols';
 import { mailchainAddressHasher } from './addressHasher';
 
 test('addressHasher should create unique 128bit hash of addresses', async () => {
@@ -15,19 +15,19 @@ test('addressHasher should create unique 128bit hash of addresses', async () => 
 		.mockResolvedValueOnce({
 			data: {
 				identityKey: encodeHexZeroX(encodePublicKey(BobED25519PublicKey)),
-				protocol: protocols.ETHEREUM,
+				protocol: ETHEREUM,
 			},
 		})
 		.mockResolvedValueOnce({
 			data: {
 				identityKey: encodeHexZeroX(encodePublicKey(BobED25519PublicKey)),
-				protocol: protocols.MAILCHAIN,
+				protocol: MAILCHAIN,
 			},
 		})
 		.mockResolvedValueOnce({
 			data: {
 				identityKey: encodeHexZeroX(encodePublicKey(AliceED25519PublicKey)),
-				protocol: protocols.ETHEREUM,
+				protocol: ETHEREUM,
 			},
 		});
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);

@@ -1,6 +1,6 @@
-import { KeyRingDecrypter } from '@mailchain/keyring/functions';
-import { encodeHexZeroX, decodeHexZeroX } from '@mailchain/encoding/hex';
-import { signMailchainDeliveryConfirmation } from '@mailchain/crypto/signatures/mailchain_message_confirmation';
+import { KeyRingDecrypter } from '@mailchain/keyring';
+import { encodeHexZeroX, decodeHexZeroX } from '@mailchain/encoding';
+import { signMailchainDeliveryConfirmation } from '../signatures/mailchain_message_confirmation';
 import { TransportApiFactory } from '../api';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Configuration } from '../../mailchain';

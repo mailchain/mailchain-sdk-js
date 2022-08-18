@@ -1,11 +1,10 @@
 import { randomUUID } from 'crypto';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { protocols } from '@mailchain/internal';
 import { KeyRing } from '@mailchain/keyring';
-import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
-import { encodeAddressByProtocol } from '@mailchain/internal/addressing';
+import { ALGORAND, ETHEREUM, ProtocolType } from '@mailchain/addressing/protocols';
+import { encodeAddressByProtocol } from '@mailchain/addressing';
 import { encodeBase64 } from '@mailchain/encoding';
-import { user } from '@mailchain/sdk/internal/protobuf/user/user';
+import { user } from '../protobuf/user/user';
 import { MailchainUserProfile } from './userProfile';
 import { Address } from './address';
 
@@ -26,8 +25,8 @@ describe('userProfile', () => {
 		const userProfile = new MailchainUserProfile(userApi, keyRing.userProfileCrypto());
 
 		const newAddresses = [
-			{ address: '0x1337', nonce: 1, protocol: protocols.ETHEREUM, network: 'main' },
-			{ address: 'geztgny', nonce: 1337, protocol: protocols.ALGORAND, network: 'test' },
+			{ address: '0x1337', nonce: 1, protocol: ETHEREUM, network: 'main' },
+			{ address: 'geztgny', nonce: 1337, protocol: ALGORAND, network: 'test' },
 		];
 
 		// When - add the two addresses from expectedAddresses

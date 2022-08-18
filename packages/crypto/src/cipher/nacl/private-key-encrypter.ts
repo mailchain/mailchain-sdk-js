@@ -1,5 +1,5 @@
-import { idFromPrivateKey } from '@mailchain/crypto/multikey';
 import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto';
+import { idFromPrivateKey } from '../../multikey';
 import { EncryptedContent, Encrypter } from '..';
 import { PrivateKey, RandomFunction, secureRandom } from '../..';
 import { SECP256K1PrivateKey } from '../../secp256k1';

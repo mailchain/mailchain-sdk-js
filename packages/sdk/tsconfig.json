@@ -11,6 +11,7 @@
 		}
 	],
 	"compilerOptions": {
+		"types": ["node", "jest"],
 		"module": "commonjs",
 		"forceConsistentCasingInFileNames": true,
 		"strict": true,

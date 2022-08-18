@@ -1,21 +1,20 @@
+import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
+import flatten from 'lodash/flatten';
+import { KeyRing, InboxKey } from '@mailchain/keyring';
+import { Configuration } from '../../';
 import {
 	InboxApiInterface,
 	PutEncryptedMessageRequestBodyFolderEnum,
 	Message as ApiMessagePreview,
 	InboxApiFactory,
 	AddressesApiFactory,
-} from '@mailchain/sdk/internal/api';
-import * as protoInbox from '@mailchain/sdk/internal/protobuf/inbox/inbox';
-import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
-import { parseMimeText } from '@mailchain/sdk/internal/formatters/parse';
-import { InboxKey } from '@mailchain/keyring/functions';
-import { MailData } from '@mailchain/sdk/internal/formatters/types';
-import flatten from 'lodash/flatten';
-import { getAxiosWithSigner } from '@mailchain/sdk/internal/auth/jwt';
-import { KeyRing } from '@mailchain/keyring';
-import { Payload } from '@mailchain/sdk/internal/transport/payload/content/payload';
-import { Configuration } from '@mailchain/sdk';
-import { createAxiosConfiguration } from '@mailchain/sdk/internal/axios/config';
+} from '../api';
+import * as protoInbox from '../protobuf/inbox/inbox';
+import { parseMimeText } from '../formatters/parse';
+import { MailData } from '../formatters/types';
+import { getAxiosWithSigner } from '../auth/jwt';
+import { Payload } from '../transport/payload/content/payload';
+import { createAxiosConfiguration } from '../axios/config';
 import { AddressesHasher, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';

@@ -3,20 +3,22 @@ import {
 	BobED25519PublicKey,
 	BobED25519PrivateKey,
 	AliceED25519PrivateKey,
-} from '@mailchain/crypto/ed25519/test.const';
+} from '../../ed25519/test.const';
 import {
 	BobSECP256K1PublicKey,
 	AliceSECP256K1PublicKey,
 	BobSECP256K1PrivateKey,
 	AliceSECP256K1PrivateKey,
-} from '@mailchain/crypto/secp256k1/test.const';
+} from '../../secp256k1/test.const';
 import {
 	BobSR25519PublicKey,
 	AliceSR25519PublicKey,
 	BobSR25519PrivateKey,
 	AliceSR25519PrivateKey,
-} from '@mailchain/crypto/sr25519/test.const';
-import { SECP256K1KeyExchange, ED25519KeyExchange, SR25519KeyExchange } from '../ecdh';
+} from '../../sr25519/test.const';
+import { ED25519KeyExchange } from '../ecdh/ed25519';
+import { SR25519KeyExchange } from '../ecdh/sr25519';
+import { SECP256K1KeyExchange } from '../ecdh/secp256k1';
 import { PublicKeyDecrypter, PublicKeyEncrypter } from '.';
 
 describe('encrypt-then-decrypt', () => {

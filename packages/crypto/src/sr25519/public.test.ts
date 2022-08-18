@@ -1,4 +1,3 @@
-import { decodeHex } from '@mailchain/encoding';
 import {
 	AliceSR25519PublicKeyBytes,
 	AliceSR25519PublicKey,
@@ -61,8 +60,11 @@ describe('verify()', () => {
 			name: 'alice',
 			pubKey: AliceSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('egassem', 'ascii')),
-			sig: decodeHex(
-				'e647e6daf24aeceb7147fca1b370522045167399f6bfcc208b3a6a0d2e046f17ce2bf3d9c5220afb82546023e258c680909318f604be29c1219b7d0371b9188b',
+			sig: Uint8Array.from(
+				Buffer.from(
+					'e647e6daf24aeceb7147fca1b370522045167399f6bfcc208b3a6a0d2e046f17ce2bf3d9c5220afb82546023e258c680909318f604be29c1219b7d0371b9188b',
+					'hex',
+				),
 			),
 			expected: true,
 			shouldThrow: false,
@@ -71,8 +73,11 @@ describe('verify()', () => {
 			name: 'bob',
 			pubKey: BobSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			sig: decodeHex(
-				'96457c205f97a0f9854c8468d9c9c7dfbe44a5b86d5aca779e1bb0ffde91360e3fec2a5722ea65673c38b100173dc58bf57462bd8c319830601c39395a43ba8c',
+			sig: Uint8Array.from(
+				Buffer.from(
+					'96457c205f97a0f9854c8468d9c9c7dfbe44a5b86d5aca779e1bb0ffde91360e3fec2a5722ea65673c38b100173dc58bf57462bd8c319830601c39395a43ba8c',
+					'hex',
+				),
 			),
 			expected: true,
 			shouldThrow: false,
@@ -81,8 +86,11 @@ describe('verify()', () => {
 			name: 'err-invalid-signature-alice',
 			pubKey: AliceSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			sig: decodeHex(
-				'96457c205f97a0f9854c8468d9c9c7dfbe44a5b86d5aca779e1bb0ffde91360e3fec2a5722ea65673c38b100173dc58bf57462bd8c319830601c39395a43ba8c',
+			sig: Uint8Array.from(
+				Buffer.from(
+					'96457c205f97a0f9854c8468d9c9c7dfbe44a5b86d5aca779e1bb0ffde91360e3fec2a5722ea65673c38b100173dc58bf57462bd8c319830601c39395a43ba8c',
+					'hex',
+				),
 			),
 			expected: false,
 			shouldThrow: false,
@@ -91,8 +99,11 @@ describe('verify()', () => {
 			name: 'err-invalid-signature-bob',
 			pubKey: BobSR25519PublicKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			sig: decodeHex(
-				'e647e6daf24aeceb7147fca1b370522045167399f6bfcc208b3a6a0d2e046f17ce2bf3d9c5220afb82546023e258c680909318f604be29c1219b7d0371b9188b',
+			sig: Uint8Array.from(
+				Buffer.from(
+					'e647e6daf24aeceb7147fca1b370522045167399f6bfcc208b3a6a0d2e046f17ce2bf3d9c5220afb82546023e258c680909318f604be29c1219b7d0371b9188b',
+					'hex',
+				),
 			),
 			expected: false,
 			shouldThrow: false,

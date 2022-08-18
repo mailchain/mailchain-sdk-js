@@ -1,7 +1,4 @@
-import { PrivateKey } from '@mailchain/crypto';
-import { PrivateKeyDecrypter } from '@mailchain/crypto/cipher/nacl/private-key-decrypter';
-import { deriveHardenedKey } from '@mailchain/crypto/ed25519';
-import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
+import { PrivateKey, ED25519ExtendedPrivateKey, PrivateKeyDecrypter, deriveHardenedKey } from '@mailchain/crypto';
 import { SerializablePayloadHeaders } from './headers';
 import { EncryptedPayload, Payload } from './payload';
 

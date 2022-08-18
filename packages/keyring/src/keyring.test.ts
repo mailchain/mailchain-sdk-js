@@ -1,5 +1,5 @@
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { ETHEREUM, MAILCHAIN } from '@mailchain/internal/protocols';
+import { ETHEREUM, MAILCHAIN } from '@mailchain/addressing/protocols';
 import { KeyRing } from './keyring';
 
 describe('keyring', () => {

@@ -1,8 +1,12 @@
 import { KeyRing } from '@mailchain/keyring';
-import { protocols } from '@mailchain/internal';
-import { decodeAddressByProtocol } from '@mailchain/internal/addressing';
-import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { MailSender, PrepareResult, SendResult } from './internal/transport/mail/send';
+import { decodeAddressByProtocol, MAILCHAIN } from '@mailchain/addressing';
+import { ED25519PrivateKey } from '@mailchain/crypto';
+import {
+	FailedAddressMessageKeyResolutionsError,
+	MailSender,
+	PrepareResult,
+	SendResult,
+} from './internal/transport/mail/send';
 import { Lookup } from './internal/identityKeys';
 import { MailchainUserProfile, UserProfile } from './internal/user';
 import { toUint8Array } from './internal/formatters/hex';
@@ -16,11 +20,11 @@ export type Configuration = {
 
 const defaultConfiguration = { apiPath: 'https:/api.mailchain.com' };
 
-export type SendMailResult2 = SendResult | PrepareResult;
+type MailSenderResult = SendResult | PrepareResult;
 
 export type SendMailResult = {
 	messageID: string;
-} & SendMailResult2;
+} & MailSenderResult;
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
@@ -53,8 +57,32 @@ export class Mailchain {
 	}
 
 	/**
-	 * Send a mail to any blockchain address
-	 * @param params {@link SendMailParams} message to send
+	 * Send a mail to any blockchain or Mailchain address.
+	 *
+	 * @param params {@link SendMailParams} Information about message to send.
+	 * Required:
+	 * - `from` the address that the mail is being sent from.
+	 * - At least one of `to`, `cc`, or `bcc`, who will receive the mail.
+	 * - `subject` of the mail.
+	 * - `content` both `html` and `text`.
+	 *
+	 * @example
+	 * import { Mailchain } from '@mailchain/sdk';
+	 *
+	 * const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
+	 *
+	 * await result = mailchain.sendMail({
+	 * 		from: `yoursername@mailchain.local`, // sender address
+	 * 		to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
+	 * 		subject: 'My first message', // subject line
+	 * 		content: {
+	 * 			html: 'Hello Mailchain 👋', // plain text body
+	 * 			text: '<p>Hello Mailchain 👋</p>', // html body
+	 * 		},
+	 * });
+	 *
+	 * console.log(result)
+	 *
 	 * @returns
 	 */
 	async sendMail(params: SendMailParams): Promise<SendMailResult> {
@@ -78,7 +106,7 @@ export class Mailchain {
 		});
 
 		if (prepareResult.status === 'failed-resolve-recipients') {
-			throw Error('TODO:');
+			throw new FailedAddressMessageKeyResolutionsError(prepareResult.failedRecipients);
 		}
 
 		// save the message in the outbox while the sending is happening
@@ -108,13 +136,33 @@ export class Mailchain {
 		};
 	}
 
-	async self() {
+	/**
+	 * Gets the username and mail address corresponding to the authenticated user.
+	 *
+	 * @throws an error if the mnemonic phrase or seed does not have a user registered.
+	 * A user must be registered via {@link https://app.mailchain.com/register}.
+	 * Check the mnemonic phrase or seed is correct.
+	 *
+	 * @returns a promise containing the username and the mail address of the logged in user.
+	 *
+	 * @example
+	 *
+	 * import { Mailchain } from "@mailchain/sdk";
+	 *
+	 * const mailchain = const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
+	 *
+	 * const me = mailchain.me();
+	 *
+	 * console.log(`username: ${user.username}, address: ${user.address}`);
+	 * // username: alice, address: alice@mailchain.com
+	 */
+	async user() {
 		return this._userProfile.getUsername();
 	}
 
 	private async getSenderMessagingKey(fromAddress: Address, config: { lookup: Lookup; userProfile: UserProfile }) {
 		const fromPublicKey = await config.lookup.messageKey(fromAddress);
-		if (fromPublicKey.address.protocol === protocols.MAILCHAIN) {
+		if (fromPublicKey.address.protocol === MAILCHAIN) {
 			return this.keyRing.accountMessagingKey();
 		}
 
@@ -138,7 +186,7 @@ export class Mailchain {
 }
 
 export class FailedToSaveError extends Error {
-	constructor(cause: Error) {
-		super(`failed to save sent message`, { cause });
+	constructor(readonly cause: Error) {
+		super(`failed to save sent message`);
 	}
 }

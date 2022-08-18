@@ -1,4 +1,4 @@
-import { ETHEREUM, ProtocolType } from '@mailchain/internal/protocols';
+import { ETHEREUM, ProtocolType } from '@mailchain/addressing';
 import axios from 'axios';
 import { IdentityKeysApi, IdentityKeysApiFactory, MessagingKeysApi, MessagingKeysApiFactory } from '../api';
 import { createAxiosConfiguration } from '../axios/config';

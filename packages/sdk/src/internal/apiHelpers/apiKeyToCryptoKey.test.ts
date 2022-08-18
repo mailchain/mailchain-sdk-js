@@ -1,9 +1,8 @@
 import { AliceED25519PrivateKey, AliceED25519PublicKey, AliceED25519Seed } from '@mailchain/crypto/ed25519/test.const';
 import { AliceSECP256K1PublicKey, AliceSECP256K1PrivateKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceSR25519PublicKey, AliceSR25519PrivateKey } from '@mailchain/crypto/sr25519/test.const';
-import { ErrorUnsupportedKey } from '@mailchain/crypto/signatures/errors';
-
 import { encode } from '@mailchain/encoding/encoding';
+import { ErrorUnsupportedKey } from '../signatures/errors';
 import {
 	PrivateKey as ApiPrivateKey,
 	PrivateKeyCurveEnum,

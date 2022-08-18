@@ -1,5 +1,4 @@
 import { toUtf8Bytes } from 'ethers/lib/utils';
-import { decodeHex } from '@mailchain/encoding';
 import {
 	AliceED25519Seed,
 	AliceED25519PrivateKeyBytes,
@@ -233,15 +232,23 @@ describe('generate', () => {
 			name: 'generates a key from rand',
 			rand: (num?: number): Uint8Array => {
 				return new Uint8Array(
-					decodeHex(
-						'86ded70a9e8e5476d3717210072085b407d1b4f6e736f081c33e3d9a1225740824c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4',
+					Uint8Array.from(
+						Buffer.from(
+							'86ded70a9e8e5476d3717210072085b407d1b4f6e736f081c33e3d9a1225740824c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4',
+							'hex',
+						),
 					).slice(0, num),
 				);
 			},
 			expected: new ED25519PrivateKey({
-				publicKey: decodeHex('24c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4'),
-				secretKey: decodeHex(
-					'86ded70a9e8e5476d3717210072085b407d1b4f6e736f081c33e3d9a1225740824c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4',
+				publicKey: Uint8Array.from(
+					Buffer.from('24c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4', 'hex'),
+				),
+				secretKey: Uint8Array.from(
+					Buffer.from(
+						'86ded70a9e8e5476d3717210072085b407d1b4f6e736f081c33e3d9a1225740824c19fbb25d3988393c2452db72e8c28fa5405277119762f7fe1cdcdfa0bdfc4',
+						'hex',
+					),
 				),
 			}),
 			shouldThrow: false,

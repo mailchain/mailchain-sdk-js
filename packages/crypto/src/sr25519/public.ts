@@ -1,14 +1,14 @@
 import { cryptoWaitReady, sr25519Verify } from '@polkadot/util-crypto';
 import { KindSR25519, PublicKey } from '../';
 
-export const PublicKeyLen = 32;
+export const SR25519PublicKeyLen = 32;
 
 export class SR25519PublicKey implements PublicKey {
 	readonly bytes: Uint8Array;
 	readonly curve: string = KindSR25519;
 
 	constructor(bytes: Uint8Array) {
-		if (bytes.length !== PublicKeyLen) {
+		if (bytes.length !== SR25519PublicKeyLen) {
 			throw new RangeError('invalid public key length');
 		}
 		this.bytes = bytes;

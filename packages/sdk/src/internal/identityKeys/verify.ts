@@ -1,8 +1,6 @@
-import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
-
 import { decodeHexZeroX } from '@mailchain/encoding';
-import { ProtocolType } from '@mailchain/internal/protocols';
-import { formatAddress } from '@mailchain/internal/addressing';
+import { formatAddress, ProtocolType } from '@mailchain/addressing';
+import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
 import { ApiKeyConvert } from '../apiHelpers';
 import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
 import { Configuration } from '../../mailchain';

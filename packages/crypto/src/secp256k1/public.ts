@@ -1,5 +1,4 @@
 import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
-import { decodeHexZeroX } from '@mailchain/encoding';
 import { hashMessage, recoverPublicKey } from 'ethers/lib/utils';
 import { KindSECP256K1, PublicKey } from '../';
 
@@ -39,13 +38,13 @@ export class SECP256K1PublicKey implements PublicKey {
 			throw Error('signature is missing recovery id');
 		}
 
-		const dataBytes = decodeHexZeroX(hashMessage(Buffer.from(message)));
+		const dataBytes = Uint8Array.from(Buffer.from(hashMessage(Buffer.from(message)).replace('0x', ''), 'hex'));
 		const recoveredKeyBytes = recoverPublicKey(dataBytes, signature);
 
 		// TODO: this always returns a public key even if the recovered key does not match
 		// the private key it was signed with. This should not be peformed without knowing the address.
 		// Need to include method to caluluate address
-		const pubKey = new SECP256K1PublicKey(decodeHexZeroX(recoveredKeyBytes));
+		const pubKey = new SECP256K1PublicKey(Uint8Array.from(Buffer.from(recoveredKeyBytes.replace('0x', ''), 'hex')));
 
 		return pubKey;
 	}
@@ -57,7 +56,9 @@ export class SECP256K1PublicKey implements PublicKey {
 		}
 
 		// Verify as personal ethereum message
-		const messageToVerify = decodeHexZeroX(hashMessage(Buffer.from(message)));
+		const messageToVerify = Uint8Array.from(
+			Buffer.from(hashMessage(Buffer.from(message)).replace('0x', ''), 'hex'),
+		);
 
 		return ecdsaVerify(sig, messageToVerify, this.bytes);
 	}

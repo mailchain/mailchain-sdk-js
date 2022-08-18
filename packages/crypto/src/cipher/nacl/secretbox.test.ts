@@ -1,4 +1,4 @@
-import { RandomFunction } from '@mailchain/crypto/rand';
+import { RandomFunction } from '../../rand';
 import { easySeal, easyOpen } from './secretbox';
 
 describe('easy-seal', () => {

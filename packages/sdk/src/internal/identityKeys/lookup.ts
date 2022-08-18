@@ -1,12 +1,9 @@
-import { verifyMailchainProvidedMessagingKey } from '@mailchain/crypto/signatures/mailchain_msgkey';
-import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '@mailchain/crypto/signatures/errors';
-import { createProofMessage } from '@mailchain/keyreg/proofs/message';
-import { ProofParams } from '@mailchain/keyreg/proofs/params';
-import { decodeHexZeroX } from '@mailchain/encoding';
-import { ProtocolType } from '@mailchain/internal/protocols';
-import { verify } from '@mailchain/crypto/signatures/verify';
-import { MailchainAddress } from '@mailchain/internal/addressing';
-import { decode } from '@mailchain/encoding/encoding';
+import { decodeHexZeroX, decode } from '@mailchain/encoding';
+import { MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
+import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '../signatures/errors';
+import { createProofMessage, ProofParams } from '../keyreg';
+import { verify } from '../signatures/verify';
 import { ApiKeyConvert } from '../apiHelpers';
 import {
 	MessagingKeysApi,

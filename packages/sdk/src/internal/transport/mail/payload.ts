@@ -1,9 +1,8 @@
 import { KindNaClSecretKey, SignerWithPublicKey } from '@mailchain/crypto';
 import { EncodingTypes } from '@mailchain/encoding';
-import { createMimeMessage } from '@mailchain/sdk/internal/formatters/generate';
-import { MailData } from '@mailchain/sdk/internal/formatters/types';
-import { Payload } from '@mailchain/sdk/internal/transport/payload/content/payload';
-import { MailAddress } from '../../formatters/types';
+import { MailData, MailAddress } from '../../formatters/types';
+import { Payload } from '../../transport/payload/content/payload';
+import { createMimeMessage } from '../../formatters/generate';
 
 export type Distribution = {
 	recipients: MailAddress[];

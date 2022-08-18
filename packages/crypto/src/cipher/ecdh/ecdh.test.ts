@@ -1,8 +1,11 @@
-import { AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { AliceSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
+import { AliceSECP256K1PublicKey } from '../../secp256k1/test.const';
+import { AliceED25519PublicKey } from '../../ed25519/test.const';
+import { AliceSR25519PublicKey } from '../../sr25519/test.const';
 import { AliceUnknownPublicKey } from '../../testing/public';
-import { ED25519KeyExchange, SECP256K1KeyExchange, fromPublicKey, SR25519KeyExchange } from './';
+import { ED25519KeyExchange } from './ed25519';
+import { SECP256K1KeyExchange } from './secp256k1';
+import { SR25519KeyExchange } from './sr25519';
+import { fromPublicKey } from './';
 
 describe('FromPublicKey', () => {
 	const tests = [
