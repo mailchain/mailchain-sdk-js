@@ -34,8 +34,8 @@ mailchain.sendMail({
 	to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
 	subject: 'My first message', // subject line
 	content: {
-		html: 'Hello Mailchain 👋', // plain text body
-		text: '<p>Hello Mailchain 👋</p>', // html body
+		text: 'Hello Mailchain 👋', // plain text body
+		html: '<p>Hello Mailchain 👋</p>', // html body
 	},
 });
 ```
