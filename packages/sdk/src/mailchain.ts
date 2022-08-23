@@ -18,7 +18,7 @@ export type Configuration = {
 	apiPath: string;
 };
 
-const defaultConfiguration = { apiPath: 'https:/api.mailchain.com' };
+const defaultConfiguration = { apiPath: 'https://api.mailchain.com' };
 
 type MailSenderResult = SendResult | PrepareResult;
 
