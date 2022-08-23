@@ -89,7 +89,7 @@ describe('JWT tokens()', () => {
 		const mock = new MockAdapter(axios);
 		const kr = new KeyRing(AliceED25519PrivateKey);
 
-		const postBody = { scripts: { test: 'jest --passWithNoTests' } };
+		const postBody = { scripts: { test: 'test value' } };
 		const len = Buffer.byteLength(JSON.stringify(postBody));
 
 		const payloadPost = {
