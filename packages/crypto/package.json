@@ -1,9 +1,9 @@
 {
 	"name": "@mailchain/crypto",
 	"license": "Apache-2.0",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"dependencies": {
-		"@mailchain/encoding": "0.2.0",
+		"@mailchain/encoding": "0.3.0",
 		"@noble/hashes": "^1.0.0",
 		"@polkadot/util": "^8.7.1",
 		"@polkadot/util-crypto": "^8.7.1",
