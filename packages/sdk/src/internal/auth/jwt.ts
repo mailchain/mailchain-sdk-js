@@ -18,7 +18,7 @@ export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstan
 	const axiosInstance = axios.create();
 	axiosInstance.interceptors.request.use(async (request) => {
 		if (request.headers) {
-			const expires = Math.floor(Date.now() / 1000 + 60 * 60 * 24); // 1 day from now
+			const expires = Math.floor(Date.now() / 1000 + 60 * 5); // 5 mins
 			const tokenPayload = createTokenPayload(
 				new URL(request?.url ?? ''),
 				request.method?.toUpperCase() ?? '',

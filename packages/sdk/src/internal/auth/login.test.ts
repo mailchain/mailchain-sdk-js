@@ -1,7 +1,7 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { OpaqueClient, KE1, KE2, KE3 } from '@cloudflare/opaque-ts';
 import { AxiosResponse } from 'axios';
-import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
+import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
@@ -63,10 +63,11 @@ describe('isolated login tests', () => {
 			const encryptedAccountKeySeed = await PrivateKeyEncrypter.fromPrivateKey(
 				ED25519PrivateKey.fromSeed(sha256(mockExportKey)),
 			).encrypt(accountKeySeed);
+			const localStorageSessionKey = secureRandom();
 			const mockAuthFinalizeResponse = {
 				status: 200,
 				data: {
-					session: encodeBase64(secureRandom()),
+					localStorageSessionKey: encodeBase64(localStorageSessionKey),
 					encryptedAccountSeed: {
 						encryptedAccountSeed: encodeBase64(encryptedAccountKeySeed),
 					},
@@ -84,7 +85,7 @@ describe('isolated login tests', () => {
 			);
 
 			expect(res.clientSecretKey).toEqual(mockExportKey);
-			expect(res.sessionKey).toEqual(decodeBase64(mockAuthFinalizeResponse.data.session));
+			expect(res.localStorageSessionKey).toEqual(localStorageSessionKey);
 			expect(res.rootAccountKey).toEqual(ED25519PrivateKey.fromSeed(accountKeySeed));
 			expect(mockOpaqueClient.authFinish).toBeCalledWith(
 				mockKe2,

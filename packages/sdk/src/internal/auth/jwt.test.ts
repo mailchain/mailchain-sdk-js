@@ -20,7 +20,7 @@ describe('JWT tokens()', () => {
 
 	const MS_IN_DATE = 1577836800;
 	Date.now = jest.fn(() => MS_IN_DATE);
-	const time = Math.floor(MS_IN_DATE * 0.001 + 86400);
+	const time = Math.floor(MS_IN_DATE * 0.001 + 60 * 5);
 
 	it('verify signing', async () => {
 		expect.assertions(1);
@@ -96,7 +96,7 @@ describe('JWT tokens()', () => {
 			m: 'POST',
 			url: '/users/settings',
 			len,
-			aud: 'google.com',
+			aud: 'mailchain.com',
 		};
 
 		const token = await getToken(kr.accountIdentityKey(), payloadPost, time);
@@ -124,7 +124,7 @@ describe('JWT tokens()', () => {
 			m: 'PUT',
 			url: '/transport/delivery-requests',
 			len,
-			aud: 'google.com',
+			aud: 'mailchain.com',
 		};
 
 		const token = await getToken(kr.accountMessagingKey(), payloadPut, time);
@@ -152,9 +152,9 @@ describe('JWT tokens()', () => {
 
 		const payloadPut = {
 			m: 'PUT',
-			url: '/user/1/comments/23',
+			url: '/user',
 			len,
-			aud: 'google.com',
+			aud: 'mailchain.com',
 		};
 
 		const token = await getToken(kr.accountIdentityKey(), payloadPut, time);
@@ -180,9 +180,9 @@ describe('JWT tokens()', () => {
 
 		const payloadPatch = {
 			m: 'PATCH',
-			url: '/user/1/comments/23/reactions/likes',
+			url: '/user',
 			len,
-			aud: 'google.com',
+			aud: 'mailchain.com',
 		};
 
 		const token = await getToken(kr.accountIdentityKey(), payloadPatch, time);

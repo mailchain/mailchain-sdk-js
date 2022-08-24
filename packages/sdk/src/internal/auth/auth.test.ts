@@ -1,6 +1,6 @@
 import { OpaqueClient } from '@cloudflare/opaque-ts';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { encodeBase64 } from '@mailchain/encoding';
+import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
@@ -65,14 +65,15 @@ describe('login', () => {
 		// authFinalize
 		const ke3Serialize = secureRandom(32);
 		const accountSeed = secureRandom(32);
-		const sessionKey = secureRandom(32);
+		const session = secureRandom(32);
+		const localStorageSessionKey = secureRandom(32);
 		const accountAuthFinalizeResponse: AccountAuthFinalizeResponseBody = {
 			encryptedAccountSeed: {
 				encryptedAccountSeed: encodeBase64(
 					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountSeed),
 				),
 			},
-			session: encodeBase64(sessionKey),
+			localStorageSessionKey: encodeBase64(localStorageSessionKey),
 		} as any;
 		mockOpaqueClient.authFinish.mockResolvedValue({
 			ke3: { serialize: () => ke3Serialize },
@@ -109,7 +110,7 @@ describe('login', () => {
 		});
 		// assert final result
 		expect(authRes.clientSecretKey).toEqual(clientSecretKeyBytes);
-		expect(authRes.sessionKey).toEqual(sessionKey);
+		expect(authRes.localStorageSessionKey).toEqual(localStorageSessionKey);
 		expect(authRes.rootAccountKey).toEqual(ED25519PrivateKey.fromSeed(accountSeed));
 	});
 });

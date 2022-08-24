@@ -90,7 +90,7 @@ export async function accountAuthFinalize(
 
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
-		sessionKey: decodeBase64(response.data.session),
+		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
 		rootAccountKey: ED25519PrivateKey.fromSeed(decryptedAccountSeed),
 	};
 }
