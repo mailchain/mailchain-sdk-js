@@ -151,7 +151,7 @@ export class Mailchain {
 	 *
 	 * const mailchain = const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
 	 *
-	 * const me = mailchain.me();
+	 * const user = mailchain.user();
 	 *
 	 * console.log(`username: ${user.username}, address: ${user.address}`);
 	 * // username: alice, address: alice@mailchain.com
