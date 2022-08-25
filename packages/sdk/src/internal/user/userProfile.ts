@@ -1,6 +1,7 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { decodeAddressByProtocol, encodeAddressByProtocol, ProtocolType } from '@mailchain/addressing';
 import { Decrypter, Encrypter, SignerWithPublicKey } from '@mailchain/crypto';
+import { AxiosError } from 'axios';
 import { user } from '../protobuf/user/user';
 import { Setting, UserApiFactory, UserApiInterface } from '../api';
 import { Configuration } from '../../mailchain';
@@ -9,6 +10,12 @@ import { getAxiosWithSigner } from '../auth/jwt';
 import { Address } from './address';
 
 export type UserSettings = { [key: string]: Setting | undefined };
+
+export class UserNotFoundError extends Error {
+	constructor() {
+		super(`user not found for provided key`);
+	}
+}
 
 type NewAddress = Omit<Address, 'id'>;
 export interface UserProfile {
@@ -39,11 +46,21 @@ export class MailchainUserProfile implements UserProfile {
 	}
 
 	async getUsername() {
-		const { data } = await this.userApi.getUsername();
-		return {
-			address: data.address,
-			username: data.username,
-		};
+		return this.userApi
+			.getUsername()
+			.then((response) => {
+				const { data } = response;
+				return {
+					address: data.address,
+					username: data.username,
+				};
+			})
+			.catch((e: AxiosError) => {
+				if (e.response?.status === 404) {
+					throw new UserNotFoundError();
+				}
+				throw e;
+			});
 	}
 
 	async setSetting(key: string, value: string) {
