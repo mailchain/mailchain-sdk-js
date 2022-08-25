@@ -69,7 +69,9 @@ export class Mailchain {
 	 * @example
 	 * import { Mailchain } from '@mailchain/sdk';
 	 *
-	 * const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
+	 * const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
+	 *
+	 * const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
 	 *
 	 * const result = await mailchain.sendMail({
 	 * 		from: `yoursername@mailchain.local`, // sender address
@@ -83,7 +85,8 @@ export class Mailchain {
 	 *
 	 * console.log(result)
 	 *
-	 * @returns
+	 * @returns Status of the messaging sending request. {@link SendMailResult} contains different data
+	 * depending on the status of the request.
 	 */
 	async sendMail(params: SendMailParams): Promise<SendMailResult> {
 		const senderMessagingKey = await this.getSenderMessagingKey(params.from, {
@@ -149,9 +152,11 @@ export class Mailchain {
 	 *
 	 * import { Mailchain } from "@mailchain/sdk";
 	 *
-	 * const mailchain = const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
+	 * const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
 	 *
-	 * const user = mailchain.user();
+	 * const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
+	 *
+	 * const user = await mailchain.user();
 	 *
 	 * console.log(`username: ${user.username}, address: ${user.address}`);
 	 * // username: alice, address: alice@mailchain.com
@@ -182,11 +187,5 @@ export class Mailchain {
 			foundRegisteredAddress.protocol,
 			foundRegisteredAddress.nonce,
 		);
-	}
-}
-
-export class FailedToSaveError extends Error {
-	constructor(readonly cause: Error) {
-		super(`failed to save sent message`);
 	}
 }

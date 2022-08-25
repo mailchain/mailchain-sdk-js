@@ -27,9 +27,11 @@ Try sending your first message a message to `0xbb56FbD7A2caC3e4C1793602710234412
 ```typescript
 import { Mailchain } from '@mailchain/sdk';
 
-const mailchain = Mailchain.fromMnemonicPhrase('cat mail okay ...'); // use your seed phrase
+const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
 
-mailchain.sendMail({
+const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
+
+const result = await mailchain.sendMail({
 	from: `yoursername@mailchain.local`, // sender address
 	to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
 	subject: 'My first message', // subject line
@@ -38,6 +40,8 @@ mailchain.sendMail({
 		html: '<p>Hello Mailchain 👋</p>', // html body
 	},
 });
+
+console.log(result);
 ```
 
 _You can send a message to yourself your `username@mailchain` if you've registered an ethereum address you can send a message to it `0x.....@mailchain.com`, or try sending a message to `0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`, that's us at Mailchain, we own the private key for `0xbb56FbD7A2caC3e4C17936027102344127b7a112`._
