@@ -1,4 +1,4 @@
-import getLibraryConfig from '../../scripts/library.webpack.config';
+import { getBrowserLibraryConfig, getNodeLibraryConfig } from '../../scripts/library.webpack.config';
 import { dependencies } from './package.json';
 
 const libraryDetails = {
@@ -12,4 +12,6 @@ const externals = Object.keys(dependencies)
 		return { ...acc, [rec]: rec };
 	}, {});
 
-export default getLibraryConfig(libraryDetails, externals);
+const configs = [getNodeLibraryConfig(libraryDetails, externals), getBrowserLibraryConfig(libraryDetails, externals)];
+// eslint-disable-next-line import/no-default-export
+export default configs;

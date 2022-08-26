@@ -1,5 +1,6 @@
 import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
-import { hashMessage, recoverPublicKey } from 'ethers/lib/utils';
+import { recoverPublicKey } from '@ethersproject/signing-key';
+import { hashMessage } from '@ethersproject/hash';
 import { KindSECP256K1, PublicKey } from '../';
 
 export class SECP256K1PublicKey implements PublicKey {

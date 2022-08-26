@@ -1,5 +1,5 @@
 import { privateKeyVerify, publicKeyCreate, ecdsaSign } from 'secp256k1';
-import { hashMessage } from 'ethers/lib/utils';
+import { hashMessage } from '@ethersproject/hash';
 import { RandomFunction, secureRandom } from '../rand';
 import { KindSECP256K1, PrivateKey } from '../';
 import { SECP256K1PublicKey } from './public';

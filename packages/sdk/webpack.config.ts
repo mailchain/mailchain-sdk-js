@@ -1,4 +1,4 @@
-import getLibraryConfig from '../../scripts/library.webpack.config';
+import { getBrowserLibraryConfig, getNodeLibraryConfig } from '../../scripts/library.webpack.config';
 import { dependencies } from './package.json';
 
 const libraryDetails = {
@@ -8,8 +8,13 @@ const libraryDetails = {
 
 const externals = Object.keys(dependencies)
 	.filter((x) => x.startsWith('@mailchain'))
-	.reduce((acc, rec) => {
-		return { ...acc, [rec]: rec };
-	}, {});
+	.reduce(
+		(acc, rec) => {
+			return { ...acc, [rec]: rec };
+		},
+		{ axios: 'axios' },
+	);
 
-export default getLibraryConfig(libraryDetails, externals);
+const configs = [getNodeLibraryConfig(libraryDetails, externals), getBrowserLibraryConfig(libraryDetails, externals)];
+// eslint-disable-next-line import/no-default-export
+export default configs;

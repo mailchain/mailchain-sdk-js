@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from 'ethers/lib/utils';
+import { toUtf8Bytes } from '@ethersproject/strings';
 import {
 	AliceED25519Seed,
 	AliceED25519PrivateKeyBytes,

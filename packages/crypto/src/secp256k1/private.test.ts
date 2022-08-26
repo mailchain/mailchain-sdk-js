@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from 'ethers/lib/utils';
+import { toUtf8Bytes } from '@ethersproject/strings';
 import {
 	BobSECP256K1PublicKey,
 	AliceSECP256K1PublicKey,

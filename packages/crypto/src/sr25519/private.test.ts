@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from 'ethers/lib/utils';
+import { toUtf8Bytes } from '@ethersproject/strings';
 import {
 	AliceSR25519PublicKey,
 	AliceSR25519KeyPair,

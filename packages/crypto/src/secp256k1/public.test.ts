@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from 'ethers/lib/utils';
+import { toUtf8Bytes } from '@ethersproject/strings';
 import {
 	AliceUncompressedSECP256K1PublicKeyBytes,
 	AliceCompressedSECP256K1PublicKeyBytes,
