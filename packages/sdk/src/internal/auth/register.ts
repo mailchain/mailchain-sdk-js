@@ -151,18 +151,21 @@ export async function accountRegisterFinalize(
 
 	const signedRegistrationSession = await identityKey.sign(registrationSession);
 
-	const response = await authApi.accountRegisterFinalize({
-		username,
-		authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
-		authState: encodeBase64(state),
-		encryptedAccountSeed: encodeBase64(encryptedAccountSeed),
-		session: encodeBase64(Uint8Array.from(clientSessionKey)),
-		signedRegistrationSession: encodeBase64(signedRegistrationSession),
-		messagingKey: {
-			key: encodeHexZeroX(encodePublicKey(messagingPublicKey)),
-			signature: encodeHexZeroX(signedUsernameProof),
+	const response = await authApi.accountRegisterFinalize(
+		{
+			username,
+			authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
+			authState: encodeBase64(state),
+			encryptedAccountSeed: encodeBase64(encryptedAccountSeed),
+			session: encodeBase64(Uint8Array.from(clientSessionKey)),
+			signedRegistrationSession: encodeBase64(signedRegistrationSession),
+			messagingKey: {
+				key: encodeHexZeroX(encodePublicKey(messagingPublicKey)),
+				signature: encodeHexZeroX(signedUsernameProof),
+			},
 		},
-	});
+		{ withCredentials: true },
+	);
 
 	if (response.status !== 200) {
 		throw new Error(`failed to finalize registration status: ${response.status}`);

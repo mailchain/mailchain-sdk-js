@@ -1,4 +1,8 @@
-import { AliceED25519PrivateKey, AliceED25519PublicKey, AliceED25519Seed } from '@mailchain/crypto/ed25519/test.const';
+import {
+	AliceED25519PrivateKey,
+	AliceED25519PrivateKeyBytes,
+	AliceED25519PublicKey,
+} from '@mailchain/crypto/ed25519/test.const';
 import { AliceSECP256K1PublicKey, AliceSECP256K1PrivateKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceSR25519PublicKey, AliceSR25519PrivateKey } from '@mailchain/crypto/sr25519/test.const';
 import { encode } from '@mailchain/encoding/encoding';
@@ -59,7 +63,7 @@ const privateKeyTestCases = [
 		apiPrivateKey: {
 			curve: PrivateKeyCurveEnum.Ed25519,
 			encoding: PrivateKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceED25519Seed),
+			value: encode('hex/plain', AliceED25519PrivateKeyBytes),
 		} as ApiPrivateKey,
 		resultPrivateKey: AliceED25519PrivateKey,
 	},

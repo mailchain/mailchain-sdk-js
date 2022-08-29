@@ -93,10 +93,13 @@ describe('isolated login tests', () => {
 				'username',
 				mockOpaqueConfig.context,
 			);
-			expect(mockAuthApi.accountAuthFinalize).toBeCalledWith({
-				params: encodeBase64(ke3Serialized),
-				authState: encodeBase64(mockAuthState),
-			});
+			expect(mockAuthApi.accountAuthFinalize).toBeCalledWith(
+				{
+					params: encodeBase64(ke3Serialized),
+					authState: encodeBase64(mockAuthState),
+				},
+				{ withCredentials: true },
+			);
 		});
 	});
 });

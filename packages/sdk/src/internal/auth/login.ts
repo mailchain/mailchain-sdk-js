@@ -71,10 +71,13 @@ export async function accountAuthFinalize(
 		throw new LoginError('failed-auth', 'failed authFinish');
 	}
 
-	const response = await authApi.accountAuthFinalize({
-		params: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
-		authState: encodeBase64(authState),
-	});
+	const response = await authApi.accountAuthFinalize(
+		{
+			params: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
+			authState: encodeBase64(authState),
+		},
+		{ withCredentials: true },
+	);
 
 	if (response.status !== 200) {
 		throw new LoginError('failed-auth', 'failed authFinish, non 200 status');

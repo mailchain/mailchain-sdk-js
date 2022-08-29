@@ -2,6 +2,7 @@ import { PublicKey, IdSECP256K1, IdED25519, IdSR25519, PrivateKey } from '..';
 import { SECP256K1PublicKey, SECP256K1PrivateKey } from '../secp256k1';
 import { ED25519PublicKey, ED25519PrivateKey } from '../ed25519';
 import { SR25519PublicKey, SR25519PrivateKey } from '../sr25519';
+import { ED25519SeedLength } from '../ed25519/private';
 
 export function idFromPublicKey(key: PublicKey): number {
 	switch (key.constructor) {

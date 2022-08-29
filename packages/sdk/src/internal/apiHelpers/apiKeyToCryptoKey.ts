@@ -35,7 +35,7 @@ export function convertPublic(key: ApiPublicKey): PublicKey {
 export function convertPrivate(key: ApiPrivateKey): PrivateKey {
 	switch (key.curve) {
 		case PrivateKeyCurveEnum.Ed25519:
-			return ED25519PrivateKey.fromSeed(decode(key.encoding, key.value));
+			return ED25519PrivateKey.fromSecretKey(decode(key.encoding, key.value));
 		case PrivateKeyCurveEnum.Secp256k1:
 			return new SECP256K1PrivateKey(decode(key.encoding, key.value));
 		case PrivateKeyCurveEnum.Sr25519:
