@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`headerHandler exportStringHeader should export as UTF-8 base64 encoded 1`] = `
+"=?UTF-8?B?6YCU5Zue56aP5qeL6YeO5biC5aSp5pmC55Wq5YWQ5LqL5pel5pyf5L+d44CC6KuH?=
+	=?UTF-8?B?55yf5pyb6LyJ5pyA5a2m5pu46KGo5q6656WJ5YaN54m55b6M5pel6Lev6KaB5Lq6?=
+	=?UTF-8?B?44CC6K2w5rih5bCP55yf6Kit5L+z6JC95qip5pWw5bem5bqD5ZOh5oSP56u55ZC4?=
+	=?UTF-8?B?5pu05Zyw6KiA44CC5oqe5Ymy54m55Zuz54Sh5qiq5Y6f5rK56ZuG55uu5YaN5pm0?=
+	=?UTF-8?B?5aSn5aCx55So5bem55Sj44CC5rS75b+F5ZCN5byV5aSn5L2O5pmu5rWc5ZGK6KaL?=
+	=?UTF-8?B?56qT5bmM6aiT5LqV57aa5YyW44CC5LiW5L6b6Iq46LKg57+S5a2m5o6I5oim6LOq?=
+	=?UTF-8?B?5bem5pS56Yi06L+w56aB6LOg6IO96JaE44CC6Zai6LaF5Li754K55YiH5LiW5rK7?=
+	=?UTF-8?B?56Oo55m66LuK6K2w56aB5Lq65pS/44CC56m25pKD5qiq5LqG6Ki06Kmx6ICF6IKy?=
+	=?UTF-8?B?55qE5by35aSp5bGV6Kq/5Lmd5pet5pKD6IO95riI44CC6IO955qH6IeT5ZOy5aSp?=
+	=?UTF-8?B?5qip55uu6bm/5biC5YWo5rGC5ZCE5a6I6L+O57Sw5Y+w5qi45oqA5YiG?="
+`;
+
+exports[`headerHandler exportStringHeader should semanticaly fold US-ASCII only line 1`] = `
+"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+ tempor incididunt ut labore et dolore magna aliqua. Elit ullamcorper
+ dignissim cras tincidunt lobortis feugiat vivamus at. Blandit aliquam etiam
+ erat velit scelerisque in dictum non. Sed viverra tellus in hac habitasse
+ platea dictumst vestibulum. Nibh tellus molestie nunc non. Id leo in vitae
+ turpis massa sed elementum tempus. Ante metus dictum at tempor commodo
+ ullamcorper a lacus vestibulum. Non odio euismod lacinia at quis risus sed.
+ Imperdiet massa tincidunt nunc pulvinar. Est ante in nibh mauris. Cursus
+ euismod quis viverra nibh cras. Duis at tellus at urna condimentum mattis
+ pellentesque. Amet mauris commodo quis imperdiet massa tincidunt nunc. Vitae
+ congue mauris rhoncus aenean vel elit scelerisque mauris."
+`;

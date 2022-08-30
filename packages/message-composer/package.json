@@ -1,0 +1,21 @@
+{
+	"name": "@mailchain/message-composer",
+	"description": "Mailchain MIME message composer. RFC-5322 compliant",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Mailchain",
+		"email": "support@mailchain.co",
+		"url": "https://mailchain.com/"
+	},
+	"version": "0.4.0",
+	"dependencies": {
+		"@mailchain/encoding": "^0.1.0",
+		"date-fns": "^2.29.2"
+	},
+	"scripts": {
+		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+		"test": "jest",
+		"lint:test": "yarn eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+	}
+}
