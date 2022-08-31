@@ -1,6 +1,4 @@
 import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
-import { recoverPublicKey } from '@ethersproject/signing-key';
-import { hashMessage } from '@ethersproject/hash';
 import { KindSECP256K1, PublicKey } from '../';
 
 export class SECP256K1PublicKey implements PublicKey {
@@ -39,6 +37,8 @@ export class SECP256K1PublicKey implements PublicKey {
 			throw Error('signature is missing recovery id');
 		}
 
+		const { recoverPublicKey } = await import('@ethersproject/signing-key');
+		const { hashMessage } = await import('@ethersproject/hash');
 		const dataBytes = Uint8Array.from(Buffer.from(hashMessage(Buffer.from(message)).replace('0x', ''), 'hex'));
 		const recoveredKeyBytes = recoverPublicKey(dataBytes, signature);
 
@@ -55,6 +55,7 @@ export class SECP256K1PublicKey implements PublicKey {
 		if (sig.length === 65) {
 			sig = sig.slice(0, -1);
 		}
+		const { hashMessage } = await import('@ethersproject/hash');
 
 		// Verify as personal ethereum message
 		const messageToVerify = Uint8Array.from(

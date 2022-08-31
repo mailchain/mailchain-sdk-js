@@ -11,7 +11,7 @@ export function verify(
 ): Promise<boolean> {
 	switch (signingMethod) {
 		case KindEthereumPersonalMessage:
-			return Promise.resolve(verifyEthereumPersonalMessage(verifyingKey, Buffer.from(message), signature));
+			return verifyEthereumPersonalMessage(verifyingKey, Buffer.from(message), signature);
 		case KindRawED25519:
 			return verifyRawEd25519(verifyingKey, message, signature);
 		default:

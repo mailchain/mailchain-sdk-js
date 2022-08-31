@@ -1,10 +1,13 @@
-import { hashMessage } from '@ethersproject/hash';
 import { ecdsaSign, ecdsaVerify } from 'secp256k1';
 import { PublicKey, PrivateKey, KindSECP256K1 } from '@mailchain/crypto';
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { ErrorUnsupportedKey } from './errors';
 
-export function verifyEthereumPersonalMessage(key: PublicKey, message: Buffer, signature: Uint8Array): boolean {
+export async function verifyEthereumPersonalMessage(
+	key: PublicKey,
+	message: Buffer,
+	signature: Uint8Array,
+): Promise<boolean> {
 	switch (key.curve) {
 		case KindSECP256K1:
 			// remove rec id if present
@@ -12,6 +15,7 @@ export function verifyEthereumPersonalMessage(key: PublicKey, message: Buffer, s
 				signature = signature.slice(0, -1);
 			}
 
+			const { hashMessage } = await import('@ethersproject/hash');
 			const personalMessage = decodeHexZeroX(hashMessage(message));
 
 			return ecdsaVerify(signature, Uint8Array.from(personalMessage), key.bytes);
@@ -21,9 +25,10 @@ export function verifyEthereumPersonalMessage(key: PublicKey, message: Buffer, s
 	}
 }
 
-export function signEthereumPersonalMessage(key: PrivateKey, message: Uint8Array): Uint8Array {
+export async function signEthereumPersonalMessage(key: PrivateKey, message: Uint8Array): Promise<Uint8Array> {
 	switch (key.curve) {
 		case KindSECP256K1:
+			const { hashMessage } = await import('@ethersproject/hash');
 			const personalMessage = decodeHexZeroX(hashMessage(message));
 
 			const sigObj = ecdsaSign(personalMessage, key.bytes);

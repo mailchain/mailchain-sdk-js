@@ -70,10 +70,10 @@ describe('VerifyEthereumPersonalMessage', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				verifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature);
-			}).toThrowError(ErrorUnsupportedKey);
+				return verifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature);
+			}).rejects.toThrow(ErrorUnsupportedKey);
 		} else {
-			expect(verifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature)).toEqual(
+			expect(await verifyEthereumPersonalMessage(test.args.key, test.args.message, test.args.signature)).toEqual(
 				test.expected,
 			);
 		}

@@ -1,5 +1,4 @@
 import { privateKeyVerify, publicKeyCreate, ecdsaSign } from 'secp256k1';
-import { hashMessage } from '@ethersproject/hash';
 import { RandomFunction, secureRandom } from '../rand';
 import { KindSECP256K1, PrivateKey } from '../';
 import { SECP256K1PublicKey } from './public';
@@ -24,6 +23,7 @@ export class SECP256K1PrivateKey implements PrivateKey {
 	}
 	async sign(message: Uint8Array): Promise<Uint8Array> {
 		// sign as an ethereum personal message
+		const { hashMessage } = await import('@ethersproject/hash');
 		const messageToVerify = Uint8Array.from(Buffer.from(hashMessage(message).replace('0x', ''), 'hex'));
 		const sigObj = ecdsaSign(messageToVerify, this.bytes);
 

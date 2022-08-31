@@ -1,4 +1,4 @@
-import { toUtf8Bytes } from '@ethersproject/strings';
+import { decodeUtf8 } from '@mailchain/encoding/utf8';
 import {
 	AliceSR25519PublicKey,
 	AliceSR25519KeyPair,
@@ -214,14 +214,14 @@ describe('sign()', () => {
 		{
 			name: 'alice',
 			privKey: AliceSR25519PrivateKey,
-			message: toUtf8Bytes('egassem'),
+			message: decodeUtf8('egassem'),
 			// expected: different each time
 			shouldThrow: false,
 		},
 		{
 			name: 'bob',
 			privKey: BobSR25519PrivateKey,
-			message: toUtf8Bytes('message'),
+			message: decodeUtf8('message'),
 			// expected: different each time
 			shouldThrow: false,
 		},
