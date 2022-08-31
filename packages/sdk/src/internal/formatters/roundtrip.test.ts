@@ -1,6 +1,19 @@
+import wrap from 'lodash/wrap';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';
 import { MailData } from './types';
+
+const sampleTexts = [
+	'Lorem ipsum dolor sit amet',
+	'Лорем ипсум долор сит амет',
+	'Λορεμ ιπσθμ δολορ σιτ αμετ',
+	'側経意責家方家閉討店暖育田庁載社転線宇',
+	'पढाए हिंदी रहारुप अनुवाद',
+	'واعتلاء. انه كل وإقامة الموا',
+	'אל אינו כלכלה שתי',
+	'լոռեմ իպսում դոլոռ սիթ ամեթ',
+	'🐺🏢🔹🔯🍵 🕒🌐📚🍤💀👾',
+] as const;
 
 describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	const mailData: MailData = {
@@ -19,13 +32,13 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 			{ address: 'rec5@mailchain.local', name: 'rec5' },
 			{ address: 'rec6@mailchain.local', name: 'rec6' },
 		],
-		subject: 'Subject',
-		message: ['line 1', 'line2', '', 'line4'].join('\n'),
-		plainTextMessage: ['line 1', 'line2', '', 'line4'].join('\n'),
+		subject: 'LoremЛоремΛορεμ側経意セムレ발전을रहारुपكلאינוդոլոռ🐺🏢🔹🔯',
+		message: sampleTexts.map((it) => `<p>${it}</p>`).join(''),
+		plainTextMessage: sampleTexts.join('\n'),
 	};
 
 	it('should create ORIGINAL mime mail message and parse it its entirety', async () => {
-		const messages = createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData);
 
 		const result = await parseMimeText(messages.original);
 
@@ -33,7 +46,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	});
 
 	it('should create mime mail message for visible recipients and parse it', async () => {
-		const messages = createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData);
 
 		const result = await parseMimeText(messages.visibleRecipients);
 
@@ -41,7 +54,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	});
 
 	it('should create mime mail message for blind recipients and parse it', async () => {
-		const messages = createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData);
 
 		const resultBlind = await Promise.all(
 			messages.blindRecipients.map(async (message) => ({

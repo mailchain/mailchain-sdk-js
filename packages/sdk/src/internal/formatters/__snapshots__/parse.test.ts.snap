@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parse should handle legacy message content and subject 1`] = `
+Object {
+  "blindCarbonCopyRecipients": Array [
+    Object {
+      "address": "rec5@mailchain.local",
+      "name": "rec5",
+    },
+    Object {
+      "address": "rec6@mailchain.local",
+      "name": "rec6",
+    },
+  ],
+  "carbonCopyRecipients": Array [
+    Object {
+      "address": "rec3@mailchain.local",
+      "name": "rec3",
+    },
+    Object {
+      "address": "rec4@mailchain.local",
+      "name": "rec4",
+    },
+  ],
+  "date": 2022-06-06T00:00:00.000Z,
+  "from": Object {
+    "address": "1337@mailchain.com",
+    "name": "1337",
+  },
+  "id": "123@mailchain.local",
+  "message": "<p>Lorem ipsum dolor sit amet</p><p>Лорем ипсум долор сит амет</p><p>Λορεμ ιπσθμ δολορ σιτ αμετ</p><p>側経意責家方家閉討店暖育田庁載社転線宇</p><p>🐺🏢🔹🔯🍵 🕒</p>",
+  "plainTextMessage": undefined,
+  "recipients": Array [
+    Object {
+      "address": "rec1@mailchain.local",
+      "name": "rec1",
+    },
+    Object {
+      "address": "rec2@mailchain.local",
+      "name": "rec2",
+    },
+  ],
+  "subject": "Lorem ipsum dolor sit ametЛорем ипсум долор сит аметΛορεμ ιπσθμ δολορ σιτ αμετ側経意責家方家閉討店暖育田庁載社転線宇🐺🏢🔹🔯🍵 🕒",
+}
+`;

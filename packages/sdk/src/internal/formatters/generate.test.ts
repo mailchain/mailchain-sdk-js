@@ -23,12 +23,23 @@ describe('createMimeMessage', () => {
 		date: new Date('2022-06-06'),
 	};
 
-	it('should ', () => {
-		const messages = createMimeMessage(mailData);
+	it('should generate correct message', async () => {
+		const messages = await createMimeMessage(mailData);
 
-		expect(messages.original).toMatchSnapshot('ORIGINAL');
-		expect(messages.visibleRecipients).toMatchSnapshot('VISIBLE');
-		expect(messages.blindRecipients[0]).toMatchSnapshot('BLIND rec5@mailchain.local');
-		expect(messages.blindRecipients[1]).toMatchSnapshot('BLIND rec6@mailchain.local');
+		expect(removeRandomBoundaries(messages.original)).toMatchSnapshot('ORIGINAL');
+		expect(removeRandomBoundaries(messages.visibleRecipients)).toMatchSnapshot('VISIBLE');
+		expect(removeRandomBoundaries(messages.blindRecipients[0].content)).toMatchSnapshot(
+			'BLIND rec5@mailchain.local',
+		);
+		expect(removeRandomBoundaries(messages.blindRecipients[1].content)).toMatchSnapshot(
+			'BLIND rec6@mailchain.local',
+		);
 	});
 });
+
+function removeRandomBoundaries(msg: string): string {
+	msg = msg.replaceAll(/boundary.*/g, `boundary="boundary"`);
+	msg = msg.replaceAll(/--.*/g, `--boundary`);
+
+	return msg;
+}

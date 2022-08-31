@@ -15,13 +15,13 @@
 		"@mailchain/addressing": "0.4.0",
 		"@mailchain/crypto": "0.4.0",
 		"@mailchain/encoding": "0.4.0",
+		"@mailchain/message-composer": "0.4.0",
 		"@mailchain/keyring": "0.4.0",
 		"@noble/hashes": "^1.0.0",
 		"@types/secp256k1": "^4.0.2",
 		"axios": "^0.26.1",
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
-		"mimetext": "^2.0.7",
 		"protobufjs": "~6.11.3",
 		"secp256k1": "^4.0.2"
 	},
@@ -36,7 +36,6 @@
 	},
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
-		"@types/mimetext": "^2.0.0",
 		"axios-mock-adapter": "^1.21.1",
 		"jest-mock-extended": "^2.0.7"
 	}

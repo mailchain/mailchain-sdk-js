@@ -16,7 +16,7 @@ export async function createMailPayloads(
 	original: Payload;
 	distributions: Distribution[];
 }> {
-	const message = createMimeMessage(mailData);
+	const message = await createMimeMessage(mailData);
 
 	const original = await createMailPayload(senderMessagingKey, message.original);
 	const visibleRecipientsPayload = await createMailPayload(senderMessagingKey, message.visibleRecipients);

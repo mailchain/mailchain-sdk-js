@@ -50,20 +50,10 @@ describe('mailbox', () => {
 		blindCarbonCopyRecipients: [],
 		message: mockMessage,
 		plainTextMessage: mockMessage,
-		subject: 'Subject',
+		subject:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
 	};
-	const payload: Payload = {
-		Headers: {
-			Origin: keyRing.accountMessagingKey().publicKey,
-			ContentSignature: new Uint8Array([1, 3, 3, 7]),
-			Created: new Date('06/14/2022'),
-			ContentLength: 1337,
-			ContentType: 'message/x.mailchain',
-			ContentEncoding: EncodingTypes.Base64,
-			ContentEncryption: KindNaClSecretKey,
-		},
-		Content: Buffer.from(createMimeMessage(mailData).original),
-	};
+	let payload: Payload;
 
 	const msg1Preview = protoInbox.preview.MessagePreview.create({
 		from: 'Bob',
@@ -89,6 +79,21 @@ describe('mailbox', () => {
 			createMailchainMessageIdCreator(keyRing),
 			dateOffset,
 		);
+	});
+
+	beforeAll(async () => {
+		payload = {
+			Headers: {
+				Origin: keyRing.accountMessagingKey().publicKey,
+				ContentSignature: new Uint8Array([1, 3, 3, 7]),
+				Created: new Date('06/14/2022'),
+				ContentLength: 1337,
+				ContentType: 'message/x.mailchain',
+				ContentEncoding: EncodingTypes.Base64,
+				ContentEncryption: KindNaClSecretKey,
+			},
+			Content: Buffer.from((await createMimeMessage(mailData)).original),
+		};
 	});
 
 	it('should return message preview for message', async () => {
