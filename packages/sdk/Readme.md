@@ -24,7 +24,7 @@ Send your first message
 
 Try sending your first message a message to `0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`, that's us at Mailchain, we own the private key for `0xbb56FbD7A2caC3e4C17936027102344127b7a112`.
 
-```typescript
+```ts
 import { Mailchain } from '@mailchain/sdk';
 
 const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
