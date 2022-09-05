@@ -1,5 +1,5 @@
 import { decodeHexZeroX } from '@mailchain/encoding';
-import { formatAddress, ProtocolType } from '@mailchain/addressing';
+import { createMailchainAddress, formatAddress, ProtocolType } from '@mailchain/addressing';
 import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
 import { ApiKeyConvert } from '../apiHelpers';
 import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
@@ -20,7 +20,7 @@ export async function verify(
 	const mailchainPublicKey = ApiKeyConvert.public(mailchainPublicKeyResponse.data.key);
 
 	const result = await addressApi.getAddressMessagingKey(
-		formatAddress({ value: address, protocol, domain: mailchainMailDomain }, 'mail'),
+		formatAddress(createMailchainAddress(address, protocol, mailchainMailDomain), 'mail'),
 	);
 	const { registeredKeyProof, providedKeyProof } = result.data;
 	const keyProof = providedKeyProof ?? registeredKeyProof;

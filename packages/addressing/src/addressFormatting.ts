@@ -1,5 +1,5 @@
 import { ETHEREUM, MAILCHAIN, ProtocolType } from './protocols';
-import { MailchainAddress } from './types';
+import { MailchainAddress } from '.';
 
 export function formatAddress(address: MailchainAddress, format: 'mail' | 'human-friendly'): string {
 	switch (format) {
@@ -13,7 +13,7 @@ export function formatAddress(address: MailchainAddress, format: 'mail' | 'human
 }
 
 /**
- * @param address the wallet address in raw non-encoded format
+ * @param encodedAddress the wallet address in raw non-encoded format
  */
 export function formatMailLike(encodedAddress: string, protocol: ProtocolType, mailchainDomain: string): string {
 	if (protocol === MAILCHAIN) {
