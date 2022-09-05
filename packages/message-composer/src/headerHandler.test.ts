@@ -22,24 +22,24 @@ describe('headerHandler', () => {
 		});
 
 		it('should export single address header', async () => {
-			const header = createHeader('Label', [{ name: 'Alice', address: 'alice@mailchian.com' }]);
+			const header = createHeader('Label', [{ name: 'Alice', address: 'alice@mailchain.com' }]);
 
 			const res = await exportHeader(header, defaultMessageComposerContext());
 
-			expect(res).toEqual(`Label: "Alice" <alice@mailchian.com>`);
+			expect(res).toEqual(`Label: "Alice" <alice@mailchain.com>`);
 		});
 
 		it('should export multiple address header', async () => {
 			const header = createHeader('Label', [
-				{ name: 'Alice', address: 'alice@mailchian.co' },
-				{ name: 'Bob', address: 'bob@mailchian.co' },
-				{ name: 'Rob', address: 'rob@mailchian.xyz' },
+				{ name: 'Alice', address: 'alice@mailchain.co' },
+				{ name: 'Bob', address: 'bob@mailchain.co' },
+				{ name: 'Rob', address: 'rob@mailchain.xyz' },
 			]);
 
 			const res = await exportHeader(header, defaultMessageComposerContext());
 
 			expect(res).toEqual(
-				`Label: "Alice" <alice@mailchian.co>,${CRLF} "Bob" <bob@mailchian.co>,${CRLF} "Rob" <rob@mailchian.xyz>`,
+				`Label: "Alice" <alice@mailchain.co>,${CRLF} "Bob" <bob@mailchain.co>,${CRLF} "Rob" <rob@mailchain.xyz>`,
 			);
 		});
 	});
