@@ -2,7 +2,13 @@ import { OpaqueClient, KE2 } from '@cloudflare/opaque-ts';
 import { ED25519PrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
-import { AuthApiFactory, AuthApiInterface } from '../api';
+import {
+	AuthApiFactory,
+	AuthApiInterface,
+	GetUsernameAvailableResponseBody,
+	UsersApiFactory,
+	UsersApiInterface,
+} from '../api';
 import { createAxiosConfiguration } from '../axios/config';
 import { Configuration } from '../../mailchain';
 import { OpaqueConfig } from './opaque';
@@ -23,13 +29,31 @@ type RegisterParams = {
 	reservedNameSignature?: string;
 };
 
+type UsernameAvailabilityCause = {
+	type: 'username-availability';
+	reason: 'reserved' | 'invalid' | 'taken' | 'unavailable';
+};
+type SeedPhraseCause = { type: 'seed-phrase'; reason: 'already-used' };
+type RegisterErrorCause = UsernameAvailabilityCause | SeedPhraseCause;
+export class RegisterError extends Error {
+	constructor(public readonly regCause: RegisterErrorCause) {
+		super(`[${regCause.type}]-[${regCause.reason}]`);
+	}
+}
+
 export class Authentication {
-	constructor(private readonly authApi: AuthApiInterface, private readonly opaqueConfig: OpaqueConfig) {}
+	constructor(
+		private readonly usersApi: UsersApiInterface,
+		private readonly authApi: AuthApiInterface,
+		private readonly opaqueConfig: OpaqueConfig,
+	) {}
 
 	static create(sdkConfig: Configuration, opaqueConfig: OpaqueConfig) {
-		const authApi = AuthApiFactory(createAxiosConfiguration(sdkConfig));
+		const axiosConfig = createAxiosConfiguration(sdkConfig);
+		const authApi = AuthApiFactory(axiosConfig);
+		const usersApi = UsersApiFactory(axiosConfig);
 
-		return new Authentication(authApi, opaqueConfig);
+		return new Authentication(usersApi, authApi, opaqueConfig);
 	}
 
 	async login(params: LoginParams) {
@@ -66,6 +90,12 @@ export class Authentication {
 		}
 	}
 
+	async checkUsernameAvailability(username: string): Promise<GetUsernameAvailableResponseBody> {
+		const { data: availability } = await this.usersApi.getUsernameAvailable(username);
+		return { ...availability };
+	}
+
+	/** @throws {@link RegisterError} */
 	async register(params: RegisterParams) {
 		params.username = params.username.trim().toLowerCase();
 
@@ -85,7 +115,25 @@ export class Authentication {
 			this.authApi,
 			this.opaqueConfig,
 			opaqueRegisterClient,
-		);
+		).catch((e) => {
+			if (Axios.isAxiosError(e)) {
+				switch (e.response?.data.message) {
+					case 'username is taken':
+					case 'username already exists':
+						throw new RegisterError({ type: 'username-availability', reason: 'taken' });
+					case 'username is invalid':
+						throw new RegisterError({ type: 'username-availability', reason: 'invalid' });
+					case 'username is reserved':
+						throw new RegisterError({ type: 'username-availability', reason: 'reserved' });
+					case 'username is unavailable':
+						throw new RegisterError({ type: 'username-availability', reason: 'unavailable' });
+					case 'seed phrase already in use': {
+						throw new RegisterError({ type: 'seed-phrase', reason: 'already-used' });
+					}
+				}
+			}
+			throw e;
+		});
 		const registerCreateResponse = await accountRegisterCreate(
 			params.username,
 			params.password,

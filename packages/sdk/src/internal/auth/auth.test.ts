@@ -1,10 +1,15 @@
 import { OpaqueClient } from '@cloudflare/opaque-ts';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { encodeBase64 } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { AccountAuthFinalizeResponseBody, AccountAuthInitResponseBody, AuthApiInterface } from '../api';
+import {
+	AccountAuthFinalizeResponseBody,
+	AccountAuthInitResponseBody,
+	AuthApiInterface,
+	UsersApiInterface,
+} from '../api';
 import { OpaqueConfig } from './opaque';
 import { Authentication } from './auth';
 
@@ -34,8 +39,10 @@ const testOpaqueConfig: OpaqueConfig = {
 describe('login', () => {
 	let mailchainAuth: Authentication;
 	let mockAuthApi: MockProxy<AuthApiInterface>;
+	let mockUsersApi: MockProxy<UsersApiInterface>;
 	let mockOpaqueClient: MockProxy<OpaqueClient>;
 	beforeEach(() => {
+		mockUsersApi = mock();
 		mockAuthApi = mock();
 		mockAuthApiFactory.mockReturnValue(mockAuthApi);
 
@@ -43,7 +50,7 @@ describe('login', () => {
 		mockedOpaqueClientConstructor.mockReturnValue(mockOpaqueClient);
 		mockKe2Deserialize.mockClear();
 
-		mailchainAuth = new Authentication(mockAuthApi, testOpaqueConfig);
+		mailchainAuth = new Authentication(mockUsersApi, mockAuthApi, testOpaqueConfig);
 	});
 	it('should successfully perform auth init and finalize', async () => {
 		// Note: Most of this test is redundant since the individual login steps have been tested as part of 'login.test.ts'
@@ -65,7 +72,6 @@ describe('login', () => {
 		// authFinalize
 		const ke3Serialize = secureRandom(32);
 		const accountSeed = secureRandom(32);
-		const session = secureRandom(32);
 		const localStorageSessionKey = secureRandom(32);
 		const accountAuthFinalizeResponse: AccountAuthFinalizeResponseBody = {
 			encryptedAccountSeed: {
