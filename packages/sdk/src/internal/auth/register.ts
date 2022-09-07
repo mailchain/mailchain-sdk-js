@@ -164,7 +164,6 @@ export async function accountRegisterFinalize(
 
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
-		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
 	};
 }
 

@@ -57,6 +57,7 @@ export async function accountAuthFinalize(
 	username: string,
 	keyExchange2: KE2,
 	authState: Uint8Array,
+	createSession: boolean,
 	authApi: AuthApiInterface,
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: AuthClient,
@@ -76,6 +77,7 @@ export async function accountAuthFinalize(
 		{
 			params: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
 			authState: encodeBase64(authState),
+			createSessionCookie: createSession,
 		},
 		{ withCredentials: true },
 	);
@@ -88,7 +90,6 @@ export async function accountAuthFinalize(
 
 	return {
 		clientSecretKey,
-		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
 		rootAccountKey: await decryptRootAccountKey(clientSecretKey, response.data.encryptedAccountSecret),
 	};
 }

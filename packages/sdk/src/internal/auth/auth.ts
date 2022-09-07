@@ -21,6 +21,7 @@ type LoginParams = {
 	username: string;
 	password: string;
 	captcha: string;
+	createSession?: boolean;
 };
 
 type RegisterParams = {
@@ -80,6 +81,7 @@ export class Authentication {
 				params.username,
 				keyExchange2,
 				authInitResponse.state,
+				params.createSession ?? false,
 				this.authApi,
 				this.opaqueConfig,
 				opaqueClient,

@@ -76,7 +76,6 @@ describe('login', () => {
 		// authFinalize
 		const ke3Serialize = secureRandom(32);
 		const accountEntropy = toEntropy(generate());
-		const localStorageSessionKey = secureRandom(32);
 		const accountAuthFinalizeResponse = {
 			encryptedAccountSecret: {
 				encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
@@ -84,7 +83,6 @@ describe('login', () => {
 					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountEntropy),
 				),
 			} as EncryptedAccountSecret,
-			localStorageSessionKey: encodeBase64(localStorageSessionKey),
 		} as AccountAuthFinalizeResponseBody;
 		mockOpaqueClient.authFinish.mockResolvedValue({
 			ke3: { serialize: () => ke3Serialize },
@@ -117,11 +115,11 @@ describe('login', () => {
 		]);
 		expect(mockAuthApi.accountAuthFinalize.mock.calls[0][0]).toEqual({
 			params: encodeBase64(ke3Serialize),
+			createSessionCookie: false,
 			authState: testAuthState,
 		});
 		// assert final result
 		expect(authRes.clientSecretKey).toEqual(clientSecretKeyBytes);
-		expect(authRes.localStorageSessionKey).toEqual(localStorageSessionKey);
 		expect(authRes.rootAccountKey).toEqual(ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(accountEntropy)));
 	});
 });

@@ -68,11 +68,9 @@ describe('isolated login tests', () => {
 			const encryptedAccountKeySeed = await PrivateKeyEncrypter.fromPrivateKey(
 				ED25519PrivateKey.fromSeed(sha256(mockExportKey)),
 			).encrypt(accountEntropy);
-			const localStorageSessionKey = secureRandom();
 			const mockAuthFinalizeResponse = {
 				status: 200,
 				data: {
-					localStorageSessionKey: encodeBase64(localStorageSessionKey),
 					encryptedAccountSecret: {
 						encryptedAccountSecret: encodeBase64(encryptedAccountKeySeed),
 						encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
@@ -85,13 +83,13 @@ describe('isolated login tests', () => {
 				'username',
 				mockKe2,
 				mockAuthState,
+				true,
 				mockAuthApi,
 				mockOpaqueConfig,
 				mockOpaqueClient,
 			);
 
 			expect(res.clientSecretKey).toEqual(mockExportKey);
-			expect(res.localStorageSessionKey).toEqual(localStorageSessionKey);
 			expect(res.rootAccountKey).toEqual(ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(accountEntropy)));
 			expect(mockOpaqueClient.authFinish).toBeCalledWith(
 				mockKe2,
@@ -102,6 +100,7 @@ describe('isolated login tests', () => {
 			expect(mockAuthApi.accountAuthFinalize).toBeCalledWith(
 				{
 					params: encodeBase64(ke3Serialized),
+					createSessionCookie: true,
 					authState: encodeBase64(mockAuthState),
 				},
 				{ withCredentials: true },
