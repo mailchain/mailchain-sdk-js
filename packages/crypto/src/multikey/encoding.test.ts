@@ -161,7 +161,7 @@ describe('DecodePrivateKey()', () => {
 		} else {
 			const { sign, ...expected } = test.expected!;
 
-			expect(decodePrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
+			expect(decodePrivateKey(test.arg)).toEqual(expected);
 		}
 	});
 });

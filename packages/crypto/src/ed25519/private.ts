@@ -34,7 +34,7 @@ export class ED25519PrivateKey implements PrivateKey {
 		return new this(ed25519PairFromSecret(secretKey));
 	}
 
-	static fromMnemonicPhrase(mnemonic: string, password?: string): ED25519PrivateKey {
+	static fromMnemonicPhrase(mnemonic: string, password = ''): ED25519PrivateKey {
 		return this.fromSeed(toSeed(mnemonic, password, ED25519SeedLength));
 	}
 

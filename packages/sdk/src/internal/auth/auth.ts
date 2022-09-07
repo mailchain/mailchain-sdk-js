@@ -2,6 +2,7 @@ import { OpaqueClient, KE2 } from '@cloudflare/opaque-ts';
 import { ED25519PrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
 import Axios from 'axios';
+import { validate } from '@mailchain/crypto/mnemonic/mnemonic';
 import {
 	AuthApiFactory,
 	AuthApiInterface,
@@ -14,6 +15,7 @@ import { Configuration } from '../../mailchain';
 import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
 import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';
+import { AuthenticatedResponse } from './response';
 
 type LoginParams = {
 	username: string;
@@ -25,7 +27,7 @@ type RegisterParams = {
 	username: string;
 	password: string;
 	captcha: string;
-	identityKeySeed: Uint8Array;
+	mnemonicPhrase: string;
 	reservedNameSignature?: string;
 };
 
@@ -96,13 +98,17 @@ export class Authentication {
 	}
 
 	/** @throws {@link RegisterError} */
-	async register(params: RegisterParams) {
+	async register(params: RegisterParams): Promise<AuthenticatedResponse> {
 		params.username = params.username.trim().toLowerCase();
 
 		const opaqueRegisterClient = new OpaqueClient(this.opaqueConfig.parameters);
 		const opaqueLoginClient = new OpaqueClient(this.opaqueConfig.parameters);
 
-		const rootAccountKey = ED25519PrivateKey.fromSeed(params.identityKeySeed);
+		if (!validate(params.mnemonicPhrase)) {
+			throw new Error('invalid mnemonic phrase');
+		}
+
+		const rootAccountKey = ED25519PrivateKey.fromMnemonicPhrase(params.mnemonicPhrase);
 		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
 		const identityKey = keyRing.accountIdentityKey();
 		const messagingPublicKey = keyRing.accountMessagingKey().publicKey;
@@ -144,18 +150,22 @@ export class Authentication {
 			opaqueLoginClient,
 		);
 
-		return accountRegisterFinalize(
-			params.identityKeySeed,
+		const finalizeResponse = await accountRegisterFinalize(
+			params.mnemonicPhrase,
 			identityKey,
 			messagingPublicKey,
 			params.username,
 			registerCreateResponse.authStartResponse,
 			registerCreateResponse.state,
 			registerInitResponse.registrationSession,
-			rootAccountKey,
 			this.authApi,
 			this.opaqueConfig,
 			opaqueLoginClient,
 		);
+
+		return {
+			...finalizeResponse,
+			rootAccountKey,
+		};
 	}
 }

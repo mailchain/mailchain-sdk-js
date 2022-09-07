@@ -4,10 +4,13 @@ import { encodeBase64 } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
+import { fromEntropy, generate, toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
 import {
 	AccountAuthFinalizeResponseBody,
 	AccountAuthInitResponseBody,
 	AuthApiInterface,
+	EncryptedAccountSecret,
+	EncryptedAccountSecretEncryptionIdEnum,
 	UsersApiInterface,
 } from '../api';
 import { OpaqueConfig } from './opaque';
@@ -24,6 +27,7 @@ jest.mock('@cloudflare/opaque-ts', () => ({
 	},
 }));
 jest.mock('../api', () => ({
+	...jest.requireActual('../api'),
 	AuthApiFactory: (...params) => mockAuthApiFactory(...params),
 }));
 
@@ -71,16 +75,17 @@ describe('login', () => {
 		mockKe2Deserialize.mockReturnValue('mockedKE2');
 		// authFinalize
 		const ke3Serialize = secureRandom(32);
-		const accountSeed = secureRandom(32);
+		const accountEntropy = toEntropy(generate());
 		const localStorageSessionKey = secureRandom(32);
-		const accountAuthFinalizeResponse: AccountAuthFinalizeResponseBody = {
-			encryptedAccountSeed: {
-				encryptedAccountSeed: encodeBase64(
-					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountSeed),
+		const accountAuthFinalizeResponse = {
+			encryptedAccountSecret: {
+				encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
+				encryptedAccountSecret: encodeBase64(
+					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountEntropy),
 				),
-			},
+			} as EncryptedAccountSecret,
 			localStorageSessionKey: encodeBase64(localStorageSessionKey),
-		} as any;
+		} as AccountAuthFinalizeResponseBody;
 		mockOpaqueClient.authFinish.mockResolvedValue({
 			ke3: { serialize: () => ke3Serialize },
 			export_key: clientSecretKeyBytes,
@@ -117,6 +122,6 @@ describe('login', () => {
 		// assert final result
 		expect(authRes.clientSecretKey).toEqual(clientSecretKeyBytes);
 		expect(authRes.localStorageSessionKey).toEqual(localStorageSessionKey);
-		expect(authRes.rootAccountKey).toEqual(ED25519PrivateKey.fromSeed(accountSeed));
+		expect(authRes.rootAccountKey).toEqual(ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(accountEntropy)));
 	});
 });

@@ -1,6 +1,5 @@
 import { RegistrationResponse, RegistrationClient, AuthClient, KE2 } from '@cloudflare/opaque-ts';
 import {
-	PrivateKey,
 	PublicKey,
 	Signer,
 	SignerWithPublicKey,
@@ -10,12 +9,12 @@ import {
 } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { decodeBase64, encodeBase64, encodeHexZeroX, decodeUtf8 } from '@mailchain/encoding';
+import { toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
 import { signMailchainUsername } from '../signatures/mailchain_username';
 import { getMailchainUsernameParams, createProofMessage } from '../keyreg';
 import { signRawEd25519 } from '../signatures/raw_ed25119';
 import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from './opaque';
-import { AuthenticatedResponse } from './response';
 
 export async function accountRegisterInit(
 	username: string,
@@ -108,18 +107,17 @@ export async function accountRegisterCreate(
 }
 
 export async function accountRegisterFinalize(
-	identityKeySeed: Uint8Array,
+	mnemonicPhrase: string,
 	identityKey: Signer,
 	messagingPublicKey: PublicKey,
 	username: string,
 	authStartResponse: Uint8Array,
 	state: Uint8Array,
 	registrationSession: Uint8Array,
-	rootAccountKey: PrivateKey,
 	authApi: AuthApiInterface,
 	opaqueConfig: OpaqueConfig,
 	opaqueClient: AuthClient,
-): Promise<AuthenticatedResponse> {
+) {
 	username = username.trim().toLowerCase();
 	const keyExchange2 = KE2.deserialize(opaqueConfig.parameters, Array.from(authStartResponse));
 
@@ -138,17 +136,10 @@ export async function accountRegisterFinalize(
 	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
 	const encrypter = PrivateKeyEncrypter.fromPrivateKey(encryptionKey);
 
-	const usernameParams = getMailchainUsernameParams();
-	const usernameProofMessage = createProofMessage(
-		usernameParams,
-		decodeUtf8(username),
-		messagingPublicKey,
-		1 /** TODO: Nonce */,
-	);
-	const signedUsernameProof = await signRawEd25519(identityKey, decodeUtf8(usernameProofMessage));
-
-	const encryptedAccountSeed = await encrypter.encrypt(identityKeySeed);
-
+	// sign username with identity as proof they are linked
+	const signedUsernameProof = await createUsernameProof(username, messagingPublicKey, identityKey);
+	// encrypt entropy so mnemonic phrase can be recovered later
+	const encryptedMnemonicEntropy = await encrypter.encrypt(toEntropy(mnemonicPhrase));
 	const signedRegistrationSession = await identityKey.sign(registrationSession);
 
 	const response = await authApi.accountRegisterFinalize(
@@ -156,7 +147,7 @@ export async function accountRegisterFinalize(
 			username,
 			authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
 			authState: encodeBase64(state),
-			encryptedAccountSeed: encodeBase64(encryptedAccountSeed),
+			encryptedMnemonicEntropy: encodeBase64(encryptedMnemonicEntropy),
 			session: encodeBase64(Uint8Array.from(clientSessionKey)),
 			signedRegistrationSession: encodeBase64(signedRegistrationSession),
 			messagingKey: {
@@ -174,6 +165,16 @@ export async function accountRegisterFinalize(
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
 		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
-		rootAccountKey,
 	};
+}
+
+async function createUsernameProof(username: string, messagingPublicKey: PublicKey, identityKey: Signer) {
+	const usernameParams = getMailchainUsernameParams();
+	const usernameProofMessage = createProofMessage(
+		usernameParams,
+		decodeUtf8(username),
+		messagingPublicKey,
+		1 /** TODO: Nonce */,
+	);
+	return await signRawEd25519(identityKey, decodeUtf8(usernameProofMessage));
 }

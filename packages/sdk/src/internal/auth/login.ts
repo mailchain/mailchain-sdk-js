@@ -3,7 +3,8 @@ import { sha256 } from '@noble/hashes/sha256';
 import { ED25519PrivateKey, PrivateKeyDecrypter } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
-import { AuthApiInterface } from '../api';
+import { fromEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
+import { AuthApiInterface, EncryptedAccountSecret, EncryptedAccountSecretEncryptionIdEnum } from '../api';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
 
@@ -83,17 +84,33 @@ export async function accountAuthFinalize(
 		throw new LoginError('failed-auth', 'failed authFinish, non 200 status');
 	}
 
-	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
+	const clientSecretKey = Uint8Array.from(authFinishResponse.export_key);
+
+	return {
+		clientSecretKey,
+		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
+		rootAccountKey: await decryptRootAccountKey(clientSecretKey, response.data.encryptedAccountSecret),
+	};
+}
+
+export async function decryptRootAccountKey(
+	clientSecretKey: Uint8Array,
+	encryptedAccountSecret: EncryptedAccountSecret,
+): Promise<ED25519PrivateKey> {
+	const seed = sha256(clientSecretKey);
 	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
 	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
 
-	const decryptedAccountSeed = await decrypter.decrypt(
-		decodeBase64(response.data.encryptedAccountSeed.encryptedAccountSeed),
-	);
+	const decryptedSecret = await decrypter.decrypt(decodeBase64(encryptedAccountSecret.encryptedAccountSecret));
 
-	return {
-		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
-		localStorageSessionKey: decodeBase64(response.data.localStorageSessionKey),
-		rootAccountKey: ED25519PrivateKey.fromSeed(decryptedAccountSeed),
-	};
+	switch (encryptedAccountSecret.encryptionId) {
+		case EncryptedAccountSecretEncryptionIdEnum.Account:
+			return ED25519PrivateKey.fromSeed(decryptedSecret);
+
+		case EncryptedAccountSecretEncryptionIdEnum.Mnemonic:
+			return ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(decryptedSecret));
+
+		default:
+			throw new Error(`unknown encryptionId [${encryptedAccountSecret.encryptionId}]`);
+	}
 }

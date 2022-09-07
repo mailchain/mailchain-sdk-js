@@ -119,6 +119,6 @@ describe('Derive()', () => {
 		}
 		const { sign, ...expected } = test.expected!;
 
-		expect(extendedKey.privateKey).toEqual(expect.objectContaining(expected));
+		expect(extendedKey.privateKey).toEqual(expected);
 	});
 });

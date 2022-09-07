@@ -1,13 +1,18 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { OpaqueClient, KE1, KE2, KE3 } from '@cloudflare/opaque-ts';
 import { AxiosResponse } from 'axios';
-import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { encodeBase64 } from '@mailchain/encoding';
 import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
-import { AuthApiInterface } from '../api';
+import { fromEntropy, generate, toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
+import {
+	AuthApiInterface,
+	EncryptedAccountSecretEncryptionIdEnum,
+	EncryptedAccountSecretEncryptionKindEnum,
+} from '../api';
 import { OpaqueConfig } from './opaque';
-import { accountAuthFinalize, accountAuthInit } from './login';
+import { accountAuthFinalize, accountAuthInit, decryptRootAccountKey } from './login';
 
 describe('isolated login tests', () => {
 	let mockAuthApi: MockProxy<AuthApiInterface>;
@@ -46,7 +51,7 @@ describe('isolated login tests', () => {
 		const mockOpaqueConfig = { serverIdentity: 'serverIdentity', context: 'context' } as OpaqueConfig;
 
 		const mockExportKey = secureRandom(32);
-		const accountKeySeed = secureRandom(32);
+		const accountEntropy = toEntropy(generate());
 
 		const mockKe2 = {} as KE2;
 		const ke3Serialized = secureRandom();
@@ -62,14 +67,15 @@ describe('isolated login tests', () => {
 			mockOpaqueClient.authFinish.mockResolvedValue(mockAuthFinish);
 			const encryptedAccountKeySeed = await PrivateKeyEncrypter.fromPrivateKey(
 				ED25519PrivateKey.fromSeed(sha256(mockExportKey)),
-			).encrypt(accountKeySeed);
+			).encrypt(accountEntropy);
 			const localStorageSessionKey = secureRandom();
 			const mockAuthFinalizeResponse = {
 				status: 200,
 				data: {
 					localStorageSessionKey: encodeBase64(localStorageSessionKey),
-					encryptedAccountSeed: {
-						encryptedAccountSeed: encodeBase64(encryptedAccountKeySeed),
+					encryptedAccountSecret: {
+						encryptedAccountSecret: encodeBase64(encryptedAccountKeySeed),
+						encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
 					},
 				},
 			};
@@ -86,7 +92,7 @@ describe('isolated login tests', () => {
 
 			expect(res.clientSecretKey).toEqual(mockExportKey);
 			expect(res.localStorageSessionKey).toEqual(localStorageSessionKey);
-			expect(res.rootAccountKey).toEqual(ED25519PrivateKey.fromSeed(accountKeySeed));
+			expect(res.rootAccountKey).toEqual(ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(accountEntropy)));
 			expect(mockOpaqueClient.authFinish).toBeCalledWith(
 				mockKe2,
 				mockOpaqueConfig.serverIdentity,
@@ -101,5 +107,38 @@ describe('isolated login tests', () => {
 				{ withCredentials: true },
 			);
 		});
+	});
+});
+
+describe('decryptRootAccountKey', () => {
+	const clientSecretKey = secureRandom(32);
+	const encrypter = PrivateKeyEncrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sha256(clientSecretKey)));
+
+	it('should decrypt the root account key based on mnemonic phrase', async () => {
+		const mnemonicPhrase = generate();
+		const encryptedMnemonicPhrase = await encrypter.encrypt(toEntropy(mnemonicPhrase));
+
+		const rootAccountKey = await decryptRootAccountKey(clientSecretKey, {
+			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
+			encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
+			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
+			encryptionVersion: 1,
+		});
+
+		expect(rootAccountKey).toEqual(ED25519PrivateKey.fromMnemonicPhrase(mnemonicPhrase));
+	});
+
+	it('should decrypt the root account key based on key seed', async () => {
+		const seed = secureRandom(32);
+		const encryptedMnemonicPhrase = await encrypter.encrypt(seed);
+
+		const rootAccountKey = await decryptRootAccountKey(clientSecretKey, {
+			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
+			encryptionId: EncryptedAccountSecretEncryptionIdEnum.Account,
+			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
+			encryptionVersion: 1,
+		});
+
+		expect(rootAccountKey).toEqual(ED25519PrivateKey.fromSeed(seed));
 	});
 });

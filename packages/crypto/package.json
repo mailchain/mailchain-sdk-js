@@ -1,11 +1,11 @@
 {
 	"name": "@mailchain/crypto",
 	"license": "Apache-2.0",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"dependencies": {
 		"@ethersproject/hash": "5.7.0",
 		"@ethersproject/signing-key": "5.6.2",
-		"@mailchain/encoding": "0.5.0",
+		"@mailchain/encoding": "0.6.0",
 		"@noble/hashes": "^1.0.0",
 		"@polkadot/util": "^8.7.1",
 		"@polkadot/util-crypto": "^8.7.1",

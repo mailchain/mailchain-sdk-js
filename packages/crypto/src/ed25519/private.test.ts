@@ -56,12 +56,12 @@ describe('fromSeed()', () => {
 		} else {
 			const { ...expected } = test.expected!;
 
-			expect(ED25519PrivateKey.fromSeed(test.arg)).toEqual(expect.objectContaining(expected));
+			expect(ED25519PrivateKey.fromSeed(test.arg)).toEqual(expected);
 		}
 	});
 });
 
-describe('fromSeed()', () => {
+describe('fromSecretKey()', () => {
 	const tests = [
 		{
 			name: 'alice',
@@ -106,7 +106,61 @@ describe('fromSeed()', () => {
 		} else {
 			const { ...expected } = test.expected!;
 
-			expect(ED25519PrivateKey.fromSecretKey(test.arg)).toEqual(expect.objectContaining(expected));
+			expect(ED25519PrivateKey.fromSecretKey(test.arg)).toEqual(expected);
+		}
+	});
+});
+
+describe('fromMnemonicPhrase()', () => {
+	const tests = [
+		{
+			name: 'phrase 1',
+			arg: 'deputy other grain consider empty next inform myself combine dish parent maple priority outdoor inherit lonely battle add humble jar silly tank item balance',
+			expected: {
+				bytes: Uint8Array.from([
+					196, 61, 147, 66, 207, 131, 22, 179, 98, 3, 83, 23, 116, 171, 96, 65, 14, 243, 147, 40, 21, 137, 42,
+					185, 147, 169, 115, 33, 38, 53, 82, 88, 207, 224, 107, 206, 228, 89, 205, 113, 91, 58, 221, 110, 38,
+					247, 249, 41, 68, 174, 114, 143, 130, 172, 80, 233, 138, 21, 123, 242, 72, 35, 248, 164,
+				]),
+				curve: 'ed25519',
+				keyPair: {
+					publicKey: Uint8Array.from([
+						207, 224, 107, 206, 228, 89, 205, 113, 91, 58, 221, 110, 38, 247, 249, 41, 68, 174, 114, 143,
+						130, 172, 80, 233, 138, 21, 123, 242, 72, 35, 248, 164,
+					]),
+					secretKey: Uint8Array.from([
+						196, 61, 147, 66, 207, 131, 22, 179, 98, 3, 83, 23, 116, 171, 96, 65, 14, 243, 147, 40, 21, 137,
+						42, 185, 147, 169, 115, 33, 38, 53, 82, 88, 207, 224, 107, 206, 228, 89, 205, 113, 91, 58, 221,
+						110, 38, 247, 249, 41, 68, 174, 114, 143, 130, 172, 80, 233, 138, 21, 123, 242, 72, 35, 248,
+						164,
+					]),
+				},
+				publicKey: {
+					bytes: Uint8Array.from([
+						207, 224, 107, 206, 228, 89, 205, 113, 91, 58, 221, 110, 38, 247, 249, 41, 68, 174, 114, 143,
+						130, 172, 80, 233, 138, 21, 123, 242, 72, 35, 248, 164,
+					]),
+					curve: 'ed25519',
+				},
+			},
+			shouldThrow: false,
+		},
+		{
+			name: 'invalid',
+			arg: 'invalid other grain consider empty next inform myself combine dish parent maple priority outdoor inherit lonely battle add humble jar silly tank item balance',
+			expected: null,
+			shouldThrow: true,
+		},
+	];
+	test.each(tests)('$name', async (test) => {
+		if (test.shouldThrow) {
+			expect(() => {
+				ED25519PrivateKey.fromMnemonicPhrase(test.arg);
+			}).toThrow();
+		} else {
+			const { ...expected } = test.expected!;
+
+			expect(ED25519PrivateKey.fromMnemonicPhrase(test.arg)).toEqual(expected);
 		}
 	});
 });
@@ -164,7 +218,7 @@ describe('new()', () => {
 			}).toThrow();
 		} else {
 			const { ...expected } = test.expected!;
-			expect(new ED25519PrivateKey(test.arg)).toEqual(expect.objectContaining(expected));
+			expect(new ED25519PrivateKey(test.arg)).toEqual(expected);
 		}
 	});
 });
@@ -222,7 +276,7 @@ describe('public-key', () => {
 	];
 	test.each(tests)('$name', async (test) => {
 		const { ...expected } = test.expected!;
-		expect(test.privKey.publicKey).toEqual(expect.objectContaining(expected));
+		expect(test.privKey.publicKey).toEqual(expected);
 	});
 });
 
@@ -270,7 +324,7 @@ describe('generate', () => {
 		} else {
 			const actual = ED25519PrivateKey.generate(test.rand);
 			const { sign, ...expected } = test.expected!;
-			expect(actual).toEqual(expect.objectContaining(expected));
+			expect(actual).toEqual(expected);
 		}
 	});
 });

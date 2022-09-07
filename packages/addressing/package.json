@@ -7,9 +7,9 @@
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"dependencies": {
-		"@mailchain/encoding": "0.5.0"
+		"@mailchain/encoding": "0.6.0"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
