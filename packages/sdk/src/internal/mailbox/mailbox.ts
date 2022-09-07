@@ -19,6 +19,9 @@ import { AddressesHasher, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
 import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
+import { Address } from '../api/api';
+import { OwnedMailchainAddress } from '@mailchain/addressing';
+import { formatAddress } from '../../../../addressing/src/addressFormatting';
 
 type SaveSentMessageParam = { payload: Payload; content: MailData };
 
@@ -171,13 +174,18 @@ export class MailchainMailbox implements Mailbox {
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
 		const messageContent = await parseMimeText(messageData.Content.toString());
+		const to = messageContent.recipients.map((r) => r.address);
+		const cc = messageContent.carbonCopyRecipients.map((r) => r.address);
+		const bcc = messageContent.blindCarbonCopyRecipients.map((r) => r.address);
 
 		return {
 			from: messageContent.from.address,
-			to: messageContent.recipients.map((r) => r.address),
+			to,
 			subject: messageContent.subject,
 			timestamp: messageData.Headers.Created,
 			body: messageContent.message,
+			cc,
+			bcc,
 		};
 	}
 
