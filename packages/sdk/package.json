@@ -10,8 +10,8 @@
 	"homepage": "https://docs.mailchain.com/developer",
 	"version": "0.6.0",
 	"dependencies": {
-		"@ethersproject/hash": "5.7.0",
 		"@cloudflare/opaque-ts": "^0.7.5",
+		"@ethersproject/hash": "5.7.0",
 		"@mailchain/addressing": "0.6.0",
 		"@mailchain/crypto": "0.6.0",
 		"@mailchain/encoding": "0.6.0",
@@ -37,6 +37,7 @@
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
 		"axios-mock-adapter": "^1.21.1",
+		"jest-environment-jsdom": "^29.0.1",
 		"jest-mock-extended": "^2.0.7"
 	}
 }

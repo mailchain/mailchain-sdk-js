@@ -17,5 +17,8 @@
 		"test": "jest",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+	},
+	"devDependencies": {
+		"jest-environment-jsdom": "^29.0.1"
 	}
 }

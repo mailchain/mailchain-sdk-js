@@ -1,4 +1,3 @@
-import wrap from 'lodash/wrap';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';
 import { MailData } from './types';
