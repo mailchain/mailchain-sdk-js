@@ -64,6 +64,14 @@ class MessageComposer {
 		return this;
 	}
 
+	/**
+	 * Set the address that the reply message should be sent to when you want the reply to go to an address that is different than the `From:` address.
+	 */
+	replyTo(address: Address): MessageComposer {
+		this._headers.set(HEADER_LABELS.ReplyTo, { label: HEADER_LABELS.ReplyTo, value: [address] });
+		return this;
+	}
+
 	/** Set the Date field for the message. If not set, timestamp of the time invoking `build` will set. */
 	date(value: Date): MessageComposer {
 		this._headers.set(HEADER_LABELS.Date, { label: HEADER_LABELS.Date, value });
@@ -76,7 +84,7 @@ class MessageComposer {
 	 * @param label the label for the header, can be any string containing just US-ASCII printable characters (without white space characters).
 	 * @param value the value for the header, can be any `string` or {@link Date} or {@link Address} array. Providing other type values will fail.
 	 */
-	customHeader<T>(label: string, value: T): MessageComposer {
+	customHeader<T extends string | Date | Address[]>(label: string, value: T): MessageComposer {
 		if (!hasOnlyPrintableUsAscii(label, false)) {
 			throw new Error(
 				`invalid header label [${label}]. Header label should be composed only of printable US-ASCII characters without WSC.`,

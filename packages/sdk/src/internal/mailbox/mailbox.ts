@@ -181,6 +181,7 @@ export class MailchainMailbox implements Mailbox {
 		return {
 			from: messageContent.from.address,
 			to,
+			replyTo: messageContent.replyTo ? messageContent.replyTo.address : undefined,
 			subject: messageContent.subject,
 			timestamp: messageData.Headers.Created,
 			body: messageContent.message,

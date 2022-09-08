@@ -32,6 +32,8 @@ export type Attachment = {
 export type SendMailParams = {
 	/** Address for sending the mail. If not owned by the authenticated user, error is thrown. */
 	from: Address;
+	/** Address that the replies should be sent to instead of the {@link SendMailParams.from} address. */
+	replyTo?: Address;
 	/** The recipients that will appear in the `To:` field. */
 	to?: Address[];
 	/** The recipients that will appear in the `Cc:` field. */

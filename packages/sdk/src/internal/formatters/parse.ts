@@ -91,6 +91,8 @@ export async function parseMimeText(text: string): Promise<MailData> {
 		headers: { from, to, bcc, cc, subject },
 	}: any = parsedMessage;
 
+	const replyToHeader = headers['reply-to']?.[0]?.value?.[0];
+
 	const extractedContent =
 		parsedMessage.childNodes.length > 0
 			? extractContent(parsedMessage.childNodes)
@@ -100,6 +102,7 @@ export async function parseMimeText(text: string): Promise<MailData> {
 		id: headers['message-id'][0].value,
 		date: new Date(headers['date'][0].value),
 		from: { name: from[0].value[0].name, address: from[0].value[0].address },
+		replyTo: replyToHeader ? { name: replyToHeader.name, address: replyToHeader.address } : undefined,
 		recipients: to[0].value.map((it: any) => ({ name: it.name, address: it.address })),
 		carbonCopyRecipients: cc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
 		blindCarbonCopyRecipients: bcc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],

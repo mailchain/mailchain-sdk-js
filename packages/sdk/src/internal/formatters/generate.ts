@@ -19,6 +19,8 @@ export const createMimeMessage = async (
 		.message('html', Buffer.from(mailData.message))
 		.message('plain', Buffer.from(mailData.plainTextMessage));
 
+	if (mailData.replyTo) msg.replyTo(mailData.replyTo);
+
 	const builtMsg = await msg.build();
 
 	return {

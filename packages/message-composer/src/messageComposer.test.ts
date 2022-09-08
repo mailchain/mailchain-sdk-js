@@ -29,6 +29,7 @@ describe('MailchainMessageComposer UTF8', () => {
 				{ name: 'Jane Doe', address: 'jane@mailchain.com' },
 				{ name: 'Bob', address: 'bob@mailchain.com' },
 			)
+			.replyTo({ name: 'Robert', address: 'robert@mailchain.com' })
 			.message('plain', Buffer.from('Plaintext content. Can also contain UTF-8 and emojis 🤐.'))
 			.message('html', Buffer.from('This is ✨rich-text✨ HTML <b>content</b>.'))
 			.attachment({

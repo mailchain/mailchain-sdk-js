@@ -15,6 +15,7 @@ export type MessagePreview = {
 
 export type Message = {
 	from: string;
+	replyTo?: string;
 	to: string[];
 	cc: string[];
 	bcc: string[];

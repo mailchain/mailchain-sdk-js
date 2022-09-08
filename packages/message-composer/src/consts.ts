@@ -12,6 +12,7 @@ export const HEADER_LABELS = {
 	To: 'To',
 	Cc: 'Cc',
 	Bcc: 'Bcc',
+	ReplyTo: 'Reply-To',
 	ContentType: 'Content-Type',
 	ContentTransferEncoding: 'Content-Transfer-Encoding',
 	ContentDisposition: 'Content-Disposition',

@@ -5,6 +5,7 @@ describe('createMimeMessage', () => {
 	const mailData: MailData = {
 		id: '123@mailchain.local',
 		from: { address: '1337@mailchain.com', name: '1337' },
+		replyTo: { address: '7331@mailchain.com', name: '7311' },
 		recipients: [
 			{ address: 'rec1@mailchain.local', name: 'rec1' },
 			{ address: 'rec2@mailchain.local', name: 'rec2' },

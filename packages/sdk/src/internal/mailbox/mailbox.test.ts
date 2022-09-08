@@ -42,12 +42,19 @@ describe('mailbox', () => {
 		date: new Date('2022-06-06'),
 		id: '123@mailchain.local',
 		from: { address: '0x1234@ethereum.mailchain.local', name: '0x1234' },
+		replyTo: { address: 'alice@mailchain.local', name: 'Alice' },
 		recipients: [
 			{ address: '0x4321@ethereum.mailchain.local', name: '0x4321' },
 			{ address: '0xabcd@ethereum.mailchain.local', name: '0xabcd' },
 		],
-		carbonCopyRecipients: [],
-		blindCarbonCopyRecipients: [],
+		carbonCopyRecipients: [
+			{ address: 'cc1@mailchain.local', name: 'cc1' },
+			{ address: 'cc2@mailchain.local', name: 'cc2' },
+		],
+		blindCarbonCopyRecipients: [
+			{ address: 'bcc1@mailchain.local', name: 'bcc1' },
+			{ address: 'bcc2@mailchain.local', name: 'bcc2' },
+		],
 		message: mockMessage,
 		plainTextMessage: mockMessage,
 		subject:
@@ -184,7 +191,10 @@ describe('mailbox', () => {
 		const message = await mailbox.getFullMessage('messageId');
 
 		expect(message.from).toEqual(mailData.from.address);
+		expect(message.replyTo).toEqual(mailData.replyTo?.address);
 		expect(message.to).toEqual(mailData.recipients.map((r) => r.address));
+		expect(message.cc).toEqual(mailData.carbonCopyRecipients.map((r) => r.address));
+		expect(message.bcc).toEqual(mailData.blindCarbonCopyRecipients.map((r) => r.address));
 		expect(message.timestamp).toEqual(payload.Headers.Created);
 		expect(message.body).toMatchSnapshot('fullMessageBody');
 	});
@@ -214,9 +224,9 @@ describe('mailbox', () => {
 				'Mailchain makes it possible for users. All message contents & attachments are encrypted so only the',
 			subject: mailData.subject,
 			timestamp: payload.Headers.Created.getTime() / 1000,
-			to: ['0x4321@ethereum.mailchain.local', '0xabcd@ethereum.mailchain.local'],
-			bcc: [],
-			cc: [],
+			to: mailData.recipients.map((r) => r.address),
+			cc: mailData.carbonCopyRecipients.map((r) => r.address),
+			bcc: mailData.blindCarbonCopyRecipients.map((r) => r.address),
 		});
 		expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);
 		expect(requestBody.folder).toEqual(PutEncryptedMessageRequestBodyFolderEnum.Outbox);
@@ -254,9 +264,9 @@ describe('mailbox', () => {
 				'Mailchain makes it possible for users. All message contents & attachments are encrypted so only the',
 			subject: mailData.subject,
 			timestamp: payload.Headers.Created.getTime() / 1000,
-			to: mailData.recipients.map(({ address }) => address),
-			bcc: [],
-			cc: [],
+			to: mailData.recipients.map((r) => r.address),
+			cc: mailData.carbonCopyRecipients.map((r) => r.address),
+			bcc: mailData.blindCarbonCopyRecipients.map((r) => r.address),
 		});
 		expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);
 		expect(requestBody.folder).toEqual(PutEncryptedMessageRequestBodyFolderEnum.Inbox);
