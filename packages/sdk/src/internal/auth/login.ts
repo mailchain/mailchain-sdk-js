@@ -87,17 +87,20 @@ export async function accountAuthFinalize(
 	}
 
 	const clientSecretKey = Uint8Array.from(authFinishResponse.export_key);
+	const accountSecret = await decryptAccountSecret(clientSecretKey, response.data.encryptedAccountSecret);
+	const rootAccountKey = createRootAccountKey(accountSecret);
 
 	return {
 		clientSecretKey,
-		rootAccountKey: await decryptRootAccountKey(clientSecretKey, response.data.encryptedAccountSecret),
+		rootAccountKey,
+		accountSecret,
 	};
 }
 
-export async function decryptRootAccountKey(
+export async function decryptAccountSecret(
 	clientSecretKey: Uint8Array,
 	encryptedAccountSecret: EncryptedAccountSecret,
-): Promise<ED25519PrivateKey> {
+): Promise<AuthenticatedResponse['accountSecret']> {
 	const seed = sha256(clientSecretKey);
 	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
 	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
@@ -106,12 +109,19 @@ export async function decryptRootAccountKey(
 
 	switch (encryptedAccountSecret.encryptionId) {
 		case EncryptedAccountSecretEncryptionIdEnum.Account:
-			return ED25519PrivateKey.fromSeed(decryptedSecret);
-
+			return { kind: 'key-seed', value: decryptedSecret };
 		case EncryptedAccountSecretEncryptionIdEnum.Mnemonic:
-			return ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(decryptedSecret));
-
+			return { kind: 'mnemonic-phrase', value: decryptedSecret };
 		default:
 			throw new Error(`unknown encryptionId [${encryptedAccountSecret.encryptionId}]`);
+	}
+}
+
+export function createRootAccountKey({ kind, value }: AuthenticatedResponse['accountSecret']) {
+	switch (kind) {
+		case 'key-seed':
+			return ED25519PrivateKey.fromSeed(value);
+		case 'mnemonic-phrase':
+			return ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(value));
 	}
 }

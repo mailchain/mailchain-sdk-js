@@ -15,6 +15,7 @@ import { getMailchainUsernameParams, createProofMessage } from '../keyreg';
 import { signRawEd25519 } from '../signatures/raw_ed25119';
 import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from './opaque';
+import { AuthenticatedResponse } from './response';
 
 export async function accountRegisterInit(
 	username: string,
@@ -162,8 +163,14 @@ export async function accountRegisterFinalize(
 		throw new Error(`failed to finalize registration status: ${response.status}`);
 	}
 
+	const accountSecret: AuthenticatedResponse['accountSecret'] = {
+		kind: 'mnemonic-phrase',
+		value: toEntropy(mnemonicPhrase),
+	};
+
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),
+		accountSecret,
 	};
 }
 
