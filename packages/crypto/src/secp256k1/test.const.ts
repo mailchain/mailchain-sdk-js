@@ -24,7 +24,6 @@ export const BobHexSECP256K1PrivateKey = 'DF4BA9F6106AD2846472F759476535E55C5805
 export const BobSECP256K1PrivateKeyBytes = Uint8Array.from(Buffer.from(BobHexSECP256K1PrivateKey, 'hex'));
 export const BobSECP256K1PrivateKey = new SECP256K1PrivateKey(BobSECP256K1PrivateKeyBytes);
 
-//     "public_address": "0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6",
 export const AliceSECP256K1HexPrivateKey = '01901E63389EF02EAA7C5782E08B40D98FAEF835F28BD144EECF5614A415943F';
 export const AliceSECP256K1PrivateKeyBytes = Uint8Array.from(Buffer.from(AliceSECP256K1HexPrivateKey, 'hex'));
 export const AliceSECP256K1PrivateKey = new SECP256K1PrivateKey(AliceSECP256K1PrivateKeyBytes);

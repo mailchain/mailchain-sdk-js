@@ -4,29 +4,50 @@ import { KeyRing } from '@mailchain/keyring';
 import { ALGORAND, ETHEREUM, ProtocolType } from '@mailchain/addressing/protocols';
 import { encodeAddressByProtocol } from '@mailchain/addressing';
 import { encodeBase64 } from '@mailchain/encoding';
+import { mock, MockProxy } from 'jest-mock-extended';
+import { Decrypter, ED25519PublicKey, encodePublicKey, Encrypter, secureRandom } from '@mailchain/crypto';
 import { user } from '../protobuf/user/user';
+import { UserApiInterface } from '../api';
+import { nopMigration } from '../migration';
 import { MailchainUserProfile } from './userProfile';
 import { Address } from './address';
+import { UserAddressMigrationRule } from './migrations';
 
 describe('userProfile', () => {
+	let mockUserApi: MockProxy<UserApiInterface>;
+
+	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
+
+	const dummyIdentityKey1 = new ED25519PublicKey(secureRandom(32));
+	const dummyIdentityKey2 = new ED25519PublicKey(secureRandom(32));
+	const migratedDummyIdentityKey2 = new ED25519PublicKey(secureRandom(32));
+
+	const dummyV1toV2Migration: UserAddressMigrationRule = {
+		shouldApply: ({ version }) => Promise.resolve(version === 1),
+		apply: (data) =>
+			Promise.resolve({
+				protoAddress: user.Address.create({
+					...data.protoAddress,
+					identityKey: encodePublicKey(migratedDummyIdentityKey2),
+				}),
+				version: 2,
+			}),
+	};
+
+	beforeEach(() => {
+		mockUserApi = mock();
+		mockUserApi.postUserAddress.mockImplementation(() =>
+			Promise.resolve({ data: { addressId: randomUUID() } } as any),
+		);
+	});
+
 	it('should save addresses and retrieve them', async () => {
 		// Bit hacky multiple cases in a single test, but in a way end-to-end test
-
-		const postUserAddressFn = jest.fn();
-		postUserAddressFn.mockImplementation(() => Promise.resolve({ data: { addressId: randomUUID() } }));
-		const getUserAddressesFn = jest.fn();
-		const userApi = {
-			postUserAddress: postUserAddressFn,
-			getUserAddresses: getUserAddressesFn,
-		} as any;
-		const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-
-		// @ts-ignore
-		const userProfile = new MailchainUserProfile(userApi, keyRing.userProfileCrypto());
+		const userProfile = new MailchainUserProfile(mockUserApi, keyRing.userProfileCrypto(), dummyV1toV2Migration);
 
 		const newAddresses = [
-			{ address: '0x1337', nonce: 1, protocol: ETHEREUM, network: 'main' },
-			{ address: 'geztgny', nonce: 1337, protocol: ALGORAND, network: 'test' },
+			{ identityKey: dummyIdentityKey1, address: '0x1337', nonce: 1, protocol: ETHEREUM, network: 'main' },
+			{ identityKey: dummyIdentityKey2, address: 'geztgny', nonce: 1337, protocol: ALGORAND, network: 'test' },
 		];
 
 		// When - add the two addresses from expectedAddresses
@@ -37,14 +58,16 @@ describe('userProfile', () => {
 		const apiAddresses = [
 			{
 				addressId: newAddress1.id,
-				encryptedAddressInformation: postUserAddressFn.mock.calls[0][0].encryptedAddressInformation,
+				encryptedAddressInformation: mockUserApi.postUserAddress.mock.calls[0][0].encryptedAddressInformation,
+				version: 2,
 			},
 			{
 				addressId: newAddress2.id,
-				encryptedAddressInformation: postUserAddressFn.mock.calls[1][0].encryptedAddressInformation,
+				encryptedAddressInformation: mockUserApi.postUserAddress.mock.calls[1][0].encryptedAddressInformation,
+				version: 1,
 			},
 		];
-		getUserAddressesFn.mockReturnValue(Promise.resolve({ data: { addresses: apiAddresses } }));
+		mockUserApi.getUserAddresses.mockResolvedValue({ data: { addresses: apiAddresses } } as any);
 
 		// When - the user requests the address
 		const actualAddresses = await userProfile.addresses();
@@ -53,36 +76,36 @@ describe('userProfile', () => {
 
 		expect(actualAddresses).toEqual([
 			{ ...newAddresses[0], id: newAddress1.id },
-			{ ...newAddresses[1], id: newAddress2.id },
+			{ ...newAddresses[1], id: newAddress2.id, identityKey: migratedDummyIdentityKey2 },
 		]);
 	});
 
 	it('should update existing address', async () => {
-		const putUserAddressFn = jest.fn();
-		const userApi = {
-			putUserAddress: putUserAddressFn,
-		} as any;
-		const cryptoFn = {
-			encrypt: jest.fn(),
-			decrypt: jest.fn(),
+		const mockCrypto = mock<Encrypter & Decrypter>();
+		mockCrypto.encrypt.mockResolvedValue(new Uint8Array([1, 3, 3, 7]));
+		const userProfile = new MailchainUserProfile(mockUserApi, mockCrypto, nopMigration());
+
+		const address: Address = {
+			id: '1337',
+			address: '0x1337',
+			identityKey: dummyIdentityKey1,
+			nonce: 1338,
+			protocol: ETHEREUM,
+			network: 'main',
 		};
-		cryptoFn.encrypt.mockReturnValue(new Uint8Array([1, 3, 3, 7]));
-		// @ts-ignore
-		const userProfile = new MailchainUserProfile(userApi, cryptoFn);
 
-		const address: Address = { id: '1337', address: '0x1337', nonce: 1337, protocol: ETHEREUM, network: 'main' };
+		const resAddress = await userProfile.updateAddress('1337', address);
 
-		const resAddress = await userProfile.updateAddress(address, 1338);
-
-		const protoAddress = user.Address.decode(cryptoFn.encrypt.mock.calls[0][0]);
+		const protoAddress = user.Address.decode(mockCrypto.encrypt.mock.calls[0][0]);
 		expect(encodeAddressByProtocol(protoAddress.address, protoAddress.protocol as ProtocolType).encoded).toEqual(
 			address.address,
 		);
 		expect(protoAddress.protocol).toEqual(address.protocol);
 		expect(protoAddress.network).toEqual(address.network);
 		expect(protoAddress.nonce).toEqual(1338);
-		expect(putUserAddressFn.mock.calls[0][0]).toEqual(address.id);
-		expect(putUserAddressFn.mock.calls[0][1]).toEqual({
+		expect(mockUserApi.putUserAddress.mock.calls[0][0]).toEqual(address.id);
+		expect(mockUserApi.putUserAddress.mock.calls[0][1]).toEqual({
+			version: 2,
 			encryptedAddressInformation: encodeBase64(new Uint8Array([1, 3, 3, 7])),
 		});
 		expect(resAddress).toEqual({ ...address, nonce: 1338 });

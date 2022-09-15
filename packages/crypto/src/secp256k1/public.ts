@@ -24,7 +24,7 @@ export class SECP256K1PublicKey implements PublicKey {
 		}
 	}
 	/**
-	 * FromSignature will return a public key from the message and signature. The returned key
+	 * fromSignature will return a public key from the message and signature. The returned key
 	 * will validate the hash. Meaning message and signature pairs will return a public key.
 	 * Additionally checks should be performed to ensure the public key is as expected.
 	 * @param message
@@ -43,8 +43,8 @@ export class SECP256K1PublicKey implements PublicKey {
 		const recoveredKeyBytes = recoverPublicKey(dataBytes, signature);
 
 		// TODO: this always returns a public key even if the recovered key does not match
-		// the private key it was signed with. This should not be peformed without knowing the address.
-		// Need to include method to caluluate address
+		// the private key it was signed with. This should not be performed without knowing the address.
+		// Need to include method to calculate address
 		const pubKey = new SECP256K1PublicKey(Uint8Array.from(Buffer.from(recoveredKeyBytes.replace('0x', ''), 'hex')));
 
 		return pubKey;

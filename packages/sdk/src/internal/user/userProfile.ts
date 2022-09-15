@@ -1,13 +1,15 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { decodeAddressByProtocol, encodeAddressByProtocol, ProtocolType } from '@mailchain/addressing';
-import { Decrypter, Encrypter, SignerWithPublicKey } from '@mailchain/crypto';
+import { decodePublicKey, Decrypter, encodePublicKey, Encrypter, SignerWithPublicKey } from '@mailchain/crypto';
 import { AxiosError } from 'axios';
 import { user } from '../protobuf/user/user';
-import { Setting, UserApiFactory, UserApiInterface } from '../api';
+import { AddressesApiFactory, Setting, UserApiFactory, UserApiInterface } from '../api';
 import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
+import { combineMigrations } from '../migration';
 import { Address } from './address';
+import { createV1V2IdentityKeyMigration, UserAddressMigrationRule } from './migrations';
 
 export type UserSettings = { [key: string]: Setting | undefined };
 
@@ -17,11 +19,13 @@ export class UserNotFoundError extends Error {
 	}
 }
 
+const CURRENT_ADDRESS_VERSION = 2 as const;
+
 type NewAddress = Omit<Address, 'id'>;
 export interface UserProfile {
 	addresses(): Promise<Address[]>;
 	addAddress(address: NewAddress): Promise<Address>;
-	updateAddress(address: Address, newNonce: number): Promise<Address>;
+	updateAddress(addressId: string, address: NewAddress): Promise<Address>;
 	deleteAddress(addressId: string): Promise<void>;
 	getSettings(): Promise<UserSettings>;
 	setSetting(key: string, value: string): Promise<void>;
@@ -29,20 +33,24 @@ export interface UserProfile {
 }
 
 export class MailchainUserProfile implements UserProfile {
-	private constructor(
+	constructor(
 		private readonly userApi: UserApiInterface,
 		private readonly addressCrypto: Encrypter & Decrypter,
+		private readonly migration: UserAddressMigrationRule,
 	) {}
 
 	static create(
-		configuration: Configuration,
+		config: Configuration,
 		accountIdentityKey: SignerWithPublicKey,
 		addressCrypto: Encrypter & Decrypter,
 	): MailchainUserProfile {
-		return new this(
-			UserApiFactory(createAxiosConfiguration(configuration), undefined, getAxiosWithSigner(accountIdentityKey)),
-			addressCrypto,
+		const axiosConfig = createAxiosConfiguration(config);
+		const addressesApi = AddressesApiFactory(axiosConfig);
+		const userApi = UserApiFactory(axiosConfig, undefined, getAxiosWithSigner(accountIdentityKey));
+		const migrations = combineMigrations(
+			createV1V2IdentityKeyMigration(addressesApi, config.mailchainAddressDomain),
 		);
+		return new MailchainUserProfile(userApi, addressCrypto, migrations);
 	}
 
 	async getUsername() {
@@ -74,29 +82,44 @@ export class MailchainUserProfile implements UserProfile {
 
 	async addresses(): Promise<Address[]> {
 		const { addresses } = await this.userApi.getUserAddresses().then((r) => r.data);
-		if (addresses) {
-			const resultAddresses: Address[] = [];
-			for (const address of addresses) {
-				const decryptedAddress = await this.addressCrypto.decrypt(
-					decodeBase64(address.encryptedAddressInformation),
-				);
-				const protoAddress = user.Address.decode(decryptedAddress);
-				const protocol = protoAddress.protocol as ProtocolType;
-				resultAddresses.push({
-					id: address.addressId!,
-					address: encodeAddressByProtocol(protoAddress.address!, protocol).encoded,
-					nonce: protoAddress.nonce,
-					protocol,
-					network: protoAddress.network,
-				});
+		const resultAddresses: Address[] = [];
+		for (const apiAddress of addresses) {
+			const decryptedAddress = await this.addressCrypto.decrypt(
+				decodeBase64(apiAddress.encryptedAddressInformation),
+			);
+
+			const originalAddressData = {
+				version: apiAddress.version,
+				protoAddress: user.Address.decode(decryptedAddress),
+			};
+			const addressData = (await this.migration.shouldApply(originalAddressData))
+				? await this.migration.apply(originalAddressData)
+				: originalAddressData;
+
+			if (originalAddressData.version !== addressData.version) {
+				// TODO another PR: put update userProfile.update(...)
 			}
-			return resultAddresses;
+
+			const { protoAddress } = addressData;
+			const protocol = protoAddress.protocol as ProtocolType;
+			const encodedAddress = encodeAddressByProtocol(protoAddress.address!, protocol).encoded;
+
+			resultAddresses.push({
+				id: apiAddress.addressId!,
+				address: encodedAddress,
+				identityKey: decodePublicKey(protoAddress.identityKey),
+				nonce: protoAddress.nonce,
+				protocol,
+				network: protoAddress.network,
+			});
 		}
-		return [];
+
+		return resultAddresses;
 	}
 
 	async addAddress(address: NewAddress): Promise<Address> {
 		const protoAddress = user.Address.create({
+			identityKey: encodePublicKey(address.identityKey),
 			address: decodeAddressByProtocol(address.address, address.protocol).decoded,
 			nonce: address.nonce,
 			protocol: address.protocol,
@@ -104,21 +127,26 @@ export class MailchainUserProfile implements UserProfile {
 		});
 		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
 		const { addressId } = await this.userApi
-			.postUserAddress({ encryptedAddressInformation: encodeBase64(encrypted) })
+			.postUserAddress({ encryptedAddressInformation: encodeBase64(encrypted), version: CURRENT_ADDRESS_VERSION })
 			.then((res) => res.data);
+
 		return { ...address, id: addressId! };
 	}
 
-	async updateAddress(address: Address, newNonce: number): Promise<Address> {
+	async updateAddress(addressId: string, address: NewAddress): Promise<Address> {
 		const protoAddress = user.Address.create({
+			identityKey: encodePublicKey(address.identityKey),
 			address: decodeAddressByProtocol(address.address, address.protocol).decoded,
-			nonce: newNonce,
+			nonce: address.nonce,
 			protocol: address.protocol,
 			network: address.network,
 		});
 		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
-		await this.userApi.putUserAddress(address.id, { encryptedAddressInformation: encodeBase64(encrypted) });
-		return { ...address, nonce: newNonce };
+		await this.userApi.putUserAddress(addressId, {
+			encryptedAddressInformation: encodeBase64(encrypted),
+			version: CURRENT_ADDRESS_VERSION,
+		});
+		return { id: addressId, ...address };
 	}
 
 	async deleteAddress(addressId: string): Promise<void> {

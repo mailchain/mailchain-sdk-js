@@ -36,10 +36,9 @@ interface TestDetails {
 		| { reason: Error; status: string }[];
 }
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8080';
+const MAILCHAIN_ADDRESS_DOMAIN_NAME = (process.env.MAILCHAIN_ADDRESS_DOMAIN_NAME = 'mailchain.local');
 
-const apiConfig = { apiPath: SERVER_URL } as Configuration;
-
-process.env.MAILCHAIN_ADDRESS_DOMAIN_NAME = 'mailchain.local';
+const apiConfig: Configuration = { apiPath: SERVER_URL, mailchainAddressDomain: MAILCHAIN_ADDRESS_DOMAIN_NAME };
 
 const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);

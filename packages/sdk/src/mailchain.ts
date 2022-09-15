@@ -16,9 +16,13 @@ import { toMailData } from './convertSendMailParams';
 
 export type Configuration = {
 	apiPath: string;
+	mailchainAddressDomain: string;
 };
 
-const defaultConfiguration = { apiPath: 'https://api.mailchain.com' };
+const defaultConfiguration: Configuration = {
+	apiPath: 'https://api.mailchain.com',
+	mailchainAddressDomain: 'mailchain.com',
+};
 
 type MailSenderResult = SendResult | PrepareResult;
 
@@ -91,11 +95,7 @@ export class Mailchain {
 	async sendMail(params: SendMailParams): Promise<SendMailResult> {
 		const senderMessagingKey = await this.getSenderMessagingKey(params.from, {
 			lookup: Lookup.create(this.config),
-			userProfile: MailchainUserProfile.create(
-				this.config,
-				this.keyRing.accountIdentityKey(),
-				this.keyRing.userProfileCrypto(),
-			),
+			userProfile: this._userProfile,
 		});
 
 		const sender = MailSender.create(this.config, senderMessagingKey);
