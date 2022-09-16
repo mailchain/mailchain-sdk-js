@@ -84,34 +84,49 @@ export class MailchainUserProfile implements UserProfile {
 		const { addresses } = await this.userApi.getUserAddresses().then((r) => r.data);
 		const resultAddresses: Address[] = [];
 		for (const apiAddress of addresses) {
-			const decryptedAddress = await this.addressCrypto.decrypt(
-				decodeBase64(apiAddress.encryptedAddressInformation),
-			);
+			try {
+				const decryptedAddress = await this.addressCrypto.decrypt(
+					decodeBase64(apiAddress.encryptedAddressInformation),
+				);
 
-			const originalAddressData = {
-				version: apiAddress.version,
-				protoAddress: user.Address.decode(decryptedAddress),
-			};
-			const addressData = (await this.migration.shouldApply(originalAddressData))
-				? await this.migration.apply(originalAddressData)
-				: originalAddressData;
+				const originalAddressData = {
+					version: apiAddress.version,
+					protoAddress: user.Address.decode(decryptedAddress),
+				};
 
-			if (originalAddressData.version !== addressData.version) {
-				// TODO another PR: put update userProfile.update(...)
+				const addressData = (await this.migration.shouldApply(originalAddressData))
+					? await this.migration.apply(originalAddressData)
+					: originalAddressData;
+
+				if (apiAddress.version !== addressData.version) {
+					console.debug(
+						`${apiAddress.addressId} migrated from v${apiAddress.version} to v${addressData.version}`,
+					);
+					this.internalUpdateAddress(
+						apiAddress.addressId,
+						addressData.protoAddress,
+						addressData.version,
+					).then(
+						() => console.debug(`successfully stored migrated address ${apiAddress.addressId}`),
+						(e) => console.warn(`failed storing migrated address ${apiAddress.addressId}`, e),
+					);
+				}
+
+				const { protoAddress } = addressData;
+				const protocol = protoAddress.protocol as ProtocolType;
+				const encodedAddress = encodeAddressByProtocol(protoAddress.address!, protocol).encoded;
+
+				resultAddresses.push({
+					id: apiAddress.addressId,
+					address: encodedAddress,
+					identityKey: decodePublicKey(protoAddress.identityKey),
+					nonce: protoAddress.nonce,
+					protocol,
+					network: protoAddress.network,
+				});
+			} catch (e) {
+				console.error(`failed processing address ${apiAddress.addressId}`, e);
 			}
-
-			const { protoAddress } = addressData;
-			const protocol = protoAddress.protocol as ProtocolType;
-			const encodedAddress = encodeAddressByProtocol(protoAddress.address!, protocol).encoded;
-
-			resultAddresses.push({
-				id: apiAddress.addressId!,
-				address: encodedAddress,
-				identityKey: decodePublicKey(protoAddress.identityKey),
-				nonce: protoAddress.nonce,
-				protocol,
-				network: protoAddress.network,
-			});
 		}
 
 		return resultAddresses;
@@ -130,7 +145,7 @@ export class MailchainUserProfile implements UserProfile {
 			.postUserAddress({ encryptedAddressInformation: encodeBase64(encrypted), version: CURRENT_ADDRESS_VERSION })
 			.then((res) => res.data);
 
-		return { ...address, id: addressId! };
+		return { ...address, id: addressId };
 	}
 
 	async updateAddress(addressId: string, address: NewAddress): Promise<Address> {
@@ -141,12 +156,18 @@ export class MailchainUserProfile implements UserProfile {
 			protocol: address.protocol,
 			network: address.network,
 		});
-		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
-		await this.userApi.putUserAddress(addressId, {
-			encryptedAddressInformation: encodeBase64(encrypted),
-			version: CURRENT_ADDRESS_VERSION,
-		});
+		await this.internalUpdateAddress(addressId, protoAddress, CURRENT_ADDRESS_VERSION);
 		return { id: addressId, ...address };
+	}
+
+	private async internalUpdateAddress(
+		addressId: string,
+		protoAddress: user.Address,
+		version: number,
+	): Promise<user.Address> {
+		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
+		await this.userApi.putUserAddress(addressId, { encryptedAddressInformation: encodeBase64(encrypted), version });
+		return protoAddress;
 	}
 
 	async deleteAddress(addressId: string): Promise<void> {
