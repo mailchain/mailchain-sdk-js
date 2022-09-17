@@ -1,0 +1,46 @@
+import { formatAddress, MailchainAddress } from '@mailchain/addressing';
+import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
+import Axios from 'axios';
+import { Configuration } from '../../mailchain';
+import {
+	AddressesApiFactory,
+	AddressesApiInterface,
+	IdentityKeysApiFactory,
+	IdentityKeysApiInterface,
+	PutMsgKeyByIDKeyRequestBody,
+} from '../api';
+import { createAxiosConfiguration } from '../axios/config';
+
+export class IdentityKeys {
+	constructor(
+		private readonly addressesApi: AddressesApiInterface,
+		private readonly identityKeysApi: IdentityKeysApiInterface,
+	) {}
+
+	static create(config: Configuration) {
+		return new IdentityKeys(
+			AddressesApiFactory(createAxiosConfiguration(config)),
+			IdentityKeysApiFactory(createAxiosConfiguration(config)),
+		);
+	}
+
+	async getAddressIdentityKey(address: MailchainAddress): Promise<PublicKey | null> {
+		return this.addressesApi
+			.getAddressIdentityKey(formatAddress(address, 'mail'))
+			.then(({ data }) => decodePublicKey(decodeHexZeroX(data.identityKey)))
+			.catch((e) => {
+				if (Axios.isAxiosError(e)) {
+					if (e.response?.data?.message === 'address not found') {
+						return null;
+					}
+				}
+				throw e;
+			});
+	}
+
+	async putAddressIdentityKey(addressProofParams: PutMsgKeyByIDKeyRequestBody, identityKey: PublicKey): Promise<any> {
+		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(identityKey));
+		return this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, addressProofParams);
+	}
+}
