@@ -10,13 +10,6 @@ export type MailchainAddress = {
 	domain: string;
 };
 
-/**
- * Representation of the address used in Mailchain applications that is owned by the current user. For safety, should be created by {@link createOwnedMailchainAddress}.
- */
-export type OwnedMailchainAddress = MailchainAddress & {
-	nonce: number;
-};
-
 export function createMailchainAddress(value: string, protocol: ProtocolType, domain: string): MailchainAddress {
 	protocol = protocol.toLowerCase() as ProtocolType;
 	return {
@@ -28,13 +21,4 @@ export function createMailchainAddress(value: string, protocol: ProtocolType, do
 
 export function isSameMailchainAddress(a: MailchainAddress, b: MailchainAddress): boolean {
 	return a.value === b.value && a.protocol === b.protocol && a.domain === b.domain;
-}
-
-export function createOwnedMailchainAddress(
-	value: string,
-	protocol: ProtocolType,
-	domain: string,
-	nonce: number,
-): OwnedMailchainAddress {
-	return { ...createMailchainAddress(value, protocol, domain), nonce };
 }

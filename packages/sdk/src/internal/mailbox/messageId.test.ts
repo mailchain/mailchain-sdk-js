@@ -1,4 +1,5 @@
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
+import { AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { KeyRing } from '@mailchain/keyring';
 import { MailData } from '../formatters/types';
 import { createMailchainMessageIdCreator } from './messageId';
@@ -25,11 +26,13 @@ describe('mailbox message id', () => {
 		const recipientHash1 = await aliceHasher({
 			mailData: { id: '123@mailchain.local' } as MailData,
 			type: 'received',
+			mailbox: AliceSECP256K1PublicKey,
 			owner: '0x4321@ethereum.mailchain.local',
 		});
 		const recipientHash2 = await aliceHasher({
 			mailData: { id: '123@mailchain.local' } as MailData,
 			type: 'received',
+			mailbox: AliceSECP256K1PublicKey,
 			owner: '0x1234@ethereum.mailchain.local',
 		});
 

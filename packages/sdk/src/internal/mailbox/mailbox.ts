@@ -1,6 +1,7 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import flatten from 'lodash/flatten';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
+import { formatAddress } from '@mailchain/addressing';
 import { Configuration } from '../../';
 import {
 	InboxApiInterface,
@@ -15,17 +16,15 @@ import { MailData } from '../formatters/types';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Payload } from '../transport/payload/content/payload';
 import { createAxiosConfiguration } from '../axios/config';
+import { UserMailbox } from '../user/types';
 import { AddressesHasher, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
 import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
-import { Address } from '../api/api';
-import { OwnedMailchainAddress } from '@mailchain/addressing';
-import { formatAddress } from '../../../../addressing/src/addressFormatting';
 
-type SaveSentMessageParam = { payload: Payload; content: MailData };
+type SaveSentMessageParam = { userMailbox: UserMailbox; payload: Payload; content: MailData };
 
-type SaveReceivedMessageParam = { owner: string; payload: Payload };
+type SaveReceivedMessageParam = { userMailbox: UserMailbox; payload: Payload };
 
 export interface Mailbox {
 	getMessage(messageId: string): Promise<MessagePreview>;
@@ -192,23 +191,31 @@ export class MailchainMailbox implements Mailbox {
 
 	async saveSentMessage(params: SaveSentMessageParam): Promise<MessagePreview> {
 		const messageId = await this.messageIdCreator({ type: 'sent', mailData: params.content });
-		return this.saveMessage(messageId, params.payload, params.content, params.content.from.address, 'outbox');
+		return this.saveMessage(messageId, params.payload, params.content, params.userMailbox, 'outbox');
 	}
 
 	async saveReceivedMessage(params: SaveReceivedMessageParam): Promise<MessagePreview> {
 		const mailData = await parseMimeText(params.payload.Content.toString());
-		const messageId = await this.messageIdCreator({ type: 'received', mailData, owner: params.owner });
-		return await this.saveMessage(messageId, params.payload, mailData, params.owner, 'inbox');
+
+		// Note: As of developing this it was safe to assume single alias per mailbox.
+		// Long-term this will not be the case and will need to be reworked.
+		const messageId = await this.messageIdCreator({
+			type: 'received',
+			mailData,
+			owner: formatAddress(params.userMailbox.sendAs[0], 'mail'),
+			mailbox: params.userMailbox.identityKey,
+		});
+		return await this.saveMessage(messageId, params.payload, mailData, params.userMailbox, 'inbox');
 	}
 
 	private async saveMessage(
 		messageId: string,
 		payload: Payload,
 		content: MailData,
-		owner: string,
+		userMailbox: UserMailbox,
 		folder: 'inbox' | 'outbox',
 	): Promise<MessagePreview> {
-		const messagePreview = createMessagePreview(owner, payload, content);
+		const messagePreview = createMessagePreview(userMailbox, payload, content);
 		const encodedMessagePreview = protoInbox.preview.MessagePreview.encode(messagePreview).finish();
 
 		const encryptedMessagePreview = await this.messagePreviewCrypto.encrypt(encodedMessagePreview);
@@ -289,13 +296,13 @@ export class MailchainMailbox implements Mailbox {
 }
 
 function createMessagePreview(
-	owner: string,
+	userMailbox: UserMailbox,
 	payload: Payload,
 	content: MailData,
 	snippetLength = 100,
 ): protoInbox.preview.MessagePreview {
 	return protoInbox.preview.MessagePreview.create({
-		owner,
+		owner: formatAddress(userMailbox.sendAs[0], 'mail'),
 		to: content.recipients.map((it) => it.address),
 		cc: content.carbonCopyRecipients.map((it) => it.address),
 		bcc: content.blindCarbonCopyRecipients.map((it) => it.address),

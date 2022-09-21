@@ -1,5 +1,5 @@
 import { KeyRing } from '@mailchain/keyring';
-import { decodeAddressByProtocol, MAILCHAIN } from '@mailchain/addressing';
+import { decodeAddressByProtocol, formatAddress, MAILCHAIN } from '@mailchain/addressing';
 import { ED25519PrivateKey } from '@mailchain/crypto';
 import {
 	FailedAddressMessageKeyResolutionsError,
@@ -13,6 +13,7 @@ import { toUint8Array } from './internal/formatters/hex';
 import { Mailbox, MailchainMailbox } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
 import { toMailData } from './convertSendMailParams';
+import { UserMailbox } from './internal/user/types';
 
 export type Configuration = {
 	apiPath: string;
@@ -93,10 +94,15 @@ export class Mailchain {
 	 * depending on the status of the request.
 	 */
 	async sendMail(params: SendMailParams): Promise<SendMailResult> {
-		const senderMessagingKey = await this.getSenderMessagingKey(params.from, {
+		const senderMailbox = await this.getSenderMailbox(params.from, {
 			lookup: Lookup.create(this.config),
 			userProfile: this._userProfile,
 		});
+		const senderMessagingKey = this.keyRing.addressMessagingKey(
+			senderMailbox.messagingKeyParams.address,
+			senderMailbox.messagingKeyParams.protocol,
+			senderMailbox.messagingKeyParams.nonce,
+		);
 
 		const sender = MailSender.create(this.config, senderMessagingKey);
 
@@ -114,6 +120,7 @@ export class Mailchain {
 
 		// save the message in the outbox while the sending is happening
 		const outboxMessage = await this._mailbox.saveSentMessage({
+			userMailbox: senderMailbox,
 			payload: prepareResult.message,
 			content: mailData,
 		});
@@ -165,27 +172,20 @@ export class Mailchain {
 		return this._userProfile.getUsername();
 	}
 
-	private async getSenderMessagingKey(fromAddress: Address, config: { lookup: Lookup; userProfile: UserProfile }) {
-		const fromPublicKey = await config.lookup.messageKey(fromAddress);
-		if (fromPublicKey.address.protocol === MAILCHAIN) {
-			return this.keyRing.accountMessagingKey();
-		}
+	private async getSenderMailbox(
+		fromAddress: Address,
+		config: { lookup: Lookup; userProfile: UserProfile },
+	): Promise<UserMailbox> {
+		const mailboxes = await config.userProfile.mailboxes();
 
-		const registeredAddresses = await config.userProfile.addresses();
-
-		const foundRegisteredAddress = registeredAddresses.find((x) => {
+		const foundMailbox = mailboxes.find((mailbox) => {
 			// comparing raw address is case sensitive
-			return x.address === fromPublicKey.address.value && x.protocol === fromPublicKey.address.protocol;
+			return mailbox.sendAs.some((alias) => formatAddress(alias, 'mail') === fromAddress);
 		});
 
-		if (!foundRegisteredAddress) {
+		if (!foundMailbox) {
 			throw Error(`${fromAddress} is not registered by this account`);
 		}
-
-		return this.keyRing.addressMessagingKey(
-			decodeAddressByProtocol(foundRegisteredAddress.address, foundRegisteredAddress.protocol).decoded,
-			foundRegisteredAddress.protocol,
-			foundRegisteredAddress.nonce,
-		);
+		return foundMailbox;
 	}
 }

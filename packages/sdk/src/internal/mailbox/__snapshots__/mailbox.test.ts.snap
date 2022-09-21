@@ -175,7 +175,7 @@ Array [
 ]
 `;
 
-exports[`mailbox should encrypt and post received message: received message id 1`] = `"5118b83a98441db6bf202a43c7dc6f002418f2f23dd583e14a71a1a81db5a77a"`;
+exports[`mailbox should encrypt and post received message: received message id 1`] = `"8f78dab901d334e75c951ec70576dab9e50faff1e8c2b40e9ee35777d1e51488"`;
 
 exports[`mailbox should encrypt and post sent message: hashedFrom 1`] = `
 Array [

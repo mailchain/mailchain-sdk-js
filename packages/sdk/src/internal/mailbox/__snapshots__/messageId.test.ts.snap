@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`mailbox message id should create unique id for received messages: recipientHash1 1`] = `"5118b83a98441db6bf202a43c7dc6f002418f2f23dd583e14a71a1a81db5a77a"`;
+exports[`mailbox message id should create unique id for received messages: recipientHash1 1`] = `"7ab57af2c5cd660e62ebe6eec0f17109203a022672d7d137e6fc73cc8f49b6b9"`;
 
-exports[`mailbox message id should create unique id for received messages: recipientHash2 1`] = `"875bb458b4a5493e081f1499581d79a7203632d2f1197a975a5d99e8c9607c29"`;
+exports[`mailbox message id should create unique id for received messages: recipientHash2 1`] = `"9ba1c633ef3c83917dc904abe0dbf870ffa175082a1027361d881f5d1e52c02c"`;
 
 exports[`mailbox message id should create unique id for sent messages: aliceSentHash 1`] = `"112574bb1fcf3fe670bdcd14e2dda34de77343509adb8f9a68dc9b16a0414602"`;
 

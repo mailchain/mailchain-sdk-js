@@ -4,6 +4,7 @@ import { KindNaClSecretKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64, encodeHex, EncodingTypes } from '@mailchain/encoding';
 import { mock } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
+import { formatAddress } from '@mailchain/addressing';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { createMimeMessage } from '../formatters/generate';
 import { Payload } from '../transport/payload/content/payload';
@@ -15,6 +16,7 @@ import {
 	PutEncryptedMessageRequestBodyFolderEnum,
 } from '../api';
 import { MailData } from '../formatters/types';
+import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
 import { Mailbox, MailchainMailbox } from './mailbox';
 import { createMailchainMessageCrypto } from './messageCrypto';
 import { AddressesHasher } from './addressHasher';
@@ -207,7 +209,7 @@ describe('mailbox', () => {
 		} as AxiosResponse<PostPayloadResponseBody>);
 		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
-		const message = await mailbox.saveSentMessage({ payload, content: mailData });
+		const message = await mailbox.saveSentMessage({ userMailbox: AliceAccountMailbox, payload, content: mailData });
 
 		expect(message.messageId).toMatchSnapshot('sent message id');
 		expect(inboxApi.putEncryptedMessage.mock.calls[0][0]).toEqual(message.messageId);
@@ -217,7 +219,7 @@ describe('mailbox', () => {
 		);
 
 		expect(decryptedPreview).toEqual({
-			owner: mailData.from.address,
+			owner: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
 			from: mailData.from.address,
 			hasAttachment: false,
 			snippet:
@@ -246,7 +248,10 @@ describe('mailbox', () => {
 		} as AxiosResponse<PostPayloadResponseBody>);
 		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
-		const message = await mailbox.saveReceivedMessage({ payload, owner: mailData.recipients[0].address });
+		const message = await mailbox.saveReceivedMessage({
+			payload,
+			userMailbox: AliceWalletMailbox,
+		});
 
 		expect(message.messageId).toMatchSnapshot('received message id');
 		expect(inboxApi.putEncryptedMessage.mock.calls).toHaveLength(1);
@@ -258,7 +263,7 @@ describe('mailbox', () => {
 
 		expect(decryptedPreview).toEqual({
 			from: mailData.from.address,
-			owner: mailData.recipients[0].address,
+			owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
 			hasAttachment: false,
 			snippet:
 				'Mailchain makes it possible for users. All message contents & attachments are encrypted so only the',

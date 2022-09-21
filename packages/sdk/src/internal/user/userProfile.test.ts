@@ -1,24 +1,27 @@
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { ETHEREUM } from '@mailchain/addressing/protocols';
-import { decodeAddressByProtocol, encodeAddressByProtocol } from '@mailchain/addressing';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ED25519PublicKey, encodePublicKey, secureRandom } from '@mailchain/crypto';
-import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AxiosResponse } from 'axios';
+import { formatAddress } from '@mailchain/addressing';
 import { user } from '../protobuf/user/user';
-import { GetUserAddressesResponseBody, PostUserAddressResponseBody, UserApiInterface } from '../api';
+import {
+	GetUserAddressesResponseBody,
+	GetUsernameResponseBody,
+	PostUserAddressResponseBody,
+	UserApiInterface,
+} from '../api';
 import { nopMigration } from '../migration';
-import { AliceSECP256K1PublicAddress, BobSECP256K1PublicAddress } from '../ethereum/test.const';
-import { MailchainUserProfile } from './userProfile';
-import { Address } from './address';
+import { MailchainUserProfile, UserProfile } from './userProfile';
 import { UserAddressMigrationRule } from './migrations';
+import { AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox } from './test.const';
 
 describe('userProfile', () => {
 	let mockUserApi: MockProxy<UserApiInterface>;
 
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
+	const fetchIdentityKey = () => Promise.resolve(keyRing.accountIdentityKey().publicKey);
 
 	const migratedIdentityKey = new ED25519PublicKey(secureRandom(32));
 	const dummyMigration: UserAddressMigrationRule = {
@@ -33,55 +36,61 @@ describe('userProfile', () => {
 			}),
 	};
 
-	const address1: Address = {
-		id: 'address1-id',
-		address: encodeAddressByProtocol(AliceSECP256K1PublicAddress, ETHEREUM).encoded,
-		identityKey: AliceSECP256K1PublicKey,
-		nonce: 1,
-		network: 'main',
-		protocol: ETHEREUM,
-	};
 	const protoAddress1: user.Address = user.Address.create({
-		address: decodeAddressByProtocol(address1.address, address1.protocol).decoded,
-		identityKey: encodePublicKey(address1.identityKey),
-		nonce: address1.nonce,
-		network: address1.network,
-		protocol: address1.protocol,
+		address: AliceWalletMailbox.messagingKeyParams.address,
+		identityKey: encodePublicKey(AliceWalletMailbox.identityKey),
+		nonce: AliceWalletMailbox.messagingKeyParams.nonce,
+		network: AliceWalletMailbox.messagingKeyParams.network,
+		protocol: AliceWalletMailbox.messagingKeyParams.protocol,
 	});
-	const address2: Address = {
-		id: 'address2-id',
-		address: encodeAddressByProtocol(BobSECP256K1PublicAddress, ETHEREUM).encoded,
-		identityKey: BobSECP256K1PublicKey,
-		nonce: 20,
-		network: 'main',
-		protocol: ETHEREUM,
-	};
+
 	const protoAddress2: user.Address = user.Address.create({
-		address: decodeAddressByProtocol(address2.address, address2.protocol).decoded,
-		identityKey: encodePublicKey(address2.identityKey),
-		nonce: address2.nonce,
-		network: address2.network,
-		protocol: address2.protocol,
+		address: BobWalletMailbox.messagingKeyParams.address,
+		identityKey: encodePublicKey(BobWalletMailbox.identityKey),
+		nonce: BobWalletMailbox.messagingKeyParams.nonce,
+		network: BobWalletMailbox.messagingKeyParams.network,
+		protocol: BobWalletMailbox.messagingKeyParams.protocol,
 	});
+
+	let userProfile: UserProfile;
+	let userProfileWithMigration: UserProfile;
 
 	beforeEach(() => {
 		mockUserApi = mock();
 		mockUserApi.postUserAddress
 			.mockResolvedValueOnce({
-				data: { addressId: address1.id },
+				data: { addressId: AliceWalletMailbox.id },
 			} as AxiosResponse<PostUserAddressResponseBody>)
 			.mockResolvedValueOnce({
-				data: { addressId: address2.id },
+				data: { addressId: BobWalletMailbox.id },
 			} as AxiosResponse<PostUserAddressResponseBody>);
+		mockUserApi.getUsername.mockResolvedValue({
+			data: {
+				username: AliceAccountMailbox.sendAs[0].value,
+				address: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+			},
+		} as AxiosResponse<GetUsernameResponseBody>);
+		userProfile = new MailchainUserProfile(
+			'mailchain.test',
+			mockUserApi,
+			fetchIdentityKey,
+			keyRing.userProfileCrypto(),
+			nopMigration(),
+		);
+		userProfileWithMigration = new MailchainUserProfile(
+			'mailchain.test',
+			mockUserApi,
+			fetchIdentityKey,
+			keyRing.userProfileCrypto(),
+			dummyMigration,
+		);
 	});
 
-	it('should save addresses, migrate second address and retrieve them', async () => {
+	it('should save addresses and retrieve them', async () => {
 		// Bit hacky multiple cases in a single test, but in a way end-to-end test
-		const userProfile = new MailchainUserProfile(mockUserApi, keyRing.userProfileCrypto(), dummyMigration);
-
 		// When - add the two addresses from expectedAddresses
-		const newAddress1 = await userProfile.addAddress(address1);
-		const newAddress2 = await userProfile.addAddress(address2);
+		const newAddress1 = await userProfile.addMailbox(AliceWalletMailbox);
+		const newAddress2 = await userProfile.addMailbox(BobWalletMailbox);
 
 		// Given - get the encrypted values from the invoked putAddress API request
 		const apiAddresses = [
@@ -99,25 +108,23 @@ describe('userProfile', () => {
 		mockUserApi.getUserAddresses.mockResolvedValue({ data: { addresses: apiAddresses } } as any);
 
 		// When - the user requests the address
-		const actualAddresses = await userProfile.addresses();
+		const actualMailboxes = await userProfile.mailboxes();
 
 		// Then - the received addresses should be the same as the ones that were put
 
-		expect(actualAddresses).toEqual([address1, { ...address2, identityKey: migratedIdentityKey }]);
+		expect(actualMailboxes).toEqual([AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox]);
 	});
 
 	it('should update existing address', async () => {
-		const userProfile = new MailchainUserProfile(mockUserApi, keyRing.userProfileCrypto(), nopMigration());
-
-		const resAddress = await userProfile.updateAddress(address1.id, address1);
+		const resMailbox = await userProfile.updateMailbox(AliceWalletMailbox.id, AliceWalletMailbox);
 
 		const [addressId, postedData] = mockUserApi.putUserAddress.mock.calls[0];
-		expect(addressId).toEqual(address1.id);
+		expect(addressId).toEqual(AliceWalletMailbox.id);
 		const protoAddress = user.Address.decode(
 			await keyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedAddressInformation)),
 		);
 		expect(protoAddress).toEqual(protoAddress1);
-		expect(resAddress).toEqual(address1);
+		expect(resMailbox).toEqual(AliceWalletMailbox);
 	});
 
 	it('should run migration on address and store the update', async () => {
@@ -125,14 +132,13 @@ describe('userProfile', () => {
 			await keyRing.userProfileCrypto().encrypt(user.Address.encode(protoAddress1).finish()),
 		);
 		mockUserApi.getUserAddresses.mockResolvedValue({
-			data: { addresses: [{ encryptedAddressInformation, version: 1, addressId: address1.id }] },
+			data: { addresses: [{ encryptedAddressInformation, version: 1, addressId: AliceWalletMailbox.id }] },
 		} as AxiosResponse<GetUserAddressesResponseBody>);
-		const userProfile = new MailchainUserProfile(mockUserApi, keyRing.userProfileCrypto(), dummyMigration);
 
-		const addresses = await userProfile.addresses();
+		const mailboxes = await userProfileWithMigration.mailboxes();
 
-		expect(addresses).toEqual([{ ...address1, identityKey: migratedIdentityKey }]);
-		expect(mockUserApi.putUserAddress.mock.calls[0][0]).toEqual(address1.id);
+		expect(mailboxes).toEqual([AliceAccountMailbox, { ...AliceWalletMailbox, identityKey: migratedIdentityKey }]);
+		expect(mockUserApi.putUserAddress.mock.calls[0][0]).toEqual(AliceWalletMailbox.id);
 		expect(mockUserApi.putUserAddress.mock.calls[0][1].version).toEqual(2);
 		expect(mockUserApi.putUserAddress.mock.calls[0][1].encryptedAddressInformation).toBeDefined();
 	});
