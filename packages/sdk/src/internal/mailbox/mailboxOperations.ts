@@ -2,7 +2,7 @@ import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import flatten from 'lodash/flatten';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
 import { formatAddress } from '@mailchain/addressing';
-import { Configuration } from '../../';
+import { Configuration } from '../..';
 import {
 	InboxApiInterface,
 	PutEncryptedMessageRequestBodyFolderEnum,
@@ -22,49 +22,63 @@ import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
 import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
 
-type SaveSentMessageParam = { userMailbox: UserMailbox; payload: Payload; content: MailData };
+type SaveSentMessageParam = {
+	/** The {@link UserMailbox} that is sending this message */
+	userMailbox: UserMailbox;
+	payload: Payload;
+	content: MailData;
+};
 
-type SaveReceivedMessageParam = { userMailbox: UserMailbox; payload: Payload };
+type SaveReceivedMessageParam = {
+	/** The {@link UserMailbox} that is receiving this message */
+	userMailbox: UserMailbox;
+	payload: Payload;
+};
 
-export interface Mailbox {
+export interface MailboxOperations {
+	/** Get {@link MessagePreview} for a single message. */
 	getMessage(messageId: string): Promise<MessagePreview>;
 
+	// GETTING MESSAGES
+	/** Get messages from the Inbox folder (with INBOX label) */
 	getInboxMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Starred folder (with STARRED label) */
 	getStarredMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Trash folder (with TRASH label) */
 	getTrashMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Unread folder (without READ label) */
 	getUnreadMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Send folder (with SEND label) */
 	getSentMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Outbox folder */
 	getOutboxMessages(): Promise<MessagePreview[]>;
-
+	/** Get messages from the Archived folder (with ARCHIVED label) */
 	getArchivedMessages(): Promise<MessagePreview[]>;
-
 	searchMessages(): Promise<MessagePreview[]>;
 
-	getFullMessage(messageUri: string): Promise<Message>;
+	/** Get the full contents of the single message for the provided ID (same as the {@link MessagePreview.id}) */
+	getFullMessage(messageId: string): Promise<Message>;
 
+	// SAVING MESSAGES
+	/**
+	 * Save the send message
+	 *
+	 * Note: initially the message is put into Outbox folder and needs to me marked as send via {@link MailboxOperations.markOutboxMessageAsSent}
+	 */
 	saveSentMessage(message: SaveSentMessageParam): Promise<MessagePreview>;
-
+	/** Save the received message. */
 	saveReceivedMessage(message: SaveReceivedMessageParam): Promise<MessagePreview>;
 
+	// MESSAGE ACTIONS
 	markOutboxMessageAsSent(messageId: string): Promise<void>;
-
 	modifyArchiveMessage(messageId: string, archived: boolean): Promise<void>;
-
 	modifyIsReadMessage(messageId: string, isRead: boolean): Promise<void>;
-
 	modifyTrashMessage(messageId: string, trash: boolean): Promise<void>;
-
 	modifyStarredMessage(messageId: string, isStarred: boolean): Promise<void>;
-
 	modifyUserLabel(messageId: string, userLabel: UserMessageLabel, include: boolean): Promise<void>;
 }
 
-export class MailchainMailbox implements Mailbox {
+export class MailchainMailboxOperations implements MailboxOperations {
 	constructor(
 		private readonly inboxApi: InboxApiInterface,
 		private readonly messagePreviewCrypto: InboxKey,
@@ -82,7 +96,7 @@ export class MailchainMailbox implements Mailbox {
 		const messageMessageCrypto = createMailchainMessageCrypto(keyRing);
 		const addressHasher = mailchainAddressHasher(AddressesApiFactory(axiosConfig), keyRing);
 		const messageHasher = createMailchainMessageIdCreator(keyRing);
-		return new MailchainMailbox(
+		return new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
 			messageMessageCrypto,

@@ -17,7 +17,7 @@ import {
 } from '../api';
 import { MailData } from '../formatters/types';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
-import { Mailbox, MailchainMailbox } from './mailbox';
+import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
 import { createMailchainMessageCrypto } from './messageCrypto';
 import { AddressesHasher } from './addressHasher';
 import { createMailchainMessageIdCreator } from './messageId';
@@ -75,12 +75,12 @@ describe('mailbox', () => {
 	});
 	const msg2Preview = { ...msg1Preview, snippet: 'Another message from Bob to Alice' };
 
-	let mailbox: Mailbox;
+	let mailboxOperations: MailboxOperations;
 
 	const dateOffset = 999;
 	beforeEach(() => {
 		jest.resetAllMocks();
-		mailbox = new MailchainMailbox(
+		mailboxOperations = new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
 			messageCrypto,
@@ -119,7 +119,7 @@ describe('mailbox', () => {
 			},
 		} as AxiosResponse<GetMessageResponseBody>);
 
-		const message = await mailbox.getMessage('messageId');
+		const message = await mailboxOperations.getMessage('messageId');
 
 		expect(inboxApi.getMessage.mock.calls[0][0]).toEqual('messageId');
 		expect(message).toEqual({
@@ -169,7 +169,7 @@ describe('mailbox', () => {
 			} as AxiosResponse<GetMessagesInViewResponseBody>);
 
 			// When
-			const messages = await mailbox[mailboxMethod]();
+			const messages = await mailboxOperations[mailboxMethod]();
 
 			// Then
 			expect(inboxApi[apiMethod].mock.calls).toHaveLength(1);
@@ -190,7 +190,7 @@ describe('mailbox', () => {
 		const encryptedPayload = await messageCrypto.encrypt(payload);
 		inboxApi.getEncryptedMessageBody.mockResolvedValue({ data: encryptedPayload } as AxiosResponse<object>);
 
-		const message = await mailbox.getFullMessage('messageId');
+		const message = await mailboxOperations.getFullMessage('messageId');
 
 		expect(message.from).toEqual(mailData.from.address);
 		expect(message.replyTo).toEqual(mailData.replyTo?.address);
@@ -209,7 +209,11 @@ describe('mailbox', () => {
 		} as AxiosResponse<PostPayloadResponseBody>);
 		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
-		const message = await mailbox.saveSentMessage({ userMailbox: AliceAccountMailbox, payload, content: mailData });
+		const message = await mailboxOperations.saveSentMessage({
+			userMailbox: AliceAccountMailbox,
+			payload,
+			content: mailData,
+		});
 
 		expect(message.messageId).toMatchSnapshot('sent message id');
 		expect(inboxApi.putEncryptedMessage.mock.calls[0][0]).toEqual(message.messageId);
@@ -248,7 +252,7 @@ describe('mailbox', () => {
 		} as AxiosResponse<PostPayloadResponseBody>);
 		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
-		const message = await mailbox.saveReceivedMessage({
+		const message = await mailboxOperations.saveReceivedMessage({
 			payload,
 			userMailbox: AliceWalletMailbox,
 		});
@@ -294,9 +298,9 @@ describe('mailbox', () => {
 	describe.each(labelsTests)('%s', (method, label, shouldPut) => {
 		it(`should put ${label} when ${method} is invoked with ${shouldPut}`, async () => {
 			if (method === 'modifyUserLabel') {
-				await mailbox[method]('messageId', label, shouldPut);
+				await mailboxOperations[method]('messageId', label, shouldPut);
 			} else {
-				await mailbox[method]('messageId', shouldPut);
+				await mailboxOperations[method]('messageId', shouldPut);
 			}
 
 			const apiCall = inboxApi.putMessageLabel.mock.calls[0];
@@ -306,9 +310,9 @@ describe('mailbox', () => {
 
 		it(`should delete ${label} when ${method} is invoked with ${!shouldPut}`, async () => {
 			if (method === 'modifyUserLabel') {
-				await mailbox[method]('messageId', label, !shouldPut);
+				await mailboxOperations[method]('messageId', label, !shouldPut);
 			} else {
-				await mailbox[method]('messageId', !shouldPut);
+				await mailboxOperations[method]('messageId', !shouldPut);
 			}
 
 			const apiCall = inboxApi.deleteMessageLabel.mock.calls[0];

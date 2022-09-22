@@ -1,3 +1,3 @@
-export { MailchainMailbox } from './mailbox';
-export type { Mailbox } from './mailbox';
+export { MailchainMailboxOperations } from './mailboxOperations';
+export type { MailboxOperations } from './mailboxOperations';
 export * from './types';

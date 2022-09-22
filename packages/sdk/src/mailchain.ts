@@ -10,7 +10,7 @@ import {
 import { Lookup } from './internal/identityKeys';
 import { MailchainUserProfile, UserProfile } from './internal/user';
 import { toUint8Array } from './internal/formatters/hex';
-import { Mailbox, MailchainMailbox } from './internal/mailbox';
+import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
 import { toMailData } from './convertSendMailParams';
 import { UserMailbox } from './internal/user/types';
@@ -33,7 +33,7 @@ export type SendMailResult = {
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
-	private readonly _mailbox: Mailbox;
+	private readonly _mailboxOperations: MailboxOperations;
 	constructor(private readonly keyRing: KeyRing, private readonly config: Configuration) {
 		this._userProfile = MailchainUserProfile.create(
 			config,
@@ -41,7 +41,7 @@ export class Mailchain {
 			keyRing.userProfileCrypto(),
 		);
 
-		this._mailbox = MailchainMailbox.create(config, keyRing);
+		this._mailboxOperations = MailchainMailboxOperations.create(config, keyRing);
 	}
 
 	static fromAccountSeed(seed: Uint8Array | string, config: Configuration = defaultConfiguration) {
@@ -119,7 +119,7 @@ export class Mailchain {
 		}
 
 		// save the message in the outbox while the sending is happening
-		const outboxMessage = await this._mailbox.saveSentMessage({
+		const outboxMessage = await this._mailboxOperations.saveSentMessage({
 			userMailbox: senderMailbox,
 			payload: prepareResult.message,
 			content: mailData,
@@ -133,7 +133,7 @@ export class Mailchain {
 		// update folder
 		switch (sendResult.status) {
 			case 'success':
-				await this._mailbox.markOutboxMessageAsSent(outboxMessage.messageId);
+				await this._mailboxOperations.markOutboxMessageAsSent(outboxMessage.messageId);
 				break;
 
 			case 'partially-completed':
