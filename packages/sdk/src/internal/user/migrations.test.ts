@@ -6,14 +6,14 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { AliceSECP256K1PublicAddress } from '../ethereum/test.const';
 import { AddressesApiInterface, GetIdentityKeyResponseBody } from '../api';
 import { user } from '../protobuf/user/user';
-import { createV1V2IdentityKeyMigration, UserAddressMigrationRule } from './migrations';
+import { createV1V2IdentityKeyMigration, UserMailboxMigrationRule } from './migrations';
 
 describe('UserProfile migrations', () => {
 	describe('v1 to v2 - IdentitKey', () => {
 		let addressesApi: MockProxy<AddressesApiInterface>;
-		let migration: UserAddressMigrationRule;
+		let migration: UserMailboxMigrationRule;
 
-		const v1Address = user.Address.create({
+		const v1Mailbox = user.Mailbox.create({
 			address: AliceSECP256K1PublicAddress,
 			nonce: 1,
 			protocol: 'ethereum',
@@ -25,16 +25,16 @@ describe('UserProfile migrations', () => {
 			migration = createV1V2IdentityKeyMigration(addressesApi, 'mailchain.test');
 		});
 
-		it('should apply for address with version 1', async () => {
-			const shouldApply = await migration.shouldApply({ version: 1, protoAddress: v1Address });
+		it('should apply for mailbox with version 1', async () => {
+			const shouldApply = await migration.shouldApply({ version: 1, protoMailbox: v1Mailbox });
 
 			expect(shouldApply).toBe(true);
 		});
 
-		it('should not apply for address above 1', async () => {
-			const shouldApply2 = await migration.shouldApply({ version: 2, protoAddress: v1Address });
-			const shouldApply3 = await migration.shouldApply({ version: 3, protoAddress: v1Address });
-			const shouldApply200 = await migration.shouldApply({ version: 200, protoAddress: v1Address });
+		it('should not apply for mailbox above 1', async () => {
+			const shouldApply2 = await migration.shouldApply({ version: 2, protoMailbox: v1Mailbox });
+			const shouldApply3 = await migration.shouldApply({ version: 3, protoMailbox: v1Mailbox });
+			const shouldApply200 = await migration.shouldApply({ version: 200, protoMailbox: v1Mailbox });
 
 			expect(shouldApply2).toBe(false);
 			expect(shouldApply3).toBe(false);
@@ -46,12 +46,12 @@ describe('UserProfile migrations', () => {
 				data: { identityKey: encodeHexZeroX(encodePublicKey(AliceSECP256K1PublicKey)) },
 			} as AxiosResponse<GetIdentityKeyResponseBody>);
 
-			const migrated = await migration.apply({ version: 1, protoAddress: v1Address });
+			const migrated = await migration.apply({ version: 1, protoMailbox: v1Mailbox });
 
 			expect(migrated).toEqual({
 				version: 2,
-				protoAddress: user.Address.create({
-					...v1Address,
+				protoMailbox: user.Mailbox.create({
+					...v1Mailbox,
 					identityKey: encodePublicKey(AliceSECP256K1PublicKey),
 				}),
 			});

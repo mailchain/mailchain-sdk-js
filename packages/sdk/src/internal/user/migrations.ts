@@ -4,29 +4,29 @@ import { AddressesApiInterface } from '../api';
 import { MigrationRule } from '../migration';
 import { user } from '../protobuf/user/user';
 
-type UserAddressData = {
+type UserMailboxData = {
 	version: number;
-	protoAddress: user.Address;
+	protoMailbox: user.Mailbox;
 };
 
-export type UserAddressMigrationRule = MigrationRule<UserAddressData>;
+export type UserMailboxMigrationRule = MigrationRule<UserMailboxData>;
 
 export function createV1V2IdentityKeyMigration(
 	addressesApi: AddressesApiInterface,
 	mailchainAddressDomain: string,
-): UserAddressMigrationRule {
+): UserMailboxMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 1),
-		apply: async ({ protoAddress }) => {
-			const protocol = protoAddress.protocol as ProtocolType;
-			const encodedAddress = encodeAddressByProtocol(protoAddress.address!, protocol).encoded;
+		apply: async ({ protoMailbox }) => {
+			const protocol = protoMailbox.protocol as ProtocolType;
+			const encodedAddress = encodeAddressByProtocol(protoMailbox.address!, protocol).encoded;
 			const identityKey = await addressesApi
 				.getAddressIdentityKey(
 					formatAddress(createMailchainAddress(encodedAddress, protocol, mailchainAddressDomain), 'mail'),
 				)
 				.then(({ data }) => decodeHexZeroX(data.identityKey));
 
-			return { version: 2, protoAddress: user.Address.create({ ...protoAddress, identityKey }) };
+			return { version: 2, protoMailbox: user.Mailbox.create({ ...protoMailbox, identityKey }) };
 		},
 	};
 }

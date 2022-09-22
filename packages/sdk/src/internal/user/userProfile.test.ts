@@ -7,14 +7,14 @@ import { AxiosResponse } from 'axios';
 import { formatAddress } from '@mailchain/addressing';
 import { user } from '../protobuf/user/user';
 import {
-	GetUserAddressesResponseBody,
+	GetUserMailboxesResponseBody,
 	GetUsernameResponseBody,
-	PostUserAddressResponseBody,
+	PostUserMailboxResponseBody,
 	UserApiInterface,
 } from '../api';
 import { nopMigration } from '../migration';
 import { MailchainUserProfile, UserProfile } from './userProfile';
-import { UserAddressMigrationRule } from './migrations';
+import { UserMailboxMigrationRule } from './migrations';
 import { AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox } from './test.const';
 
 describe('userProfile', () => {
@@ -24,19 +24,19 @@ describe('userProfile', () => {
 	const fetchIdentityKey = () => Promise.resolve(keyRing.accountIdentityKey().publicKey);
 
 	const migratedIdentityKey = new ED25519PublicKey(secureRandom(32));
-	const dummyMigration: UserAddressMigrationRule = {
+	const dummyMigration: UserMailboxMigrationRule = {
 		shouldApply: ({ version }) => Promise.resolve(version === 1),
 		apply: (data) =>
 			Promise.resolve({
-				protoAddress: user.Address.create({
-					...data.protoAddress,
+				protoMailbox: user.Mailbox.create({
+					...data.protoMailbox,
 					identityKey: encodePublicKey(migratedIdentityKey),
 				}),
 				version: 2,
 			}),
 	};
 
-	const protoAddress1: user.Address = user.Address.create({
+	const protoMailbox1: user.Mailbox = user.Mailbox.create({
 		address: AliceWalletMailbox.messagingKeyParams.address,
 		identityKey: encodePublicKey(AliceWalletMailbox.identityKey),
 		nonce: AliceWalletMailbox.messagingKeyParams.nonce,
@@ -44,7 +44,7 @@ describe('userProfile', () => {
 		protocol: AliceWalletMailbox.messagingKeyParams.protocol,
 	});
 
-	const protoAddress2: user.Address = user.Address.create({
+	const protoMailbox2: user.Mailbox = user.Mailbox.create({
 		address: BobWalletMailbox.messagingKeyParams.address,
 		identityKey: encodePublicKey(BobWalletMailbox.identityKey),
 		nonce: BobWalletMailbox.messagingKeyParams.nonce,
@@ -57,13 +57,13 @@ describe('userProfile', () => {
 
 	beforeEach(() => {
 		mockUserApi = mock();
-		mockUserApi.postUserAddress
+		mockUserApi.postUserMailbox
 			.mockResolvedValueOnce({
-				data: { addressId: AliceWalletMailbox.id },
-			} as AxiosResponse<PostUserAddressResponseBody>)
+				data: { mailboxId: AliceWalletMailbox.id },
+			} as AxiosResponse<PostUserMailboxResponseBody>)
 			.mockResolvedValueOnce({
-				data: { addressId: BobWalletMailbox.id },
-			} as AxiosResponse<PostUserAddressResponseBody>);
+				data: { mailboxId: BobWalletMailbox.id },
+			} as AxiosResponse<PostUserMailboxResponseBody>);
 		mockUserApi.getUsername.mockResolvedValue({
 			data: {
 				username: AliceAccountMailbox.sendAs[0].value,
@@ -86,60 +86,61 @@ describe('userProfile', () => {
 		);
 	});
 
-	it('should save addresses and retrieve them', async () => {
+	it('should save mailboxes and retrieve them', async () => {
 		// Bit hacky multiple cases in a single test, but in a way end-to-end test
-		// When - add the two addresses from expectedAddresses
-		const newAddress1 = await userProfile.addMailbox(AliceWalletMailbox);
-		const newAddress2 = await userProfile.addMailbox(BobWalletMailbox);
+		// When - add the two mailboxes
+		const newMailbox1 = await userProfile.addMailbox(AliceWalletMailbox);
+		const newMailbox2 = await userProfile.addMailbox(BobWalletMailbox);
 
-		// Given - get the encrypted values from the invoked putAddress API request
-		const apiAddresses = [
+		// Given - get the encrypted values from the invoked postUserMailbox API request
+		const apiMailboxes = [
 			{
-				addressId: newAddress1.id,
-				encryptedAddressInformation: mockUserApi.postUserAddress.mock.calls[0][0].encryptedAddressInformation,
+				mailboxId: newMailbox1.id,
+				encryptedMailboxInformation: mockUserApi.postUserMailbox.mock.calls[0][0].encryptedMailboxInformation,
 				version: 2,
 			},
 			{
-				addressId: newAddress2.id,
-				encryptedAddressInformation: mockUserApi.postUserAddress.mock.calls[1][0].encryptedAddressInformation,
+				mailboxId: newMailbox2.id,
+				encryptedMailboxInformation: mockUserApi.postUserMailbox.mock.calls[1][0].encryptedMailboxInformation,
 				version: 1,
 			},
 		];
-		mockUserApi.getUserAddresses.mockResolvedValue({ data: { addresses: apiAddresses } } as any);
+		mockUserApi.getUserMailboxes.mockResolvedValue({
+			data: { mailboxes: apiMailboxes },
+		} as AxiosResponse<GetUserMailboxesResponseBody>);
 
-		// When - the user requests the address
+		// When - the user requests the mailboxes
 		const actualMailboxes = await userProfile.mailboxes();
 
-		// Then - the received addresses should be the same as the ones that were put
-
+		// Then - the received mailboxes should be the same as the ones that were put
 		expect(actualMailboxes).toEqual([AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox]);
 	});
 
-	it('should update existing address', async () => {
+	it('should update existing mailbox', async () => {
 		const resMailbox = await userProfile.updateMailbox(AliceWalletMailbox.id, AliceWalletMailbox);
 
-		const [addressId, postedData] = mockUserApi.putUserAddress.mock.calls[0];
-		expect(addressId).toEqual(AliceWalletMailbox.id);
-		const protoAddress = user.Address.decode(
-			await keyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedAddressInformation)),
+		const [mailboxId, postedData] = mockUserApi.putUserMailbox.mock.calls[0];
+		expect(mailboxId).toEqual(AliceWalletMailbox.id);
+		const protoMailbox = user.Mailbox.decode(
+			await keyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedMailboxInformation)),
 		);
-		expect(protoAddress).toEqual(protoAddress1);
+		expect(protoMailbox).toEqual(protoMailbox1);
 		expect(resMailbox).toEqual(AliceWalletMailbox);
 	});
 
-	it('should run migration on address and store the update', async () => {
-		const encryptedAddressInformation = encodeBase64(
-			await keyRing.userProfileCrypto().encrypt(user.Address.encode(protoAddress1).finish()),
+	it('should run migration on mailbox and store the update', async () => {
+		const encryptedMailboxInformation = encodeBase64(
+			await keyRing.userProfileCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),
 		);
-		mockUserApi.getUserAddresses.mockResolvedValue({
-			data: { addresses: [{ encryptedAddressInformation, version: 1, addressId: AliceWalletMailbox.id }] },
-		} as AxiosResponse<GetUserAddressesResponseBody>);
+		mockUserApi.getUserMailboxes.mockResolvedValue({
+			data: { mailboxes: [{ encryptedMailboxInformation, version: 1, mailboxId: AliceWalletMailbox.id }] },
+		} as AxiosResponse<GetUserMailboxesResponseBody>);
 
 		const mailboxes = await userProfileWithMigration.mailboxes();
 
 		expect(mailboxes).toEqual([AliceAccountMailbox, { ...AliceWalletMailbox, identityKey: migratedIdentityKey }]);
-		expect(mockUserApi.putUserAddress.mock.calls[0][0]).toEqual(AliceWalletMailbox.id);
-		expect(mockUserApi.putUserAddress.mock.calls[0][1].version).toEqual(2);
-		expect(mockUserApi.putUserAddress.mock.calls[0][1].encryptedAddressInformation).toBeDefined();
+		expect(mockUserApi.putUserMailbox.mock.calls[0][0]).toEqual(AliceWalletMailbox.id);
+		expect(mockUserApi.putUserMailbox.mock.calls[0][1].version).toEqual(2);
+		expect(mockUserApi.putUserMailbox.mock.calls[0][1].encryptedMailboxInformation).toBeDefined();
 	});
 });

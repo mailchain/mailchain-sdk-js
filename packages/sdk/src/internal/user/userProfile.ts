@@ -21,7 +21,7 @@ import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { combineMigrations } from '../migration';
-import { createV1V2IdentityKeyMigration, UserAddressMigrationRule } from './migrations';
+import { createV1V2IdentityKeyMigration, UserMailboxMigrationRule } from './migrations';
 import { UserMailbox } from './types';
 
 export type UserSettings = { [key: string]: Setting | undefined };
@@ -32,7 +32,7 @@ export class UserNotFoundError extends Error {
 	}
 }
 
-const CURRENT_ADDRESS_VERSION = 2 as const;
+const CURRENT_MAILBOX_VERSION = 2 as const;
 
 export type NewUserMailbox = Omit<UserMailbox, 'id' | 'type'>;
 
@@ -51,14 +51,14 @@ export class MailchainUserProfile implements UserProfile {
 		private readonly mailchainAddressDomain: string,
 		private readonly userApi: UserApiInterface,
 		private readonly accountIdentityKey: () => Promise<PublicKey>,
-		private readonly addressCrypto: Encrypter & Decrypter,
-		private readonly migration: UserAddressMigrationRule,
+		private readonly mailboxCrypto: Encrypter & Decrypter,
+		private readonly migration: UserMailboxMigrationRule,
 	) {}
 
 	static create(
 		config: Configuration,
 		accountIdentityKey: SignerWithPublicKey,
-		addressCrypto: Encrypter & Decrypter,
+		mailboxCrypto: Encrypter & Decrypter,
 	): MailchainUserProfile {
 		const axiosConfig = createAxiosConfiguration(config);
 		const addressesApi = AddressesApiFactory(axiosConfig);
@@ -70,7 +70,7 @@ export class MailchainUserProfile implements UserProfile {
 			config.mailchainAddressDomain,
 			userApi,
 			() => Promise.resolve(accountIdentityKey.publicKey),
-			addressCrypto,
+			mailboxCrypto,
 			migrations,
 		);
 	}
@@ -103,55 +103,55 @@ export class MailchainUserProfile implements UserProfile {
 	}
 
 	async mailboxes(): Promise<[UserMailbox, ...UserMailbox[]]> {
-		const { addresses } = await this.userApi.getUserAddresses().then((r) => r.data);
+		const { mailboxes: apiMailboxes } = await this.userApi.getUserMailboxes().then((r) => r.data);
 		const resultMailboxes: UserMailbox[] = [];
-		for (const apiAddress of addresses) {
+		for (const apiMailbox of apiMailboxes) {
 			try {
-				const decryptedAddress = await this.addressCrypto.decrypt(
-					decodeBase64(apiAddress.encryptedAddressInformation),
+				const decryptedMailbox = await this.mailboxCrypto.decrypt(
+					decodeBase64(apiMailbox.encryptedMailboxInformation),
 				);
 
-				const originalAddressData = {
-					version: apiAddress.version,
-					protoAddress: user.Address.decode(decryptedAddress),
+				const originalMailboxData = {
+					version: apiMailbox.version,
+					protoMailbox: user.Mailbox.decode(decryptedMailbox),
 				};
 
-				const addressData = (await this.migration.shouldApply(originalAddressData))
-					? await this.migration.apply(originalAddressData)
-					: originalAddressData;
+				const mailboxData = (await this.migration.shouldApply(originalMailboxData))
+					? await this.migration.apply(originalMailboxData)
+					: originalMailboxData;
 
-				if (apiAddress.version !== addressData.version) {
+				if (apiMailbox.version !== mailboxData.version) {
 					console.debug(
-						`${apiAddress.addressId} migrated from v${apiAddress.version} to v${addressData.version}`,
+						`${apiMailbox.mailboxId} migrated from v${apiMailbox.version} to v${mailboxData.version}`,
 					);
 					this.internalUpdateMailbox(
-						apiAddress.addressId,
-						addressData.protoAddress,
-						addressData.version,
+						apiMailbox.mailboxId,
+						mailboxData.protoMailbox,
+						mailboxData.version,
 					).then(
-						() => console.debug(`successfully stored migrated address ${apiAddress.addressId}`),
-						(e) => console.warn(`failed storing migrated address ${apiAddress.addressId}`, e),
+						() => console.debug(`successfully stored migrated mailbox ${apiMailbox.mailboxId}`),
+						(e) => console.warn(`failed storing migrated mailbox ${apiMailbox.mailboxId}`, e),
 					);
 				}
 
-				const { protoAddress } = addressData;
-				const protocol = protoAddress.protocol as ProtocolType;
-				const encodedAddress = encodeAddressByProtocol(protoAddress.address!, protocol).encoded;
+				const { protoMailbox } = mailboxData;
+				const protocol = protoMailbox.protocol as ProtocolType;
+				const encodedAddress = encodeAddressByProtocol(protoMailbox.address!, protocol).encoded;
 
 				resultMailboxes.push({
 					type: 'wallet',
-					id: apiAddress.addressId,
-					identityKey: decodePublicKey(protoAddress.identityKey),
+					id: apiMailbox.mailboxId,
+					identityKey: decodePublicKey(protoMailbox.identityKey),
 					sendAs: [createMailchainAddress(encodedAddress, protocol, this.mailchainAddressDomain)],
 					messagingKeyParams: {
-						address: protoAddress.address,
+						address: protoMailbox.address,
 						protocol,
-						network: protoAddress.network,
-						nonce: protoAddress.nonce,
+						network: protoMailbox.network,
+						nonce: protoMailbox.nonce,
 					},
 				});
 			} catch (e) {
-				console.error(`failed processing address ${apiAddress.addressId}`, e);
+				console.error(`failed processing mailbox ${apiMailbox.mailboxId}`, e);
 			}
 		}
 
@@ -176,45 +176,45 @@ export class MailchainUserProfile implements UserProfile {
 	}
 
 	async addMailbox(mailbox: NewUserMailbox): Promise<UserMailbox> {
-		const protoAddress = user.Address.create({
+		const protoMailbox = user.Mailbox.create({
 			identityKey: encodePublicKey(mailbox.identityKey),
 			address: mailbox.messagingKeyParams.address,
 			protocol: mailbox.messagingKeyParams.protocol,
 			network: mailbox.messagingKeyParams.network,
 			nonce: mailbox.messagingKeyParams.nonce,
 		});
-		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
-		const { addressId } = await this.userApi
-			.postUserAddress({ encryptedAddressInformation: encodeBase64(encrypted), version: CURRENT_ADDRESS_VERSION })
+		const encrypted = await this.mailboxCrypto.encrypt(user.Mailbox.encode(protoMailbox).finish());
+		const { mailboxId } = await this.userApi
+			.postUserMailbox({ encryptedMailboxInformation: encodeBase64(encrypted), version: CURRENT_MAILBOX_VERSION })
 			.then((res) => res.data);
 
-		return { ...mailbox, type: 'wallet', id: addressId };
+		return { ...mailbox, type: 'wallet', id: mailboxId };
 	}
 
 	async updateMailbox(mailboxId: string, mailbox: NewUserMailbox): Promise<UserMailbox> {
-		const protoAddress = user.Address.create({
+		const protoMailbox = user.Mailbox.create({
 			identityKey: encodePublicKey(mailbox.identityKey),
 			address: mailbox.messagingKeyParams.address,
 			protocol: mailbox.messagingKeyParams.protocol,
 			network: mailbox.messagingKeyParams.network,
 			nonce: mailbox.messagingKeyParams.nonce,
 		});
-		await this.internalUpdateMailbox(mailboxId, protoAddress, CURRENT_ADDRESS_VERSION);
+		await this.internalUpdateMailbox(mailboxId, protoMailbox, CURRENT_MAILBOX_VERSION);
 		return { id: mailboxId, type: 'wallet', ...mailbox };
 	}
 
 	private async internalUpdateMailbox(
 		addressId: string,
-		protoAddress: user.Address,
+		protoMailbox: user.Mailbox,
 		version: number,
-	): Promise<user.Address> {
-		const encrypted = await this.addressCrypto.encrypt(user.Address.encode(protoAddress).finish());
-		await this.userApi.putUserAddress(addressId, { encryptedAddressInformation: encodeBase64(encrypted), version });
-		return protoAddress;
+	): Promise<user.Mailbox> {
+		const encrypted = await this.mailboxCrypto.encrypt(user.Mailbox.encode(protoMailbox).finish());
+		await this.userApi.putUserMailbox(addressId, { encryptedMailboxInformation: encodeBase64(encrypted), version });
+		return protoMailbox;
 	}
 
 	async removeMailbox(mailboxId: string): Promise<void> {
-		await this.userApi.deleteUserAddress(mailboxId);
+		await this.userApi.deleteUserMailbox(mailboxId);
 		return;
 	}
 }
