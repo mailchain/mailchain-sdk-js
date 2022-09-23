@@ -88,7 +88,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		private readonly messageDateOffset: number,
 	) {}
 
-	static create(sdkConfig: Configuration, keyRing: KeyRing) {
+	static create(sdkConfig: Configuration, keyRing: KeyRing): MailboxOperations {
 		const axiosConfig = createAxiosConfiguration(sdkConfig);
 		const axiosClient = getAxiosWithSigner(keyRing.accountMessagingKey());
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
