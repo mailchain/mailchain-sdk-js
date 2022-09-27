@@ -21,6 +21,7 @@ import { AddressesHasher, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
 import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
+import { createMailchainUserMailboxHasher, UserMailboxHasher } from './userMailboxHasher';
 
 type SaveSentMessageParam = {
 	/** The {@link UserMailbox} that is sending this message */
@@ -85,6 +86,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		private readonly messageCrypto: MessageCrypto,
 		private readonly addressHasher: AddressesHasher,
 		private readonly messageIdCreator: MessageIdCreator,
+		private readonly userMailboxHasher: UserMailboxHasher,
 		private readonly messageDateOffset: number,
 	) {}
 
@@ -96,12 +98,14 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const messageMessageCrypto = createMailchainMessageCrypto(keyRing);
 		const addressHasher = mailchainAddressHasher(AddressesApiFactory(axiosConfig), keyRing);
 		const messageHasher = createMailchainMessageIdCreator(keyRing);
+		const userMailboxHasher = createMailchainUserMailboxHasher(keyRing);
 		return new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
 			messageMessageCrypto,
 			addressHasher,
 			messageHasher,
+			userMailboxHasher,
 			keyRing.inboxMessageDateOffset(),
 		);
 	}
@@ -242,11 +246,13 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const { resourceId } = await this.inboxApi.postEncryptedMessageBody(encryptedMessage).then((res) => res.data);
 
 		await this.inboxApi.putEncryptedMessage(messageId, {
+			version: 2,
 			folder:
 				folder === 'outbox'
 					? PutEncryptedMessageRequestBodyFolderEnum.Outbox
 					: PutEncryptedMessageRequestBodyFolderEnum.Inbox,
 			date: messagePreview.timestamp - this.messageDateOffset,
+			mailbox: [...(await this.userMailboxHasher(userMailbox))],
 			hashedFrom: [...(addressHashes[content.from.address]?.[0] ?? [])],
 			hashedTo: flatten(to.map(({ address }) => addressHashes[address]?.map((h) => [...h]) ?? [])),
 			hashedCc: flatten(cc.map(({ address }) => addressHashes[address]?.map((h) => [...h]) ?? [])),
@@ -317,6 +323,7 @@ function createMessagePreview(
 ): protoInbox.preview.MessagePreview {
 	return protoInbox.preview.MessagePreview.create({
 		owner: formatAddress(userMailbox.sendAs[0], 'mail'),
+		mailbox: userMailbox.identityKey.bytes,
 		to: content.recipients.map((it) => it.address),
 		cc: content.carbonCopyRecipients.map((it) => it.address),
 		bcc: content.blindCarbonCopyRecipients.map((it) => it.address),

@@ -21,6 +21,7 @@ import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperatio
 import { createMailchainMessageCrypto } from './messageCrypto';
 import { AddressesHasher } from './addressHasher';
 import { createMailchainMessageIdCreator } from './messageId';
+import { UserMailboxHasher } from './userMailboxHasher';
 
 const mockMessage = [
 	'Mailchain makes it possible for users.',
@@ -39,6 +40,7 @@ describe('mailbox', () => {
 				{},
 			),
 		);
+	const mockUserMailboxHasher: UserMailboxHasher = (mailbox) => Promise.resolve(mailbox.identityKey.bytes);
 	const inboxApi = mock<InboxApi>();
 	const mailData: MailData = {
 		date: new Date('2022-06-06'),
@@ -86,6 +88,7 @@ describe('mailbox', () => {
 			messageCrypto,
 			mockAddressHasher,
 			createMailchainMessageIdCreator(keyRing),
+			mockUserMailboxHasher,
 			dateOffset,
 		);
 	});
@@ -224,6 +227,7 @@ describe('mailbox', () => {
 
 		expect(decryptedPreview).toEqual({
 			owner: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+			mailbox: AliceAccountMailbox.identityKey.bytes,
 			from: mailData.from.address,
 			hasAttachment: false,
 			snippet:
@@ -234,11 +238,13 @@ describe('mailbox', () => {
 			cc: mailData.carbonCopyRecipients.map((r) => r.address),
 			bcc: mailData.blindCarbonCopyRecipients.map((r) => r.address),
 		});
+		expect(requestBody.version).toEqual(2);
 		expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);
 		expect(requestBody.folder).toEqual(PutEncryptedMessageRequestBodyFolderEnum.Outbox);
 		expect(requestBody.messageBodyResourceId).toEqual(resourceId);
 		expect(requestBody.hashedFrom).toMatchSnapshot('hashedFrom');
 		expect(requestBody.hashedTo).toMatchSnapshot('hashedTo');
+		expect(requestBody.mailbox).toEqual([...(await mockUserMailboxHasher(AliceAccountMailbox))]);
 		expect(await messageCrypto.decrypt(inboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array)).toEqual(
 			payload,
 		);
@@ -268,6 +274,7 @@ describe('mailbox', () => {
 		expect(decryptedPreview).toEqual({
 			from: mailData.from.address,
 			owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+			mailbox: AliceWalletMailbox.identityKey.bytes,
 			hasAttachment: false,
 			snippet:
 				'Mailchain makes it possible for users. All message contents & attachments are encrypted so only the',
@@ -277,6 +284,8 @@ describe('mailbox', () => {
 			cc: mailData.carbonCopyRecipients.map((r) => r.address),
 			bcc: mailData.blindCarbonCopyRecipients.map((r) => r.address),
 		});
+		expect(requestBody.version).toEqual(2);
+		expect(requestBody.mailbox).toEqual([...(await mockUserMailboxHasher(AliceWalletMailbox))]);
 		expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);
 		expect(requestBody.folder).toEqual(PutEncryptedMessageRequestBodyFolderEnum.Inbox);
 		expect(requestBody.messageBodyResourceId).toEqual(resourceId);
