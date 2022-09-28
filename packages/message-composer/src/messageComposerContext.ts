@@ -9,7 +9,10 @@ export type MessageComposerContext = {
 
 export function defaultMessageComposerContext(): MessageComposerContext {
 	return {
-		random: (len) => crypto.getRandomValues(new Uint8Array(len)),
+		random: (len) =>
+			typeof crypto !== 'undefined'
+				? crypto.getRandomValues(new Uint8Array(len))
+				: require('crypto').webcrypto.getRandomValues(new Uint8Array(len)),
 		decodeUtf8: (content) => Promise.resolve(decodeUtf8(content)),
 		encodeBase64: (content, urlSafe) =>
 			urlSafe ? Promise.resolve(encodeBase64UrlSafe(content)) : Promise.resolve(encodeBase64(content)),

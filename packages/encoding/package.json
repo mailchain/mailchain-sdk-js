@@ -7,7 +7,7 @@
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"dependencies": {
 		"@polkadot/util-crypto": "^8.7.1"
 	},
