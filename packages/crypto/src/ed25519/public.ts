@@ -1,5 +1,6 @@
 import { ed25519Verify } from '@polkadot/util-crypto';
-import { KindED25519, PublicKey } from '../';
+import { KindED25519 } from '../keys';
+import { PublicKey } from '../public';
 
 export const ED25519PublicKeyLen = 32;
 

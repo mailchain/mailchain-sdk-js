@@ -1,8 +1,7 @@
 import { mnemonicGenerate, mnemonicValidate, mnemonicToLegacySeed } from '@polkadot/util-crypto/mnemonic';
 import { entropyToMnemonic, mnemonicToEntropy } from '@polkadot/util-crypto/mnemonic/bip39';
-import { WordCount } from '@polkadot/util-crypto/mnemonic/generate';
 
-export function generate(words: WordCount = 24): string {
+export function generate(words: 12 | 15 | 18 | 21 | 24 = 24): string {
 	return mnemonicGenerate(words, true);
 }
 

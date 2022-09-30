@@ -1,5 +1,5 @@
 import { KeyRing } from '@mailchain/keyring';
-import { decodeAddressByProtocol, formatAddress, MAILCHAIN } from '@mailchain/addressing';
+import { formatAddress } from '@mailchain/addressing';
 import { ED25519PrivateKey } from '@mailchain/crypto';
 import {
 	FailedAddressMessageKeyResolutionsError,
@@ -8,7 +8,7 @@ import {
 	SendResult,
 } from './internal/transport/mail/send';
 import { Lookup } from './internal/identityKeys';
-import { MailchainUserProfile, UserProfile } from './internal/user';
+import { MailchainUserProfile, UserNotFoundError, UserProfile } from './internal/user';
 import { toUint8Array } from './internal/formatters/hex';
 import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
@@ -149,7 +149,7 @@ export class Mailchain {
 	/**
 	 * Gets the username and mail address corresponding to the authenticated user.
 	 *
-	 * @throws an error if the mnemonic phrase or seed does not have a user registered.
+	 * @throws a {@link UserNotFoundError} error if the mnemonic phrase or seed does not have a user registered.
 	 * A user must be registered via {@link https://app.mailchain.com/register}.
 	 * Check the mnemonic phrase or seed is correct.
 	 *

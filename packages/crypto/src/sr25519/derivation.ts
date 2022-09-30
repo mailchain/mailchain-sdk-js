@@ -6,7 +6,7 @@ import { SR25519ExtendedPrivateKey, SR25519PrivateKey } from '.';
 
 export async function sr25519DeriveHardenedKey(
 	parentKey: SR25519ExtendedPrivateKey,
-	index: string | number | bigint | Uint8Array | BN,
+	index: string | number | bigint | Uint8Array,
 ): Promise<SR25519ExtendedPrivateKey> {
 	const ready = await cryptoWaitReady(); // needed before calling sr25519DeriveHard
 	if (!ready) {

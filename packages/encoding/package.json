@@ -9,7 +9,7 @@
 	},
 	"version": "0.7.1",
 	"dependencies": {
-		"@polkadot/util-crypto": "^8.7.1"
+		"@polkadot/util-crypto": "^10.1.9"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",

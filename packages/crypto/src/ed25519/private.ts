@@ -1,8 +1,10 @@
 import { ed25519Sign, ed25519PairFromSeed, ed25519PairFromSecret } from '@polkadot/util-crypto';
 import { Keypair } from '@polkadot/util-crypto/types';
+import { KindED25519 } from '../keys';
 import { toSeed } from '../mnemonic/mnemonic';
+import { PrivateKey } from '../private';
+import { PublicKey } from '../public';
 import { RandomFunction, secureRandom } from '../rand';
-import { KindED25519, PrivateKey, PublicKey } from '../';
 import { ED25519PublicKey } from './public';
 
 export const ED25519PrivateKeyLength = 64;
