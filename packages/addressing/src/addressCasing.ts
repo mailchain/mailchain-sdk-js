@@ -9,6 +9,6 @@ export function casingByProtocol(value: string, protocol: ProtocolType): string 
 		case SUBSTRATE:
 			return value; // substrate encoding is case sensitive
 		case ALGORAND:
-			return value.toUpperCase(); // case insensitive
+			return value.toLowerCase(); // case insensitive
 	}
 }

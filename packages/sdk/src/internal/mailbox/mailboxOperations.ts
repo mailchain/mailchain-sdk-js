@@ -215,6 +215,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	async saveReceivedMessage(params: SaveReceivedMessageParam): Promise<MessagePreview> {
 		const mailData = await parseMimeText(params.payload.Content.toString());
 
+		// Go through the recipients of the message
+		// 	Recipients corresponds to the mailbox identity key
+		//  Save the message with with unique message ID for the particular recipient
+
 		// Note: As of developing this it was safe to assume single alias per mailbox.
 		// Long-term this will not be the case and will need to be reworked.
 		const messageId = await this.messageIdCreator({

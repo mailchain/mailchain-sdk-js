@@ -66,7 +66,7 @@ describe('userProfile', () => {
 			} as AxiosResponse<PostUserMailboxResponseBody>);
 		mockUserApi.getUsername.mockResolvedValue({
 			data: {
-				username: AliceAccountMailbox.sendAs[0].value,
+				username: AliceAccountMailbox.sendAs[0].username,
 				address: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
 			},
 		} as AxiosResponse<GetUsernameResponseBody>);

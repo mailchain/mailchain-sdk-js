@@ -1,5 +1,5 @@
 import { decodeHexZeroX, decode } from '@mailchain/encoding';
-import { createMailchainAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import { createWalletAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
 import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '../signatures/errors';
 import { createProofMessage, ProofParams } from '../keyreg';
@@ -81,7 +81,7 @@ export class Lookup {
 		}
 
 		return {
-			address: createMailchainAddress(
+			address: createWalletAddress(
 				result.data.localPart!,
 				result.data.protocol as ProtocolType,
 				result.data.rootDomain!,

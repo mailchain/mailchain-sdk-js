@@ -1,7 +1,7 @@
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import {
-	createMailchainAddress,
+	createWalletAddress,
 	decodeAddressByProtocol,
 	encodeAddressByProtocol,
 	ETHEREUM,
@@ -16,7 +16,7 @@ export const AliceWalletMailbox: UserMailbox = {
 	type: 'wallet',
 	identityKey: AliceSECP256K1PublicKey,
 	sendAs: [
-		createMailchainAddress(
+		createWalletAddress(
 			encodeAddressByProtocol(AliceSECP256K1PublicAddress, ETHEREUM).encoded,
 			ETHEREUM,
 			'mailchain.test',
@@ -35,7 +35,7 @@ export const AliceAccountMailbox: UserMailbox = {
 	id: 'alice@mailchain.test',
 	type: 'account',
 	identityKey: aliceKeyRing.accountIdentityKey().publicKey,
-	sendAs: [createMailchainAddress('alice', MAILCHAIN, 'mailchain.test')],
+	sendAs: [createWalletAddress('alice', MAILCHAIN, 'mailchain.test')],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('alice', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,
@@ -49,7 +49,7 @@ export const BobWalletMailbox: UserMailbox = {
 	type: 'wallet',
 	identityKey: BobSECP256K1PublicKey,
 	sendAs: [
-		createMailchainAddress(
+		createWalletAddress(
 			encodeAddressByProtocol(BobSECP256K1PublicAddress, ETHEREUM).encoded,
 			ETHEREUM,
 			'mailchain.test',
@@ -68,7 +68,7 @@ export const BobAccountMailbox: UserMailbox = {
 	id: 'bob@mailchain.com',
 	type: 'account',
 	identityKey: bobKeyRing.accountIdentityKey().publicKey,
-	sendAs: [createMailchainAddress('bob', MAILCHAIN, 'mailchain.test')],
+	sendAs: [createWalletAddress('bob', MAILCHAIN, 'mailchain.test')],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('bob', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,

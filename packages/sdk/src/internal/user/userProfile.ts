@@ -1,6 +1,6 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import {
-	createMailchainAddress,
+	createWalletAddress,
 	decodeAddressByProtocol,
 	encodeAddressByProtocol,
 	MAILCHAIN,
@@ -142,7 +142,7 @@ export class MailchainUserProfile implements UserProfile {
 					type: 'wallet',
 					id: apiMailbox.mailboxId,
 					identityKey: decodePublicKey(protoMailbox.identityKey),
-					sendAs: [createMailchainAddress(encodedAddress, protocol, this.mailchainAddressDomain)],
+					sendAs: [createWalletAddress(encodedAddress, protocol, this.mailchainAddressDomain)],
 					messagingKeyParams: {
 						address: protoMailbox.address,
 						protocol,
@@ -165,7 +165,7 @@ export class MailchainUserProfile implements UserProfile {
 			type: 'account',
 			id: address,
 			identityKey: await this.accountIdentityKey(),
-			sendAs: [createMailchainAddress(username, MAILCHAIN, this.mailchainAddressDomain)],
+			sendAs: [createWalletAddress(username, MAILCHAIN, this.mailchainAddressDomain)],
 			messagingKeyParams: {
 				address: decodeAddressByProtocol(username, MAILCHAIN).decoded,
 				protocol: MAILCHAIN,

@@ -1,11 +1,9 @@
-import { MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import { MailchainAddress, ProtocolType, NameServiceAddress } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
 
 /**
  *
  * Represents different type of alias to be set for the {@link UserMailbox}.
- *
- * Currently only {@link MailchainAddress} makes sense, but in the future there might be more types of alias (example: `NameServiceAddress` for ENS backed addresses).
  */
 export type SendAsAlias = MailchainAddress;
 

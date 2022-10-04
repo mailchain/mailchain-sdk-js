@@ -1,27 +1,46 @@
 import { ALGORAND, ETHEREUM, MAILCHAIN, SUBSTRATE } from './protocols';
 import { formatAddress } from './addressFormatting';
-import { createMailchainAddress, MailchainAddress } from '.';
+import { createNameServiceAddress, createWalletAddress, MailchainAddress } from '.';
 
 const testCases: { address: MailchainAddress; expectedMail: string; expectedHuman: string }[] = [
 	{
-		address: createMailchainAddress('0x492d61cD88255EbC8556c6393AFA3f3ac2B0505E', ETHEREUM, 'mailchain.local'),
+		address: createWalletAddress('0x492d61cD88255EbC8556c6393AFA3f3ac2B0505E', ETHEREUM, 'mailchain.local'),
 		expectedMail: '0x492d61cd88255ebc8556c6393afa3f3ac2b0505e@ethereum.mailchain.local',
 		expectedHuman: '0x492d...505e@ethereum',
 	},
 	{
-		address: createMailchainAddress('492d61cD88255EbC8556c6393AFA3f3ac2B0505E', ALGORAND, 'mailchain.com'),
-		expectedMail: '492D61CD88255EBC8556C6393AFA3F3AC2B0505E@algorand.mailchain.com',
-		expectedHuman: '492D...505E@algorand',
+		address: createWalletAddress(
+			'bgdmm4kdvwlg7jlzzentbrt7sxtuxthdyxwlsxewx62yfb3fmtsjycb7dq',
+			ALGORAND,
+			'mailchain.com',
+		),
+		expectedMail: 'bgdmm4kdvwlg7jlzzentbrt7sxtuxthdyxwlsxewx62yfb3fmtsjycb7dq@algorand.mailchain.com',
+		expectedHuman: 'bgdm...b7dq@algorand',
 	},
 	{
-		address: createMailchainAddress('492d61cD88255EbC8556c6393AFA3f3ac2B0505E', SUBSTRATE, 'mailchain.dev'),
-		expectedMail: '492d61cD88255EbC8556c6393AFA3f3ac2B0505E@substrate.mailchain.dev',
-		expectedHuman: '492d...505E@substrate',
+		address: createWalletAddress('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', SUBSTRATE, 'mailchain.dev'),
+		expectedMail: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY@substrate.mailchain.dev',
+		expectedHuman: '5Grw...utQY@substrate',
 	},
 	{
-		address: createMailchainAddress('account', MAILCHAIN, 'mailchain.xyz'),
+		address: createNameServiceAddress('account', 'mailchain.xyz'),
 		expectedMail: 'account@mailchain.xyz',
 		expectedHuman: 'account@mailchain',
+	},
+	{
+		address: createNameServiceAddress('alice.eth', 'mailchain.test'),
+		expectedMail: 'alice.eth@mailchain.test',
+		expectedHuman: 'alice.eth',
+	},
+	{
+		address: createNameServiceAddress('alice', 'eth.mailchain.test'),
+		expectedMail: 'alice@eth.mailchain.test',
+		expectedHuman: 'alice@eth',
+	},
+	{
+		address: createNameServiceAddress('billing.alice', 'eth.ethereum.mailchain.test'),
+		expectedMail: 'billing.alice@eth.ethereum.mailchain.test',
+		expectedHuman: 'billing.alice@eth.ethereum',
 	},
 ];
 

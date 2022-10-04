@@ -1,4 +1,4 @@
-import { createMailchainAddress, encodeAddressByProtocol, formatAddress, ProtocolType } from '@mailchain/addressing';
+import { createWalletAddress, encodeAddressByProtocol, formatAddress, ProtocolType } from '@mailchain/addressing';
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { AddressesApiInterface } from '../api';
 import { MigrationRule } from '../migration';
@@ -22,7 +22,7 @@ export function createV1V2IdentityKeyMigration(
 			const encodedAddress = encodeAddressByProtocol(protoMailbox.address!, protocol).encoded;
 			const identityKey = await addressesApi
 				.getAddressIdentityKey(
-					formatAddress(createMailchainAddress(encodedAddress, protocol, mailchainAddressDomain), 'mail'),
+					formatAddress(createWalletAddress(encodedAddress, protocol, mailchainAddressDomain), 'mail'),
 				)
 				.then(({ data }) => decodeHexZeroX(data.identityKey));
 
