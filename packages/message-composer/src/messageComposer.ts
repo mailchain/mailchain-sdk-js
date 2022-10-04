@@ -31,6 +31,7 @@ export type ComposedMessage = {
 
 class MessageComposer {
 	private readonly _headers: Map<string, Header<any>> = new Map();
+	private readonly _overrideHeaders: Map<string, Map<string, Header<any>>> = new Map();
 	private readonly _messages: Map<string, ContentPart> = new Map();
 	private readonly _attachments: ContentPart[] = [];
 
@@ -83,8 +84,62 @@ class MessageComposer {
 	 *
 	 * @param label the label for the header, can be any string containing just US-ASCII printable characters (without white space characters).
 	 * @param value the value for the header, can be any `string` or {@link Date} or {@link Address} array. Providing other type values will fail.
+	 * @param attrs custom set of attributes that will be applied to the header.
 	 */
 	customHeader<T extends string | Date | Address[]>(
+		label: string,
+		value: T,
+		...attrs: HeaderAttribute[]
+	): MessageComposer {
+		return this.internalCustomHeader(this._headers, label, value, ...attrs);
+	}
+
+	/**
+	 * Set (override any existing) custom header that will be applied to the message of the referenced `address`. The bcc recipient is provided via {@link MessageComposer.recipients}.
+	 *
+	 * This method is useful if there are custom header private value that only the Bcc recipient should be able to access.
+	 *
+	 * @param address the {@link Address.address} of the `Bcc` recipient
+	 * @param label see `label` docs in {@link MessageComposer.customHeader}.
+	 * @param value see `value` docs in {@link MessageComposer.customHeader}.
+	 * @param attrs see `attrs` docs in {@link MessageComposer.customHeader}.
+	 */
+	overrideBccHeader<T extends string | Date | Address[]>(
+		address: string,
+		label: string,
+		value: T,
+		...attrs: HeaderAttribute[]
+	): MessageComposer {
+		if (!this._overrideHeaders.has(address)) {
+			this._overrideHeaders.set(address, new Map());
+		}
+
+		return this.internalCustomHeader(this._overrideHeaders.get(address)!, label, value, ...attrs);
+	}
+
+	/**
+	 * Set (override any existing) custom header that will be applied to the message of the sender {@link ComposedMessage.forSender}.
+	 *
+	 * This method is useful if there is some header value only meant for the sender of the message.
+	 *
+	 * @param label see `label` docs in {@link MessageComposer.customHeader}.
+	 * @param value see `value` docs in {@link MessageComposer.customHeader}.
+	 * @param attrs see `attrs` docs in {@link MessageComposer.customHeader}.
+	 */
+	overrideSenderHeader<T extends string | Date | Address[]>(
+		label: string,
+		value: T,
+		...attrs: HeaderAttribute[]
+	): MessageComposer {
+		if (!this._overrideHeaders.has(HEADER_LABELS.From)) {
+			this._overrideHeaders.set(HEADER_LABELS.From, new Map());
+		}
+
+		return this.internalCustomHeader(this._overrideHeaders.get(HEADER_LABELS.From)!, label, value, ...attrs);
+	}
+
+	private internalCustomHeader<T extends string | Date | Address[]>(
+		headerStore: Map<string, Header<any>>,
 		label: string,
 		value: T,
 		...attrs: HeaderAttribute[]
@@ -94,7 +149,7 @@ class MessageComposer {
 				`invalid header label [${label}]. Header label should be composed only of printable US-ASCII characters without WSC.`,
 			);
 		}
-		this._headers.set(`custom-${label}`, createHeader(label, value, ...attrs));
+		headerStore.set(`custom-${label}`, createHeader(label, value, ...attrs));
 		return this;
 	}
 
@@ -146,7 +201,15 @@ class MessageComposer {
 			finalHeaders.set(HEADER_LABELS.ContentType, contentPart.boundaryHeader);
 		}
 
-		const builtHeadersForSender = await buildHeaders([...finalHeaders.values()].sort(byHeaderOrder), this._ctx);
+		const finalHeadersForSender = new Map(finalHeaders);
+		if (this._overrideHeaders.has(HEADER_LABELS.From)) {
+			const overrideHeaders = this._overrideHeaders.get(HEADER_LABELS.From)!;
+			overrideHeaders.forEach((value, key) => finalHeadersForSender.set(key, value));
+		}
+		const builtHeadersForSender = await buildHeaders(
+			[...finalHeadersForSender.values()].sort(byHeaderOrder),
+			this._ctx,
+		);
 
 		const finalHeadersVisibleRecipients = new Map(finalHeaders);
 		finalHeadersVisibleRecipients.delete(HEADER_LABELS.Bcc);
@@ -160,6 +223,10 @@ class MessageComposer {
 		if (bccHeader && isAddressHeader(bccHeader)) {
 			for (const bccAddress of bccHeader.value) {
 				const finalBccHeaders = new Map(finalHeaders);
+				if (this._overrideHeaders.has(bccAddress.address)) {
+					const overrideHeaders = this._overrideHeaders.get(bccAddress.address)!;
+					overrideHeaders.forEach((value, key) => finalBccHeaders.set(key, value));
+				}
 				finalBccHeaders.set(HEADER_LABELS.Bcc, createHeader(HEADER_LABELS.Bcc, [bccAddress]));
 
 				const builtHeaders = await buildHeaders([...finalBccHeaders.values()].sort(byHeaderOrder), this._ctx);
