@@ -29,6 +29,12 @@ describe('MailchainMessageComposer UTF8', () => {
 				{ name: 'Jane Doe', address: 'jane@mailchain.com' },
 				{ name: 'Bob', address: 'bob@mailchain.com' },
 			)
+			.customHeader(
+				'X-IdentityKeys',
+				'', // empty header value
+				['alice@mailchain.com', '0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain'],
+				['joe@mailchain.com', '0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain'],
+			)
 			.replyTo({ name: 'Robert', address: 'robert@mailchain.com' })
 			.message('plain', Buffer.from('Plaintext content. Can also contain UTF-8 and emojis 🤐.'))
 			.message('html', Buffer.from('This is ✨rich-text✨ HTML <b>content</b>.'))

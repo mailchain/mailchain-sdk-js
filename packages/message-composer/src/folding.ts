@@ -1,4 +1,4 @@
-import { CRLF } from './consts';
+import { CRLF, HTAB } from './consts';
 
 /**
  * Simple and efficient folding that doesn't take into consideration any white spaces nor other semantic breaks. It just folds at the `lengthLimit`.
@@ -27,7 +27,7 @@ export function simpleHardFold(
 	const numFoldedLines = Math.ceil(str.length / finalContentLength);
 	let folded = '';
 	for (let i = 0; i < numFoldedLines; i++) {
-		if (opts.padNewLines && i > 0) folded += '	'; // pad with HTAB
+		if (opts.padNewLines && i > 0) folded += HTAB;
 		const foldPart = str.substring(i * finalContentLength, (i + 1) * finalContentLength);
 		folded += `${opts.prefix ?? ''}${foldPart}${opts.suffix ?? ''}`;
 		if (i + 1 < numFoldedLines) {
@@ -83,4 +83,25 @@ export function semanticLineFold(str: string, lineLength: number, afterSpace?: b
 	}
 
 	return result;
+}
+
+/**
+ * Append the `appendParts` onto the `content` by checking if there is space left on the last line to append the part. If there is no space left, new line is started with HTAB padding.
+ *
+ * The content and each of the parts is delimited with semicolon `;`.
+ */
+export function contentAppendWithFolding(content: string, appendParts: string[], lineLength: number): string {
+	const contentLines = content.split(CRLF);
+
+	for (const part of appendParts) {
+		const lastLine = contentLines[contentLines.length - 1];
+		if (lastLine.length === 0 || lastLine.length + part.length < lineLength) {
+			const resultLine = lastLine + (lastLine.length > 0 ? '; ' : '') + part; // add the ; delimiter only if the line was already some content
+			contentLines[contentLines.length - 1] = resultLine;
+		} else {
+			contentLines[contentLines.length - 1] = lastLine + ';';
+			contentLines.push(HTAB + part);
+		}
+	}
+	return contentLines.join(CRLF);
 }

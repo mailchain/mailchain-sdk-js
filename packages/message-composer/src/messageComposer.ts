@@ -6,7 +6,7 @@ import { createHeader } from './headerFactories';
 import { buildHeaders } from './headerHandler';
 import { byHeaderOrder } from './headerOrder';
 import { defaultMessageComposerContext, MessageComposerContext } from './messageComposerContext';
-import { Address, Attachment, ContentPart, Header, isAddressHeader } from './types';
+import { Address, Attachment, ContentPart, Header, HeaderAttribute, isAddressHeader } from './types';
 
 /** The result from {@link MessageComposer#build}. */
 export type ComposedMessage = {
@@ -38,19 +38,19 @@ class MessageComposer {
 
 	/** Set the `Message-ID` field for the message. If not set, random one would be generated. */
 	id(value: string): MessageComposer {
-		this._headers.set(HEADER_LABELS.MessageId, { label: HEADER_LABELS.MessageId, value });
+		this._headers.set(HEADER_LABELS.MessageId, createHeader(HEADER_LABELS.MessageId, value));
 		return this;
 	}
 
 	/** Set the `Subject` filed for the message. If it consists of non US-ASCII characters, it will get encoded. */
 	subject(value: string): MessageComposer {
-		this._headers.set(HEADER_LABELS.Subject, { label: HEADER_LABELS.Subject, value });
+		this._headers.set(HEADER_LABELS.Subject, createHeader(HEADER_LABELS.Subject, value));
 		return this;
 	}
 
 	/** Set the `From` filed for the message. This is required field and must be set. */
 	from(from: Address): MessageComposer {
-		this._headers.set(HEADER_LABELS.From, { label: HEADER_LABELS.From, value: [from] });
+		this._headers.set(HEADER_LABELS.From, createHeader(HEADER_LABELS.From, [from]));
 		return this;
 	}
 
@@ -60,7 +60,7 @@ class MessageComposer {
 	 * Note: will override any pre-existing recipients for the given `type` when reinvoked with the same `type`.
 	 */
 	recipients(type: typeof HEADER_LABELS['To' | 'Cc' | 'Bcc'], ...recipients: Address[]): MessageComposer {
-		this._headers.set(type, { label: type, value: [...recipients] });
+		this._headers.set(type, createHeader(type, [...recipients]));
 		return this;
 	}
 
@@ -68,13 +68,13 @@ class MessageComposer {
 	 * Set the address that the reply message should be sent to when you want the reply to go to an address that is different than the `From:` address.
 	 */
 	replyTo(address: Address): MessageComposer {
-		this._headers.set(HEADER_LABELS.ReplyTo, { label: HEADER_LABELS.ReplyTo, value: [address] });
+		this._headers.set(HEADER_LABELS.ReplyTo, createHeader(HEADER_LABELS.ReplyTo, [address]));
 		return this;
 	}
 
 	/** Set the Date field for the message. If not set, timestamp of the time invoking `build` will set. */
 	date(value: Date): MessageComposer {
-		this._headers.set(HEADER_LABELS.Date, { label: HEADER_LABELS.Date, value });
+		this._headers.set(HEADER_LABELS.Date, createHeader(HEADER_LABELS.Date, value));
 		return this;
 	}
 
@@ -84,13 +84,17 @@ class MessageComposer {
 	 * @param label the label for the header, can be any string containing just US-ASCII printable characters (without white space characters).
 	 * @param value the value for the header, can be any `string` or {@link Date} or {@link Address} array. Providing other type values will fail.
 	 */
-	customHeader<T extends string | Date | Address[]>(label: string, value: T): MessageComposer {
+	customHeader<T extends string | Date | Address[]>(
+		label: string,
+		value: T,
+		...attrs: HeaderAttribute[]
+	): MessageComposer {
 		if (!hasOnlyPrintableUsAscii(label, false)) {
 			throw new Error(
 				`invalid header label [${label}]. Header label should be composed only of printable US-ASCII characters without WSC.`,
 			);
 		}
-		this._headers.set(`custom-${label}`, { label, value });
+		this._headers.set(`custom-${label}`, createHeader(label, value, ...attrs));
 		return this;
 	}
 
@@ -103,8 +107,8 @@ class MessageComposer {
 	message(type: 'html' | 'plain', content: string | Buffer): MessageComposer {
 		this._messages.set(type, {
 			headers: [
-				{ label: HEADER_LABELS.ContentType, value: `text/${type}`, attrs: [['charset', 'UTF-8']] },
-				{ label: HEADER_LABELS.ContentTransferEncoding, value: 'base64' },
+				createHeader(HEADER_LABELS.ContentType, `text/${type}`, ['charset', 'UTF-8']),
+				createHeader(HEADER_LABELS.ContentTransferEncoding, `base64`),
 			],
 			content,
 		});
@@ -118,7 +122,7 @@ class MessageComposer {
 		this._attachments.push({
 			headers: [
 				createHeader(HEADER_LABELS.ContentType, attachment.contentType),
-				createHeader(HEADER_LABELS.ContentDisposition, 'attachment', [['filename', attachment.filename]]),
+				createHeader(HEADER_LABELS.ContentDisposition, 'attachment', ['filename', attachment.filename]),
 				createHeader(HEADER_LABELS.ContentTransferEncoding, 'base64'),
 				createHeader(HEADER_LABELS.ContentId, `<${attachment.cid}>`),
 			],

@@ -1,4 +1,4 @@
-import { CRLF, LINE_LENGTH_FOLD } from './consts';
+import { CRLF, HTAB, LINE_LENGTH_FOLD } from './consts';
 import { createHeader } from './headerFactories';
 import { exportHeader, exportHeaderAttributes, exportStringHeader } from './headerHandler';
 import { defaultMessageComposerContext } from './messageComposerContext';
@@ -6,15 +6,23 @@ import { defaultMessageComposerContext } from './messageComposerContext';
 describe('headerHandler', () => {
 	describe('exportHeader', () => {
 		it('should export string header', async () => {
-			const header = createHeader('Label', 'stringValue', [['key', 'value']]);
+			const header = createHeader('Label', 'stringValue', ['key', 'value']);
 
 			const res = await exportHeader(header, defaultMessageComposerContext());
 
 			expect(res).toEqual(`Label: stringValue; key="value"`);
 		});
 
+		it('should export header with empty value', async () => {
+			const header = createHeader('Label', '', ['key', 'value']);
+
+			const res = await exportHeader(header, defaultMessageComposerContext());
+
+			expect(res).toEqual(`Label: key="value"`);
+		});
+
 		it('should export date header', async () => {
-			const header = createHeader('Label', new Date('01/01/2001'), [['key', 'value']]);
+			const header = createHeader('Label', new Date('01/01/2001'), ['key', 'value']);
 
 			const res = await exportHeader(header, defaultMessageComposerContext());
 
@@ -40,6 +48,30 @@ describe('headerHandler', () => {
 
 			expect(res).toEqual(
 				`Label: "Alice" <alice@mailchain.co>,${CRLF} "Bob" <bob@mailchain.co>,${CRLF} "Rob" <rob@mailchain.xyz>`,
+			);
+		});
+
+		it('should export header with multiple attributes not being folded', async () => {
+			const header = createHeader('Label', 'value', ['key1', 'value1'], ['key2', 'value2'], ['key3', 'value3']);
+
+			const res = await exportHeader(header, defaultMessageComposerContext());
+
+			expect(res).toEqual(`Label: value; key1="value1"; key2="value2"; key3="value3"`);
+		});
+
+		it('should export header with multiple attributes with attribute folded', async () => {
+			const header = createHeader(
+				'Label',
+				'value',
+				['attr-key-1', 'long-value-1'],
+				['attr-key-2', 'extra-long-value-2'],
+				['attr-key-3', 'very-very-very-very-very-very-long-value-that-will-get-folded-3'],
+			);
+
+			const res = await exportHeader(header, defaultMessageComposerContext());
+
+			expect(res).toEqual(
+				`Label: value; attr-key-1="long-value-1"; attr-key-2="extra-long-value-2";${CRLF}${HTAB}attr-key-3="very-very-very-very-very-very-long-value-that-will-get-folded-3"`,
 			);
 		});
 	});

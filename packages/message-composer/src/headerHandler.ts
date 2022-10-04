@@ -1,7 +1,7 @@
 import formatDate from 'date-fns/format';
 import enUS from 'date-fns/locale/en-US';
 import { hasOnlyPrintableUsAscii } from './hasOnlyAscii';
-import { semanticLineFold, simpleHardFold } from './folding';
+import { contentAppendWithFolding, semanticLineFold, simpleHardFold } from './folding';
 import {
 	AddressHeader,
 	DateHeader,
@@ -39,8 +39,7 @@ export async function exportHeader(header: Header<any>, ctx: MessageComposerCont
 
 	const headerAttrs = await exportHeaderAttributes(header.attrs, ctx);
 
-	// TODO: naive join of attrs, just appending at the end. Need to take care of length
-	return [`${header.label}: ${headerValue}`, ...headerAttrs].join('; ');
+	return `${header.label}: ${contentAppendWithFolding(headerValue, headerAttrs, LINE_LENGTH_FOLD)}`;
 }
 
 /** Export just the {@link Header#value} part of the header. The {@link Header#label} is not exported. */
@@ -59,12 +58,12 @@ export async function exportHeaderAttributes(
 ): Promise<string[]> {
 	// TODO: Not taking line length limit into consideration
 	return await Promise.all(
-		attrs.map(async (attr) => {
-			const value = hasOnlyPrintableUsAscii(attr[1])
-				? attr[1]
-				: `=?UTF-8?B?${await ctx.encodeBase64(await ctx.decodeUtf8(attr[1]))}?=`;
+		attrs.map(async ([attrKey, attrValue]) => {
+			const value = hasOnlyPrintableUsAscii(attrValue)
+				? attrValue
+				: `=?UTF-8?B?${await ctx.encodeBase64(await ctx.decodeUtf8(attrValue))}?=`;
 
-			if (attr[0] != null) return `${attr[0]}="${value}"`;
+			if (attrKey != null) return `${attrKey}="${value}"`;
 			return `"${value}"`;
 		}),
 	);
@@ -103,7 +102,7 @@ export async function exportDateHeader(header: DateHeader, ctx: MessageComposerC
  * Example:
  * ```
  * "Alice Lastname" <alice@mailchain.com>,
- *  "Bob Lastname" <bob@mailchain.com>
+ * "Bob Lastname" <bob@mailchain.com>
  * ```
  */
 export async function exportAddressHeader(header: AddressHeader, ctx: MessageComposerContext): Promise<string> {

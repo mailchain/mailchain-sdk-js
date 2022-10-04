@@ -3,10 +3,15 @@ export type Address = {
 	address: string;
 };
 
+/**
+ * Define single attribute of a header. First element is the `key` and the second is the `value`. A attribute is not required to have a key.
+ */
+export type HeaderAttribute = [string | undefined, string];
+
 export type Header<T> = {
 	label: string;
 	value: T;
-	attrs?: [string | undefined, string][];
+	attrs?: HeaderAttribute[];
 };
 
 export type StringHeader = Header<string>;

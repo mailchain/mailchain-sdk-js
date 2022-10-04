@@ -13,7 +13,7 @@ export async function concludeHeaders(
 	if (fromHeader == null)
 		throw new Error('defining FROM is required, more info https://www.rfc-editor.org/rfc/rfc5322#section-3.6');
 
-	finalHeaders.set(HEADER_LABELS.MimeVersion, { label: HEADER_LABELS.MimeVersion, value: '1.0' });
+	finalHeaders.set(HEADER_LABELS.MimeVersion, createHeader(HEADER_LABELS.MimeVersion, '1.0'));
 	if (!finalHeaders.has(HEADER_LABELS.MessageId)) {
 		finalHeaders.set(HEADER_LABELS.MessageId, await fallbackMessageId(fromHeader.value[0], ctx));
 	}

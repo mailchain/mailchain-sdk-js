@@ -3,6 +3,8 @@ export const LINE_LENGTH_FOLD = 78;
 
 export const CRLF = '\r\n' as const;
 
+export const HTAB = '	' as const;
+
 export const HEADER_LABELS = {
 	MimeVersion: 'MIME-Version',
 	MessageId: 'Message-ID',

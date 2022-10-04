@@ -8,13 +8,13 @@ import { HEADER_LABELS } from './consts';
 const sampleTextContent1 =
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Elit ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at. Blandit aliquam etiam erat velit scelerisque in dictum non. Sed viverra tellus in hac habitasse platea dictumst vestibulum. Nibh tellus molestie nunc non. Id leo in vitae turpis massa sed elementum tempus. Ante metus dictum at tempor commodo ullamcorper a lacus vestibulum. Non odio euismod lacinia at quis risus sed. Imperdiet massa tincidunt nunc pulvinar. Est ante in nibh mauris. Cursus euismod quis viverra nibh cras. Duis at tellus at urna condimentum mattis pellentesque. Amet mauris commodo quis imperdiet massa tincidunt nunc. Vitae congue mauris rhoncus aenean vel elit scelerisque mauris.';
 const sampleContentPart1: ContentPart = {
-	headers: [createHeader('Label1', 'value1', [['attrKey1', 'attrValue1']])],
+	headers: [createHeader('Label1', 'value1', ['attrKey1', 'attrValue1'])],
 	content: encodeBase64(decodeUtf8(sampleTextContent1)),
 };
 const sampTextContent2 =
 	'Neque sodales ut etiam sit. Et egestas quis ipsum suspendisse. Scelerisque felis imperdiet proin fermentum leo. Neque convallis a cras semper auctor neque vitae tempus. Libero volutpat sed cras ornare arcu dui vivamus arcu felis. In nisl nisi scelerisque eu ultrices vitae auctor. In eu mi bibendum neque egestas. Sed tempus urna et pharetra pharetra massa massa. Augue lacus viverra vitae congue eu consequat ac felis. Pellentesque diam volutpat commodo sed egestas egestas. Donec pretium vulputate sapien nec sagittis aliquam malesuada bibendum. Amet justo donec enim diam vulputate ut pharetra.';
 const sampleContentPart2: ContentPart = {
-	headers: [createHeader('Label2', 'Value2', [['atrrKey2', 'attrValue2']])],
+	headers: [createHeader('Label2', 'Value2', ['atrrKey2', 'attrValue2'])],
 	content: encodeBase64(decodeUtf8(sampTextContent2)),
 };
 
@@ -41,7 +41,7 @@ describe('contentHandler', () => {
 
 		it('should build buffer of bytes', async () => {
 			const contentPart: ContentPart = {
-				headers: [createHeader('Label', 'value', [['attrName', 'attrValue']])],
+				headers: [createHeader('Label', 'value', ['attrName', 'attrValue'])],
 				content: Buffer.from(decodeUtf8(sampleTextContent1)),
 			};
 
