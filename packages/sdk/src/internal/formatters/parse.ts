@@ -1,4 +1,7 @@
-import { decodeBase64, encodeUtf8 } from '@mailchain/encoding';
+import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
+import { decodePublicKey, PublicKey } from '@mailchain/crypto';
+import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
+import { X_IDENTITY_KEYS } from './conts';
 import { MailData } from './types';
 
 type MimeHeaderValue = {
@@ -83,13 +86,22 @@ function extractContent(nodes: MimeNode[]): ExtractedContent {
 	return extracted;
 }
 
-export async function parseMimeText(text: string): Promise<MailData> {
+export type ParseMimeTextResult = {
+	mailData: MailData;
+	addressIdentityKeys: Map<string, { identityKey: PublicKey; protocol: ProtocolType; network?: string }>;
+};
+
+export async function parseMimeText(text: string): Promise<ParseMimeTextResult> {
 	const parse = (await import('emailjs-mime-parser')).default;
 	const parsedMessage: MimeNode = parse(text);
 	const {
 		headers,
 		headers: { from, to, bcc, cc, subject },
 	}: any = parsedMessage;
+
+	const addressIdentityKeys = parseIdentityKeys(
+		parsedMessage.headers[X_IDENTITY_KEYS.toLowerCase()]?.[0]?.initial ?? '',
+	);
 
 	const replyToHeader = headers['reply-to']?.[0]?.value?.[0];
 
@@ -98,7 +110,7 @@ export async function parseMimeText(text: string): Promise<MailData> {
 			? extractContent(parsedMessage.childNodes)
 			: extractContent([parsedMessage]);
 
-	return {
+	const mailData: MailData = {
 		id: headers['message-id'][0].value,
 		date: new Date(headers['date'][0].value),
 		from: { name: from[0].value[0].name, address: from[0].value[0].address },
@@ -110,6 +122,8 @@ export async function parseMimeText(text: string): Promise<MailData> {
 		plainTextMessage: extractedContent.messages['text/plain']!,
 		message: extractedContent.messages['text/html']!,
 	};
+
+	return { mailData, addressIdentityKeys };
 }
 
 function parseSubjectHeader(rawSubject: string): string {
@@ -165,4 +179,39 @@ function parseSubjectHeader(rawSubject: string): string {
 	}
 
 	return charsetEncodedContent ?? encodedContent;
+}
+
+function parseIdentityKeys(attrStr: string): ParseMimeTextResult['addressIdentityKeys'] {
+	const result: ParseMimeTextResult['addressIdentityKeys'] = new Map();
+
+	for (const attrPairStr of attrStr.split(';')) {
+		// attrPairStr: alice@mailchain.com="0x192382039fu89sdf82u893123:mailchain"
+		const [attrKey, quotedValue] = attrPairStr.trim().split('=');
+		if (attrKey == null || attrKey.length === 0 || quotedValue == null || quotedValue.length === 0) continue;
+		const value = quotedValue.substring(1, quotedValue.length - 1); // remote the quotes from "0x192382039fu89sdf82u893123:mailchain"
+
+		if (attrKey === 'v') {
+			// This is the version attribute, example: v=1
+			if (value !== '1') {
+				console.warn(`unsupported ${X_IDENTITY_KEYS} version of [${value}]`);
+				return new Map();
+			}
+		} else {
+			const [encodedIdentityKey, protocol] = value.split(':');
+			if (!ALL_PROTOCOLS.includes(protocol as ProtocolType)) {
+				console.warn(`address [${attrKey}] has unsupported protocol [${protocol}]`);
+			}
+			try {
+				const identityKey = decodePublicKey(decodeHexZeroX(encodedIdentityKey));
+				result.set(attrKey, { ...{ identityKey, protocol: protocol as ProtocolType } });
+			} catch (e) {
+				console.warn(
+					`failed decoding identity key of address [${attrKey}] for value [${encodedIdentityKey}]`,
+					e,
+				);
+			}
+		}
+	}
+
+	return result;
 }

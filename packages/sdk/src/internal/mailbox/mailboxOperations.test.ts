@@ -104,7 +104,7 @@ describe('mailbox', () => {
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
 			},
-			Content: Buffer.from((await createMimeMessage(mailData)).original),
+			Content: Buffer.from((await createMimeMessage(mailData, new Map())).original),
 		};
 	});
 

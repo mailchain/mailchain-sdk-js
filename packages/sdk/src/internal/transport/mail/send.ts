@@ -1,12 +1,11 @@
-import { SignerWithPublicKey } from '@mailchain/crypto';
+import { ProtocolType } from '@mailchain/addressing';
+import { PublicKey, SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
 import { Configuration } from '../../../';
-import { ApiKeyConvert } from '../../apiHelpers';
 import { createAxiosConfiguration } from '../../axios/config';
 import { MailAddress, MailData } from '../../formatters/types';
 import { Lookup, LookupResult } from '../../identityKeys';
-import { PublicKey } from '../../api';
 import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
 import { createMailPayloads, Distribution } from './payload';
@@ -18,18 +17,18 @@ export interface PrepareParams {
 
 export interface SendParams {
 	distributions: Distribution[];
-	resolvedRecipients: ResolvedRecipientsResult;
+	resolvedAddresses: ResolvedAddressResult['resolved'];
 }
 
 export class FailedAddressMessageKeyResolutionsError extends Error {
-	constructor(private readonly failedResolutions: FailedAddressMessageKeyResolutionError[]) {
-		super(`at least one address resoluton has failed`);
+	constructor(public readonly failedResolutions: FailedAddressResolutionError[]) {
+		super(`at least one address resolution has failed`);
 	}
 }
 
-export class FailedAddressMessageKeyResolutionError extends Error {
+export class FailedAddressResolutionError extends Error {
 	constructor(readonly address: string, readonly cause: Error) {
-		super(`resoluton for ${address} has failed`);
+		super(`resolution for ${address} has failed`);
 	}
 }
 
@@ -41,14 +40,14 @@ export class FailedDistributionError extends Error {
 
 type PrepareResultFailedResolveRecipients = {
 	status: 'failed-resolve-recipients';
-	failedRecipients: FailedAddressMessageKeyResolutionError[];
+	failedRecipients: FailedAddressResolutionError[];
 };
 
 type PrepareResultSuccess = {
 	status: 'prepare-success';
 	distributions: Distribution[];
 	message: Payload;
-	resolvedRecipients: ResolvedRecipientsResult;
+	resolvedAddresses: ResolvedAddressResult['resolved'];
 };
 
 export type PrepareResult = PrepareResultSuccess | PrepareResultFailedResolveRecipients;
@@ -78,9 +77,9 @@ export type SendResult = SendResultFailedPrepare | SendResultFullyCompleted | Se
 
 export type LookupMessageKeyResolver = (address: string) => Promise<LookupResult>;
 
-type ResolvedRecipientsResult = {
-	success: { [key: string]: PublicKey };
-	failed: FailedAddressMessageKeyResolutionError[];
+export type ResolvedAddressResult = {
+	resolved: Map<string, LookupResult>;
+	failed: FailedAddressResolutionError[];
 };
 
 export class MailSender {
@@ -99,7 +98,7 @@ export class MailSender {
 	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey): Promise<boolean> {
 		const resolvedMessagingKey = await this.lookupMessageKeyResolver(fromAddress.address);
 
-		const resolvedMessagingKeyBytes = ApiKeyConvert.public(resolvedMessagingKey.messagingKey).bytes;
+		const resolvedMessagingKeyBytes = resolvedMessagingKey.messagingKey.bytes;
 		const paramsMessagingKey = senderMessagingKey.publicKey.bytes;
 
 		return isEqual(paramsMessagingKey, resolvedMessagingKeyBytes);
@@ -119,45 +118,57 @@ export class MailSender {
 			throw new Error('content html must not be empty');
 		}
 
-		if (
-			[...message.recipients, ...message.blindCarbonCopyRecipients, ...message.carbonCopyRecipients].length === 0
-		) {
+		const allRecipients = [
+			...message.recipients,
+			...message.blindCarbonCopyRecipients,
+			...message.carbonCopyRecipients,
+		];
+		if (allRecipients.length === 0) {
 			throw new Error('at least one recipient is required');
 		}
-
 		const isSenderMatching = await this.verifySender(message.from, params.senderMessagingKey);
 		if (!isSenderMatching) {
 			throw new Error('messaging is not the latest message key for sender address');
 		}
 
-		const messagePayloads = await createMailPayloads(params.senderMessagingKey, message);
-		const resolvedRecipients = await this.resolveRecipientMessagingKeys(messagePayloads.distributions);
-		if (resolvedRecipients.failed.length > 0) {
+		const allParticipants = [...allRecipients, message.from];
+		if (message.replyTo != null) {
+			allParticipants.push(message.replyTo);
+		}
+
+		const resolvedAddresses = await this.resolveAddresses(allParticipants);
+		if (resolvedAddresses.failed.length > 0) {
 			return {
 				status: 'failed-resolve-recipients',
-				failedRecipients: resolvedRecipients.failed,
+				failedRecipients: resolvedAddresses.failed,
 			};
 		}
+
+		const messagePayloads = await createMailPayloads(
+			params.senderMessagingKey,
+			resolvedAddresses.resolved,
+			message,
+		);
 
 		return {
 			status: 'prepare-success',
 			distributions: messagePayloads.distributions,
 			message: messagePayloads.original,
-			resolvedRecipients,
+			resolvedAddresses: resolvedAddresses.resolved,
 		};
 	}
 
 	async send(params: SendParams): Promise<SendResult> {
 		const { successfulDistributions, failedDistributions } = await this.prepareDistributions(params.distributions);
 
-		if (failedDistributions.length !== 0) {
+		if (failedDistributions.length > 0) {
 			return {
 				status: 'failed-prepare',
 				failedDistributions,
 			};
 		}
 
-		const sendResults = await this.sendPayloads(successfulDistributions, params.resolvedRecipients);
+		const sendResults = await this.sendPayloads(successfulDistributions, params.resolvedAddresses);
 		const allSucceeded = sendResults.every((x) => x.status === 'success');
 
 		if (allSucceeded) {
@@ -173,34 +184,29 @@ export class MailSender {
 		};
 	}
 
-	private async resolveRecipientMessagingKeys(distributions: Distribution[]): Promise<ResolvedRecipientsResult> {
-		const recipientAddresses = flatten(distributions.map((d) => d.recipients.map((r) => r.address)));
-		const recipientsPromises = await Promise.allSettled(
-			recipientAddresses.map(async (address) => ({
-				address,
-				messagingKey: (await this.lookupMessageKeyResolver(address)
-					.then((r) => r.messagingKey)
-					.catch((e: Error) => {
-						throw new FailedAddressMessageKeyResolutionError(address, e);
-					})) as PublicKey,
-			})),
+	private async resolveAddresses(mailAddresses: MailAddress[]): Promise<ResolvedAddressResult> {
+		const addresses = [...new Set(mailAddresses.map((r) => r.address))];
+		const lookupResults = await Promise.allSettled(
+			addresses.map(async (address) => {
+				const lookupResult = await this.lookupMessageKeyResolver(address).catch((e: Error) => {
+					throw new FailedAddressResolutionError(address, e);
+				});
+				return { address, ...lookupResult };
+			}),
 		);
 
-		const resolvedRecipients: ResolvedRecipientsResult = (await recipientsPromises).reduce(
-			(acc, result) => {
-				if (result.status === 'fulfilled') {
-					const { address, messagingKey } = result.value;
-					return { ...acc, success: { ...acc.success, [address]: messagingKey } };
-				}
-				if (result.reason instanceof FailedAddressMessageKeyResolutionError) {
-					return { ...acc, failed: [...acc.failed, result.reason] };
-				}
-				return acc;
-			},
-			{ success: {}, failed: [] as FailedAddressMessageKeyResolutionError[] },
-		);
+		const resolved: ResolvedAddressResult['resolved'] = new Map();
+		const failed: ResolvedAddressResult['failed'] = [];
+		for (const result of lookupResults) {
+			if (result.status === 'fulfilled') {
+				const { messagingKey, identityKey, protocol, network } = result.value;
+				resolved.set(result.value.address, { messagingKey, identityKey, protocol, network });
+			} else {
+				failed.push(result.reason as FailedAddressResolutionError);
+			}
+		}
 
-		return resolvedRecipients;
+		return { resolved, failed };
 	}
 
 	private async prepareDistributions(distributions: Distribution[]) {
@@ -215,8 +221,8 @@ export class MailSender {
 			}),
 		);
 
-		const distErrors = [] as FailedDistributionError[];
-		const successfulDistributions = [] as PreparedDistribution[];
+		const distErrors: FailedDistributionError[] = [];
+		const successfulDistributions: PreparedDistribution[] = [];
 
 		preparedDistributions.forEach((x) => {
 			if (x.status === 'rejected') {
@@ -234,14 +240,14 @@ export class MailSender {
 
 	private async sendPayloads(
 		successfulDistributions: PreparedDistribution[],
-		resolvedRecipients: ResolvedRecipientsResult,
+		resolvedAddresses: ResolvedAddressResult['resolved'],
 	) {
 		const sendResults = flatten(
 			await Promise.all(
 				successfulDistributions.map(async (preparedDistribution) => {
-					const recipients = preparedDistribution.distribution.recipients
-						.filter(({ address }) => resolvedRecipients.success[address])
-						.map(({ address }) => resolvedRecipients.success[address]);
+					const recipients = preparedDistribution.distribution.recipients.map(
+						({ address }) => resolvedAddresses.get(address)!.messagingKey,
+					);
 					const { payloadRootEncryptionKey, payloadUri } = preparedDistribution.preparedPayload;
 
 					return this.sender.send({

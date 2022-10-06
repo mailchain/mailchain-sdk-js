@@ -1,3 +1,11 @@
+import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
+import { BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
+import { AliceSR25519PublicKey, BobSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
+import {
+	dummyMailData,
+	dummyMailDataResolvedAddresses,
+	dummyMailDataResolvedAddressesWithoutMessagingKey,
+} from '../test.const';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';
 import { MailData } from './types';
@@ -16,45 +24,34 @@ const sampleTexts = [
 
 describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	const mailData: MailData = {
-		date: new Date('2022-06-06'),
-		id: '123@mailchain.local',
-		from: { address: '1337@mailchain.com', name: '1337' },
-		replyTo: { address: '7331@mailchain.com', name: '7311' },
-		recipients: [
-			{ address: 'rec1@mailchain.local', name: 'rec1' },
-			{ address: 'rec2@mailchain.local', name: 'rec2' },
-		],
-		carbonCopyRecipients: [
-			{ address: 'rec3@mailchain.local', name: 'rec3' },
-			{ address: 'rec4@mailchain.local', name: 'rec4' },
-		],
-		blindCarbonCopyRecipients: [
-			{ address: 'rec5@mailchain.local', name: 'rec5' },
-			{ address: 'rec6@mailchain.local', name: 'rec6' },
-		],
+		...dummyMailData,
 		subject: 'LoremЛоремΛορεμ側経意セムレ발전을रहारुपكلאינוդոլոռ🐺🏢🔹🔯',
 		message: sampleTexts.map((it) => `<p>${it}</p>`).join(''),
 		plainTextMessage: sampleTexts.join('\n'),
 	};
 
 	it('should create ORIGINAL mime mail message and parse it its entirety', async () => {
-		const messages = await createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData, dummyMailDataResolvedAddresses);
 
 		const result = await parseMimeText(messages.original);
 
-		expect(result).toEqual(mailData);
+		expect(result.mailData).toEqual(mailData);
+		expect(result.addressIdentityKeys).toEqual(dummyMailDataResolvedAddressesWithoutMessagingKey);
 	});
 
 	it('should create mime mail message for visible recipients and parse it', async () => {
-		const messages = await createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData, dummyMailDataResolvedAddresses);
 
 		const result = await parseMimeText(messages.visibleRecipients);
 
-		expect(result).toEqual({ ...mailData, blindCarbonCopyRecipients: [] });
+		expect(result.mailData).toEqual({ ...mailData, blindCarbonCopyRecipients: [] });
+		const visibleIdentityKeys = new Map(dummyMailDataResolvedAddressesWithoutMessagingKey);
+		dummyMailData.blindCarbonCopyRecipients.forEach(({ address }) => visibleIdentityKeys.delete(address));
+		expect(result.addressIdentityKeys).toEqual(visibleIdentityKeys);
 	});
 
 	it('should create mime mail message for blind recipients and parse it', async () => {
-		const messages = await createMimeMessage(mailData);
+		const messages = await createMimeMessage(mailData, dummyMailDataResolvedAddresses);
 
 		const resultBlind = await Promise.all(
 			messages.blindRecipients.map(async (message) => ({
@@ -64,10 +61,19 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 		);
 
 		expect(resultBlind).toEqual(
-			mailData.blindCarbonCopyRecipients.map((r) => ({
-				recipient: r,
-				parsed: { ...mailData, blindCarbonCopyRecipients: [r] },
-			})),
+			mailData.blindCarbonCopyRecipients.map((r) => {
+				const bccAddressIdentityKeys = new Map(dummyMailDataResolvedAddressesWithoutMessagingKey);
+				dummyMailData.blindCarbonCopyRecipients.forEach(({ address }) => {
+					if (r.address !== address) bccAddressIdentityKeys.delete(address);
+				});
+				return {
+					recipient: r,
+					parsed: {
+						mailData: { ...mailData, blindCarbonCopyRecipients: [r] },
+						addressIdentityKeys: bccAddressIdentityKeys,
+					},
+				};
+			}),
 		);
 	});
 });

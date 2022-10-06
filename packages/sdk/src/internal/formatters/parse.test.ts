@@ -7,6 +7,6 @@ describe('parse', () => {
 
 		const result = await parseMimeText(legacyContent);
 
-		expect(result).toMatchSnapshot();
+		expect(result.mailData).toMatchSnapshot();
 	});
 });

@@ -1,5 +1,6 @@
 import { decodeHexZeroX, decode } from '@mailchain/encoding';
-import { createWalletAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
+import { PublicKey } from '@mailchain/crypto';
 import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
 import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '../signatures/errors';
 import { createProofMessage, ProofParams } from '../keyreg';
@@ -11,7 +12,6 @@ import {
 	RegisteredKeyProof,
 	AddressesApiFactory,
 	MessagingKeysApiFactory,
-	PublicKey,
 	Address,
 	AddressesApi,
 } from '../api';
@@ -22,11 +22,18 @@ export const getAddressFromApiResponse = (address: Address) => {
 	return decode(address.encoding!, address.value);
 };
 
-export type LookupResult = { address: MailchainAddress; messagingKey: PublicKey };
+export type LookupResult = {
+	messagingKey: PublicKey;
+	identityKey?: PublicKey;
+	protocol: ProtocolType;
+	network?: string;
+};
 export class Lookup {
 	constructor(private readonly addressApi: AddressesApi, private readonly messagingKeysApi: MessagingKeysApi) {}
 
-	private checkRegisteredKeyProof = async (registeredKeyProof: RegisteredKeyProof, messagingKey: PublicKey) => {
+	private async checkRegisteredKeyProof(registeredKeyProof: RegisteredKeyProof, messagingKey: PublicKey) {
+		if (registeredKeyProof.signature == null) throw new AddressVerificationFailed();
+
 		const params = {
 			AddressEncoding: registeredKeyProof?.address.encoding,
 			PublicKeyEncoding: registeredKeyProof?.messagingKeyEncoding,
@@ -37,20 +44,22 @@ export class Lookup {
 		const message = createProofMessage(
 			params,
 			getAddressFromApiResponse(registeredKeyProof.address),
-			ApiKeyConvert.public(messagingKey),
-			registeredKeyProof.nonce!,
+			messagingKey,
+			registeredKeyProof.nonce,
 		);
 		// verify the proof with the correct signer
-		const isVerified = verify(
-			registeredKeyProof?.signingMethod!,
-			ApiKeyConvert.public(registeredKeyProof?.identityKey!),
+		const identityKey = ApiKeyConvert.public(registeredKeyProof.identityKey);
+		const isVerified = await verify(
+			registeredKeyProof.signingMethod,
+			identityKey,
 			Buffer.from(message),
-			decodeHexZeroX(registeredKeyProof?.signature!),
+			decodeHexZeroX(registeredKeyProof.signature),
 		);
 		if (!isVerified) throw new AddressVerificationFailed();
-	};
+		return identityKey;
+	}
 
-	private checkProvidedKeyProof = async (providedKeyProof: ProvidedKeyProof, messagingKey: PublicKey) => {
+	private async checkProvidedKeyProof(providedKeyProof: ProvidedKeyProof, messagingKey: PublicKey) {
 		const mailchainPublicKeyResponse = await this.messagingKeysApi.getMailchainPublicKey();
 
 		if (!mailchainPublicKeyResponse.data.key?.value) throw new PublicKeyNotFoundFailed();
@@ -59,36 +68,36 @@ export class Lookup {
 		if (!providedKeyProof?.signature) throw new AddressVerificationFailed();
 		const isKeyValid = await verifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,
-			ApiKeyConvert.public(messagingKey),
+			messagingKey,
 			decodeHexZeroX(providedKeyProof?.signature),
 			providedKeyProof.address!,
 			providedKeyProof.protocol as ProtocolType,
 		);
 
 		if (!isKeyValid) throw new AddressVerificationFailed();
-	};
+	}
 
-	messageKey = async (address: string): Promise<LookupResult> => {
-		const result = await this.addressApi.getAddressMessagingKey(address);
-		const { registeredKeyProof, providedKeyProof, messagingKey } = result.data;
+	async messageKey(address: string): Promise<LookupResult> {
+		const { data } = await this.addressApi.getAddressMessagingKey(address);
+		const { registeredKeyProof, providedKeyProof, messagingKey: apiMessagingKey } = data;
 
+		const messagingKey = ApiKeyConvert.public(apiMessagingKey);
+		let identityKey: PublicKey | undefined = undefined;
 		if (providedKeyProof) {
-			this.checkProvidedKeyProof(providedKeyProof, messagingKey);
+			await this.checkProvidedKeyProof(providedKeyProof, messagingKey);
 		} else if (registeredKeyProof) {
-			this.checkRegisteredKeyProof(registeredKeyProof, messagingKey);
+			identityKey = await this.checkRegisteredKeyProof(registeredKeyProof, messagingKey);
 		} else {
 			throw new AddressVerificationFailed();
 		}
 
-		return {
-			address: createWalletAddress(
-				result.data.localPart!,
-				result.data.protocol as ProtocolType,
-				result.data.rootDomain!,
-			),
-			messagingKey: result.data.messagingKey,
-		};
-	};
+		const protocol = data.protocol as ProtocolType;
+		if (!ALL_PROTOCOLS.includes(protocol)) {
+			throw new Error(`invalid address protocol of [${data.protocol}]`);
+		}
+
+		return { messagingKey, identityKey, protocol };
+	}
 
 	static create(configuration: Configuration) {
 		return new Lookup(

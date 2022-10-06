@@ -127,7 +127,7 @@ export class Mailchain {
 
 		const sendResult = await sender.send({
 			distributions: prepareResult.distributions,
-			resolvedRecipients: prepareResult.resolvedRecipients,
+			resolvedAddresses: prepareResult.resolvedAddresses,
 		});
 
 		// update folder

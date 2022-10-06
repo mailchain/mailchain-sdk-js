@@ -190,18 +190,18 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			.then((res) => res.data as ArrayBuffer);
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
-		const messageContent = await parseMimeText(messageData.Content.toString());
-		const to = messageContent.recipients.map((r) => r.address);
-		const cc = messageContent.carbonCopyRecipients.map((r) => r.address);
-		const bcc = messageContent.blindCarbonCopyRecipients.map((r) => r.address);
+		const { mailData } = await parseMimeText(messageData.Content.toString());
+		const to = mailData.recipients.map((r) => r.address);
+		const cc = mailData.carbonCopyRecipients.map((r) => r.address);
+		const bcc = mailData.blindCarbonCopyRecipients.map((r) => r.address);
 
 		return {
-			from: messageContent.from.address,
+			from: mailData.from.address,
 			to,
-			replyTo: messageContent.replyTo ? messageContent.replyTo.address : undefined,
-			subject: messageContent.subject,
+			replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
+			subject: mailData.subject,
 			timestamp: messageData.Headers.Created,
-			body: messageContent.message,
+			body: mailData.message,
 			cc,
 			bcc,
 		};
@@ -213,7 +213,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	}
 
 	async saveReceivedMessage(params: SaveReceivedMessageParam): Promise<MessagePreview> {
-		const mailData = await parseMimeText(params.payload.Content.toString());
+		const { mailData } = await parseMimeText(params.payload.Content.toString());
 
 		// Go through the recipients of the message
 		// 	Recipients corresponds to the mailbox identity key

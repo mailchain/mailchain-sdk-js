@@ -1,109 +1,181 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createMimeMessage should generate correct message: BLIND rec5@mailchain.local 1`] = `
+exports[`createMimeMessage should generate correct message: BLIND jane@mailchain.test 1`] = `
 "MIME-Version: 1.0
 Date: Mon, 06 Jun 2022 00:00:00 +0000
-Message-ID: 123@mailchain.local
-Subject: =?UTF-8?B?U3ViamVjdCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYIg5aSn5aSn5aSn5aSn?=
-From: \\"1337\\" <1337@mailchain.com>
-Reply-To: \\"7311\\" <7331@mailchain.com>
-To: \\"rec1\\" <rec1@mailchain.local>,
- \\"rec2\\" <rec2@mailchain.local>
-Cc: \\"rec3\\" <rec3@mailchain.local>,
- \\"rec4\\" <rec4@mailchain.local>
-Bcc: \\"rec5\\" <rec5@mailchain.local>
+Message-ID: mail-data-id@mailchain.test
+Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
+From: \\"alice\\" <alice@mailchain.test>
+To: \\"bob\\" <bob@mailchain.test>,
+ \\"0xEBa...af8d\\" <0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test>,
+ \\"tim.eth\\" <tim@eth.mailchain.test>
+Cc: \\"john\\" <john@mailchain.test>
+Bcc: \\"jane\\" <jane@mailchain.test>
+X-IdentityKeys: v=\\"1\\";
+	alice@mailchain.test=\\"0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain\\";
+	bob@mailchain.test=\\"0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain\\";
+	0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	tim@eth.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e471ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	john@mailchain.test=\\"0xe2727eaa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\";
+	jane@mailchain.test=\\"0xe2723c7523a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\"
 Content-Type: multipart/alternative; boundary=\\"boundary\\"
 
 --boundary
 Content-Type: text/html; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYI=
+PHVsPjxsaT5Mb3JlbSBpcHN1bSBkb2xvciBzaXQgYW1ldCwgY29uc2VjdGV0dWVyIGFkaXBpc2Np
+bmcgZWxpdC48L2xpPjxsaT5BbGlxdWFtIHRpbmNpZHVudCBtYXVyaXMgZXUgcmlzdXMuPC9saT48
+bGk+VmVzdGlidWx1bSBhdWN0b3IgZGFwaWJ1cyBuZXF1ZS48L2xpPjwvdWw+
 --boundary
 Content-Type: text/plain; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNA==
+TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
+c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+YSBhbGlxdWEuIE5lcXVlIHZpdGFlIHRlbXB1cyBxdWFtIHBlbGxlbnRlc3F1ZSBuZWMgbmFtLiBR
+dWFtIG51bGxhIHBvcnR0aXRvciBtYXNzYSBpZC4gTmlzbCByaG9uY3VzIG1hdHRpcyByaG9uY3Vz
+IHVybmEuIFRvcnRvciBwb3N1ZXJlIGFjIHV0IGNvbnNlcXVhdCBzZW1wZXIgdml2ZXJyYSBuYW0u
+IEZhY2lsaXNpcyBtYXVyaXMgc2l0IGFtZXQgbWFzc2EuIEV0IG1vbGVzdGllIGFjIGZldWdpYXQg
+c2VkIGxlY3R1cyB2ZXN0aWJ1bHVtLiBJZCBjdXJzdXMgbWV0dXMgYWxpcXVhbSBlbGVpZmVuZCBt
+aSBpbiBudWxsYSBwb3N1ZXJlIHNvbGxpY2l0dWRpbi4gQSBkaWFtIHNvbGxpY2l0dWRpbiB0ZW1w
+b3IgaWQuIE1hdXJpcyB1bHRyaWNlcyBlcm9zIGluIGN1cnN1cyB0dXJwaXMgbWFzc2EuIEVsZW1l
+bnR1bSBmYWNpbGlzaXMgbGVvIHZlbCBmcmluZ2lsbGEgZXN0IHVsbGFtY29ycGVyLiBBbGlxdWFt
+IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
-exports[`createMimeMessage should generate correct message: BLIND rec6@mailchain.local 1`] = `
+exports[`createMimeMessage should generate correct message: BLIND maria@mailchain.test 1`] = `
 "MIME-Version: 1.0
 Date: Mon, 06 Jun 2022 00:00:00 +0000
-Message-ID: 123@mailchain.local
-Subject: =?UTF-8?B?U3ViamVjdCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYIg5aSn5aSn5aSn5aSn?=
-From: \\"1337\\" <1337@mailchain.com>
-Reply-To: \\"7311\\" <7331@mailchain.com>
-To: \\"rec1\\" <rec1@mailchain.local>,
- \\"rec2\\" <rec2@mailchain.local>
-Cc: \\"rec3\\" <rec3@mailchain.local>,
- \\"rec4\\" <rec4@mailchain.local>
-Bcc: \\"rec6\\" <rec6@mailchain.local>
+Message-ID: mail-data-id@mailchain.test
+Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
+From: \\"alice\\" <alice@mailchain.test>
+To: \\"bob\\" <bob@mailchain.test>,
+ \\"0xEBa...af8d\\" <0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test>,
+ \\"tim.eth\\" <tim@eth.mailchain.test>
+Cc: \\"john\\" <john@mailchain.test>
+Bcc: \\"maria\\" <maria@mailchain.test>
+X-IdentityKeys: v=\\"1\\";
+	alice@mailchain.test=\\"0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain\\";
+	bob@mailchain.test=\\"0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain\\";
+	0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	tim@eth.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e471ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	john@mailchain.test=\\"0xe2727eaa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\";
+	maria@mailchain.test=\\"0xe2723c7523a59111af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\"
 Content-Type: multipart/alternative; boundary=\\"boundary\\"
 
 --boundary
 Content-Type: text/html; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYI=
+PHVsPjxsaT5Mb3JlbSBpcHN1bSBkb2xvciBzaXQgYW1ldCwgY29uc2VjdGV0dWVyIGFkaXBpc2Np
+bmcgZWxpdC48L2xpPjxsaT5BbGlxdWFtIHRpbmNpZHVudCBtYXVyaXMgZXUgcmlzdXMuPC9saT48
+bGk+VmVzdGlidWx1bSBhdWN0b3IgZGFwaWJ1cyBuZXF1ZS48L2xpPjwvdWw+
 --boundary
 Content-Type: text/plain; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNA==
+TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
+c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+YSBhbGlxdWEuIE5lcXVlIHZpdGFlIHRlbXB1cyBxdWFtIHBlbGxlbnRlc3F1ZSBuZWMgbmFtLiBR
+dWFtIG51bGxhIHBvcnR0aXRvciBtYXNzYSBpZC4gTmlzbCByaG9uY3VzIG1hdHRpcyByaG9uY3Vz
+IHVybmEuIFRvcnRvciBwb3N1ZXJlIGFjIHV0IGNvbnNlcXVhdCBzZW1wZXIgdml2ZXJyYSBuYW0u
+IEZhY2lsaXNpcyBtYXVyaXMgc2l0IGFtZXQgbWFzc2EuIEV0IG1vbGVzdGllIGFjIGZldWdpYXQg
+c2VkIGxlY3R1cyB2ZXN0aWJ1bHVtLiBJZCBjdXJzdXMgbWV0dXMgYWxpcXVhbSBlbGVpZmVuZCBt
+aSBpbiBudWxsYSBwb3N1ZXJlIHNvbGxpY2l0dWRpbi4gQSBkaWFtIHNvbGxpY2l0dWRpbiB0ZW1w
+b3IgaWQuIE1hdXJpcyB1bHRyaWNlcyBlcm9zIGluIGN1cnN1cyB0dXJwaXMgbWFzc2EuIEVsZW1l
+bnR1bSBmYWNpbGlzaXMgbGVvIHZlbCBmcmluZ2lsbGEgZXN0IHVsbGFtY29ycGVyLiBBbGlxdWFt
+IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
 exports[`createMimeMessage should generate correct message: ORIGINAL 1`] = `
 "MIME-Version: 1.0
 Date: Mon, 06 Jun 2022 00:00:00 +0000
-Message-ID: 123@mailchain.local
-Subject: =?UTF-8?B?U3ViamVjdCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYIg5aSn5aSn5aSn5aSn?=
-From: \\"1337\\" <1337@mailchain.com>
-Reply-To: \\"7311\\" <7331@mailchain.com>
-To: \\"rec1\\" <rec1@mailchain.local>,
- \\"rec2\\" <rec2@mailchain.local>
-Cc: \\"rec3\\" <rec3@mailchain.local>,
- \\"rec4\\" <rec4@mailchain.local>
-Bcc: \\"rec5\\" <rec5@mailchain.local>,
- \\"rec6\\" <rec6@mailchain.local>
+Message-ID: mail-data-id@mailchain.test
+Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
+From: \\"alice\\" <alice@mailchain.test>
+To: \\"bob\\" <bob@mailchain.test>,
+ \\"0xEBa...af8d\\" <0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test>,
+ \\"tim.eth\\" <tim@eth.mailchain.test>
+Cc: \\"john\\" <john@mailchain.test>
+Bcc: \\"jane\\" <jane@mailchain.test>,
+ \\"maria\\" <maria@mailchain.test>
+X-IdentityKeys: v=\\"1\\";
+	alice@mailchain.test=\\"0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain\\";
+	bob@mailchain.test=\\"0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain\\";
+	0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	tim@eth.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e471ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	john@mailchain.test=\\"0xe2727eaa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\";
+	jane@mailchain.test=\\"0xe2723c7523a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\";
+	maria@mailchain.test=\\"0xe2723c7523a59111af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\"
 Content-Type: multipart/alternative; boundary=\\"boundary\\"
 
 --boundary
 Content-Type: text/html; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYI=
+PHVsPjxsaT5Mb3JlbSBpcHN1bSBkb2xvciBzaXQgYW1ldCwgY29uc2VjdGV0dWVyIGFkaXBpc2Np
+bmcgZWxpdC48L2xpPjxsaT5BbGlxdWFtIHRpbmNpZHVudCBtYXVyaXMgZXUgcmlzdXMuPC9saT48
+bGk+VmVzdGlidWx1bSBhdWN0b3IgZGFwaWJ1cyBuZXF1ZS48L2xpPjwvdWw+
 --boundary
 Content-Type: text/plain; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNA==
+TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
+c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+YSBhbGlxdWEuIE5lcXVlIHZpdGFlIHRlbXB1cyBxdWFtIHBlbGxlbnRlc3F1ZSBuZWMgbmFtLiBR
+dWFtIG51bGxhIHBvcnR0aXRvciBtYXNzYSBpZC4gTmlzbCByaG9uY3VzIG1hdHRpcyByaG9uY3Vz
+IHVybmEuIFRvcnRvciBwb3N1ZXJlIGFjIHV0IGNvbnNlcXVhdCBzZW1wZXIgdml2ZXJyYSBuYW0u
+IEZhY2lsaXNpcyBtYXVyaXMgc2l0IGFtZXQgbWFzc2EuIEV0IG1vbGVzdGllIGFjIGZldWdpYXQg
+c2VkIGxlY3R1cyB2ZXN0aWJ1bHVtLiBJZCBjdXJzdXMgbWV0dXMgYWxpcXVhbSBlbGVpZmVuZCBt
+aSBpbiBudWxsYSBwb3N1ZXJlIHNvbGxpY2l0dWRpbi4gQSBkaWFtIHNvbGxpY2l0dWRpbiB0ZW1w
+b3IgaWQuIE1hdXJpcyB1bHRyaWNlcyBlcm9zIGluIGN1cnN1cyB0dXJwaXMgbWFzc2EuIEVsZW1l
+bnR1bSBmYWNpbGlzaXMgbGVvIHZlbCBmcmluZ2lsbGEgZXN0IHVsbGFtY29ycGVyLiBBbGlxdWFt
+IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
 exports[`createMimeMessage should generate correct message: VISIBLE 1`] = `
 "MIME-Version: 1.0
 Date: Mon, 06 Jun 2022 00:00:00 +0000
-Message-ID: 123@mailchain.local
-Subject: =?UTF-8?B?U3ViamVjdCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYIg5aSn5aSn5aSn5aSn?=
-From: \\"1337\\" <1337@mailchain.com>
-Reply-To: \\"7311\\" <7331@mailchain.com>
-To: \\"rec1\\" <rec1@mailchain.local>,
- \\"rec2\\" <rec2@mailchain.local>
-Cc: \\"rec3\\" <rec3@mailchain.local>,
- \\"rec4\\" <rec4@mailchain.local>
+Message-ID: mail-data-id@mailchain.test
+Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
+From: \\"alice\\" <alice@mailchain.test>
+To: \\"bob\\" <bob@mailchain.test>,
+ \\"0xEBa...af8d\\" <0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test>,
+ \\"tim.eth\\" <tim@eth.mailchain.test>
+Cc: \\"john\\" <john@mailchain.test>
+X-IdentityKeys: v=\\"1\\";
+	alice@mailchain.test=\\"0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain\\";
+	bob@mailchain.test=\\"0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain\\";
+	0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	tim@eth.mailchain.test=\\"0xe2ab3caa23a5b511af5ad7b7ef6076e471ab7e75a9dc910ea60e417a2b770a5671:ethereum\\";
+	john@mailchain.test=\\"0xe2727eaa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671:mailchain\\"
 Content-Type: multipart/alternative; boundary=\\"boundary\\"
 
 --boundary
 Content-Type: text/html; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNCDwn6Sj8J+YsvCfpbPwn5iy8J+ls/CfmYI=
+PHVsPjxsaT5Mb3JlbSBpcHN1bSBkb2xvciBzaXQgYW1ldCwgY29uc2VjdGV0dWVyIGFkaXBpc2Np
+bmcgZWxpdC48L2xpPjxsaT5BbGlxdWFtIHRpbmNpZHVudCBtYXVyaXMgZXUgcmlzdXMuPC9saT48
+bGk+VmVzdGlidWx1bSBhdWN0b3IgZGFwaWJ1cyBuZXF1ZS48L2xpPjwvdWw+
 --boundary
 Content-Type: text/plain; charset=\\"UTF-8\\"
 Content-Transfer-Encoding: base64
 
-bGluZSAxCmxpbmUyCgpsaW5lNA==
+TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
+c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
+YSBhbGlxdWEuIE5lcXVlIHZpdGFlIHRlbXB1cyBxdWFtIHBlbGxlbnRlc3F1ZSBuZWMgbmFtLiBR
+dWFtIG51bGxhIHBvcnR0aXRvciBtYXNzYSBpZC4gTmlzbCByaG9uY3VzIG1hdHRpcyByaG9uY3Vz
+IHVybmEuIFRvcnRvciBwb3N1ZXJlIGFjIHV0IGNvbnNlcXVhdCBzZW1wZXIgdml2ZXJyYSBuYW0u
+IEZhY2lsaXNpcyBtYXVyaXMgc2l0IGFtZXQgbWFzc2EuIEV0IG1vbGVzdGllIGFjIGZldWdpYXQg
+c2VkIGxlY3R1cyB2ZXN0aWJ1bHVtLiBJZCBjdXJzdXMgbWV0dXMgYWxpcXVhbSBlbGVpZmVuZCBt
+aSBpbiBudWxsYSBwb3N1ZXJlIHNvbGxpY2l0dWRpbi4gQSBkaWFtIHNvbGxpY2l0dWRpbiB0ZW1w
+b3IgaWQuIE1hdXJpcyB1bHRyaWNlcyBlcm9zIGluIGN1cnN1cyB0dXJwaXMgbWFzc2EuIEVsZW1l
+bnR1bSBmYWNpbGlzaXMgbGVvIHZlbCBmcmluZ2lsbGEgZXN0IHVsbGFtY29ycGVyLiBBbGlxdWFt
+IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;

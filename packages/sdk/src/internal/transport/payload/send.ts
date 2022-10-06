@@ -1,8 +1,13 @@
-import { ED25519ExtendedPrivateKey, ED25519PrivateKey, SignerWithPublicKey, encodePublicKey } from '@mailchain/crypto';
+import {
+	ED25519ExtendedPrivateKey,
+	ED25519PrivateKey,
+	SignerWithPublicKey,
+	encodePublicKey,
+	PublicKey,
+} from '@mailchain/crypto';
 import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
-import { ApiKeyConvert } from '../../apiHelpers';
 import { protocol } from '../../protobuf/protocol/protocol';
-import { Configuration, PublicKey, TransportApiInterface, TransportApiFactory } from '../../api';
+import { Configuration, TransportApiInterface, TransportApiFactory } from '../../api';
 import { getAxiosWithSigner } from '../../auth/jwt';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
@@ -117,15 +122,11 @@ export class PayloadSender {
 		messageUri: string,
 		payloadRootEncryptionKey: ED25519ExtendedPrivateKey,
 	): Promise<string> {
-		const deliveryCreated = await createDelivery(
-			ApiKeyConvert.public(recipientMessageKey),
-			payloadRootEncryptionKey,
-			messageUri,
-		);
+		const deliveryCreated = await createDelivery(recipientMessageKey, payloadRootEncryptionKey, messageUri);
 
 		const res = await this.transportApi.postDeliveryRequest({
 			encryptedDeliveryRequest: encodeBase64(protocol.Delivery.encode(deliveryCreated).finish()),
-			recipientMessagingKey: encodeHexZeroX(encodePublicKey(ApiKeyConvert.public(recipientMessageKey))),
+			recipientMessagingKey: encodeHexZeroX(encodePublicKey(recipientMessageKey)),
 		});
 		return res.data.deliveryRequestID;
 	}

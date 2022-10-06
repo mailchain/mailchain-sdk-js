@@ -4,8 +4,7 @@ import { testRandomFunction } from '@mailchain/crypto/rand.test.const';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
-import { encodeHexZeroX } from '@mailchain/encoding';
-import { PostDeliveryRequestResponseBody, PublicKey, TransportApiInterface } from '../../api';
+import { PostDeliveryRequestResponseBody, TransportApiInterface } from '../../api';
 import { PayloadSender } from './send';
 import { Payload } from './content/payload';
 import { decryptPayload } from './content/decrypt';
@@ -14,17 +13,9 @@ import { deserialize } from './content/serialization';
 const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 
-const aliceMessagingKey = {
-	value: encodeHexZeroX(aliceKeyRing.accountMessagingKey().publicKey.bytes),
-	encoding: 'hex/0x-prefix',
-	curve: 'ed25519',
-} as PublicKey;
+const aliceMessagingKey = aliceKeyRing.accountMessagingKey().publicKey;
 
-const bobMessagingKey = {
-	curve: 'ed25519',
-	encoding: 'hex/0x-prefix',
-	value: encodeHexZeroX(bobKeyRing.accountMessagingKey().publicKey.bytes),
-} as PublicKey;
+const bobMessagingKey = bobKeyRing.accountMessagingKey().publicKey;
 
 const payload: Payload = {
 	Headers: {
