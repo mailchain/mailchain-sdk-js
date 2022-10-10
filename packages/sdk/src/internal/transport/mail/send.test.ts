@@ -1,8 +1,8 @@
 import { mock, MockProxy } from 'jest-mock-extended';
-import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
+import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { LookupResult } from '../../identityKeys';
 import { PayloadSender } from '../payload/send';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
@@ -35,8 +35,6 @@ jest.mock('./payload', () => ({
 }));
 
 describe('MailSender', () => {
-	const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-
 	let mockPayloadSender: MockProxy<PayloadSender>;
 	let mockAddressResolver: jest.Mock<Promise<LookupResult>, [string]>;
 	let mailSender: MailSender;
@@ -101,7 +99,7 @@ describe('MailSender', () => {
 
 		expect(mockPayloadSender.prepare).toHaveBeenCalledWith(dummyPayload);
 		expect(result.status).toEqual('success');
-		expect(result['deliveries']).toHaveLength(5);
+		expect(result['deliveries']).toHaveLength(6);
 		for (const delivery of result['deliveries']) {
 			expect([...dummyMailDataResolvedAddresses.values()].map((r) => r.messagingKey)).toContain(
 				delivery.recipient,

@@ -1,5 +1,6 @@
 import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
 import { KindSECP256K1, PublicKey } from '../';
+export const SECP256K1PublicKeyLength = 33;
 
 export class SECP256K1PublicKey implements PublicKey {
 	readonly bytes: Uint8Array;
@@ -12,7 +13,7 @@ export class SECP256K1PublicKey implements PublicKey {
 			case 65:
 				this.bytes = publicKeyConvert(bytes, true);
 				break;
-			case 33:
+			case SECP256K1PublicKeyLength:
 				this.bytes = bytes;
 				break;
 			default:

@@ -1,4 +1,4 @@
-import { formatAddress, MailchainAddress } from '@mailchain/addressing';
+import { formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
 import Axios from 'axios';
@@ -25,10 +25,15 @@ export class IdentityKeys {
 		);
 	}
 
-	async getAddressIdentityKey(address: MailchainAddress): Promise<PublicKey | null> {
+	async getAddressIdentityKey(
+		address: MailchainAddress,
+	): Promise<{ identityKey: PublicKey; protocol: ProtocolType } | null> {
 		return this.addressesApi
 			.getAddressIdentityKey(formatAddress(address, 'mail'))
-			.then(({ data }) => decodePublicKey(decodeHexZeroX(data.identityKey)))
+			.then(({ data }) => ({
+				identityKey: decodePublicKey(decodeHexZeroX(data.identityKey)),
+				protocol: data.protocol as ProtocolType,
+			}))
 			.catch((e) => {
 				if (Axios.isAxiosError(e)) {
 					if (e.response?.data?.message === 'address not found') {

@@ -7,6 +7,7 @@ import {
 	BobSECP256K1PublicKey,
 	AliceSECP256K1PublicKey,
 } from './test.const';
+import { SECP256K1PublicKeyLength } from './public';
 import { SECP256K1PublicKey } from './';
 
 describe('new()', () => {
@@ -60,7 +61,9 @@ describe('new()', () => {
 				new SECP256K1PublicKey(test.arg);
 			}).toThrow();
 		} else {
-			expect(new SECP256K1PublicKey(test.arg)).toEqual(test.expected);
+			const target = new SECP256K1PublicKey(test.arg);
+			expect(target).toEqual(test.expected);
+			expect(target.bytes).toHaveLength(SECP256K1PublicKeyLength);
 		}
 	});
 });

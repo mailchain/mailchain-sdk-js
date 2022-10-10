@@ -1,22 +1,37 @@
-import { ETHEREUM, MAILCHAIN } from '@mailchain/addressing';
+import { ETHEREUM, formatAddress, MAILCHAIN } from '@mailchain/addressing';
 import { ED25519PublicKey } from '@mailchain/crypto';
-import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { KeyRing } from '@mailchain/keyring';
+import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import { Configuration } from '../mailchain';
 import { MailData } from './formatters/types';
 import { LookupResult } from './identityKeys';
+import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox, BobWalletMailbox } from './user/test.const';
 
 export const dummyMailData: MailData = {
 	date: new Date('2022-06-06'),
 	id: 'mail-data-id@mailchain.test',
 	subject: '💌 Dummy MailData subject 😉',
-	from: { name: 'alice', address: 'alice@mailchain.test' },
+	from: {
+		name: formatAddress(AliceAccountMailbox.sendAs[0], 'human-friendly'),
+		address: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+	},
 	recipients: [
-		{ name: 'bob', address: 'bob@mailchain.test' },
-		{ name: '0xEBa...af8d', address: '0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test' },
+		{
+			name: formatAddress(BobAccountMailbox.sendAs[0], 'human-friendly'),
+			address: formatAddress(BobAccountMailbox.sendAs[0], 'mail'),
+		},
+		{
+			name: formatAddress(AliceWalletMailbox.sendAs[0], 'human-friendly'),
+			address: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+		},
 		{ name: 'tim.eth', address: 'tim@eth.mailchain.test' },
 	],
-	carbonCopyRecipients: [{ name: 'john', address: 'john@mailchain.test' }],
+	carbonCopyRecipients: [
+		{
+			name: formatAddress(BobWalletMailbox.sendAs[0], 'human-friendly'),
+			address: formatAddress(BobWalletMailbox.sendAs[0], 'mail'),
+		},
+		{ name: 'john', address: 'john@mailchain.test' },
+	],
 	blindCarbonCopyRecipients: [
 		{ name: 'jane', address: 'jane@mailchain.test' },
 		{ name: 'maria', address: 'maria@mailchain.test' },
@@ -27,19 +42,17 @@ export const dummyMailData: MailData = {
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque vitae tempus quam pellentesque nec nam. Quam nulla porttitor massa id. Nisl rhoncus mattis rhoncus urna. Tortor posuere ac ut consequat semper viverra nam. Facilisis mauris sit amet massa. Et molestie ac feugiat sed lectus vestibulum. Id cursus metus aliquam eleifend mi in nulla posuere sollicitudin. A diam sollicitudin tempor id. Mauris ultrices eros in cursus turpis massa. Elementum facilisis leo vel fringilla est ullamcorper. Aliquam sem et tortor consequat id porta.	',
 };
 
-export const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-export const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map([
 	[
-		'alice@mailchain.test',
+		formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
 		{
 			messagingKey: aliceKeyRing.accountMessagingKey().publicKey,
-			identityKey: aliceKeyRing.accountIdentityKey().publicKey,
+			identityKey: AliceAccountMailbox.identityKey,
 			protocol: MAILCHAIN,
 		},
 	],
 	[
-		'bob@mailchain.test',
+		formatAddress(BobAccountMailbox.sendAs[0], 'mail'),
 		{
 			messagingKey: bobKeyRing.accountMessagingKey().publicKey,
 			identityKey: bobKeyRing.accountIdentityKey().publicKey,
@@ -47,21 +60,27 @@ export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map
 		},
 	],
 	[
-		'0xEBaae0532dF65ee3f1623f324C9620bB84c8af8d@ethereum.mailchain.test',
+		formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
 		{
-			messagingKey: new ED25519PublicKey(
-				new Uint8Array([
-					0x72, 0x3c, 0xaa, 0x23, 0xa5, 0xb5, 0x11, 0xaf, 0x5a, 0xd7, 0xb7, 0xef, 0x60, 0x76, 0xe4, 0x14,
-					0x72, 0x7e, 0x75, 0xa9, 0xdc, 0x91, 0xe, 0xa6, 0xe, 0x41, 0x7a, 0x2b, 0x77, 0xa, 0x56, 0x71,
-				]),
-			),
-			identityKey: new ED25519PublicKey(
-				new Uint8Array([
-					0xab, 0x3c, 0xaa, 0x23, 0xa5, 0xb5, 0x11, 0xaf, 0x5a, 0xd7, 0xb7, 0xef, 0x60, 0x76, 0xe4, 0x14,
-					0xab, 0x7e, 0x75, 0xa9, 0xdc, 0x91, 0xe, 0xa6, 0xe, 0x41, 0x7a, 0x2b, 0x77, 0xa, 0x56, 0x71,
-				]),
-			),
-			protocol: ETHEREUM,
+			messagingKey: aliceKeyRing.addressMessagingKey(
+				AliceWalletMailbox.messagingKeyParams.address,
+				AliceWalletMailbox.messagingKeyParams.protocol,
+				AliceWalletMailbox.messagingKeyParams.nonce,
+			).publicKey,
+			identityKey: AliceWalletMailbox.identityKey,
+			protocol: AliceWalletMailbox.messagingKeyParams.protocol,
+		},
+	],
+	[
+		formatAddress(BobWalletMailbox.sendAs[0], 'mail'),
+		{
+			messagingKey: bobKeyRing.addressMessagingKey(
+				BobWalletMailbox.messagingKeyParams.address,
+				BobWalletMailbox.messagingKeyParams.protocol,
+				BobWalletMailbox.messagingKeyParams.nonce,
+			).publicKey,
+			identityKey: BobWalletMailbox.identityKey,
+			protocol: BobWalletMailbox.messagingKeyParams.protocol,
 		},
 	],
 	[

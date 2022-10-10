@@ -1,27 +1,19 @@
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
+import { createWalletAddress, decodeAddressByProtocol, ETHEREUM, MAILCHAIN } from '@mailchain/addressing';
+import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import {
-	createWalletAddress,
-	decodeAddressByProtocol,
-	encodeAddressByProtocol,
-	ETHEREUM,
-	MAILCHAIN,
-} from '@mailchain/addressing';
-import { KeyRing } from '@mailchain/keyring';
-import { AliceSECP256K1PublicAddress, BobSECP256K1PublicAddress } from '../ethereum/test.const';
+	AliceSECP256K1PublicAddress,
+	AliceSECP256K1PublicAddressStr,
+	BobSECP256K1PublicAddress,
+	BobSECP256K1PublicAddressStr,
+} from '../ethereum/test.const';
 import { UserMailbox } from './types';
 
 export const AliceWalletMailbox: UserMailbox = {
 	id: 'alice-ethereum-mailbox',
 	type: 'wallet',
 	identityKey: AliceSECP256K1PublicKey,
-	sendAs: [
-		createWalletAddress(
-			encodeAddressByProtocol(AliceSECP256K1PublicAddress, ETHEREUM).encoded,
-			ETHEREUM,
-			'mailchain.test',
-		),
-	],
+	sendAs: [createWalletAddress(AliceSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test')],
 	messagingKeyParams: {
 		address: AliceSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -30,7 +22,6 @@ export const AliceWalletMailbox: UserMailbox = {
 	},
 };
 
-const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 export const AliceAccountMailbox: UserMailbox = {
 	id: 'alice@mailchain.test',
 	type: 'account',
@@ -48,13 +39,7 @@ export const BobWalletMailbox: UserMailbox = {
 	id: 'bob-ethereum-mailbox',
 	type: 'wallet',
 	identityKey: BobSECP256K1PublicKey,
-	sendAs: [
-		createWalletAddress(
-			encodeAddressByProtocol(BobSECP256K1PublicAddress, ETHEREUM).encoded,
-			ETHEREUM,
-			'mailchain.test',
-		),
-	],
+	sendAs: [createWalletAddress(BobSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test')],
 	messagingKeyParams: {
 		address: BobSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -63,7 +48,6 @@ export const BobWalletMailbox: UserMailbox = {
 	},
 };
 
-const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 export const BobAccountMailbox: UserMailbox = {
 	id: 'bob@mailchain.com',
 	type: 'account',

@@ -1,6 +1,5 @@
 import { KeyRing } from '@mailchain/keyring';
-import { formatAddress } from '@mailchain/addressing';
-import { ED25519PrivateKey } from '@mailchain/crypto';
+import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import {
 	FailedAddressMessageKeyResolutionsError,
 	MailSender,
@@ -178,14 +177,19 @@ export class Mailchain {
 	): Promise<UserMailbox> {
 		const mailboxes = await config.userProfile.mailboxes();
 
+		const { identityKey } = await config.lookup.messageKey(fromAddress);
+		if (identityKey == null) {
+			throw Error(`${fromAddress} is not registered with Mailchain services`);
+		}
+
 		const foundMailbox = mailboxes.find((mailbox) => {
 			// comparing raw address is case sensitive
-			return mailbox.sendAs.some((alias) => formatAddress(alias, 'mail') === fromAddress);
+			return isPublicKeyEqual(mailbox.identityKey, identityKey);
 		});
-
-		if (!foundMailbox) {
+		if (foundMailbox == null) {
 			throw Error(`${fromAddress} is not registered by this account`);
 		}
+
 		return foundMailbox;
 	}
 }

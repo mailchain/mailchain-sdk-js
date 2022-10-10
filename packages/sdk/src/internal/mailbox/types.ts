@@ -1,4 +1,5 @@
 export type MessagePreview = {
+	mailbox: Uint8Array;
 	messageId: string;
 	from: string;
 	owner: string;

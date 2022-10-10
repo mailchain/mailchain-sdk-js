@@ -1,8 +1,8 @@
 import MockAdapter from 'axios-mock-adapter';
 import globalAxios from 'axios';
 import { KeyRing } from '@mailchain/keyring';
-import { AliceED25519PrivateKey, BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519PublicKey } from '@mailchain/crypto';
+import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import { Configuration } from '../../mailchain';
 import { Receiver } from './receive';
 
@@ -39,9 +39,6 @@ const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8080';
 const MAILCHAIN_ADDRESS_DOMAIN_NAME = (process.env.MAILCHAIN_ADDRESS_DOMAIN_NAME = 'mailchain.local');
 
 const apiConfig: Configuration = { apiPath: SERVER_URL, mailchainAddressDomain: MAILCHAIN_ADDRESS_DOMAIN_NAME };
-
-const aliceKeyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-const bobKeyRing = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 
 describe('Receiving messages tests', () => {
 	beforeEach(() => {

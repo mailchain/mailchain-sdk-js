@@ -1,4 +1,4 @@
-import { PublicKey } from '@mailchain/crypto';
+import { encodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeUtf8, encodeHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
 import { sha3_256 } from '@noble/hashes/sha3';
@@ -14,7 +14,7 @@ export function createMailchainMessageIdCreator(keyRing: KeyRing): MessageIdCrea
 	return async (params) => {
 		const typeBytes = decodeUtf8(params.type);
 		const mailIdBytes = decodeUtf8(params.mailData.id);
-		const mailboxBytes = params.type === 'received' ? params.mailbox.bytes : new Uint8Array();
+		const mailboxBytes = params.type === 'received' ? encodePublicKey(params.mailbox) : new Uint8Array();
 		const ownerBytes = params.type === 'received' ? decodeUtf8(params.owner) : new Uint8Array();
 
 		return encodeHex(

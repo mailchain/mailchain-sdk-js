@@ -2,7 +2,7 @@ import { KindSECP256K1, PublicKey } from '@mailchain/crypto';
 import { decodeHexZeroX } from '@mailchain/encoding';
 
 /**
- * Derive the address corresponding to the {@link PublicKey}.
+ * Derive the ethereum address corresponding to the {@link PublicKey}.
  *
  * @param publicKey must be with with {@link KindSECP256K1} curve
  * @throw if the provided key is on unsupported curve

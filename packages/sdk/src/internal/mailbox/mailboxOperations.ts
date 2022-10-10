@@ -1,14 +1,13 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
-import flatten from 'lodash/flatten';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
-import { formatAddress } from '@mailchain/addressing';
+import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
+import { encodePublicKey } from '@mailchain/crypto';
 import { Configuration } from '../..';
 import {
 	InboxApiInterface,
 	PutEncryptedMessageRequestBodyFolderEnum,
 	Message as ApiMessagePreview,
 	InboxApiFactory,
-	AddressesApiFactory,
 } from '../api';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { parseMimeText } from '../formatters/parse';
@@ -16,12 +15,16 @@ import { MailData } from '../formatters/types';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Payload } from '../transport/payload/content/payload';
 import { createAxiosConfiguration } from '../axios/config';
-import { UserMailbox } from '../user/types';
-import { AddressesHasher, mailchainAddressHasher } from './addressHasher';
+import { SendAsAlias, UserMailbox } from '../user/types';
+import { IdentityKeys } from '../identityKeys';
+import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
 import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
 import { createMailchainUserMailboxHasher, UserMailboxHasher } from './userMailboxHasher';
+import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
+import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
+import { getAllMessagePreviewMigrations, MessagePreviewMigrationRule } from './migrations';
 
 type SaveSentMessageParam = {
 	/** The {@link UserMailbox} that is sending this message */
@@ -68,7 +71,7 @@ export interface MailboxOperations {
 	 */
 	saveSentMessage(message: SaveSentMessageParam): Promise<MessagePreview>;
 	/** Save the received message. */
-	saveReceivedMessage(message: SaveReceivedMessageParam): Promise<MessagePreview>;
+	saveReceivedMessage(message: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]>;
 
 	// MESSAGE ACTIONS
 	markOutboxMessageAsSent(messageId: string): Promise<void>;
@@ -84,10 +87,12 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		private readonly inboxApi: InboxApiInterface,
 		private readonly messagePreviewCrypto: InboxKey,
 		private readonly messageCrypto: MessageCrypto,
+		private readonly messageMailboxOwnerMatcher: MessageMailboxOwnerMatcher,
 		private readonly addressHasher: AddressesHasher,
 		private readonly messageIdCreator: MessageIdCreator,
 		private readonly userMailboxHasher: UserMailboxHasher,
 		private readonly messageDateOffset: number,
+		private readonly migration: MessagePreviewMigrationRule,
 	) {}
 
 	static create(sdkConfig: Configuration, keyRing: KeyRing): MailboxOperations {
@@ -96,17 +101,24 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
 		const messagePreviewCrypto = keyRing.inboxKey();
 		const messageMessageCrypto = createMailchainMessageCrypto(keyRing);
-		const addressHasher = mailchainAddressHasher(AddressesApiFactory(axiosConfig), keyRing);
+		const messageMailboxOwnerMatcher = MessageMailboxOwnerMatcher.create(sdkConfig);
+		const addressHasher = mailchainAddressHasher(
+			createMailchainApiAddressIdentityKeyResolver(IdentityKeys.create(sdkConfig)),
+			keyRing,
+		);
 		const messageHasher = createMailchainMessageIdCreator(keyRing);
 		const userMailboxHasher = createMailchainUserMailboxHasher(keyRing);
+
 		return new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
 			messageMessageCrypto,
+			messageMailboxOwnerMatcher,
 			addressHasher,
 			messageHasher,
 			userMailboxHasher,
 			keyRing.inboxMessageDateOffset(),
+			getAllMessagePreviewMigrations(sdkConfig),
 		);
 	}
 
@@ -158,29 +170,59 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	private async handleMessagePreviews(messages: ApiMessagePreview[]): Promise<MessagePreview[]> {
 		const messagePreviews: MessagePreview[] = [];
 		for (const message of messages) {
-			messagePreviews.push(await this.handleMessagePreview(message));
+			try {
+				messagePreviews.push(await this.handleMessagePreview(message));
+			} catch (error) {
+				// TODO: decide how to handle
+				console.error(
+					`failed to read message preview: version=${message.version};messageId=${message.messageId}, ${error}`,
+				);
+			}
 		}
 		return messagePreviews;
 	}
 
-	private async handleMessagePreview(message: ApiMessagePreview): Promise<MessagePreview> {
-		const encryptedPreviewData = decodeBase64(message.encryptedPreview);
-		const previewData = await this.messagePreviewCrypto.decrypt(encryptedPreviewData);
-		const preview = protoInbox.preview.MessagePreview.decode(previewData);
+	private async handleMessagePreview(apiMessage: ApiMessagePreview): Promise<MessagePreview> {
+		const encryptedPreviewData = decodeBase64(apiMessage.encryptedPreview);
+		// const previewData = await this.messagePreviewCrypto.decrypt(encryptedPreviewData);
+		// const preview = protoInbox.preview.MessagePreview.decode(previewData);
+
+		const originalPreviewData = {
+			version: apiMessage.version,
+			messagePreview: protoInbox.preview.MessagePreview.decode(
+				await this.messagePreviewCrypto.decrypt(encryptedPreviewData),
+			),
+		};
+
+		const message = (await this.migration.shouldApply(originalPreviewData))
+			? await this.migration.apply(originalPreviewData)
+			: originalPreviewData;
+
+		if (apiMessage.version !== message.version) {
+			console.debug(`${apiMessage.messageId} migrated from v${apiMessage.version} to v${message.version}`);
+			// TODO: this needs to be figured out
+			// this.internalUpdateMailbox(apiMessage.mailboxId, message.protoMailbox, message.version).then(
+			// 	() => console.debug(`successfully stored migrated message preview ${apiMessage.mailboxId}`),
+			// 	(e) => console.warn(`failed storing migrated message preview ${apiMessage.mailboxId}`, e),
+			// );
+		}
+
+		const { messagePreview } = message;
 
 		return {
-			messageId: message.messageId,
-			owner: preview.owner,
-			to: preview.to,
-			bcc: preview.bcc,
-			cc: preview.cc,
-			from: preview.from,
-			subject: preview.subject,
-			snippet: preview.snippet,
-			hasAttachment: preview.hasAttachment,
-			timestamp: new Date(preview.timestamp * 1000),
-			isRead: !message.systemLabels.includes('unread'),
-			systemLabels: message.systemLabels as SystemMessageLabel[],
+			mailbox: messagePreview.mailbox,
+			messageId: apiMessage.messageId,
+			owner: messagePreview.owner,
+			to: messagePreview.to,
+			bcc: messagePreview.bcc,
+			cc: messagePreview.cc,
+			from: messagePreview.from,
+			subject: messagePreview.subject,
+			snippet: messagePreview.snippet,
+			hasAttachment: messagePreview.hasAttachment,
+			timestamp: new Date(messagePreview.timestamp * 1000),
+			isRead: !apiMessage.systemLabels.includes('unread'),
+			systemLabels: apiMessage.systemLabels as SystemMessageLabel[],
 		};
 	}
 
@@ -209,25 +251,37 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	async saveSentMessage(params: SaveSentMessageParam): Promise<MessagePreview> {
 		const messageId = await this.messageIdCreator({ type: 'sent', mailData: params.content });
-		return this.saveMessage(messageId, params.payload, params.content, params.userMailbox, 'outbox');
+		const owner = parseNameServiceAddress(params.content.from.address);
+		return this.saveMessage(messageId, params.payload, params.content, params.userMailbox, owner, 'outbox');
 	}
 
-	async saveReceivedMessage(params: SaveReceivedMessageParam): Promise<MessagePreview> {
-		const { mailData } = await parseMimeText(params.payload.Content.toString());
+	async saveReceivedMessage({
+		userMailbox,
+		payload,
+	}: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]> {
+		const { mailData, addressIdentityKeys } = await parseMimeText(payload.Content.toString());
+		const owners = await this.messageMailboxOwnerMatcher
+			.withMessageIdentityKeys(addressIdentityKeys)
+			.findMatches(mailData, userMailbox);
+		if (owners.length === 0) throw new Error('no owners found for message');
 
-		// Go through the recipients of the message
-		// 	Recipients corresponds to the mailbox identity key
-		//  Save the message with with unique message ID for the particular recipient
+		const savedMessages: MessagePreview[] = [];
+		for (const { address: owner } of owners) {
+			const messageId = await this.messageIdCreator({
+				type: 'received',
+				mailData,
+				owner: formatAddress(owner, 'mail'),
+				mailbox: userMailbox.identityKey,
+			});
+			const savedMessage = await this.saveMessage(messageId, payload, mailData, userMailbox, owner, 'inbox');
+			savedMessages.push(savedMessage);
+		}
 
-		// Note: As of developing this it was safe to assume single alias per mailbox.
-		// Long-term this will not be the case and will need to be reworked.
-		const messageId = await this.messageIdCreator({
-			type: 'received',
-			mailData,
-			owner: formatAddress(params.userMailbox.sendAs[0], 'mail'),
-			mailbox: params.userMailbox.identityKey,
-		});
-		return await this.saveMessage(messageId, params.payload, mailData, params.userMailbox, 'inbox');
+		if (savedMessages.length === 0) {
+			throw new Error(`no message was saved for message with ID [${mailData.id}]`);
+		}
+
+		return savedMessages as [MessagePreview, ...MessagePreview[]];
 	}
 
 	private async saveMessage(
@@ -235,9 +289,12 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		payload: Payload,
 		content: MailData,
 		userMailbox: UserMailbox,
+		owner: SendAsAlias,
 		folder: 'inbox' | 'outbox',
 	): Promise<MessagePreview> {
-		const messagePreview = createMessagePreview(userMailbox, payload, content);
+		const ownerAddress = formatAddress(owner, 'mail');
+		debugger;
+		const messagePreview = createMessagePreview(userMailbox, owner, payload, content);
 		const encodedMessagePreview = protoInbox.preview.MessagePreview.encode(messagePreview).finish();
 
 		const encryptedMessagePreview = await this.messagePreviewCrypto.encrypt(encodedMessagePreview);
@@ -245,27 +302,32 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 		const { recipients: to, carbonCopyRecipients: cc, blindCarbonCopyRecipients: bcc } = content;
 		const addresses = [content.from, ...to, ...cc, ...bcc].map((a) => a.address);
+		addresses.push(ownerAddress);
 		const addressHashes = await this.addressHasher(addresses);
 
 		const { resourceId } = await this.inboxApi.postEncryptedMessageBody(encryptedMessage).then((res) => res.data);
 
 		await this.inboxApi.putEncryptedMessage(messageId, {
-			version: 2,
+			version: 3,
 			folder:
 				folder === 'outbox'
 					? PutEncryptedMessageRequestBodyFolderEnum.Outbox
 					: PutEncryptedMessageRequestBodyFolderEnum.Inbox,
 			date: messagePreview.timestamp - this.messageDateOffset,
-			mailbox: [...(await this.userMailboxHasher(userMailbox))],
-			hashedFrom: [...(addressHashes[content.from.address]?.[0] ?? [])],
-			hashedTo: flatten(to.map(({ address }) => addressHashes[address]?.map((h) => [...h]) ?? [])),
-			hashedCc: flatten(cc.map(({ address }) => addressHashes[address]?.map((h) => [...h]) ?? [])),
-			hashedBcc: flatten(bcc.map(({ address }) => addressHashes[address]?.map((h) => [...h]) ?? [])),
+			mailbox: Array.from(await this.userMailboxHasher(userMailbox)),
+			// Note: 'hashedOwner' is only 'username' hash because there is no need for 'identity-key' because that is covered by 'mailbox'
+			hashedOwner: Array.from(getAddressHash(addressHashes, ownerAddress, 'username')),
+			// Note: 'hashedFrom' takes only single type of hash because there is API type restriction, so 'identity-key' hash is proffered.
+			hashedFrom: Array.from(getAddressHash(addressHashes, content.from.address, 'identity-key', 'username')),
+			hashedTo: getMailAddressesHashes(addressHashes, to).map((h) => Array.from(h)),
+			hashedCc: getMailAddressesHashes(addressHashes, cc).map((h) => Array.from(h)),
+			hashedBcc: getMailAddressesHashes(addressHashes, bcc).map((h) => Array.from(h)),
 			encryptedPreview: encodeBase64(encryptedMessagePreview),
 			messageBodyResourceId: resourceId,
 		});
 
 		return {
+			mailbox: encodePublicKey(userMailbox.identityKey),
 			messageId,
 			from: messagePreview.from,
 			to: messagePreview.to,
@@ -321,13 +383,14 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 function createMessagePreview(
 	userMailbox: UserMailbox,
+	owner: SendAsAlias,
 	payload: Payload,
 	content: MailData,
 	snippetLength = 100,
 ): protoInbox.preview.MessagePreview {
 	return protoInbox.preview.MessagePreview.create({
-		owner: formatAddress(userMailbox.sendAs[0], 'mail'),
-		mailbox: userMailbox.identityKey.bytes,
+		owner: formatAddress(owner, 'mail'),
+		mailbox: encodePublicKey(userMailbox.identityKey),
 		to: content.recipients.map((it) => it.address),
 		cc: content.carbonCopyRecipients.map((it) => it.address),
 		bcc: content.blindCarbonCopyRecipients.map((it) => it.address),
