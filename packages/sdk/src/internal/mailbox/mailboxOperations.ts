@@ -293,7 +293,6 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		folder: 'inbox' | 'outbox',
 	): Promise<MessagePreview> {
 		const ownerAddress = formatAddress(owner, 'mail');
-		debugger;
 		const messagePreview = createMessagePreview(userMailbox, owner, payload, content);
 		const encodedMessagePreview = protoInbox.preview.MessagePreview.encode(messagePreview).finish();
 

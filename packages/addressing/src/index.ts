@@ -8,6 +8,7 @@ export * from './addressPredicates';
 export * from './walletAddress';
 export * from './nameServiceAddress';
 export * from './addressComparison';
+export * from './parseVanityAddress';
 export * from './parseWalletAddress';
 
 export type MailchainAddress = NameServiceAddress;
