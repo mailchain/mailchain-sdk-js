@@ -1,5 +1,7 @@
+import { PublicKey } from '@mailchain/crypto';
+
 export type MessagePreview = {
-	mailbox: Uint8Array;
+	mailbox: PublicKey;
 	messageId: string;
 	from: string;
 	owner: string;

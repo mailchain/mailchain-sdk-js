@@ -121,7 +121,7 @@ describe('mailbox', () => {
 		expect(inboxApi.getMessage.mock.calls[0][0]).toEqual('messageId');
 		expect(message).toEqual({
 			...msg1Preview,
-			mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
+			mailbox: AliceAccountMailbox.identityKey,
 			messageId: encodeHex(Uint8Array.from([1])),
 			isRead: false,
 			timestamp: new Date(msg1Preview.timestamp * 1000),
@@ -174,7 +174,7 @@ describe('mailbox', () => {
 			expect(messages).toEqual(
 				[msg1Preview, msg2Preview].map((msg, index) => ({
 					...msg,
-					mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
+					mailbox: AliceAccountMailbox.identityKey,
 					messageId: encodeHex(Uint8Array.from([index + 1])),
 					isRead: true,
 					timestamp: new Date(msg.timestamp * 1000),

@@ -1,7 +1,7 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
 import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
-import { encodePublicKey } from '@mailchain/crypto';
+import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
 import { Configuration } from '../..';
 import {
 	InboxApiInterface,
@@ -175,7 +175,8 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			} catch (error) {
 				// TODO: decide how to handle
 				console.error(
-					`failed to read message preview: version=${message.version};messageId=${message.messageId}, ${error}`,
+					`failed to read message preview: version=${message.version};messageId=${message.messageId}`,
+					error,
 				);
 			}
 		}
@@ -200,17 +201,13 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 		if (apiMessage.version !== message.version) {
 			console.debug(`${apiMessage.messageId} migrated from v${apiMessage.version} to v${message.version}`);
-			// TODO: this needs to be figured out
-			// this.internalUpdateMailbox(apiMessage.mailboxId, message.protoMailbox, message.version).then(
-			// 	() => console.debug(`successfully stored migrated message preview ${apiMessage.mailboxId}`),
-			// 	(e) => console.warn(`failed storing migrated message preview ${apiMessage.mailboxId}`, e),
-			// );
+			// TODO #750: save migrated message to Mailchain
 		}
 
 		const { messagePreview } = message;
 
 		return {
-			mailbox: messagePreview.mailbox,
+			mailbox: decodePublicKey(messagePreview.mailbox),
 			messageId: apiMessage.messageId,
 			owner: messagePreview.owner,
 			to: messagePreview.to,
@@ -326,7 +323,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		});
 
 		return {
-			mailbox: encodePublicKey(userMailbox.identityKey),
+			mailbox: userMailbox.identityKey,
 			messageId,
 			from: messagePreview.from,
 			to: messagePreview.to,

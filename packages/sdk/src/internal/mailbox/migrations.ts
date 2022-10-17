@@ -1,12 +1,11 @@
-import { encodePublicKey } from '@mailchain/crypto';
+import { encodePublicKey, PublicKey } from '@mailchain/crypto';
 import { ED25519PublicKey, ED25519PublicKeyLen } from '@mailchain/crypto/ed25519';
 import { SECP256K1PublicKey, SECP256K1PublicKeyLength } from '@mailchain/crypto/secp256k1/public';
-import { decodeHexZeroX } from '@mailchain/encoding';
-import { AddressesApiFactory, AddressesApiInterface } from '../api';
-import { createAxiosConfiguration } from '../axios/config';
+import { isMailchainAccountAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { combineMigrations, MigrationRule } from '../migration';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { Configuration } from '../..';
+import { IdentityKeys } from '../identityKeys';
 
 type MessagePreviewData = {
 	version: number;
@@ -16,49 +15,55 @@ type MessagePreviewData = {
 export type MessagePreviewMigrationRule = MigrationRule<MessagePreviewData>;
 
 export function getAllMessagePreviewMigrations(sdkConfig: Configuration) {
-	const axiosConfig = createAxiosConfiguration(sdkConfig);
+	const identityKeys = IdentityKeys.create(sdkConfig);
 
-	const addressesApi = AddressesApiFactory(axiosConfig);
-	return combineMigrations(
-		createV1V2MessagePreviewMigration(addressesApi),
-		createV2V3MessagePreviewMigration(sdkConfig.mailchainAddressDomain),
-	);
+	return combineMigrations(createV1V2MessagePreviewMigration(identityKeys), createV2V3MessagePreviewMigration());
 }
 
-function createV1V2MessagePreviewMigration(addressesApi: AddressesApiInterface): MessagePreviewMigrationRule {
+export function createV1V2MessagePreviewMigration(identityKeys: IdentityKeys): MessagePreviewMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 1),
-		apply: async ({ messagePreview }) => {
-			const mailbox = await addressesApi
-				.getAddressIdentityKey(messagePreview.owner)
-				.then(({ data }) => decodeHexZeroX(data.identityKey));
+		apply: async (data) => {
+			const result = await identityKeys.getAddressIdentityKey(parseNameServiceAddress(data.messagePreview.owner));
+
+			if (result == null)
+				throw new Error(`no identity key found for [${data.messagePreview.owner}], failed message migration`);
 
 			return {
 				version: 2,
-				messagePreview: protoInbox.preview.MessagePreview.create({ ...messagePreview, mailbox }),
+				messagePreview: protoInbox.preview.MessagePreview.create({
+					...data.messagePreview,
+					mailbox: result.identityKey.bytes,
+				}),
 			};
 		},
 	};
 }
 
-function createV2V3MessagePreviewMigration(mailchainAddressDomain: string): MessagePreviewMigrationRule {
+export function createV2V3MessagePreviewMigration(): MessagePreviewMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 2),
-		apply: async ({ messagePreview }) => {
-			if (
-				messagePreview.mailbox.length === SECP256K1PublicKeyLength &&
-				messagePreview.owner.indexOf(`@${mailchainAddressDomain}`) === -1
-			) {
-				messagePreview.mailbox = encodePublicKey(new SECP256K1PublicKey(messagePreview.mailbox));
-			} else if (messagePreview.mailbox.length === ED25519PublicKeyLen) {
+		apply: async (data) => {
+			const { messagePreview } = data;
+			const owner = parseNameServiceAddress(messagePreview.owner);
+			let mailboxIdentityKey: PublicKey | null = null;
+			if (messagePreview.mailbox.length === ED25519PublicKeyLen && isMailchainAccountAddress(owner)) {
 				// ed25519 keys are only used for Mailchain accounts as of v2
 				// should also check protocol
-				messagePreview.mailbox = encodePublicKey(new ED25519PublicKey(messagePreview.mailbox));
+				mailboxIdentityKey = new ED25519PublicKey(messagePreview.mailbox);
+			} else if (messagePreview.mailbox.length === SECP256K1PublicKeyLength) {
+				mailboxIdentityKey = new SECP256K1PublicKey(messagePreview.mailbox);
 			}
+
+			if (mailboxIdentityKey == null)
+				throw new Error(`failed message migration, failed mailbox identity key resolution`);
 
 			return {
 				version: 3,
-				messagePreview: protoInbox.preview.MessagePreview.create({ ...messagePreview }),
+				messagePreview: protoInbox.preview.MessagePreview.create({
+					...messagePreview,
+					mailbox: encodePublicKey(mailboxIdentityKey),
+				}),
 			};
 		},
 	};
