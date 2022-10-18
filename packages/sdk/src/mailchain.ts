@@ -50,10 +50,27 @@ export class Mailchain {
 		return Mailchain.fromKeyRing(keyRing, config);
 	}
 
-	static fromMnemonicPhrase(mnemonic: string, password?: string, config: Configuration = defaultConfiguration) {
-		const keyRing = KeyRing.fromMnemonic(mnemonic, password);
+	/**
+	 * Use your Secret Recovery Phrase to authenticate with the SDK.
+	 * You can get your Secret Recovery Phrases when registering an account or via the [settings page](https://app.mailchain.com/settings) in the application.
+	 * @param secretRecoveryPhrase a 24 word [BIP 39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) compatible mnemonic phrase.
+	 * @returns an authenticated {@link Mailchain} SDK. Use {@link Mailchain.user()} to get the currently authenticate used details
+	 */
+	static fromSecretRecoveryPhrase(
+		secretRecoveryPhrase: string,
+		password?: string,
+		config: Configuration = defaultConfiguration,
+	) {
+		const keyRing = KeyRing.fromMnemonic(secretRecoveryPhrase, password);
 
 		return Mailchain.fromKeyRing(keyRing, config);
+	}
+
+	/**
+	 * @deprecated use {@link fromSecretRecoveryPhrase} instead.
+	 */
+	static fromMnemonicPhrase(mnemonic: string, password?: string, config: Configuration = defaultConfiguration) {
+		return Mailchain.fromSecretRecoveryPhrase(mnemonic, password, config);
 	}
 
 	static fromKeyRing(keyRing: KeyRing, config: Configuration = defaultConfiguration) {
@@ -73,12 +90,12 @@ export class Mailchain {
 	 * @example
 	 * import { Mailchain } from '@mailchain/sdk';
 	 *
-	 * const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
+	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
 	 *
-	 * const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
+	 * const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 	 *
 	 * const result = await mailchain.sendMail({
-	 * 		from: `yoursername@mailchain.local`, // sender address
+	 * 		from: `yoursername@mailchain.com`, // sender address
 	 * 		to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
 	 * 		subject: 'My first message', // subject line
 	 * 		content: {
@@ -158,9 +175,9 @@ export class Mailchain {
 	 *
 	 * import { Mailchain } from "@mailchain/sdk";
 	 *
-	 * const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
+	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
 	 *
-	 * const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
+	 * const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 	 *
 	 * const user = await mailchain.user();
 	 *

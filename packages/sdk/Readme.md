@@ -27,12 +27,12 @@ Try sending your first message a message to `0xbb56FbD7A2caC3e4C1793602710234412
 ```ts
 import { Mailchain } from '@mailchain/sdk';
 
-const mnemonicPhrase = 'cat mail okay ...'; // securely include mnemonic phrase
+const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
 
-const mailchain = Mailchain.fromMnemonicPhrase(mnemonicPhrase); // use your mnemonic phrase
+const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 
 const result = await mailchain.sendMail({
-	from: `yoursername@mailchain.local`, // sender address
+	from: `yoursername@mailchain.com`, // sender address
 	to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
 	subject: 'My first message', // subject line
 	content: {
