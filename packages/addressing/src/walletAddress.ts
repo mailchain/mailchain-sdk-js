@@ -1,7 +1,7 @@
-import { MailchainAddress } from '.';
 import { casingByProtocol } from './addressCasing';
 import { createNameServiceAddress } from './nameServiceAddress';
 import { MAILCHAIN, ProtocolType } from './protocols';
+import { MailchainAddress } from '.';
 
 /**
  * Helper method for creating of {@link MailchainAddress} for when the address is with specific protocol.

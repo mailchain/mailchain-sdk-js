@@ -1,5 +1,5 @@
-import { createWalletAddress, MailchainAddress } from '.';
 import { ETHEREUM, MAILCHAIN, ProtocolType } from './protocols';
+import { createWalletAddress, MailchainAddress } from '.';
 
 const createWalletAddressTests: {
 	testName: string;

@@ -1,3 +1,5 @@
+import { formatMailLike } from './formatMailLike';
+import { NameServiceAddress } from './nameServiceAddress';
 import {
 	decodeAddressByProtocol,
 	ETHEREUM,
@@ -6,8 +8,6 @@ import {
 	MailchainAddress,
 	parseWalletAddress,
 } from '.';
-import { formatMailLike } from './formatMailLike';
-import { NameServiceAddress } from './nameServiceAddress';
 
 /** If the rule is applicable,format the provided address. If not applicable, return `undefined`  */
 export type AddressFormattingRule<T extends MailchainAddress> = (address: T) => string | undefined;

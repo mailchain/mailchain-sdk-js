@@ -6,7 +6,7 @@ export function parseWalletAddress(
 	const domainParts = address.domain.split('.');
 	if (domainParts.length <= 2) return undefined;
 
-	const protocol = ALL_PROTOCOLS.find((protocol) => domainParts.includes(protocol));
+	const protocol = ALL_PROTOCOLS.find((search) => domainParts.includes(search));
 	if (protocol == null || protocol === MAILCHAIN) return undefined;
 
 	const protocolIndex = domainParts.indexOf(protocol);
