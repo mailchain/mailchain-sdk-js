@@ -10,6 +10,7 @@
 	"homepage": "https://docs.mailchain.com/developer",
 	"version": "0.7.4",
 	"dependencies": {
+		"email-addresses": "5.0.0",
 		"@cloudflare/opaque-ts": "^0.7.5",
 		"@ethersproject/hash": "5.7.0",
 		"@ethersproject/transactions": "^5.7.0",

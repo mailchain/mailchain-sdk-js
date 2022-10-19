@@ -1,11 +1,10 @@
-import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSR25519PublicKey, BobSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
+import { formatAddress } from '@mailchain/addressing';
 import {
 	dummyMailData,
 	dummyMailDataResolvedAddresses,
 	dummyMailDataResolvedAddressesWithoutMessagingKey,
 } from '../test.const';
+import { AliceAccountMailbox, BobAccountMailbox } from '../user/test.const';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';
 import { MailData } from './types';
@@ -23,7 +22,7 @@ const sampleTexts = [
 ] as const;
 
 describe('roundtrip createMimeMessage -> parseMimeText', () => {
-	const mailData: MailData = {
+	let mailData: MailData = {
 		...dummyMailData,
 		subject: 'LoremЛоремΛορεμ側経意セムレ발전을रहारुपكلאינוդոլոռ🐺🏢🔹🔯',
 		message: sampleTexts.map((it) => `<p>${it}</p>`).join(''),
@@ -75,5 +74,33 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 				};
 			}),
 		);
+	});
+
+	it('should handle unicode message participants', async () => {
+		const unicodeAlice = { name: 'Алиса 👩🏼‍💻', address: '👩🏼‍💻.alice.eth@mailchain.test' };
+		const unicodeBob = { name: '👨‍💻 Боб 🥸', address: '👨‍💻.боб.🥸@mailchain.test' };
+		mailData = {
+			...dummyMailData,
+			from: unicodeAlice,
+			recipients: [unicodeBob],
+		};
+		const identityKeys = new Map(dummyMailDataResolvedAddresses);
+		identityKeys.set(
+			unicodeAlice.address,
+			dummyMailDataResolvedAddresses.get(formatAddress(AliceAccountMailbox.sendAs[0], 'mail'))!,
+		);
+		identityKeys.set(
+			unicodeBob.address,
+			dummyMailDataResolvedAddresses.get(formatAddress(BobAccountMailbox.sendAs[0], 'mail'))!,
+		);
+
+		const { original } = await createMimeMessage(mailData, identityKeys);
+		const parsed = await parseMimeText(original);
+
+		expect(parsed.mailData).toEqual(mailData);
+		expect(parsed.addressIdentityKeys.get(unicodeAlice.address)?.identityKey).toEqual(
+			AliceAccountMailbox.identityKey,
+		);
+		expect(parsed.addressIdentityKeys.get(unicodeBob.address)?.identityKey).toEqual(BobAccountMailbox.identityKey);
 	});
 });

@@ -1,8 +1,10 @@
 import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
+import { HEADER_LABELS } from '@mailchain/message-composer/consts';
 import { X_IDENTITY_KEYS } from './conts';
-import { MailData } from './types';
+import { MailAddress, MailData } from './types';
+import { simpleMimeHeaderParser } from './simpleMimeHeaderParser';
 
 type MimeHeaderValue = {
 	value: string;
@@ -93,17 +95,14 @@ export type ParseMimeTextResult = {
 
 export async function parseMimeText(text: string): Promise<ParseMimeTextResult> {
 	const parse = (await import('emailjs-mime-parser')).default;
+	const headersMap = simpleMimeHeaderParser(text);
+
+	const parsedParticipants = await parseParticipants(headersMap);
+
 	const parsedMessage: MimeNode = parse(text);
-	const {
-		headers,
-		headers: { from, to, bcc, cc, subject },
-	}: any = parsedMessage;
+	const { headers }: any = parsedMessage;
 
-	const addressIdentityKeys = parseIdentityKeys(
-		parsedMessage.headers[X_IDENTITY_KEYS.toLowerCase()]?.[0]?.initial ?? '',
-	);
-
-	const replyToHeader = headers['reply-to']?.[0]?.value?.[0];
+	const addressIdentityKeys = parseIdentityKeys(headersMap.get(X_IDENTITY_KEYS) ?? '');
 
 	const extractedContent =
 		parsedMessage.childNodes.length > 0
@@ -113,17 +112,65 @@ export async function parseMimeText(text: string): Promise<ParseMimeTextResult> 
 	const mailData: MailData = {
 		id: headers['message-id'][0].value,
 		date: new Date(headers['date'][0].value),
-		from: { name: from[0].value[0].name, address: from[0].value[0].address },
-		replyTo: replyToHeader ? { name: replyToHeader.name, address: replyToHeader.address } : undefined,
-		recipients: to[0].value.map((it: any) => ({ name: it.name, address: it.address })),
-		carbonCopyRecipients: cc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
-		blindCarbonCopyRecipients: bcc?.[0].value.map((it: any) => ({ name: it.name, address: it.address })) ?? [],
-		subject: parseSubjectHeader(subject?.[0].initial),
+		...parsedParticipants,
+		subject: parseSubjectHeader(headers.subject?.[0].initial),
 		plainTextMessage: extractedContent.messages['text/plain']!,
 		message: extractedContent.messages['text/html']!,
 	};
 
 	return { mailData, addressIdentityKeys };
+}
+
+async function parseParticipants(
+	headers: Map<string, string>,
+): Promise<Pick<MailData, 'from' | 'recipients' | 'carbonCopyRecipients' | 'blindCarbonCopyRecipients' | 'replyTo'>> {
+	const { parseOneAddress, parseAddressList } = (await import('email-addresses')).default;
+
+	const fromValue = headers.get(HEADER_LABELS.From);
+	const parsedFrom = parseOneAddress({ input: fromValue ?? '', rfc6532: true, rejectTLD: true });
+	if (parsedFrom == null) throw new Error(`message doesn't include valid 'from' header field [${fromValue}]`);
+	const from: MailAddress = isParsedMailbox(parsedFrom)
+		? { name: parsedFrom.name ?? '', address: parsedFrom.address }
+		: { name: parsedFrom.name, address: parsedFrom.addresses[0].address };
+
+	const replyTooValue = headers.get(HEADER_LABELS.ReplyTo);
+	const parsedReplyTo = parseOneAddress({ input: replyTooValue ?? '', rfc6532: true, rejectTLD: true });
+	let replyTo: MailAddress | undefined = undefined;
+	if (parsedReplyTo != null) {
+		replyTo = isParsedMailbox(parsedReplyTo)
+			? { name: parsedReplyTo.name ?? '', address: parsedReplyTo.address }
+			: { name: parsedReplyTo.name, address: parsedReplyTo.addresses[0].address };
+	}
+
+	function parseAddresses(headerLabel: string): MailAddress[] {
+		const result: MailAddress[] = [];
+		const headerValue = headers.get(headerLabel);
+		if (headerValue != null) {
+			const parsedAddresses = parseAddressList({ input: headerValue, rfc6532: true, rejectTLD: true }) ?? [];
+			for (const address of parsedAddresses) {
+				if (isParsedMailbox(address)) {
+					result.push({ name: address.name ?? '', address: address.address });
+				} else {
+					result.push(
+						...address.addresses.map((a) => ({ name: a.name ?? address.name, address: a.address })),
+					);
+				}
+			}
+		}
+		return result;
+	}
+
+	const recipients = parseAddresses(HEADER_LABELS.To);
+	const carbonCopyRecipients = parseAddresses(HEADER_LABELS.Cc);
+	const blindCarbonCopyRecipients = parseAddresses(HEADER_LABELS.Bcc);
+
+	return { from, replyTo, recipients, carbonCopyRecipients, blindCarbonCopyRecipients };
+}
+
+function isParsedMailbox(
+	mailboxOrGroup: emailAddresses.ParsedMailbox | emailAddresses.ParsedGroup,
+): mailboxOrGroup is emailAddresses.ParsedMailbox {
+	return mailboxOrGroup.type === 'mailbox';
 }
 
 function parseSubjectHeader(rawSubject: string): string {
