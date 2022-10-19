@@ -7,9 +7,9 @@
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
-	"version": "0.7.3",
+	"version": "0.7.4",
 	"dependencies": {
-		"@mailchain/encoding": "0.7.3",
+		"@mailchain/encoding": "0.7.4",
 		"date-fns": "^2.29.2"
 	},
 	"scripts": {
