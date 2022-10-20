@@ -17,10 +17,10 @@ export type MessagePreviewMigrationRule = MigrationRule<MessagePreviewData>;
 export function getAllMessagePreviewMigrations(sdkConfig: Configuration) {
 	const identityKeys = IdentityKeys.create(sdkConfig);
 
-	return combineMigrations(createV1V2MessagePreviewMigration(identityKeys), createV2V3MessagePreviewMigration());
+	return combineMigrations(createV2IdentityKey(identityKeys), createV3EncodeIdentityKey());
 }
 
-export function createV1V2MessagePreviewMigration(identityKeys: IdentityKeys): MessagePreviewMigrationRule {
+export function createV2IdentityKey(identityKeys: IdentityKeys): MessagePreviewMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 1),
 		apply: async (data) => {
@@ -40,7 +40,7 @@ export function createV1V2MessagePreviewMigration(identityKeys: IdentityKeys): M
 	};
 }
 
-export function createV2V3MessagePreviewMigration(): MessagePreviewMigrationRule {
+export function createV3EncodeIdentityKey(): MessagePreviewMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 2),
 		apply: async (data) => {

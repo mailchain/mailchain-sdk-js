@@ -16,12 +16,13 @@ import {
 } from '@mailchain/crypto';
 import { AxiosError } from 'axios';
 import { user } from '../protobuf/user/user';
-import { AddressesApiFactory, Setting, UserApiFactory, UserApiInterface } from '../api';
+import { Setting, UserApiFactory, UserApiInterface } from '../api';
 import { Configuration } from '../../mailchain';
 import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { combineMigrations } from '../migration';
-import { createV1V2IdentityKeyMigration, UserMailboxMigrationRule } from './migrations';
+import { IdentityKeys } from '../identityKeys';
+import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
 import { UserMailbox } from './types';
 
 export type UserSettings = { [key: string]: Setting | undefined };
@@ -32,7 +33,7 @@ export class UserNotFoundError extends Error {
 	}
 }
 
-const CURRENT_MAILBOX_VERSION = 2 as const;
+const CURRENT_MAILBOX_VERSION = 3 as const;
 
 export type NewUserMailbox = Omit<UserMailbox, 'id' | 'type'>;
 
@@ -61,10 +62,11 @@ export class MailchainUserProfile implements UserProfile {
 		mailboxCrypto: Encrypter & Decrypter,
 	): MailchainUserProfile {
 		const axiosConfig = createAxiosConfiguration(config);
-		const addressesApi = AddressesApiFactory(axiosConfig);
+		const identityKeys = IdentityKeys.create(config);
 		const userApi = UserApiFactory(axiosConfig, undefined, getAxiosWithSigner(accountIdentityKey));
 		const migrations = combineMigrations(
-			createV1V2IdentityKeyMigration(addressesApi, config.mailchainAddressDomain),
+			createV2IdentityKey(identityKeys, config.mailchainAddressDomain),
+			createV3LabelMigration(config.mailchainAddressDomain),
 		);
 		return new MailchainUserProfile(
 			config.mailchainAddressDomain,
@@ -142,6 +144,7 @@ export class MailchainUserProfile implements UserProfile {
 					type: 'wallet',
 					id: apiMailbox.mailboxId,
 					identityKey: decodePublicKey(protoMailbox.identityKey),
+					label: protoMailbox.label ?? null,
 					sendAs: [createWalletAddress(encodedAddress, protocol, this.mailchainAddressDomain)],
 					messagingKeyParams: {
 						address: protoMailbox.address,
@@ -160,12 +163,14 @@ export class MailchainUserProfile implements UserProfile {
 
 	private async accountMailbox(): Promise<UserMailbox> {
 		const { username, address } = await this.getUsername();
+		const defaultSendAs = createWalletAddress(username, MAILCHAIN, this.mailchainAddressDomain);
 
 		return {
 			type: 'account',
 			id: address,
 			identityKey: await this.accountIdentityKey(),
-			sendAs: [createWalletAddress(username, MAILCHAIN, this.mailchainAddressDomain)],
+			label: null,
+			sendAs: [defaultSendAs],
 			messagingKeyParams: {
 				address: decodeAddressByProtocol(username, MAILCHAIN).decoded,
 				protocol: MAILCHAIN,
@@ -182,6 +187,7 @@ export class MailchainUserProfile implements UserProfile {
 			protocol: mailbox.messagingKeyParams.protocol,
 			network: mailbox.messagingKeyParams.network,
 			nonce: mailbox.messagingKeyParams.nonce,
+			label: mailbox.label,
 		});
 		const encrypted = await this.mailboxCrypto.encrypt(user.Mailbox.encode(protoMailbox).finish());
 		const { mailboxId } = await this.userApi
@@ -198,6 +204,7 @@ export class MailchainUserProfile implements UserProfile {
 			protocol: mailbox.messagingKeyParams.protocol,
 			network: mailbox.messagingKeyParams.network,
 			nonce: mailbox.messagingKeyParams.nonce,
+			label: mailbox.label,
 		});
 		await this.internalUpdateMailbox(mailboxId, protoMailbox, CURRENT_MAILBOX_VERSION);
 		return { id: mailboxId, type: 'wallet', ...mailbox };

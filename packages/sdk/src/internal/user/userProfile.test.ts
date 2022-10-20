@@ -1,10 +1,9 @@
-import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { KeyRing } from '@mailchain/keyring';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ED25519PublicKey, encodePublicKey, secureRandom } from '@mailchain/crypto';
 import { AxiosResponse } from 'axios';
 import { formatAddress } from '@mailchain/addressing';
+import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { user } from '../protobuf/user/user';
 import {
 	GetUserMailboxesResponseBody,
@@ -20,8 +19,7 @@ import { AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox } from './tes
 describe('userProfile', () => {
 	let mockUserApi: MockProxy<UserApiInterface>;
 
-	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-	const fetchIdentityKey = () => Promise.resolve(keyRing.accountIdentityKey().publicKey);
+	const fetchIdentityKey = () => Promise.resolve(aliceKeyRing.accountIdentityKey().publicKey);
 
 	const migratedIdentityKey = new ED25519PublicKey(secureRandom(32));
 	const dummyMigration: UserMailboxMigrationRule = {
@@ -42,6 +40,7 @@ describe('userProfile', () => {
 		nonce: AliceWalletMailbox.messagingKeyParams.nonce,
 		network: AliceWalletMailbox.messagingKeyParams.network,
 		protocol: AliceWalletMailbox.messagingKeyParams.protocol,
+		label: AliceWalletMailbox.label,
 	});
 
 	const protoMailbox2: user.Mailbox = user.Mailbox.create({
@@ -50,6 +49,7 @@ describe('userProfile', () => {
 		nonce: BobWalletMailbox.messagingKeyParams.nonce,
 		network: BobWalletMailbox.messagingKeyParams.network,
 		protocol: BobWalletMailbox.messagingKeyParams.protocol,
+		label: BobWalletMailbox.label,
 	});
 
 	let userProfile: UserProfile;
@@ -74,14 +74,14 @@ describe('userProfile', () => {
 			'mailchain.test',
 			mockUserApi,
 			fetchIdentityKey,
-			keyRing.userProfileCrypto(),
+			aliceKeyRing.userProfileCrypto(),
 			nopMigration(),
 		);
 		userProfileWithMigration = new MailchainUserProfile(
 			'mailchain.test',
 			mockUserApi,
 			fetchIdentityKey,
-			keyRing.userProfileCrypto(),
+			aliceKeyRing.userProfileCrypto(),
 			dummyMigration,
 		);
 	});
@@ -122,7 +122,7 @@ describe('userProfile', () => {
 		const [mailboxId, postedData] = mockUserApi.putUserMailbox.mock.calls[0];
 		expect(mailboxId).toEqual(AliceWalletMailbox.id);
 		const protoMailbox = user.Mailbox.decode(
-			await keyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedMailboxInformation)),
+			await aliceKeyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedMailboxInformation)),
 		);
 		expect(protoMailbox).toEqual(protoMailbox1);
 		expect(resMailbox).toEqual(AliceWalletMailbox);
@@ -130,7 +130,7 @@ describe('userProfile', () => {
 
 	it('should run migration on mailbox and store the update', async () => {
 		const encryptedMailboxInformation = encodeBase64(
-			await keyRing.userProfileCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),
+			await aliceKeyRing.userProfileCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),
 		);
 		mockUserApi.getUserMailboxes.mockResolvedValue({
 			data: { mailboxes: [{ encryptedMailboxInformation, version: 1, mailboxId: AliceWalletMailbox.id }] },

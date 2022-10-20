@@ -5,11 +5,7 @@ import { IdentityKeys } from '../identityKeys';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
 import { dummyMailData } from '../test.const';
-import {
-	createV1V2MessagePreviewMigration,
-	createV2V3MessagePreviewMigration,
-	MessagePreviewMigrationRule,
-} from './migrations';
+import { createV2IdentityKey, createV3EncodeIdentityKey, MessagePreviewMigrationRule } from './migrations';
 
 describe('MailboxOperations migrations', () => {
 	let migration: MessagePreviewMigrationRule;
@@ -39,7 +35,7 @@ describe('MailboxOperations migrations', () => {
 
 		beforeEach(() => {
 			identityKeys = mock();
-			migration = createV1V2MessagePreviewMigration(identityKeys);
+			migration = createV2IdentityKey(identityKeys);
 		});
 
 		it('should should apply for V1 and add the identity key', async () => {
@@ -68,7 +64,7 @@ describe('MailboxOperations migrations', () => {
 
 	describe('V2 -> V3 - encode the mailbox identity key', () => {
 		beforeEach(() => {
-			migration = createV2V3MessagePreviewMigration();
+			migration = createV3EncodeIdentityKey();
 		});
 
 		it('should encode the mailbox ED25519 identity key', async () => {

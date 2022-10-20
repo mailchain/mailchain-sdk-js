@@ -1,28 +1,34 @@
 import { encodePublicKey } from '@mailchain/crypto';
-import { AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { encodeHexZeroX } from '@mailchain/encoding';
-import { AxiosResponse } from 'axios';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AliceSECP256K1PublicAddress } from '../ethereum/test.const';
-import { AddressesApiInterface, GetIdentityKeyResponseBody } from '../api';
 import { user } from '../protobuf/user/user';
-import { createV1V2IdentityKeyMigration, UserMailboxMigrationRule } from './migrations';
+import { IdentityKeys } from '../identityKeys';
+import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
+import { AliceWalletMailbox } from './test.const';
+
+const v1Mailbox = user.Mailbox.create({
+	address: AliceSECP256K1PublicAddress,
+	nonce: 1,
+	protocol: 'ethereum',
+	network: 'main',
+});
+
+const v2Mailbox = user.Mailbox.create({ ...v1Mailbox, identityKey: encodePublicKey(AliceWalletMailbox.identityKey) });
+
+const v3Mailbox = user.Mailbox.create({
+	...v2Mailbox,
+	label: null,
+});
 
 describe('UserProfile migrations', () => {
-	describe('v1 to v2 - IdentitKey', () => {
-		let addressesApi: MockProxy<AddressesApiInterface>;
-		let migration: UserMailboxMigrationRule;
+	let migration: UserMailboxMigrationRule;
 
-		const v1Mailbox = user.Mailbox.create({
-			address: AliceSECP256K1PublicAddress,
-			nonce: 1,
-			protocol: 'ethereum',
-			network: 'main',
-		});
+	describe('v1 to v2 - IdentitKey', () => {
+		let identityKeys: MockProxy<IdentityKeys>;
 
 		beforeEach(() => {
-			addressesApi = mock();
-			migration = createV1V2IdentityKeyMigration(addressesApi, 'mailchain.test');
+			identityKeys = mock();
+			migration = createV2IdentityKey(identityKeys, 'mailchain.test');
 		});
 
 		it('should apply for mailbox with version 1', async () => {
@@ -42,19 +48,28 @@ describe('UserProfile migrations', () => {
 		});
 
 		it('should add identity key from addressesApi when applied', async () => {
-			addressesApi.getAddressIdentityKey.mockResolvedValueOnce({
-				data: { identityKey: encodeHexZeroX(encodePublicKey(AliceSECP256K1PublicKey)) },
-			} as AxiosResponse<GetIdentityKeyResponseBody>);
+			identityKeys.getAddressIdentityKey.mockResolvedValueOnce({
+				protocol: AliceWalletMailbox.messagingKeyParams.protocol,
+				identityKey: AliceWalletMailbox.identityKey,
+			});
 
 			const migrated = await migration.apply({ version: 1, protoMailbox: v1Mailbox });
 
-			expect(migrated).toEqual({
-				version: 2,
-				protoMailbox: user.Mailbox.create({
-					...v1Mailbox,
-					identityKey: encodePublicKey(AliceSECP256K1PublicKey),
-				}),
-			});
+			expect(migrated).toEqual({ version: 2, protoMailbox: v2Mailbox });
+		});
+	});
+
+	describe('v2 to v3 - label', () => {
+		beforeEach(() => {
+			migration = createV3LabelMigration('mailchain.test');
+		});
+
+		it('should add encoded address as default label to the mailbox', async () => {
+			const shouldApply = await migration.shouldApply({ version: 2, protoMailbox: v2Mailbox });
+			expect(shouldApply).toBe(true);
+
+			const migrated = await migration.apply({ version: 2, protoMailbox: v2Mailbox });
+			expect(migrated).toEqual({ version: 3, protoMailbox: v3Mailbox });
 		});
 	});
 });

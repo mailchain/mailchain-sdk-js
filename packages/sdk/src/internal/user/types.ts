@@ -1,4 +1,4 @@
-import { MailchainAddress, ProtocolType, NameServiceAddress } from '@mailchain/addressing';
+import { MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
 
 /**
@@ -18,6 +18,8 @@ export type UserMailbox = {
 	 */
 	type: 'account' | 'wallet';
 	identityKey: PublicKey;
+	/** The user preferred label to shown for this mailbox. If `null`, no user preferred label is defined, the application is free to compute one at runtime. */
+	label: string | null;
 	/** Will contain at least one defined {@link SendAsAlias}. */
 	sendAs: [SendAsAlias, ...SendAsAlias[]];
 	/** Ingredients for the creation of messaging private key via the keyring. */
