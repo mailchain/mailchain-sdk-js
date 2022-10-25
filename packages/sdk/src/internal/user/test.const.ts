@@ -15,11 +15,7 @@ export const AliceWalletMailbox: UserMailbox = {
 	type: 'wallet',
 	identityKey: AliceSECP256K1PublicKey,
 	label: 'Alice Wallet Mailbox',
-	aliases: [
-		createMailboxAlias(createWalletAddress(AliceSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'), {
-			isDefault: true,
-		}),
-	],
+	aliases: [createMailboxAlias(createWalletAddress(AliceSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'))],
 	messagingKeyParams: {
 		address: AliceSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -33,7 +29,7 @@ export const AliceAccountMailbox: UserMailbox = {
 	type: 'account',
 	identityKey: aliceKeyRing.accountIdentityKey().publicKey,
 	label: null,
-	aliases: [createMailboxAlias(createWalletAddress('alice', MAILCHAIN, 'mailchain.test'), { isDefault: true })],
+	aliases: [createMailboxAlias(createWalletAddress('alice', MAILCHAIN, 'mailchain.test'))],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('alice', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,
@@ -47,11 +43,7 @@ export const BobWalletMailbox: UserMailbox = {
 	type: 'wallet',
 	identityKey: BobSECP256K1PublicKey,
 	label: 'Bob Wallet Mailbox',
-	aliases: [
-		createMailboxAlias(createWalletAddress(BobSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'), {
-			isDefault: true,
-		}),
-	],
+	aliases: [createMailboxAlias(createWalletAddress(BobSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'))],
 	messagingKeyParams: {
 		address: BobSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -65,7 +57,7 @@ export const BobAccountMailbox: UserMailbox = {
 	type: 'account',
 	identityKey: bobKeyRing.accountIdentityKey().publicKey,
 	label: null,
-	aliases: [createMailboxAlias(createWalletAddress('bob', MAILCHAIN, 'mailchain.test'), { isDefault: true })],
+	aliases: [createMailboxAlias(createWalletAddress('bob', MAILCHAIN, 'mailchain.test'))],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('bob', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,

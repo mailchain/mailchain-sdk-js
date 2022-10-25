@@ -1,4 +1,4 @@
-import { createWalletAddress, encodeAddressByProtocol, ProtocolType } from '@mailchain/addressing';
+import { createWalletAddress, encodeAddressByProtocol, formatAddress, ProtocolType } from '@mailchain/addressing';
 import { encodePublicKey } from '@mailchain/crypto';
 import { IdentityKeys } from '../identityKeys';
 import { MigrationRule } from '../migration';
@@ -41,14 +41,36 @@ export function createV2IdentityKey(
 export function createV3LabelMigration(mailchainAddressDomain: string): UserMailboxMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 2),
-		apply: async (data) => {
-			return {
+		apply: (data) =>
+			Promise.resolve({
 				version: 3,
 				protoMailbox: user.Mailbox.create({
 					...data.protoMailbox,
 					label: null,
 				}),
-			};
+			}),
+	};
+}
+
+export function createV4AliasesMigration(mailchainAddressDomain: string): UserMailboxMigrationRule {
+	return {
+		shouldApply: (data) => Promise.resolve(data.version === 3),
+		apply: (data) => {
+			const { protoMailbox } = data;
+			const protocol = protoMailbox.protocol as ProtocolType;
+			const encodedAddress = encodeAddressByProtocol(protoMailbox.address!, protocol).encoded;
+			const address = formatAddress(
+				createWalletAddress(encodedAddress, protocol, mailchainAddressDomain),
+				'mail',
+			);
+
+			return Promise.resolve({
+				version: 4,
+				protoMailbox: user.Mailbox.create({
+					...protoMailbox,
+					aliases: [{ address, blockSending: false, blockReceiving: false }],
+				}),
+			});
 		},
 	};
 }

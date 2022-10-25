@@ -1,9 +1,15 @@
 import { encodePublicKey } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { AliceSECP256K1PublicAddress } from '../ethereum/test.const';
+import { createNameServiceAddress, formatAddress } from '@mailchain/addressing';
+import { AliceSECP256K1PublicAddress, AliceSECP256K1PublicAddressStr } from '../ethereum/test.const';
 import { user } from '../protobuf/user/user';
 import { IdentityKeys } from '../identityKeys';
-import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
+import {
+	createV2IdentityKey,
+	createV3LabelMigration,
+	createV4AliasesMigration,
+	UserMailboxMigrationRule,
+} from './migrations';
 import { AliceWalletMailbox } from './test.const';
 
 const v1Mailbox = user.Mailbox.create({
@@ -18,6 +24,17 @@ const v2Mailbox = user.Mailbox.create({ ...v1Mailbox, identityKey: encodePublicK
 const v3Mailbox = user.Mailbox.create({
 	...v2Mailbox,
 	label: null,
+});
+
+const v4Mailbox = user.Mailbox.create({
+	...v3Mailbox,
+	aliases: [
+		{
+			address: `${AliceSECP256K1PublicAddressStr.toLowerCase()}@ethereum.mailchain.test`,
+			blockSending: false,
+			blockReceiving: false,
+		},
+	],
 });
 
 describe('UserProfile migrations', () => {
@@ -64,12 +81,26 @@ describe('UserProfile migrations', () => {
 			migration = createV3LabelMigration('mailchain.test');
 		});
 
-		it('should add encoded address as default label to the mailbox', async () => {
+		it('should set null label for the mailbox', async () => {
 			const shouldApply = await migration.shouldApply({ version: 2, protoMailbox: v2Mailbox });
 			expect(shouldApply).toBe(true);
 
 			const migrated = await migration.apply({ version: 2, protoMailbox: v2Mailbox });
 			expect(migrated).toEqual({ version: 3, protoMailbox: v3Mailbox });
+		});
+	});
+
+	describe('v3 to v4 - mailbox aliases', () => {
+		beforeEach(() => {
+			migration = createV4AliasesMigration('mailchain.test');
+		});
+
+		it('should set encoded address as alias', async () => {
+			const shouldApply = await migration.shouldApply({ version: 3, protoMailbox: v3Mailbox });
+			expect(shouldApply).toBe(true);
+
+			const migrated = await migration.apply({ version: 3, protoMailbox: v3Mailbox });
+			expect(migrated).toEqual({ version: 4, protoMailbox: v4Mailbox });
 		});
 	});
 });

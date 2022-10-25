@@ -23,3 +23,9 @@ Since the mailbox is represented by `identityKey` we defined a `label` that the 
 
 -   `ProtoUserMailbox`
     -   ADDED `label` optional field that stores the user preferred label. If `null` no user preference is set, the application is free to chose what to display in this case
+
+### Version 4 - `aliases`
+
+For the purposes of offering better user experience for when the users want to send/receive messages from addresses different then the one stored in the `ProtoUserMailbox.address` (for example via their registered ENS names), we introduced the `ProtoUserMailbox.aliases`.
+
+-   `ProtoUserMailbox` - ADDED `aliases` array field that stores each aliases for sending/receiving messages for the mailbox.

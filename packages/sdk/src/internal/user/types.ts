@@ -6,7 +6,6 @@ import { PublicKey } from '@mailchain/crypto';
  */
 export type Alias = {
 	address: MailchainAddress;
-	isDefault: boolean;
 	allowSending: boolean;
 	allowReceiving: boolean;
 };
@@ -24,7 +23,7 @@ export type UserMailbox = {
 	identityKey: PublicKey;
 	/** The user preferred label to shown for this mailbox. If `null`, no user preferred label is defined, the application is free to compute one at runtime. */
 	label: string | null;
-	/** Will contain at least one defined {@link Alias}. */
+	/** Will contain at least one {@link Alias}. The first entry in the array is considered as 'default' alias. */
 	aliases: [Alias, ...Alias[]];
 	/** Ingredients for the creation of messaging private key via the keyring. */
 	messagingKeyParams: {

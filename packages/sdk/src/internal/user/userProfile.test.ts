@@ -12,6 +12,7 @@ import {
 	UserApiInterface,
 } from '../api';
 import { nopMigration } from '../migration';
+import { AliceSECP256K1PublicAddressStr, BobSECP256K1PublicAddressStr } from '../ethereum/test.const';
 import { MailchainUserProfile, UserProfile } from './userProfile';
 import { UserMailboxMigrationRule } from './migrations';
 import { AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox } from './test.const';
@@ -41,6 +42,13 @@ describe('userProfile', () => {
 		network: AliceWalletMailbox.messagingKeyParams.network,
 		protocol: AliceWalletMailbox.messagingKeyParams.protocol,
 		label: AliceWalletMailbox.label,
+		aliases: [
+			{
+				address: `${AliceSECP256K1PublicAddressStr.toLowerCase()}@ethereum.mailchain.test`,
+				blockSending: false,
+				blockReceiving: false,
+			},
+		],
 	});
 
 	const protoMailbox2: user.Mailbox = user.Mailbox.create({
@@ -50,6 +58,13 @@ describe('userProfile', () => {
 		network: BobWalletMailbox.messagingKeyParams.network,
 		protocol: BobWalletMailbox.messagingKeyParams.protocol,
 		label: BobWalletMailbox.label,
+		aliases: [
+			{
+				address: `${BobSECP256K1PublicAddressStr.toLowerCase()}@ethereum.mailchain.test`,
+				blockSending: false,
+				blockReceiving: false,
+			},
+		],
 	});
 
 	let userProfile: UserProfile;
