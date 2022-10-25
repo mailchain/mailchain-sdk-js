@@ -8,13 +8,18 @@ import {
 	BobSECP256K1PublicAddressStr,
 } from '../ethereum/test.const';
 import { UserMailbox } from './types';
+import { createMailboxAlias } from './createAlias';
 
 export const AliceWalletMailbox: UserMailbox = {
 	id: 'alice-ethereum-mailbox',
 	type: 'wallet',
 	identityKey: AliceSECP256K1PublicKey,
 	label: 'Alice Wallet Mailbox',
-	sendAs: [createWalletAddress(AliceSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test')],
+	aliases: [
+		createMailboxAlias(createWalletAddress(AliceSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'), {
+			isDefault: true,
+		}),
+	],
 	messagingKeyParams: {
 		address: AliceSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -28,7 +33,7 @@ export const AliceAccountMailbox: UserMailbox = {
 	type: 'account',
 	identityKey: aliceKeyRing.accountIdentityKey().publicKey,
 	label: null,
-	sendAs: [createWalletAddress('alice', MAILCHAIN, 'mailchain.test')],
+	aliases: [createMailboxAlias(createWalletAddress('alice', MAILCHAIN, 'mailchain.test'), { isDefault: true })],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('alice', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,
@@ -42,7 +47,11 @@ export const BobWalletMailbox: UserMailbox = {
 	type: 'wallet',
 	identityKey: BobSECP256K1PublicKey,
 	label: 'Bob Wallet Mailbox',
-	sendAs: [createWalletAddress(BobSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test')],
+	aliases: [
+		createMailboxAlias(createWalletAddress(BobSECP256K1PublicAddressStr, ETHEREUM, 'mailchain.test'), {
+			isDefault: true,
+		}),
+	],
 	messagingKeyParams: {
 		address: BobSECP256K1PublicAddress,
 		protocol: ETHEREUM,
@@ -56,7 +65,7 @@ export const BobAccountMailbox: UserMailbox = {
 	type: 'account',
 	identityKey: bobKeyRing.accountIdentityKey().publicKey,
 	label: null,
-	sendAs: [createWalletAddress('bob', MAILCHAIN, 'mailchain.test')],
+	aliases: [createMailboxAlias(createWalletAddress('bob', MAILCHAIN, 'mailchain.test'), { isDefault: true })],
 	messagingKeyParams: {
 		address: decodeAddressByProtocol('bob', MAILCHAIN).decoded,
 		protocol: MAILCHAIN,

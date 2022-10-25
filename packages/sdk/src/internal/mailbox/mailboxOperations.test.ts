@@ -222,7 +222,7 @@ describe('mailbox', () => {
 		);
 
 		expect(decryptedPreview).toEqual({
-			owner: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+			owner: formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 			mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
 			from: dummyMailData.from.address,
 			hasAttachment: false,

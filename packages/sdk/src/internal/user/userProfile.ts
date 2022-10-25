@@ -24,6 +24,7 @@ import { combineMigrations } from '../migration';
 import { IdentityKeys } from '../identityKeys';
 import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
 import { UserMailbox } from './types';
+import { createMailboxAlias } from './createAlias';
 
 export type UserSettings = { [key: string]: Setting | undefined };
 
@@ -140,12 +141,17 @@ export class MailchainUserProfile implements UserProfile {
 				const protocol = protoMailbox.protocol as ProtocolType;
 				const encodedAddress = encodeAddressByProtocol(protoMailbox.address!, protocol).encoded;
 
+				const defaultAlias = createMailboxAlias(
+					createWalletAddress(encodedAddress, protocol, this.mailchainAddressDomain),
+					{ isDefault: true },
+				);
+
 				resultMailboxes.push({
 					type: 'wallet',
 					id: apiMailbox.mailboxId,
 					identityKey: decodePublicKey(protoMailbox.identityKey),
 					label: protoMailbox.label ?? null,
-					sendAs: [createWalletAddress(encodedAddress, protocol, this.mailchainAddressDomain)],
+					aliases: [defaultAlias],
 					messagingKeyParams: {
 						address: protoMailbox.address,
 						protocol,
@@ -163,14 +169,16 @@ export class MailchainUserProfile implements UserProfile {
 
 	private async accountMailbox(): Promise<UserMailbox> {
 		const { username, address } = await this.getUsername();
-		const defaultSendAs = createWalletAddress(username, MAILCHAIN, this.mailchainAddressDomain);
+		const defaultAlias = createMailboxAlias(createWalletAddress(username, MAILCHAIN, this.mailchainAddressDomain), {
+			isDefault: true,
+		});
 
 		return {
 			type: 'account',
 			id: address,
 			identityKey: await this.accountIdentityKey(),
 			label: null,
-			sendAs: [defaultSendAs],
+			aliases: [defaultAlias],
 			messagingKeyParams: {
 				address: decodeAddressByProtocol(username, MAILCHAIN).decoded,
 				protocol: MAILCHAIN,

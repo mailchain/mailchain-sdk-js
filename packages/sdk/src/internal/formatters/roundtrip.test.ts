@@ -87,11 +87,11 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 		const identityKeys = new Map(dummyMailDataResolvedAddresses);
 		identityKeys.set(
 			unicodeAlice.address,
-			dummyMailDataResolvedAddresses.get(formatAddress(AliceAccountMailbox.sendAs[0], 'mail'))!,
+			dummyMailDataResolvedAddresses.get(formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'))!,
 		);
 		identityKeys.set(
 			unicodeBob.address,
-			dummyMailDataResolvedAddresses.get(formatAddress(BobAccountMailbox.sendAs[0], 'mail'))!,
+			dummyMailDataResolvedAddresses.get(formatAddress(BobAccountMailbox.aliases[0].address, 'mail'))!,
 		);
 
 		const { original } = await createMimeMessage(mailData, identityKeys);

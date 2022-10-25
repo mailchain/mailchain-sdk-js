@@ -1,6 +1,6 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
-import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
+import { formatAddress, MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
 import { Configuration } from '../..';
 import {
@@ -15,7 +15,7 @@ import { MailData } from '../formatters/types';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { Payload } from '../transport/payload/content/payload';
 import { createAxiosConfiguration } from '../axios/config';
-import { SendAsAlias, UserMailbox } from '../user/types';
+import { UserMailbox } from '../user/types';
 import { IdentityKeys } from '../identityKeys';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
@@ -286,7 +286,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		payload: Payload,
 		content: MailData,
 		userMailbox: UserMailbox,
-		owner: SendAsAlias,
+		owner: MailchainAddress,
 		folder: 'inbox' | 'outbox',
 	): Promise<MessagePreview> {
 		const ownerAddress = formatAddress(owner, 'mail');
@@ -379,7 +379,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 function createMessagePreview(
 	userMailbox: UserMailbox,
-	owner: SendAsAlias,
+	owner: MailchainAddress,
 	payload: Payload,
 	content: MailData,
 	snippetLength = 100,

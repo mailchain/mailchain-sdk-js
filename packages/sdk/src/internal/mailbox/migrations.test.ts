@@ -11,7 +11,7 @@ describe('MailboxOperations migrations', () => {
 	let migration: MessagePreviewMigrationRule;
 
 	const v1Message = protoInbox.preview.MessagePreview.create({
-		from: formatAddress(BobAccountMailbox.sendAs[0], 'mail'),
+		from: formatAddress(BobAccountMailbox.aliases[0].address, 'mail'),
 		subject: dummyMailData.subject,
 		snippet: dummyMailData.plainTextMessage,
 		hasAttachment: false,
@@ -19,7 +19,7 @@ describe('MailboxOperations migrations', () => {
 		to: dummyMailData.recipients.map((a) => a.address),
 		cc: dummyMailData.carbonCopyRecipients.map((a) => a.address),
 		bcc: dummyMailData.blindCarbonCopyRecipients.map((a) => a.address),
-		owner: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+		owner: formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 	});
 	const v2Message = protoInbox.preview.MessagePreview.create({
 		...v1Message,
@@ -79,7 +79,7 @@ describe('MailboxOperations migrations', () => {
 		it('should encode the mailbox SECP256 identity key', async () => {
 			const altV2Message = protoInbox.preview.MessagePreview.create({
 				...v2Message,
-				owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+				owner: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 				mailbox: AliceWalletMailbox.identityKey.bytes,
 			});
 			const shouldApply = await migration.shouldApply({ version: 2, messagePreview: altV2Message });
@@ -91,7 +91,7 @@ describe('MailboxOperations migrations', () => {
 				version: 3,
 				messagePreview: protoInbox.preview.MessagePreview.create({
 					...v3Message,
-					owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+					owner: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 					mailbox: encodePublicKey(AliceWalletMailbox.identityKey),
 				}),
 			});
@@ -109,7 +109,7 @@ describe('MailboxOperations migrations', () => {
 		it('should fail for ED25519 length but not mailchain address', async () => {
 			const altV2Message = protoInbox.preview.MessagePreview.create({
 				...v2Message,
-				owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+				owner: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 			});
 
 			expect(() => migration.apply({ version: 2, messagePreview: altV2Message })).rejects.toThrow();
@@ -118,7 +118,7 @@ describe('MailboxOperations migrations', () => {
 		it('should fail for invalid SECP256K1 public key length', async () => {
 			const altV2Message = protoInbox.preview.MessagePreview.create({
 				...v2Message,
-				owner: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+				owner: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 				mailbox: secureRandom(62),
 			});
 

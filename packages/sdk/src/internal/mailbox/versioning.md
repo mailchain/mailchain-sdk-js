@@ -31,7 +31,7 @@ The initial implementation didn't have versioning information, so no `version` p
 1. Acquire unencrypted version of the message `ProtoMessagePreview`
 2. Acquire the IdentityKey of the mailbox
 
--   Try matching the `ProtoMessagePreview.owner` to some of the `UserProfile.mailboxes.sendAs`. If there is match, use `userMailbox.identityKey`
+-   Try matching the `ProtoMessagePreview.owner` to some of the `UserProfile.mailboxes.aliases`. If there is match, use `userMailbox.identityKey`
 -   Try using the Mailchain API to get the `IdentityKey` of the `ProtoMessagePreview.owner`
 
 3. Encode and encrypt the message

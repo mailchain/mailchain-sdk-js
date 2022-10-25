@@ -1,10 +1,10 @@
-import { parseNameServiceAddress } from '@mailchain/addressing';
+import { MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { isPublicKeyEqual } from '@mailchain/crypto';
 import uniqBy from 'lodash/uniqBy';
 import { ParseMimeTextResult } from '../formatters/parse';
 import { MailData } from '../formatters/types';
 import { IdentityKeys } from '../identityKeys';
-import { SendAsAlias, UserMailbox } from '../user/types';
+import { UserMailbox } from '../user/types';
 import { Configuration } from '../../mailchain';
 import {
 	AddressIdentityKeyResolver,
@@ -15,7 +15,7 @@ import {
 /** Result of the {@link MessageMailboxOwnerMatcher.findMatches}. */
 export type AddressMatch = {
 	/** The matched address */
-	address: SendAsAlias;
+	address: MailchainAddress;
 	/** How this address was matched */
 	matchBy: 'fallback' | 'message-header' | 'mailchain-api';
 };
@@ -45,7 +45,7 @@ export class MessageMailboxOwnerMatcher {
 		return new MessageMailboxOwnerMatcher([['message-header', resolver], ...this.addressIdentityKeyResolvers]);
 	}
 
-	/** Find the matching {@link SendAsAlias} from the provided `mailData` that match to the `userMailbox`. */
+	/** Find the matching {@link Alias} from the provided `mailData` that match to the `userMailbox`. */
 	async findMatches(mailData: MailData, userMailbox: UserMailbox): Promise<AddressMatch[]> {
 		const allRecipients = uniqBy(
 			[...mailData.recipients, ...mailData.carbonCopyRecipients, ...mailData.blindCarbonCopyRecipients],
@@ -65,7 +65,7 @@ export class MessageMailboxOwnerMatcher {
 		}
 
 		if (matches.length === 0) {
-			return [{ address: userMailbox.sendAs[0], matchBy: 'fallback' }];
+			return [{ address: userMailbox.aliases[0].address, matchBy: 'fallback' }];
 		}
 
 		return matches;

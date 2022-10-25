@@ -2,10 +2,14 @@ import { MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
 
 /**
- *
  * Represents different type of alias to be set for the {@link UserMailbox}.
  */
-export type SendAsAlias = MailchainAddress;
+export type Alias = {
+	address: MailchainAddress;
+	isDefault: boolean;
+	allowSending: boolean;
+	allowReceiving: boolean;
+};
 
 /**
  * Entity for sending and receiving messages based on the provided identity key and messaging key.
@@ -20,8 +24,8 @@ export type UserMailbox = {
 	identityKey: PublicKey;
 	/** The user preferred label to shown for this mailbox. If `null`, no user preferred label is defined, the application is free to compute one at runtime. */
 	label: string | null;
-	/** Will contain at least one defined {@link SendAsAlias}. */
-	sendAs: [SendAsAlias, ...SendAsAlias[]];
+	/** Will contain at least one defined {@link Alias}. */
+	aliases: [Alias, ...Alias[]];
 	/** Ingredients for the creation of messaging private key via the keyring. */
 	messagingKeyParams: {
 		address: Uint8Array;

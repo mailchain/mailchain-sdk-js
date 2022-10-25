@@ -11,24 +11,24 @@ export const dummyMailData: MailData = {
 	id: 'mail-data-id@mailchain.test',
 	subject: '💌 Dummy MailData subject 😉',
 	from: {
-		name: formatAddress(AliceAccountMailbox.sendAs[0], 'human-friendly'),
-		address: formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+		name: formatAddress(AliceAccountMailbox.aliases[0].address, 'human-friendly'),
+		address: formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 	},
 	recipients: [
 		{
-			name: formatAddress(BobAccountMailbox.sendAs[0], 'human-friendly'),
-			address: formatAddress(BobAccountMailbox.sendAs[0], 'mail'),
+			name: formatAddress(BobAccountMailbox.aliases[0].address, 'human-friendly'),
+			address: formatAddress(BobAccountMailbox.aliases[0].address, 'mail'),
 		},
 		{
-			name: formatAddress(AliceWalletMailbox.sendAs[0], 'human-friendly'),
-			address: formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+			name: formatAddress(AliceWalletMailbox.aliases[0].address, 'human-friendly'),
+			address: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 		},
 		{ name: 'tim.eth', address: 'tim@eth.mailchain.test' },
 	],
 	carbonCopyRecipients: [
 		{
-			name: formatAddress(BobWalletMailbox.sendAs[0], 'human-friendly'),
-			address: formatAddress(BobWalletMailbox.sendAs[0], 'mail'),
+			name: formatAddress(BobWalletMailbox.aliases[0].address, 'human-friendly'),
+			address: formatAddress(BobWalletMailbox.aliases[0].address, 'mail'),
 		},
 		{ name: 'john', address: 'john@mailchain.test' },
 	],
@@ -44,7 +44,7 @@ export const dummyMailData: MailData = {
 
 export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map([
 	[
-		formatAddress(AliceAccountMailbox.sendAs[0], 'mail'),
+		formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 		{
 			messagingKey: aliceKeyRing.accountMessagingKey().publicKey,
 			identityKey: AliceAccountMailbox.identityKey,
@@ -52,7 +52,7 @@ export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map
 		},
 	],
 	[
-		formatAddress(BobAccountMailbox.sendAs[0], 'mail'),
+		formatAddress(BobAccountMailbox.aliases[0].address, 'mail'),
 		{
 			messagingKey: bobKeyRing.accountMessagingKey().publicKey,
 			identityKey: bobKeyRing.accountIdentityKey().publicKey,
@@ -60,7 +60,7 @@ export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map
 		},
 	],
 	[
-		formatAddress(AliceWalletMailbox.sendAs[0], 'mail'),
+		formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
 		{
 			messagingKey: aliceKeyRing.addressMessagingKey(
 				AliceWalletMailbox.messagingKeyParams.address,
@@ -72,7 +72,7 @@ export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map
 		},
 	],
 	[
-		formatAddress(BobWalletMailbox.sendAs[0], 'mail'),
+		formatAddress(BobWalletMailbox.aliases[0].address, 'mail'),
 		{
 			messagingKey: bobKeyRing.addressMessagingKey(
 				BobWalletMailbox.messagingKeyParams.address,

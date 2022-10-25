@@ -92,10 +92,10 @@ describe('MessageMailboxOwnerMatcher', () => {
 		expect(apiResolver2).toHaveBeenCalledTimes(4);
 	});
 
-	it('should match message with default mailbox sendAs when no address got matched', async () => {
+	it('should match message with default mailbox alias when no address got matched', async () => {
 		const matches = await ownerMatcher.findMatches(dummyMailData, AliceWalletMailbox);
 
-		expect(matches).toEqual([{ address: AliceWalletMailbox.sendAs[0], matchBy: 'fallback' }]);
+		expect(matches).toEqual([{ address: AliceWalletMailbox.aliases[0].address, matchBy: 'fallback' }]);
 		expect(apiResolver1).toHaveBeenCalledTimes(7);
 		expect(apiResolver2).toHaveBeenCalledTimes(7);
 	});
