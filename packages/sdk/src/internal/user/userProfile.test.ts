@@ -143,6 +143,16 @@ describe('userProfile', () => {
 		expect(resMailbox).toEqual(AliceWalletMailbox);
 	});
 
+	it('should update existing mailbox with consolidated mailbox', async () => {
+		const resMailbox = await userProfile.updateMailbox(AliceWalletMailbox.id, {
+			...AliceWalletMailbox,
+			aliases: [...AliceWalletMailbox.aliases, ...AliceWalletMailbox.aliases],
+			label: '     ',
+		});
+
+		expect(resMailbox).toEqual({ ...AliceWalletMailbox, label: null });
+	});
+
 	it('should run migration on mailbox and store the update', async () => {
 		const encryptedMailboxInformation = encodeBase64(
 			await aliceKeyRing.userProfileCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),

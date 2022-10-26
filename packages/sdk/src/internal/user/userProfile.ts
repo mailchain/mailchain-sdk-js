@@ -27,7 +27,7 @@ import { IdentityKeys } from '../identityKeys';
 import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
 import { Alias, UserMailbox } from './types';
 import { createMailboxAlias } from './createAlias';
-import { consolidateMailboxAliases } from './consolidateMailboxAliases';
+import { consolidateMailbox } from './consolidateMailbox';
 
 export type UserSettings = { [key: string]: Setting | undefined };
 
@@ -196,8 +196,8 @@ export class MailchainUserProfile implements UserProfile {
 	}
 
 	async addMailbox(mailbox: NewUserMailbox): Promise<UserMailbox> {
-		const consolidatedMailbox: NewUserMailbox = { ...mailbox, aliases: consolidateMailboxAliases(mailbox.aliases) };
-		const protoMailbox = this.createProtoUserMailbox(consolidatedMailbox);
+		const consolidatedMailbox = consolidateMailbox(mailbox);
+		const protoMailbox = createProtoUserMailbox(consolidatedMailbox);
 		const encrypted = await this.mailboxCrypto.encrypt(user.Mailbox.encode(protoMailbox).finish());
 		const { mailboxId } = await this.userApi
 			.postUserMailbox({ encryptedMailboxInformation: encodeBase64(encrypted), version: CURRENT_MAILBOX_VERSION })
@@ -207,8 +207,8 @@ export class MailchainUserProfile implements UserProfile {
 	}
 
 	async updateMailbox(mailboxId: string, mailbox: NewUserMailbox): Promise<UserMailbox> {
-		const consolidatedMailbox: NewUserMailbox = { ...mailbox, aliases: consolidateMailboxAliases(mailbox.aliases) };
-		const protoMailbox = this.createProtoUserMailbox(consolidatedMailbox);
+		const consolidatedMailbox = consolidateMailbox(mailbox);
+		const protoMailbox = createProtoUserMailbox(consolidatedMailbox);
 		await this.internalUpdateMailbox(mailboxId, protoMailbox, CURRENT_MAILBOX_VERSION);
 		return { id: mailboxId, type: 'wallet', ...consolidatedMailbox };
 	}
@@ -216,26 +216,6 @@ export class MailchainUserProfile implements UserProfile {
 	async removeMailbox(mailboxId: string): Promise<void> {
 		await this.userApi.deleteUserMailbox(mailboxId);
 		return;
-	}
-
-	private createProtoUserMailbox(mailbox: NewUserMailbox): user.Mailbox {
-		return user.Mailbox.create({
-			identityKey: encodePublicKey(mailbox.identityKey),
-			address: mailbox.messagingKeyParams.address,
-			protocol: mailbox.messagingKeyParams.protocol,
-			network: mailbox.messagingKeyParams.network,
-			nonce: mailbox.messagingKeyParams.nonce,
-			label: mailbox.label,
-			aliases: mailbox.aliases.map(this.createProtoAlias),
-		});
-	}
-
-	private createProtoAlias(alias: Alias): user.Mailbox.Alias {
-		return user.Mailbox.Alias.create({
-			address: formatAddress(alias.address, 'mail'),
-			blockSending: !alias.allowSending,
-			blockReceiving: !alias.allowReceiving,
-		});
 	}
 
 	private async internalUpdateMailbox(
@@ -247,4 +227,24 @@ export class MailchainUserProfile implements UserProfile {
 		await this.userApi.putUserMailbox(addressId, { encryptedMailboxInformation: encodeBase64(encrypted), version });
 		return protoMailbox;
 	}
+}
+
+function createProtoUserMailbox(mailbox: NewUserMailbox): user.Mailbox {
+	return user.Mailbox.create({
+		identityKey: encodePublicKey(mailbox.identityKey),
+		address: mailbox.messagingKeyParams.address,
+		protocol: mailbox.messagingKeyParams.protocol,
+		network: mailbox.messagingKeyParams.network,
+		nonce: mailbox.messagingKeyParams.nonce,
+		label: mailbox.label,
+		aliases: mailbox.aliases.map(createProtoAlias),
+	});
+}
+
+function createProtoAlias(alias: Alias): user.Mailbox.Alias {
+	return user.Mailbox.Alias.create({
+		address: formatAddress(alias.address, 'mail'),
+		blockSending: !alias.allowSending,
+		blockReceiving: !alias.allowReceiving,
+	});
 }
