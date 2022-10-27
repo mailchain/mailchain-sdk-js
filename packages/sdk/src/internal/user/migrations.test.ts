@@ -1,13 +1,14 @@
 import { encodePublicKey } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { createNameServiceAddress, formatAddress } from '@mailchain/addressing';
 import { AliceSECP256K1PublicAddress, AliceSECP256K1PublicAddressStr } from '../ethereum/test.const';
 import { user } from '../protobuf/user/user';
 import { IdentityKeys } from '../identityKeys';
+import { Nameservices } from '../nameservices';
 import {
 	createV2IdentityKey,
 	createV3LabelMigration,
 	createV4AliasesMigration,
+	createV5NsMigration,
 	UserMailboxMigrationRule,
 } from './migrations';
 import { AliceWalletMailbox } from './test.const';
@@ -34,6 +35,15 @@ const v4Mailbox = user.Mailbox.create({
 			blockSending: false,
 			blockReceiving: false,
 		},
+	],
+});
+
+const v5Mailbox = user.Mailbox.create({
+	...v4Mailbox,
+	aliases: [
+		...v4Mailbox.aliases,
+		{ address: 'alice.eth@mailchain.test', blockSending: false, blockReceiving: false },
+		{ address: '👩🏼‍💻.alice.eth@mailchain.test', blockSending: false, blockReceiving: false },
 	],
 });
 
@@ -101,6 +111,51 @@ describe('UserProfile migrations', () => {
 
 			const migrated = await migration.apply({ version: 3, protoMailbox: v3Mailbox });
 			expect(migrated).toEqual({ version: 4, protoMailbox: v4Mailbox });
+		});
+	});
+
+	describe('v4 to v5 - fetch nameservice aliases', () => {
+		let nameservices: MockProxy<Nameservices>;
+
+		beforeEach(() => {
+			nameservices = mock();
+			migration = createV5NsMigration(nameservices, 'mailchain.test');
+		});
+
+		it('should apply for version 4', async () => {
+			expect(await migration.shouldApply({ version: 4, protoMailbox: v4Mailbox })).toBe(true);
+			expect(await migration.shouldApply({ version: 4, protoMailbox: v5Mailbox })).toBe(true);
+		});
+
+		it('should add found nameservice names as aliases to the mailbox', async () => {
+			nameservices.reverseResolveNames.mockResolvedValue([
+				{ name: 'alice.eth', resolver: 'ens' },
+				{ name: '👩🏼‍💻.alice.eth', resolver: 'ens' },
+				{ name: 'alice.eth', resolver: 'ens' }, // duplicate
+			]);
+
+			const migrated = await migration.apply({ version: 4, protoMailbox: v4Mailbox });
+
+			expect(migrated).toEqual({ version: 5, protoMailbox: v5Mailbox });
+		});
+
+		it('should not add duplicate nameservice names as aliases', async () => {
+			nameservices.reverseResolveNames.mockResolvedValue([
+				{ name: 'alice.eth', resolver: 'ens' },
+				{ name: '👩🏼‍💻.alice.eth', resolver: 'ens' },
+			]);
+
+			const migrated = await migration.apply({ version: 4, protoMailbox: v5Mailbox }); // v5 already has the aliases
+
+			expect(migrated).toEqual({ version: 5, protoMailbox: v5Mailbox });
+		});
+
+		it('should not throw on failed ns reverse search and bump up the version', async () => {
+			nameservices.reverseResolveNames.mockRejectedValue(new Error('ns error'));
+
+			const migrated = await migration.apply({ version: 4, protoMailbox: v4Mailbox });
+
+			expect(migrated).toEqual({ version: 5, protoMailbox: v4Mailbox });
 		});
 	});
 });

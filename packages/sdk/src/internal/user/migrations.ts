@@ -1,7 +1,15 @@
-import { createWalletAddress, encodeAddressByProtocol, formatAddress, ProtocolType } from '@mailchain/addressing';
-import { encodePublicKey } from '@mailchain/crypto';
+import {
+	createNameServiceAddress,
+	createWalletAddress,
+	encodeAddressByProtocol,
+	formatAddress,
+	ProtocolType,
+} from '@mailchain/addressing';
+import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
+import { encodeHexZeroX } from '@mailchain/encoding';
 import { IdentityKeys } from '../identityKeys';
 import { MigrationRule } from '../migration';
+import { Nameservices } from '../nameservices';
 import { user } from '../protobuf/user/user';
 
 type UserMailboxData = {
@@ -71,6 +79,44 @@ export function createV4AliasesMigration(mailchainAddressDomain: string): UserMa
 					aliases: [{ address, blockSending: false, blockReceiving: false }],
 				}),
 			});
+		},
+	};
+}
+
+export function createV5NsMigration(
+	nameservices: Nameservices,
+	mailchainAddressDomain: string,
+): UserMailboxMigrationRule {
+	return {
+		shouldApply: (data) => Promise.resolve(data.version === 4),
+		apply: async ({ protoMailbox }) => {
+			const identityKey = decodePublicKey(protoMailbox.identityKey);
+			try {
+				const foundNames = await nameservices.reverseResolveNames(identityKey);
+
+				const aliases = [...protoMailbox.aliases];
+				for (const { name } of foundNames) {
+					const address = createNameServiceAddress(name, mailchainAddressDomain);
+					const aliasAddress = formatAddress(address, 'mail');
+					if (aliases.some((alias) => alias.address === aliasAddress)) continue;
+
+					const alias = user.Mailbox.Alias.create({
+						address: aliasAddress,
+						blockSending: false,
+						blockReceiving: false,
+					});
+					aliases.push(alias);
+				}
+
+				return { version: 5, protoMailbox: user.Mailbox.create({ ...protoMailbox, aliases }) };
+			} catch (e) {
+				console.warn(
+					`failed reverse search for identity key ${encodeHexZeroX(
+						protoMailbox.identityKey,
+					)}. Will bump version without storing NS aliases`,
+				);
+				return { version: 5, protoMailbox };
+			}
 		},
 	};
 }

@@ -37,7 +37,7 @@ export class UserNotFoundError extends Error {
 	}
 }
 
-const CURRENT_MAILBOX_VERSION = 4 as const;
+const CURRENT_MAILBOX_VERSION = 5 as const;
 
 export type NewUserMailbox = Omit<UserMailbox, 'id' | 'type'>;
 

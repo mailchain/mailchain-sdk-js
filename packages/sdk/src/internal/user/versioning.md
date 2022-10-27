@@ -29,3 +29,7 @@ Since the mailbox is represented by `identityKey` we defined a `label` that the 
 For the purposes of offering better user experience for when the users want to send/receive messages from addresses different then the one stored in the `ProtoUserMailbox.address` (for example via their registered ENS names), we introduced the `ProtoUserMailbox.aliases`.
 
 -   `ProtoUserMailbox` - ADDED `aliases` array field that stores each aliases for sending/receiving messages for the mailbox.
+
+### Version 5 - nameservice aliases
+
+Not data structural changes in this version, it is migration version that tries to reverse resolve the nameservice names for all of the user mailboxes.
