@@ -15,7 +15,7 @@ import type { ProtocolType } from '@mailchain/addressing';
  *   - Optional: can be omitted if it is the main network/chain of the protocol.
  *
  * Examples:
- * - Ethereum address on Ethereum mainnet `0x0E5736fbD198496Ef9A890a8D8be7538De9B2e0f@etherum.mailchain.com`
+ * - Ethereum address on Ethereum mainnet `0x0E5736fbD198496Ef9A890a8D8be7538De9B2e0f@ethereum.mailchain.com`
  * - Mailchain address `alice@mailchain.com`
  */
 export type Address = string;
