@@ -24,14 +24,13 @@
 		"axios": "^0.26.1",
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
-		"protobufjs": "~6.11.3",
 		"secp256k1": "^4.0.2"
 	},
 	"engines": {
 		"node": ">=15.0.0"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
 		"test": "jest --runInBand",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
@@ -39,7 +38,6 @@
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
 		"axios-mock-adapter": "^1.21.1",
-		"jest-environment-jsdom": "^29.0.1",
 		"jest-mock-extended": "^2.0.7"
 	}
 }

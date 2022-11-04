@@ -1,4 +1,4 @@
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeUtf8 } from '@mailchain/encoding';
 import {
 	AliceED25519Seed,
 	AliceED25519PrivateKeyBytes,

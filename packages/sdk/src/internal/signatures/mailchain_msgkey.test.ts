@@ -1,4 +1,4 @@
-import { encodeHexZeroX } from '@mailchain/encoding/hex';
+import { encodeHexZeroX } from '@mailchain/encoding';
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';

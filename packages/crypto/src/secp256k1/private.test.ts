@@ -1,4 +1,4 @@
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeUtf8 } from '@mailchain/encoding';
 import {
 	BobSECP256K1PublicKey,
 	AliceSECP256K1PublicKey,

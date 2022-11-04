@@ -1,4 +1,4 @@
-import { decodeHex } from '@mailchain/encoding/hex';
+import { decodeHex } from '@mailchain/encoding';
 import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceED25519PublicKey } from '../../../../crypto/src/ed25519/test.const';
 import { verifyEthereumPersonalMessage } from './eth_personal';

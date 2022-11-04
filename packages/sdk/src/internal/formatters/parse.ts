@@ -1,7 +1,7 @@
 import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
-import { HEADER_LABELS } from '@mailchain/message-composer/consts';
+import { HEADER_LABELS } from '@mailchain/message-composer';
 import { X_IDENTITY_KEYS } from './conts';
 import { MailAddress, MailData } from './types';
 import { simpleMimeHeaderParser } from './simpleMimeHeaderParser';

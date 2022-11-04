@@ -9,15 +9,12 @@
 	},
 	"version": "0.7.5",
 	"dependencies": {
-		"@polkadot/util-crypto": "^10.1.9"
+		"@polkadot/util-crypto": "^10.1.11"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
 		"test": "jest",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
-	},
-	"devDependencies": {
-		"jest-environment-jsdom": "^29.0.1"
 	}
 }

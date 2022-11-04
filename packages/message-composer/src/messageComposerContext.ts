@@ -1,5 +1,4 @@
-import { encodeBase64, encodeBase64UrlSafe } from '@mailchain/encoding/base64';
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { encodeBase64, encodeBase64UrlSafe, decodeUtf8 } from '@mailchain/encoding';
 
 export type MessageComposerContext = {
 	random: (len: number) => Uint8Array;

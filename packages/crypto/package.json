@@ -7,8 +7,8 @@
 		"@ethersproject/signing-key": "5.6.2",
 		"@mailchain/encoding": "0.7.5",
 		"@noble/hashes": "^1.0.0",
-		"@polkadot/util": "^10.1.9",
-		"@polkadot/util-crypto": "^10.1.9",
+		"@polkadot/util": "^10.1.11",
+		"@polkadot/util-crypto": "^10.1.11",
 		"bn.js": "^5.2.0",
 		"elliptic": "^6.5.4",
 		"lodash": "^4.17.21",
@@ -18,14 +18,13 @@
 	"devDependencies": {
 		"@types/bn.js": "^5.1.0",
 		"@types/elliptic": "^6.4.14",
-		"@types/secp256k1": "^4.0.2",
-		"jest-environment-jsdom": "^29.0.1"
+		"@types/secp256k1": "^4.0.2"
 	},
 	"engines": {
 		"node": ">=15.0.0"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production webpack --config webpack.config.ts --progress",
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
 		"test": "jest --runInBand",
 		"lint:test": "yarn eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"

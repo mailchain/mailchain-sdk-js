@@ -1,4 +1,4 @@
-import { encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { encodePublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createMessageComposer } from '@mailchain/message-composer';
 import { HeaderAttribute } from '@mailchain/message-composer/types';

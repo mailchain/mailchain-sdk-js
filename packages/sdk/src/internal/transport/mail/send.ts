@@ -1,5 +1,4 @@
-import { ProtocolType } from '@mailchain/addressing';
-import { PublicKey, SignerWithPublicKey } from '@mailchain/crypto';
+import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
 import { Configuration } from '../../../';

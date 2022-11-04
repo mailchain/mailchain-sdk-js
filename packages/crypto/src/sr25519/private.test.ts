@@ -1,4 +1,4 @@
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeUtf8 } from '@mailchain/encoding';
 import {
 	AliceSR25519PublicKey,
 	AliceSR25519KeyPair,

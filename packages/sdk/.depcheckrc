@@ -1,1 +1,1 @@
-ignores: ["protobufjs", "jest-environment-jsdom"]
+ignores: ["protobufjs"]

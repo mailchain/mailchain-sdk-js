@@ -1,4 +1,4 @@
-import { decodeHex } from '@mailchain/encoding/hex';
+import { decodeHex } from '@mailchain/encoding';
 import { chainCodeFromDeriveIndex } from './hd';
 
 describe('ChainCodeFromDeriveIndex()', () => {

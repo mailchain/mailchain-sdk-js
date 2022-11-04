@@ -1,4 +1,4 @@
-import { decodeUtf8 } from '@mailchain/encoding/utf8';
+import { decodeUtf8 } from '@mailchain/encoding';
 import {
 	AliceUncompressedSECP256K1PublicKeyBytes,
 	AliceCompressedSECP256K1PublicKeyBytes,

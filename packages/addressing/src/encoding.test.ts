@@ -1,6 +1,4 @@
-import { decodeBase58 } from '@mailchain/encoding/base58';
-import { EncodingTypes } from '@mailchain/encoding';
-import { decodeHex } from '@mailchain/encoding/hex';
+import { decodeBase58, EncodingTypes, decodeHex } from '@mailchain/encoding';
 import { ProtocolType } from './protocols';
 import { encodeAddressByProtocol, encodingByProtocol } from './encoding';
 
