@@ -10,7 +10,6 @@
 	"homepage": "https://docs.mailchain.com/developer",
 	"version": "0.7.5",
 	"dependencies": {
-		"email-addresses": "5.0.0",
 		"@cloudflare/opaque-ts": "^0.7.5",
 		"@ethersproject/hash": "5.7.0",
 		"@ethersproject/transactions": "^5.7.0",
@@ -22,6 +21,7 @@
 		"@noble/hashes": "^1.0.0",
 		"@types/secp256k1": "^4.0.2",
 		"axios": "^0.26.1",
+		"email-addresses": "5.0.0",
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
 		"secp256k1": "^4.0.2"
@@ -31,9 +31,9 @@
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
-		"test": "jest --runInBand",
-		"lint:test": "yarn eslint --ext js,ts,tsx src",
-		"lint:fix": "yarn eslint --fix --ext js,ts,tsx src"
+		"test": "run -T jest --runInBand",
+		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
 	},
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
