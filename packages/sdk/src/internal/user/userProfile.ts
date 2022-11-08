@@ -24,7 +24,14 @@ import { createAxiosConfiguration } from '../axios/config';
 import { getAxiosWithSigner } from '../auth/jwt';
 import { combineMigrations } from '../migration';
 import { IdentityKeys } from '../identityKeys';
-import { createV2IdentityKey, createV3LabelMigration, UserMailboxMigrationRule } from './migrations';
+import { Nameservices } from '../nameservices';
+import {
+	createV2IdentityKey,
+	createV3LabelMigration,
+	createV4AliasesMigration,
+	createV5NsMigration,
+	UserMailboxMigrationRule,
+} from './migrations';
 import { Alias, UserMailbox } from './types';
 import { createMailboxAlias } from './createAlias';
 import { consolidateMailbox } from './consolidateMailbox';
@@ -68,9 +75,12 @@ export class MailchainUserProfile implements UserProfile {
 		const axiosConfig = createAxiosConfiguration(config);
 		const identityKeys = IdentityKeys.create(config);
 		const userApi = UserApiFactory(axiosConfig, undefined, getAxiosWithSigner(accountIdentityKey));
+		const nameservice = Nameservices.create(config);
 		const migrations = combineMigrations(
 			createV2IdentityKey(identityKeys, config.mailchainAddressDomain),
 			createV3LabelMigration(config.mailchainAddressDomain),
+			createV4AliasesMigration(config.mailchainAddressDomain),
+			createV5NsMigration(nameservice, config.mailchainAddressDomain),
 		);
 		return new MailchainUserProfile(
 			config.mailchainAddressDomain,
