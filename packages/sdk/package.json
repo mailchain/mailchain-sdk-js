@@ -31,7 +31,7 @@
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
-		"test": "run -T jest --runInBand",
+		"test": "run -T jest",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
 	},
