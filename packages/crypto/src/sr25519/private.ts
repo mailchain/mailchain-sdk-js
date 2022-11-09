@@ -1,7 +1,9 @@
 import { sr25519Sign, sr25519PairFromSeed, cryptoWaitReady } from '@polkadot/util-crypto';
 import { Keypair } from '@polkadot/util-crypto/types';
 import { RandomFunction, secureRandom } from '../rand';
-import { KindSR25519, PrivateKey, PublicKey } from '../';
+import { PrivateKey } from '../private';
+import { PublicKey } from '../public';
+import { KindSR25519 } from '../keys';
 import { toSeed } from '../mnemonic/mnemonic';
 import { SR25519PublicKey, SR25519PublicKeyLen } from './public';
 

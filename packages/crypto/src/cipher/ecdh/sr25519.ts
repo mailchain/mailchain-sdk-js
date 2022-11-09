@@ -1,8 +1,9 @@
 import { cryptoWaitReady, sr25519Agreement } from '@polkadot/util-crypto';
 import { KeyExchange } from '../';
-import { PrivateKey, PublicKey, RandomFunction, secureRandom } from '../../';
-import { SR25519PrivateKey } from '../../sr25519';
-import { asSR25519PrivateKey } from '../../sr25519/private';
+import { RandomFunction, secureRandom } from '../../rand';
+import { PublicKey } from '../../public';
+import { PrivateKey } from '../../private';
+import { SR25519PrivateKey, asSR25519PrivateKey } from '../../sr25519/private';
 
 export class SR25519KeyExchange implements KeyExchange {
 	randomFunc: RandomFunction;

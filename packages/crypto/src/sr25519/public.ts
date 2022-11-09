@@ -1,5 +1,6 @@
 import { cryptoWaitReady, sr25519Verify } from '@polkadot/util-crypto';
-import { KindSR25519, PublicKey } from '../';
+import { PublicKey } from '../public';
+import { KindSR25519 } from '../keys';
 
 export const SR25519PublicKeyLen = 32;
 

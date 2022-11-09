@@ -1,5 +1,6 @@
-import { EncryptedContent, PlainContent, Decrypter, KeyExchange } from '..';
-import { PrivateKey } from '../..';
+import { EncryptedContent, PlainContent, Decrypter } from '../cipher';
+import { KeyExchange } from '../keyExchange';
+import { PrivateKey } from '../../private';
 import { fromPrivateKey } from '../ecdh/ecdh';
 import { easyOpen } from './secretbox';
 import { deserializePublicKeyEncryptedContent } from './serialization';

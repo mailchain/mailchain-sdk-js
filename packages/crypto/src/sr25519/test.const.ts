@@ -1,4 +1,5 @@
-import { SR25519PublicKey, SR25519PrivateKey } from './';
+import { SR25519PrivateKey } from './private';
+import { SR25519PublicKey } from './public';
 
 // Public
 export const AliceSR25519PublicKeyBytes = new Uint8Array([

@@ -1,4 +1,5 @@
-import { SECP256K1PublicKey, SECP256K1PrivateKey } from './';
+import { SECP256K1PublicKey } from './public';
+import { SECP256K1PrivateKey } from './private';
 
 // Public
 export const BobHexSECP256K1PublicKey =

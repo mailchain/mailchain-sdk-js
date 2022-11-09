@@ -1,7 +1,8 @@
-import { PublicKey, KindSECP256K1, KindED25519, KindSR25519 } from '..';
-import { SECP256K1PublicKey } from '../secp256k1';
-import { ED25519PublicKey } from '../ed25519';
-import { SR25519PublicKey } from '../sr25519';
+import { KindSECP256K1, KindED25519, KindSR25519 } from '../keys';
+import { PublicKey } from '../public';
+import { SECP256K1PublicKey } from '../secp256k1/public';
+import { ED25519PublicKey } from '../ed25519/public';
+import { SR25519PublicKey } from '../sr25519/public';
 
 export function kindFromPublicKey(key: PublicKey): string {
 	switch (key.constructor) {

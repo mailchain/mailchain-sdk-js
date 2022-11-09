@@ -1,8 +1,8 @@
 import { cryptoWaitReady, sr25519DeriveHard } from '@polkadot/util-crypto';
 import BN from 'bn.js';
-import { chainCodeFromDeriveIndex } from '..';
-import { asSR25519PrivateKey } from './private';
-import { SR25519ExtendedPrivateKey, SR25519PrivateKey } from '.';
+import { chainCodeFromDeriveIndex } from '../hd';
+import { asSR25519PrivateKey, SR25519PrivateKey } from './private';
+import { SR25519ExtendedPrivateKey } from './hd';
 
 export async function sr25519DeriveHardenedKey(
 	parentKey: SR25519ExtendedPrivateKey,

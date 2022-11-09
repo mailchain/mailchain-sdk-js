@@ -1,5 +1,7 @@
-import { EncryptedContent, Encrypter, KeyExchange } from '..';
-import { PublicKey, RandomFunction, secureRandom } from '../..';
+import { KeyExchange } from '../keyExchange';
+import { EncryptedContent, Encrypter } from '../cipher';
+import { RandomFunction, secureRandom } from '../../rand';
+import { PublicKey } from '../../public';
 import { fromPublicKey } from '../ecdh/ecdh';
 import { easySeal } from './secretbox';
 import { serializePublicKeyEncryptedContent } from './serialization';

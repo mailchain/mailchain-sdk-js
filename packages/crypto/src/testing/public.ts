@@ -1,4 +1,4 @@
-import { PublicKey } from '../';
+import { PublicKey } from '../public';
 
 export class UnknownPublicKey implements PublicKey {
 	readonly bytes: Uint8Array;

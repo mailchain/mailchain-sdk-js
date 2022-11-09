@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
+import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/hd';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519/private';
 import { decodeHex } from '@mailchain/encoding';
 import { protocol } from '../../../protobuf/protocol/protocol';

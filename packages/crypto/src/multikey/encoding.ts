@@ -1,4 +1,5 @@
-import { PrivateKey, PublicKey } from '..';
+import { PublicKey } from '../public';
+import { PrivateKey } from '../private';
 import { idFromPrivateKey, idFromPublicKey, privateKeyFromId, publicKeyFromId } from './ids';
 
 export function encodePublicKey(key: PublicKey): Uint8Array {

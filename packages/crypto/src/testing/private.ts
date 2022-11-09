@@ -1,4 +1,5 @@
-import { PrivateKey, PublicKey } from '..';
+import { PublicKey } from '../public';
+import { PrivateKey } from '../private';
 import { UnknownPublicKey } from './public';
 
 export const PrivateKeyLen = 32;

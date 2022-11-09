@@ -1,10 +1,10 @@
 import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto/ed25519/convertKey';
 import { idFromPrivateKey } from '../../multikey/ids';
-import { EncryptedContent, PlainContent, Decrypter } from '..';
-import { PrivateKey } from '../..';
-import { SECP256K1PrivateKey } from '../../secp256k1';
-import { ED25519PrivateKey } from '../../ed25519';
-import { SR25519PrivateKey } from '../../sr25519';
+import { EncryptedContent, PlainContent, Decrypter } from '../cipher';
+import { PrivateKey } from '../../private';
+import { SECP256K1PrivateKey } from '../../secp256k1/private';
+import { ED25519PrivateKey } from '../../ed25519/private';
+import { SR25519PrivateKey } from '../../sr25519/private';
 import { deserializePrivateKeyEncryptedContent } from './serialization';
 import { easyOpen } from './secretbox';
 

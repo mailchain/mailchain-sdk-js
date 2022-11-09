@@ -1,5 +1,5 @@
 import { KindNaClSecretKey } from '@mailchain/crypto';
-import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/exprivate';
+import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/hd';
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { decryptBuffer, decryptChunks, decryptPayload } from './decrypt';
 import { PayloadHeaders } from './headers';

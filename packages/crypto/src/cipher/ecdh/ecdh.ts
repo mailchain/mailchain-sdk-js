@@ -1,8 +1,13 @@
 import { KeyExchange } from '..';
-import { PublicKey, PrivateKey, RandomFunction, secureRandom } from '../..';
-import { SECP256K1PublicKey, SECP256K1PrivateKey } from '../../secp256k1';
-import { ED25519PublicKey, ED25519PrivateKey } from '../../ed25519';
-import { SR25519PublicKey, SR25519PrivateKey } from '../../sr25519';
+import { RandomFunction, secureRandom } from '../../rand';
+import { PublicKey } from '../../public';
+import { PrivateKey } from '../../private';
+import { SECP256K1PublicKey } from '../../secp256k1/public';
+import { SECP256K1PrivateKey } from '../../secp256k1/private';
+import { ED25519PublicKey } from '../../ed25519/public';
+import { ED25519PrivateKey } from '../../ed25519/private';
+import { SR25519PublicKey } from '../../sr25519/public';
+import { SR25519PrivateKey } from '../../sr25519/private';
 import { ED25519KeyExchange } from './ed25519';
 import { SR25519KeyExchange } from './sr25519';
 import { SECP256K1KeyExchange } from './secp256k1';

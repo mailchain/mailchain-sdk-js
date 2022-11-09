@@ -1,7 +1,7 @@
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../../ed25519/test.const';
 import { AliceSECP256K1PrivateKey, BobSECP256K1PrivateKey } from '../../secp256k1/test.const';
 import { AliceSR25519PrivateKey, BobSR25519PrivateKey } from '../../sr25519/test.const';
-import { PrivateKeyEncrypter } from './private-key-encrypter';
+import { PrivateKeyEncrypter } from './privateKeyEncrypter';
 
 describe('Encrypt', () => {
 	const tests = [

@@ -1,7 +1,9 @@
 import { ec as EC } from 'elliptic';
 import { KeyExchange } from '../';
-import { PrivateKey, PublicKey, RandomFunction, secureRandom } from '../../';
-import { SECP256K1PrivateKey } from '../../secp256k1';
+import { RandomFunction, secureRandom } from '../../rand';
+import { PublicKey } from '../../public';
+import { PrivateKey } from '../../private';
+import { SECP256K1PrivateKey } from '../../secp256k1/private';
 
 export class SECP256K1KeyExchange implements KeyExchange {
 	randomFunc: RandomFunction;

@@ -1,5 +1,5 @@
 import { secretbox } from 'tweetnacl';
-import { RandomFunction } from '../..';
+import { RandomFunction } from '../../rand';
 
 const nonceSize = 24;
 const secretKeySize = 32;

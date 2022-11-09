@@ -1,9 +1,11 @@
 import { convertSecretKeyToCurve25519, convertPublicKeyToCurve25519 } from '@polkadot/util-crypto';
 import { scalarMult } from 'tweetnacl';
 import { KeyExchange } from '../';
-import { PrivateKey, PublicKey, RandomFunction, secureRandom } from '../../';
-import { ED25519PrivateKey, ED25519PublicKey } from '../../ed25519';
-import { asED25519PrivateKey } from '../../ed25519/private';
+import { RandomFunction, secureRandom } from '../../rand';
+import { PublicKey } from '../../public';
+import { PrivateKey } from '../../private';
+import { ED25519PublicKey } from '../../ed25519/public';
+import { ED25519PrivateKey, asED25519PrivateKey } from '../../ed25519/private';
 
 export class ED25519KeyExchange implements KeyExchange {
 	randomFunc: RandomFunction;
