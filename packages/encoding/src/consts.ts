@@ -7,6 +7,10 @@ export const EncodingTypes = {
 	 * 0x prefixed hex encoding
 	 */
 	Hex0xPrefix: 'hex/0x-prefix',
+	/**
+	 * With or without 0x prefix
+	 */
+	HexAny: 'hex/any',
 	Base32: 'base32/plain',
 	Base58: 'base58/plain',
 	Base64: 'base64/plain',

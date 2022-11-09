@@ -1,5 +1,6 @@
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
+import { EncodingTypes, ensureDecoded } from '@mailchain/encoding';
 import {
 	FailedAddressMessageKeyResolutionsError,
 	MailSender,
@@ -8,7 +9,6 @@ import {
 } from './internal/transport/mail/send';
 import { Lookup } from './internal/identityKeys';
 import { MailchainUserProfile, UserNotFoundError, UserProfile } from './internal/user';
-import { toUint8Array } from './internal/formatters/hex';
 import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
 import { toMailData } from './convertSendMailParams';
@@ -44,7 +44,7 @@ export class Mailchain {
 	}
 
 	static fromAccountSeed(seed: Uint8Array | string, config: Configuration = defaultConfiguration) {
-		const identityKey = ED25519PrivateKey.fromSeed(toUint8Array(seed));
+		const identityKey = ED25519PrivateKey.fromSeed(ensureDecoded(seed, EncodingTypes.HexAny));
 		const keyRing = KeyRing.fromPrivateKey(identityKey);
 
 		return Mailchain.fromKeyRing(keyRing, config);

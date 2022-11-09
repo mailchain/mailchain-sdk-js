@@ -2,7 +2,7 @@ import { decodeBase32, encodeBase32 } from './base32';
 import { decodeBase58, encodeBase58 } from './base58';
 import { encodeBase64UrlSafe } from './base64';
 import { EncodingTypes, EncodingType } from './consts';
-import { decodeHex, decodeHexZeroX, encodeHex, encodeHexZeroX } from './hex';
+import { decodeHex, decodeHexAny, decodeHexZeroX, encodeHex, encodeHexZeroX } from './hex';
 import { decodeUtf8, encodeUtf8 } from './utf8';
 
 class UnsupportedEncodingError extends Error {
@@ -32,6 +32,8 @@ export function decode(encoding: EncodingType, src: string): Uint8Array {
 			return decodeUtf8(src);
 		case EncodingTypes.Base32:
 			return decodeBase32(src);
+		case EncodingTypes.HexAny:
+			return decodeHexAny(src);
 		default:
 			throw new UnsupportedEncodingError(encoding);
 	}
