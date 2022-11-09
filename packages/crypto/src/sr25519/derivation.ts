@@ -1,5 +1,4 @@
 import { cryptoWaitReady, sr25519DeriveHard } from '@polkadot/util-crypto';
-import BN from 'bn.js';
 import { chainCodeFromDeriveIndex } from '../hd';
 import { asSR25519PrivateKey, SR25519PrivateKey } from './private';
 import { SR25519ExtendedPrivateKey } from './hd';
