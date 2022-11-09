@@ -1,4 +1,4 @@
-import { ALGORAND, ETHEREUM, MAILCHAIN, ProtocolType, SUBSTRATE } from '.';
+import { ALGORAND, ETHEREUM, MAILCHAIN, ProtocolType, SUBSTRATE } from './protocols';
 
 export function casingByProtocol(value: string, protocol: ProtocolType): string {
 	switch (protocol) {

@@ -1,4 +1,5 @@
-import { ALL_PROTOCOLS, MAILCHAIN, NameServiceAddress, ProtocolType } from '.';
+import { NameServiceAddress } from './nameServiceAddress';
+import { ALL_PROTOCOLS, MAILCHAIN, ProtocolType } from './protocols';
 
 export function parseWalletAddress(
 	address: NameServiceAddress,

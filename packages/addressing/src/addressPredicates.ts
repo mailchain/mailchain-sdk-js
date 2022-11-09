@@ -1,5 +1,7 @@
 import { isAnyHex } from '@mailchain/encoding';
-import { ETHEREUM, MailchainAddress, NameServiceAddress, parseWalletAddress } from '.';
+import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
+import { parseWalletAddress } from './parseWalletAddress';
+import { ETHEREUM } from './protocols';
 
 export function isMailchainAccountAddress(address: NameServiceAddress): boolean {
 	const isMailchainUsername = address.username.match(/(^[a-zA-Z0-9][_\-a-zA-Z0-9]{0,18}[a-zA-Z0-9])$/) != null;

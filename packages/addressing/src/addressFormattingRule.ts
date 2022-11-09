@@ -1,13 +1,9 @@
+import { isEthereumAddress, isMailchainAccountAddress } from './addressPredicates';
+import { decodeAddressByProtocol } from './encoding';
 import { formatMailLike } from './formatMailLike';
-import { NameServiceAddress } from './nameServiceAddress';
-import {
-	decodeAddressByProtocol,
-	ETHEREUM,
-	isEthereumAddress,
-	isMailchainAccountAddress,
-	MailchainAddress,
-	parseWalletAddress,
-} from '.';
+import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
+import { parseWalletAddress } from './parseWalletAddress';
+import { ETHEREUM } from './protocols';
 
 /** If the rule is applicable,format the provided address. If not applicable, return `undefined`  */
 export type AddressFormattingRule<T extends MailchainAddress> = (address: T) => string | undefined;

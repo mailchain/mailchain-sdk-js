@@ -1,6 +1,6 @@
-import { formatMailLike } from './formatMailLike';
 import { humanNameServiceFormatters } from './addressFormattingRule';
-import { MailchainAddress, isNameServiceAddress, NameServiceAddress } from '.';
+import { formatMailLike } from './formatMailLike';
+import { isNameServiceAddress, NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
 
 export function formatAddress(address: MailchainAddress, format: 'mail' | 'human-friendly'): string {
 	if (isNameServiceAddress(address)) return formatNameServiceAddress(address, format);
