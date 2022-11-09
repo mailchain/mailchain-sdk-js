@@ -2,13 +2,12 @@ import json from '@rollup/plugin-json';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import { terser } from 'rollup-plugin-terser';
 import typescript from '@rollup/plugin-typescript';
-import generatePackageJson from './rollup-write-package-plugin';
 import execute from 'rollup-plugin-shell';
 import polyfillNode from 'rollup-plugin-polyfill-node';
-import inject from '@rollup/plugin-inject';
 import replaceImports from 'rollup-plugin-replace-imports';
 import glob from 'glob';
 import commonjs from '@rollup/plugin-commonjs';
+import generatePackageJson from './rollup-write-package-plugin';
 
 if (typeof process.env.OUT_DIRECTORY === 'undefined') {
 	throw new Error('Environmental variable OUT_DIRECTORY is not set');

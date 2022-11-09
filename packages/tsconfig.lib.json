@@ -11,7 +11,7 @@
 		"allowSyntheticDefaultImports": true,
 		"skipLibCheck": true,
 		"declaration": false,
-		"incremental": true
+		"incremental": false
 	},
 	"include": ["**/*.ts", "jest.config.cjs"],
 	"exclude": ["jest.config.cjs", "**/*.test.ts"]
