@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createMailPayloads create correct payload for blinded recipients of the message: blinded jane 1`] = `
-Object {
-  "Content": Object {
-    "data": Array [
+{
+  "Content": {
+    "data": [
       99,
       111,
       110,
@@ -34,7 +34,7 @@ Object {
     ],
     "type": "Buffer",
   },
-  "Headers": Object {
+  "Headers": {
     "ContentEncoding": "base64/plain",
     "ContentEncryption": "nacl-secret-key",
     "ContentLength": 27,
@@ -148,9 +148,9 @@ Object {
 `;
 
 exports[`createMailPayloads create correct payload for blinded recipients of the message: blinded maria 1`] = `
-Object {
-  "Content": Object {
-    "data": Array [
+{
+  "Content": {
+    "data": [
       99,
       111,
       110,
@@ -182,7 +182,7 @@ Object {
     ],
     "type": "Buffer",
   },
-  "Headers": Object {
+  "Headers": {
     "ContentEncoding": "base64/plain",
     "ContentEncryption": "nacl-secret-key",
     "ContentLength": 28,
@@ -296,9 +296,9 @@ Object {
 `;
 
 exports[`createMailPayloads create correct payload for sender of the message: original 1`] = `
-Object {
-  "Content": Object {
-    "data": Array [
+{
+  "Content": {
+    "data": [
       111,
       114,
       105,
@@ -310,7 +310,7 @@ Object {
     ],
     "type": "Buffer",
   },
-  "Headers": Object {
+  "Headers": {
     "ContentEncoding": "base64/plain",
     "ContentEncryption": "nacl-secret-key",
     "ContentLength": 8,
@@ -424,9 +424,9 @@ Object {
 `;
 
 exports[`createMailPayloads create correct payload for visible recipients of the message: visible 1`] = `
-Object {
-  "Content": Object {
-    "data": Array [
+{
+  "Content": {
+    "data": [
       118,
       105,
       115,
@@ -437,7 +437,7 @@ Object {
     ],
     "type": "Buffer",
   },
-  "Headers": Object {
+  "Headers": {
     "ContentEncoding": "base64/plain",
     "ContentEncryption": "nacl-secret-key",
     "ContentLength": 7,

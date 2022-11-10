@@ -1,4 +1,4 @@
-import { testRandomFunction } from '@mailchain/crypto/rand.test.const';
+import { testRandomFunction as mockRandomFunction } from '@mailchain/crypto/rand.test.const';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
@@ -43,7 +43,7 @@ const payload: Payload = {
 	]),
 };
 
-jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params) => testRandomFunction(...params) }));
+jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params) => mockRandomFunction(...params) }));
 
 const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
 	ED25519PrivateKey.fromSecretKey(

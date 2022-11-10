@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`keyring should assert against previous snapshot outputs from alice keyring: accountIdentityKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "publicKey": ED25519PublicKey {
     "bytes": Uint8Array [
@@ -114,7 +114,7 @@ Uint8Array [
 `;
 
 exports[`keyring should assert against previous snapshot outputs from alice keyring: accountMessagingKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
@@ -161,7 +161,7 @@ Object {
 exports[`keyring should assert against previous snapshot outputs from alice keyring: accountMessagingKey 2`] = `Promise {}`;
 
 exports[`keyring should assert against previous snapshot outputs from alice keyring: addressMessagingKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
@@ -314,7 +314,7 @@ ED25519PrivateKey {
     14,
   ],
   "curve": "ed25519",
-  "keyPair": Object {
+  "keyPair": {
     "publicKey": Uint8Array [
       94,
       48,
@@ -457,7 +457,7 @@ ED25519PrivateKey {
 `;
 
 exports[`keyring should assert against previous snapshot outputs from bob keyring: accountIdentityKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "publicKey": ED25519PublicKey {
     "bytes": Uint8Array [
@@ -570,7 +570,7 @@ Uint8Array [
 `;
 
 exports[`keyring should assert against previous snapshot outputs from bob keyring: accountMessagingKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
@@ -617,7 +617,7 @@ Object {
 exports[`keyring should assert against previous snapshot outputs from bob keyring: accountMessagingKey 2`] = `Promise {}`;
 
 exports[`keyring should assert against previous snapshot outputs from bob keyring: addressMessagingKey 1`] = `
-Object {
+{
   "curve": "ed25519",
   "ecdhDecrypt": [Function],
   "publicKey": ED25519PublicKey {
@@ -770,7 +770,7 @@ ED25519PrivateKey {
     198,
   ],
   "curve": "ed25519",
-  "keyPair": Object {
+  "keyPair": {
     "publicKey": Uint8Array [
       248,
       58,

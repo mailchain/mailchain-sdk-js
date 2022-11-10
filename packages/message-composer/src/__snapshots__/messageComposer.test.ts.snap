@@ -6,36 +6,36 @@ Date: Sun, 28 Aug 2022 00:00:00 +0000
 Message-ID: 47bdaf40-c3da-49f7-bfc7-66337f35c6c1@mailchain.com
 Subject: =?UTF-8?B?U3ViamVjdCBjYW4gY29udGFpbiBVVEYtOCBjaGFycyBpbmNsdWRpbmcgZW1vamlz?=
 	=?UTF-8?B?IPCfmIk=?=
-From: \\"Bob\\" <bob@mailchain.com>
-Reply-To: \\"Robert\\" <robert@mailchain.com>
-To: \\"Alice\\" <alice@mailchain.com>
-Cc: \\"Joe Doe\\" <joe@mailchain.com>
-Bcc: \\"Jane Doe\\" <jane@mailchain.com>,
- \\"Bob\\" <bob@mailchain.com>
-X-IdentityKeys: alice@mailchain.com=\\"0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain\\";
-	joe@mailchain.com=\\"0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain\\";
-	jane@mailchain.com=\\"0xed07f1a7c4261763f26814ac48e07f263a92cc07cf1ed9f47f48d829aaa3d45d:mailchain\\";
-	bob@mailchain.com=\\"0x13e451f1dc07eb5af675d14e5136d65c6573bc9114448a26d936973af00ba688:mailchain\\"
-Content-Type: multipart/mixed; boundary=\\"BAUG\\"
+From: "Bob" <bob@mailchain.com>
+Reply-To: "Robert" <robert@mailchain.com>
+To: "Alice" <alice@mailchain.com>
+Cc: "Joe Doe" <joe@mailchain.com>
+Bcc: "Jane Doe" <jane@mailchain.com>,
+ "Bob" <bob@mailchain.com>
+X-IdentityKeys: alice@mailchain.com="0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain";
+	joe@mailchain.com="0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain";
+	jane@mailchain.com="0xed07f1a7c4261763f26814ac48e07f263a92cc07cf1ed9f47f48d829aaa3d45d:mailchain";
+	bob@mailchain.com="0x13e451f1dc07eb5af675d14e5136d65c6573bc9114448a26d936973af00ba688:mailchain"
+Content-Type: multipart/mixed; boundary="BAUG"
 
 --BAUG
-Content-Type: multipart/alternative; boundary=\\"AQID\\"
+Content-Type: multipart/alternative; boundary="AQID"
 
 --AQID
-Content-Type: text/plain; charset=\\"UTF-8\\"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 UGxhaW50ZXh0IGNvbnRlbnQuIENhbiBhbHNvIGNvbnRhaW4gVVRGLTggYW5kIGVtb2ppcyDwn6SQ
 Lg==
 --AQID
-Content-Type: text/html; charset=\\"UTF-8\\"
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 VGhpcyBpcyDinKhyaWNoLXRleHTinKggSFRNTCA8Yj5jb250ZW50PC9iPi4=
 --AQID
 --BAUG
 Content-Type: image/png
-Content-Disposition: attachment; filename=\\"mailchain-logo.png\\"
+Content-Disposition: attachment; filename="mailchain-logo.png"
 Content-Transfer-Encoding: base64
 Content-ID: <bfcd3a31-646b-4dcd-a1ea-06d37baf7d2e>
 
@@ -204,32 +204,32 @@ Date: Sun, 28 Aug 2022 00:00:00 +0000
 Message-ID: 47bdaf40-c3da-49f7-bfc7-66337f35c6c1@mailchain.com
 Subject: =?UTF-8?B?U3ViamVjdCBjYW4gY29udGFpbiBVVEYtOCBjaGFycyBpbmNsdWRpbmcgZW1vamlz?=
 	=?UTF-8?B?IPCfmIk=?=
-From: \\"Bob\\" <bob@mailchain.com>
-Reply-To: \\"Robert\\" <robert@mailchain.com>
-To: \\"Alice\\" <alice@mailchain.com>
-Cc: \\"Joe Doe\\" <joe@mailchain.com>
-X-IdentityKeys: alice@mailchain.com=\\"0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain\\";
-	joe@mailchain.com=\\"0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain\\"
-Content-Type: multipart/mixed; boundary=\\"BAUG\\"
+From: "Bob" <bob@mailchain.com>
+Reply-To: "Robert" <robert@mailchain.com>
+To: "Alice" <alice@mailchain.com>
+Cc: "Joe Doe" <joe@mailchain.com>
+X-IdentityKeys: alice@mailchain.com="0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain";
+	joe@mailchain.com="0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain"
+Content-Type: multipart/mixed; boundary="BAUG"
 
 --BAUG
-Content-Type: multipart/alternative; boundary=\\"AQID\\"
+Content-Type: multipart/alternative; boundary="AQID"
 
 --AQID
-Content-Type: text/plain; charset=\\"UTF-8\\"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 UGxhaW50ZXh0IGNvbnRlbnQuIENhbiBhbHNvIGNvbnRhaW4gVVRGLTggYW5kIGVtb2ppcyDwn6SQ
 Lg==
 --AQID
-Content-Type: text/html; charset=\\"UTF-8\\"
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 VGhpcyBpcyDinKhyaWNoLXRleHTinKggSFRNTCA8Yj5jb250ZW50PC9iPi4=
 --AQID
 --BAUG
 Content-Type: image/png
-Content-Disposition: attachment; filename=\\"mailchain-logo.png\\"
+Content-Disposition: attachment; filename="mailchain-logo.png"
 Content-Transfer-Encoding: base64
 Content-ID: <bfcd3a31-646b-4dcd-a1ea-06d37baf7d2e>
 
@@ -393,9 +393,9 @@ Q3RR2B+VkFMAAACg8iil/h+ZqomqclbKEQAAAABJRU5ErkJggg==
 `;
 
 exports[`MailchainMessageComposer UTF8 should compose whole message with content and attachment 3`] = `
-Array [
-  Array [
-    Object {
+[
+  [
+    {
       "address": "jane@mailchain.com",
       "name": "Jane Doe",
     },
@@ -404,34 +404,34 @@ Date: Sun, 28 Aug 2022 00:00:00 +0000
 Message-ID: 47bdaf40-c3da-49f7-bfc7-66337f35c6c1@mailchain.com
 Subject: =?UTF-8?B?U3ViamVjdCBjYW4gY29udGFpbiBVVEYtOCBjaGFycyBpbmNsdWRpbmcgZW1vamlz?=
 	=?UTF-8?B?IPCfmIk=?=
-From: \\"Bob\\" <bob@mailchain.com>
-Reply-To: \\"Robert\\" <robert@mailchain.com>
-To: \\"Alice\\" <alice@mailchain.com>
-Cc: \\"Joe Doe\\" <joe@mailchain.com>
-Bcc: \\"Jane Doe\\" <jane@mailchain.com>
-X-IdentityKeys: alice@mailchain.com=\\"0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain\\";
-	joe@mailchain.com=\\"0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain\\";
-	jane@mailchain.com=\\"0xed07f1a7c4261763f26814ac48e07f263a92cc07cf1ed9f47f48d829aaa3d45d:mailchain\\"
-Content-Type: multipart/mixed; boundary=\\"BAUG\\"
+From: "Bob" <bob@mailchain.com>
+Reply-To: "Robert" <robert@mailchain.com>
+To: "Alice" <alice@mailchain.com>
+Cc: "Joe Doe" <joe@mailchain.com>
+Bcc: "Jane Doe" <jane@mailchain.com>
+X-IdentityKeys: alice@mailchain.com="0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain";
+	joe@mailchain.com="0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain";
+	jane@mailchain.com="0xed07f1a7c4261763f26814ac48e07f263a92cc07cf1ed9f47f48d829aaa3d45d:mailchain"
+Content-Type: multipart/mixed; boundary="BAUG"
 
 --BAUG
-Content-Type: multipart/alternative; boundary=\\"AQID\\"
+Content-Type: multipart/alternative; boundary="AQID"
 
 --AQID
-Content-Type: text/plain; charset=\\"UTF-8\\"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 UGxhaW50ZXh0IGNvbnRlbnQuIENhbiBhbHNvIGNvbnRhaW4gVVRGLTggYW5kIGVtb2ppcyDwn6SQ
 Lg==
 --AQID
-Content-Type: text/html; charset=\\"UTF-8\\"
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 VGhpcyBpcyDinKhyaWNoLXRleHTinKggSFRNTCA8Yj5jb250ZW50PC9iPi4=
 --AQID
 --BAUG
 Content-Type: image/png
-Content-Disposition: attachment; filename=\\"mailchain-logo.png\\"
+Content-Disposition: attachment; filename="mailchain-logo.png"
 Content-Transfer-Encoding: base64
 Content-ID: <bfcd3a31-646b-4dcd-a1ea-06d37baf7d2e>
 
@@ -593,8 +593,8 @@ I5krLGgkqz2LFlTUY3SOXDIAAAAgfZIUsyIsJS3uA9nk/0v/e134l16L1SbnVYObtuv90eDNe7XS
 Q3RR2B+VkFMAAACg8iil/h+ZqomqclbKEQAAAABJRU5ErkJggg==
 --BAUG",
   ],
-  Array [
-    Object {
+  [
+    {
       "address": "bob@mailchain.com",
       "name": "Bob",
     },
@@ -603,34 +603,34 @@ Date: Sun, 28 Aug 2022 00:00:00 +0000
 Message-ID: 47bdaf40-c3da-49f7-bfc7-66337f35c6c1@mailchain.com
 Subject: =?UTF-8?B?U3ViamVjdCBjYW4gY29udGFpbiBVVEYtOCBjaGFycyBpbmNsdWRpbmcgZW1vamlz?=
 	=?UTF-8?B?IPCfmIk=?=
-From: \\"Bob\\" <bob@mailchain.com>
-Reply-To: \\"Robert\\" <robert@mailchain.com>
-To: \\"Alice\\" <alice@mailchain.com>
-Cc: \\"Joe Doe\\" <joe@mailchain.com>
-Bcc: \\"Bob\\" <bob@mailchain.com>
-X-IdentityKeys: alice@mailchain.com=\\"0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain\\";
-	joe@mailchain.com=\\"0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain\\";
-	bob@mailchain.com=\\"0x13e451f1dc07eb5af675d14e5136d65c6573bc9114448a26d936973af00ba688:mailchain\\"
-Content-Type: multipart/mixed; boundary=\\"BAUG\\"
+From: "Bob" <bob@mailchain.com>
+Reply-To: "Robert" <robert@mailchain.com>
+To: "Alice" <alice@mailchain.com>
+Cc: "Joe Doe" <joe@mailchain.com>
+Bcc: "Bob" <bob@mailchain.com>
+X-IdentityKeys: alice@mailchain.com="0x74fcd5537c423eef7ae88bf1b4b8520d6180ca509e70ce8d2e9f04b1a225c6a6:mailchain";
+	joe@mailchain.com="0x3378957bdb1d09700d5e189eea9d913d0973d158bc2e3718ba5fb39261d08cfa:mailchain";
+	bob@mailchain.com="0x13e451f1dc07eb5af675d14e5136d65c6573bc9114448a26d936973af00ba688:mailchain"
+Content-Type: multipart/mixed; boundary="BAUG"
 
 --BAUG
-Content-Type: multipart/alternative; boundary=\\"AQID\\"
+Content-Type: multipart/alternative; boundary="AQID"
 
 --AQID
-Content-Type: text/plain; charset=\\"UTF-8\\"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 UGxhaW50ZXh0IGNvbnRlbnQuIENhbiBhbHNvIGNvbnRhaW4gVVRGLTggYW5kIGVtb2ppcyDwn6SQ
 Lg==
 --AQID
-Content-Type: text/html; charset=\\"UTF-8\\"
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: base64
 
 VGhpcyBpcyDinKhyaWNoLXRleHTinKggSFRNTCA8Yj5jb250ZW50PC9iPi4=
 --AQID
 --BAUG
 Content-Type: image/png
-Content-Disposition: attachment; filename=\\"mailchain-logo.png\\"
+Content-Disposition: attachment; filename="mailchain-logo.png"
 Content-Transfer-Encoding: base64
 Content-ID: <bfcd3a31-646b-4dcd-a1ea-06d37baf7d2e>
 

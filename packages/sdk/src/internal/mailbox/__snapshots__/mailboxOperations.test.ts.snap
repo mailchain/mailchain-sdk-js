@@ -3,7 +3,7 @@
 exports[`mailbox should decrypt full message body: fullMessageBody 1`] = `"<ul><li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li><li>Aliquam tincidunt mauris eu risus.</li><li>Vestibulum auctor dapibus neque.</li></ul>"`;
 
 exports[`mailbox should encrypt and post received message: hashedFrom 1`] = `
-Array [
+[
   97,
   108,
   105,
@@ -28,7 +28,7 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: hashedFrom 2`] = `
-Array [
+[
   97,
   108,
   105,
@@ -53,7 +53,7 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: hashedOwner 1`] = `
-Array [
+[
   98,
   111,
   98,
@@ -76,7 +76,7 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: hashedOwner 2`] = `
-Array [
+[
   48,
   120,
   57,
@@ -147,8 +147,8 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: hashedTo 1`] = `
-Array [
-  Array [
+[
+  [
     98,
     111,
     98,
@@ -168,7 +168,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     98,
     111,
     98,
@@ -188,7 +188,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -256,7 +256,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -324,7 +324,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,
@@ -348,7 +348,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,
@@ -376,8 +376,8 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: hashedTo 2`] = `
-Array [
-  Array [
+[
+  [
     98,
     111,
     98,
@@ -397,7 +397,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     98,
     111,
     98,
@@ -417,7 +417,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -485,7 +485,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -553,7 +553,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,
@@ -577,7 +577,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,
@@ -605,12 +605,12 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post received message: message id 0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test 1`] = `
-Object {
-  "bcc": Array [
+{
+  "bcc": [
     "jane@mailchain.test",
     "maria@mailchain.test",
   ],
-  "cc": Array [
+  "cc": [
     "0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test",
     "john@mailchain.test",
   ],
@@ -659,12 +659,12 @@ Object {
   "owner": "0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test",
   "snippet": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
   "subject": "💌 Dummy MailData subject 😉",
-  "systemLabels": Array [
+  "systemLabels": [
     "unread",
     "inbox",
   ],
   "timestamp": 2022-06-14T00:00:00.000Z,
-  "to": Array [
+  "to": [
     "bob@mailchain.test",
     "0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test",
     "tim@eth.mailchain.test",
@@ -673,12 +673,12 @@ Object {
 `;
 
 exports[`mailbox should encrypt and post received message: message id bob@mailchain.test 1`] = `
-Object {
-  "bcc": Array [
+{
+  "bcc": [
     "jane@mailchain.test",
     "maria@mailchain.test",
   ],
-  "cc": Array [
+  "cc": [
     "0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test",
     "john@mailchain.test",
   ],
@@ -727,12 +727,12 @@ Object {
   "owner": "bob@mailchain.test",
   "snippet": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
   "subject": "💌 Dummy MailData subject 😉",
-  "systemLabels": Array [
+  "systemLabels": [
     "unread",
     "inbox",
   ],
   "timestamp": 2022-06-14T00:00:00.000Z,
-  "to": Array [
+  "to": [
     "bob@mailchain.test",
     "0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test",
     "tim@eth.mailchain.test",
@@ -741,7 +741,7 @@ Object {
 `;
 
 exports[`mailbox should encrypt and post sent message: hashedFrom 1`] = `
-Array [
+[
   97,
   108,
   105,
@@ -766,7 +766,7 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post sent message: hashedOwner 1`] = `
-Array [
+[
   97,
   108,
   105,
@@ -791,8 +791,8 @@ Array [
 `;
 
 exports[`mailbox should encrypt and post sent message: hashedTo 1`] = `
-Array [
-  Array [
+[
+  [
     98,
     111,
     98,
@@ -812,7 +812,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     98,
     111,
     98,
@@ -832,7 +832,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -900,7 +900,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     48,
     120,
     100,
@@ -968,7 +968,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,
@@ -992,7 +992,7 @@ Array [
     115,
     116,
   ],
-  Array [
+  [
     116,
     105,
     109,

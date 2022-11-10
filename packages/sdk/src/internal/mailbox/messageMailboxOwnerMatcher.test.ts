@@ -5,9 +5,12 @@ import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
 import { AddressIdentityKeyResolver } from './addressIdentityKeyResolver';
 import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 
-const messageHeaderResolver = jest.fn<ReturnType<AddressIdentityKeyResolver>, Parameters<AddressIdentityKeyResolver>>();
+const mockMessageHeaderResolver = jest.fn<
+	ReturnType<AddressIdentityKeyResolver>,
+	Parameters<AddressIdentityKeyResolver>
+>();
 jest.mock('./addressIdentityKeyResolver', () => ({
-	createMessageHeaderIdentityKeyResolver: () => messageHeaderResolver,
+	createMessageHeaderIdentityKeyResolver: () => mockMessageHeaderResolver,
 }));
 
 describe('MessageMailboxOwnerMatcher', () => {
@@ -58,7 +61,7 @@ describe('MessageMailboxOwnerMatcher', () => {
 
 	it('should match additional withMessageIdentityKeys', async () => {
 		const newMatcher = ownerMatcher.withMessageIdentityKeys(new Map());
-		messageHeaderResolver.mockImplementation(async (address) => {
+		mockMessageHeaderResolver.mockImplementation(async (address) => {
 			if (formatAddress(address, 'mail') === dummyMailData.recipients[0].address)
 				return { identityKey: AliceAccountMailbox.identityKey, protocol: MAILCHAIN };
 			if (formatAddress(address, 'mail') === dummyMailData.recipients[1].address)
@@ -87,7 +90,7 @@ describe('MessageMailboxOwnerMatcher', () => {
 				matchBy: 'mailchain-api',
 			},
 		]);
-		expect(messageHeaderResolver).toHaveBeenCalledTimes(7);
+		expect(mockMessageHeaderResolver).toHaveBeenCalledTimes(7);
 		expect(apiResolver1).toHaveBeenCalledTimes(5);
 		expect(apiResolver2).toHaveBeenCalledTimes(4);
 	});

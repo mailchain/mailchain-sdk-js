@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`contentHandler buildContentPart should build buffer of bytes 1`] = `
-"Label: value; attrName=\\"attrValue\\"
+"Label: value; attrName="attrValue"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -20,7 +20,7 @@ dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4="
 `;
 
 exports[`contentHandler buildContentPart should build pre-encoded base64 content 1`] = `
-"Label1: value1; attrKey1=\\"attrValue1\\"
+"Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -40,7 +40,7 @@ dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4="
 
 exports[`contentHandler buildContentParts should build multiple parts with boundary 1`] = `
 "--AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -57,7 +57,7 @@ ZWxsdXMgYXQgdXJuYSBjb25kaW1lbnR1bSBtYXR0aXMgcGVsbGVudGVzcXVlLiBBbWV0IG1hdXJp
 cyBjb21tb2RvIHF1aXMgaW1wZXJkaWV0IG1hc3NhIHRpbmNpZHVudCBudW5jLiBWaXRhZSBjb25n
 dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 --AQID
-Label2: Value2; atrrKey2=\\"attrValue2\\"
+Label2: Value2; atrrKey2="attrValue2"
 
 TmVxdWUgc29kYWxlcyB1dCBldGlhbSBzaXQuIEV0IGVnZXN0YXMgcXVpcyBpcHN1bSBzdXNwZW5k
 aXNzZS4gU2NlbGVyaXNxdWUgZmVsaXMgaW1wZXJkaWV0IHByb2luIGZlcm1lbnR1bSBsZW8uIE5l
@@ -75,7 +75,7 @@ ZGlhbSB2dWxwdXRhdGUgdXQgcGhhcmV0cmEu
 
 exports[`contentHandler buildContentParts should build single part with boundary 1`] = `
 "--AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -95,7 +95,7 @@ dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 `;
 
 exports[`contentHandler buildContentParts should build single part without boundary 1`] = `
-"Label1: value1; attrKey1=\\"attrValue1\\"
+"Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -115,7 +115,7 @@ dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4="
 
 exports[`contentHandler buildMessageAndAttachments should build just message with alternative content 1`] = `
 "--AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -132,7 +132,7 @@ ZWxsdXMgYXQgdXJuYSBjb25kaW1lbnR1bSBtYXR0aXMgcGVsbGVudGVzcXVlLiBBbWV0IG1hdXJp
 cyBjb21tb2RvIHF1aXMgaW1wZXJkaWV0IG1hc3NhIHRpbmNpZHVudCBudW5jLiBWaXRhZSBjb25n
 dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 --AQID
-Label2: Value2; atrrKey2=\\"attrValue2\\"
+Label2: Value2; atrrKey2="attrValue2"
 
 TmVxdWUgc29kYWxlcyB1dCBldGlhbSBzaXQuIEV0IGVnZXN0YXMgcXVpcyBpcHN1bSBzdXNwZW5k
 aXNzZS4gU2NlbGVyaXNxdWUgZmVsaXMgaW1wZXJkaWV0IHByb2luIGZlcm1lbnR1bSBsZW8uIE5l
@@ -149,7 +149,7 @@ ZGlhbSB2dWxwdXRhdGUgdXQgcGhhcmV0cmEu
 `;
 
 exports[`contentHandler buildMessageAndAttachments should build just single message part without boundary 1`] = `
-"Label1: value1; attrKey1=\\"attrValue1\\"
+"Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -169,10 +169,10 @@ dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4="
 
 exports[`contentHandler buildMessageAndAttachments should build message and attachment with alternative content 1`] = `
 "--BAUG
-Content-Type: multipart/alternative; boundary=\\"AQID\\"
+Content-Type: multipart/alternative; boundary="AQID"
 
 --AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -189,7 +189,7 @@ ZWxsdXMgYXQgdXJuYSBjb25kaW1lbnR1bSBtYXR0aXMgcGVsbGVudGVzcXVlLiBBbWV0IG1hdXJp
 cyBjb21tb2RvIHF1aXMgaW1wZXJkaWV0IG1hc3NhIHRpbmNpZHVudCBudW5jLiBWaXRhZSBjb25n
 dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 --AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -207,7 +207,7 @@ cyBjb21tb2RvIHF1aXMgaW1wZXJkaWV0IG1hc3NhIHRpbmNpZHVudCBudW5jLiBWaXRhZSBjb25n
 dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 --AQID
 --BAUG
-Label2: Value2; atrrKey2=\\"attrValue2\\"
+Label2: Value2; atrrKey2="attrValue2"
 
 TmVxdWUgc29kYWxlcyB1dCBldGlhbSBzaXQuIEV0IGVnZXN0YXMgcXVpcyBpcHN1bSBzdXNwZW5k
 aXNzZS4gU2NlbGVyaXNxdWUgZmVsaXMgaW1wZXJkaWV0IHByb2luIGZlcm1lbnR1bSBsZW8uIE5l
@@ -225,7 +225,7 @@ ZGlhbSB2dWxwdXRhdGUgdXQgcGhhcmV0cmEu
 
 exports[`contentHandler buildMessageAndAttachments should build message and attachment without alternative content 1`] = `
 "--AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu
@@ -242,7 +242,7 @@ ZWxsdXMgYXQgdXJuYSBjb25kaW1lbnR1bSBtYXR0aXMgcGVsbGVudGVzcXVlLiBBbWV0IG1hdXJp
 cyBjb21tb2RvIHF1aXMgaW1wZXJkaWV0IG1hc3NhIHRpbmNpZHVudCBudW5jLiBWaXRhZSBjb25n
 dWUgbWF1cmlzIHJob25jdXMgYWVuZWFuIHZlbCBlbGl0IHNjZWxlcmlzcXVlIG1hdXJpcy4=
 --AQID
-Label1: value1; attrKey1=\\"attrValue1\\"
+Label1: value1; attrKey1="attrValue1"
 
 TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdCwg
 c2VkIGRvIGVpdXNtb2QgdGVtcG9yIGluY2lkaWR1bnQgdXQgbGFib3JlIGV0IGRvbG9yZSBtYWdu

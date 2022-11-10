@@ -38,6 +38,6 @@
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
 		"axios-mock-adapter": "^1.21.1",
-		"jest-mock-extended": "^2.0.7"
+		"jest-mock-extended": "^3.0.1"
 	}
 }

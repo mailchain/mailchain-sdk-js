@@ -44,8 +44,8 @@ Uint8Array [
 
 exports[`addressHasher should create unique 128bit hash of addresses: differentIdentityKey 1`] = `
 Map {
-  "0x1234@mailchain.com" => Array [
-    Object {
+  "0x1234@mailchain.com" => [
+    {
       "hash": Uint8Array [
         33,
         252,
@@ -66,7 +66,7 @@ Map {
       ],
       "type": "identity-key",
     },
-    Object {
+    {
       "hash": Uint8Array [
         72,
         19,
@@ -93,8 +93,8 @@ Map {
 
 exports[`addressHasher should create unique 128bit hash of addresses: differentProtocol 1`] = `
 Map {
-  "0x1234@mailchain.com" => Array [
-    Object {
+  "0x1234@mailchain.com" => [
+    {
       "hash": Uint8Array [
         44,
         148,
@@ -115,7 +115,7 @@ Map {
       ],
       "type": "identity-key",
     },
-    Object {
+    {
       "hash": Uint8Array [
         72,
         19,
@@ -142,8 +142,8 @@ Map {
 
 exports[`addressHasher should create unique 128bit hash of addresses: firstRes 1`] = `
 Map {
-  "0x1234@mailchain.com" => Array [
-    Object {
+  "0x1234@mailchain.com" => [
+    {
       "hash": Uint8Array [
         162,
         207,
@@ -164,7 +164,7 @@ Map {
       ],
       "type": "identity-key",
     },
-    Object {
+    {
       "hash": Uint8Array [
         72,
         19,
