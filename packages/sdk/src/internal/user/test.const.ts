@@ -6,7 +6,7 @@ import {
 	AliceSECP256K1PublicAddressStr,
 	BobSECP256K1PublicAddress,
 	BobSECP256K1PublicAddressStr,
-} from '../ethereum/test.const';
+} from '@mailchain/addressing/protocols/ethereum/test.const';
 import { UserMailbox } from './types';
 import { createMailboxAlias } from './createAlias';
 

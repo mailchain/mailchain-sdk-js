@@ -9,6 +9,8 @@
 	},
 	"version": "0.8.0",
 	"dependencies": {
+		"@ethersproject/transactions": "^5.7.0",
+		"@mailchain/crypto": "0.7.5",
 		"@mailchain/encoding": "0.8.0"
 	},
 	"scripts": {

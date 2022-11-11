@@ -12,7 +12,6 @@
 	"dependencies": {
 		"@cloudflare/opaque-ts": "^0.7.5",
 		"@ethersproject/hash": "5.7.0",
-		"@ethersproject/transactions": "^5.7.0",
 		"@mailchain/addressing": "0.8.0",
 		"@mailchain/crypto": "0.8.0",
 		"@mailchain/encoding": "0.8.0",

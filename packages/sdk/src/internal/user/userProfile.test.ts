@@ -4,6 +4,10 @@ import { ED25519PublicKey, encodePublicKey, secureRandom } from '@mailchain/cryp
 import { AxiosResponse } from 'axios';
 import { formatAddress } from '@mailchain/addressing';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
+import {
+	AliceSECP256K1PublicAddressStr,
+	BobSECP256K1PublicAddressStr,
+} from '@mailchain/addressing/protocols/ethereum/test.const';
 import { user } from '../protobuf/user/user';
 import {
 	GetUserMailboxesResponseBody,
@@ -12,7 +16,6 @@ import {
 	UserApiInterface,
 } from '../api';
 import { nopMigration } from '../migration';
-import { AliceSECP256K1PublicAddressStr, BobSECP256K1PublicAddressStr } from '../ethereum/test.const';
 import { MailchainUserProfile, UserProfile } from './userProfile';
 import { UserMailboxMigrationRule } from './migrations';
 import { AliceAccountMailbox, AliceWalletMailbox, BobWalletMailbox } from './test.const';

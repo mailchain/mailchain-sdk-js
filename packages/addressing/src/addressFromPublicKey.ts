@@ -1,6 +1,6 @@
-import { ETHEREUM, ProtocolType } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
-import { addressFromPublicKey as ethereumAddressFromPublicKey } from '../ethereum/address';
+import { ETHEREUM, ProtocolType } from './protocols';
+import { addressFromPublicKey as ethereumAddressFromPublicKey } from './protocols/ethereum/address';
 
 /**
  * Derive the address corresponding to the {@link PublicKey}.

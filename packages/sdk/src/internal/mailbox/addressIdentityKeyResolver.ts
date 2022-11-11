@@ -1,7 +1,12 @@
-import { decodeAddressByProtocol, formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import {
+	decodeAddressByProtocol,
+	formatAddress,
+	MailchainAddress,
+	ProtocolType,
+	addressFromPublicKey,
+} from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
 import isEqual from 'lodash/isEqual';
-import { addressFromPublicKey } from '../address/addressFromPublicKey';
 import { ParseMimeTextResult } from '../formatters/parse';
 import { IdentityKeys } from '../identityKeys';
 

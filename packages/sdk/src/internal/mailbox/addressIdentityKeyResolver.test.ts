@@ -1,6 +1,9 @@
 import { createNameServiceAddress, createWalletAddress, ETHEREUM, formatAddress } from '@mailchain/addressing';
 import { AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSECP256K1PublicAddressStr, BobSECP256K1PublicAddressStr } from '../ethereum/test.const';
+import {
+	AliceSECP256K1PublicAddressStr,
+	BobSECP256K1PublicAddressStr,
+} from '@mailchain/addressing/protocols/ethereum/test.const';
 import { createMessageHeaderIdentityKeyResolver } from './addressIdentityKeyResolver';
 
 describe('MessageHeaderIdentityKeyResolver', () => {

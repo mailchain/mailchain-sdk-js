@@ -1,7 +1,7 @@
 import { SECP256K1PublicKey } from '@mailchain/crypto';
 import { encodeHex } from '@mailchain/encoding';
 import isEqual from 'lodash/isEqual';
-import { addressFromPublicKey } from './address';
+import { ETHEREUM, addressFromPublicKey } from '@mailchain/addressing';
 
 /**
  * Gets the public key from signature and compares it to the expected address to validate it's correct.
@@ -18,7 +18,7 @@ export async function publicKeyFromSignature(
 ): Promise<SECP256K1PublicKey> {
 	const publicKey = await SECP256K1PublicKey.fromSignature(message, signature);
 
-	const address = await addressFromPublicKey(publicKey);
+	const address = await addressFromPublicKey(publicKey, ETHEREUM);
 
 	if (!isEqual(address, expectedAddress)) {
 		throw new Error(

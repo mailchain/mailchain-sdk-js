@@ -1,6 +1,9 @@
 import { AliceSECP256K1PrivateKey, AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSECP256K1PublicAddress, BobSECP256K1PublicAddress } from './test.const';
-import { publicKeyFromSignature } from './publicKey';
+import {
+	AliceSECP256K1PublicAddress,
+	BobSECP256K1PublicAddress,
+} from '@mailchain/addressing/protocols/ethereum/test.const';
+import { publicKeyFromSignature } from './signatures';
 describe('publicKey', () => {
 	it('should extract public key from signature', async () => {
 		const msg = Uint8Array.from([1, 2, 3, 4, 5]);

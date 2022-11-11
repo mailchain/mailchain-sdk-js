@@ -1,6 +1,9 @@
 import { encodePublicKey } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { AliceSECP256K1PublicAddress, AliceSECP256K1PublicAddressStr } from '../ethereum/test.const';
+import {
+	AliceSECP256K1PublicAddress,
+	AliceSECP256K1PublicAddressStr,
+} from '@mailchain/addressing/protocols/ethereum/test.const';
 import { user } from '../protobuf/user/user';
 import { IdentityKeys } from '../identityKeys';
 import { Nameservices } from '../nameservices';
