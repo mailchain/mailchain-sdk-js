@@ -23,6 +23,7 @@
 		"email-addresses": "5.0.0",
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
+		"protobufjs": "7.1.1",
 		"secp256k1": "^4.0.2"
 	},
 	"engines": {

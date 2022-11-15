@@ -28,7 +28,7 @@ const createConfig = (build, options) => {
 		minified = false,
 		input = [],
 		plugins = [],
-		preserveModules = false,
+		preserveModules = true,
 	} = build;
 
 	const { pkg, extensions = ['.js', '.ts', '.cjs'], globals = {} } = options;
@@ -53,6 +53,7 @@ const createConfig = (build, options) => {
 			preserveModules,
 			sourcemap: false,
 			globals,
+			exports: 'named',
 		},
 		external,
 		treeshake: {
@@ -72,6 +73,7 @@ const createConfig = (build, options) => {
 			typescript({
 				tsconfig: './tsconfig.json',
 				outDir: dir,
+				sourceMap: false,
 			}),
 
 			...plugins,
@@ -79,10 +81,10 @@ const createConfig = (build, options) => {
 		],
 		onwarn(warning, rollupWarn) {
 			rollupWarn(warning);
-			// if (!bundle && warning.code === 'CIRCULAR_DEPENDENCY') {
-			// 	const msg = 'Please eliminate the circular dependencies listed above and retry the build';
-			// 	throw new Error(msg);
-			// }
+			if (!bundle && warning.code === 'CIRCULAR_DEPENDENCY') {
+				const msg = 'Please eliminate the circular dependencies listed above and retry the build';
+				throw new Error(msg);
+			}
 		},
 	};
 };
@@ -169,6 +171,7 @@ export const getBundlingConfigs = (name, pkg, options = {}) => [
 				declaration: true,
 				declarationDir: `${outDir}/packages/${name}/types`,
 				noEmit: true,
+				sourceMap: false,
 			}),
 			execute({
 				commands: [
