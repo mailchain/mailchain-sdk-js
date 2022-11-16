@@ -17,7 +17,7 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@polkadot/util-crypto": "^10.1.11"
+		"@polkadot/util-crypto": "10.1.11"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
