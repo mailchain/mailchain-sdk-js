@@ -175,6 +175,7 @@ export const getBundlingConfigs = (name, pkg, options = {}) => [
 			}),
 			execute({
 				commands: [
+					`cp ./Readme.md ${outDir}/packages/${name}/Readme.md`,
 					`rm -rf ${outDir}/packages/${name}/types/*.js`,
 					`mv ${outDir}/packages/${name}/types/packages/${name}/src/* ${outDir}/packages/${name}/types`,
 					`rm -rf ${outDir}/packages/${name}/types/packages`,
