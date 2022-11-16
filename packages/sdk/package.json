@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/sdk",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"description": "Mailchain sdk for sending messages to web3 addresses",
 	"license": "Apache-2.0",
 	"author": {
@@ -20,11 +20,11 @@
 	"dependencies": {
 		"@cloudflare/opaque-ts": "^0.7.5",
 		"@ethersproject/hash": "5.7.0",
-		"@mailchain/addressing": "0.9.0",
-		"@mailchain/crypto": "0.9.0",
-		"@mailchain/encoding": "0.9.0",
-		"@mailchain/keyring": "0.9.0",
-		"@mailchain/message-composer": "0.9.0",
+		"@mailchain/addressing": "0.9.1",
+		"@mailchain/crypto": "0.9.1",
+		"@mailchain/encoding": "0.9.1",
+		"@mailchain/keyring": "0.9.1",
+		"@mailchain/message-composer": "0.9.1",
 		"@noble/hashes": "^1.0.0",
 		"@types/secp256k1": "^4.0.2",
 		"axios": "^0.26.1",
