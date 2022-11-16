@@ -1,5 +1,6 @@
 {
 	"name": "@mailchain/addressing",
+	"version": "0.9.0",
 	"description": "Mailchain addressing",
 	"license": "Apache-2.0",
 	"author": {
@@ -7,7 +8,14 @@
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
-	"version": "0.9.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "addressing"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
 	"dependencies": {
 		"@ethersproject/transactions": "^5.7.0",
 		"@mailchain/crypto": "0.9.0",

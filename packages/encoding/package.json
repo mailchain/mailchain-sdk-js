@@ -1,5 +1,6 @@
 {
 	"name": "@mailchain/encoding",
+	"version": "0.9.0",
 	"description": "Mailchain encoding tools",
 	"license": "Apache-2.0",
 	"author": {
@@ -7,7 +8,14 @@
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
-	"version": "0.9.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "encoding"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
 	"dependencies": {
 		"@polkadot/util-crypto": "^10.1.11"
 	},

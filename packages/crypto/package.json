@@ -1,7 +1,7 @@
 {
 	"name": "@mailchain/crypto",
-	"license": "Apache-2.0",
 	"version": "0.9.0",
+	"license": "Apache-2.0",
 	"dependencies": {
 		"@ethersproject/hash": "5.7.0",
 		"@ethersproject/signing-key": "5.6.2",
@@ -17,6 +17,14 @@
 	"devDependencies": {
 		"@types/elliptic": "^6.4.14",
 		"@types/secp256k1": "^4.0.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "crypto"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"engines": {
 		"node": ">=15.0.0"

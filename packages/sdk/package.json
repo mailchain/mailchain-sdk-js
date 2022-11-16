@@ -1,14 +1,22 @@
 {
 	"name": "@mailchain/sdk",
-	"description": "Mailchain sdk",
+	"version": "0.9.0",
+	"description": "Mailchain sdk for sending messages to web3 addresses",
 	"license": "Apache-2.0",
 	"author": {
 		"name": "Mailchain",
 		"email": "support@mailchain.co",
 		"url": "https://mailchain.com/"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "sdk"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
 	"homepage": "https://docs.mailchain.com/developer",
-	"version": "0.9.0",
 	"dependencies": {
 		"@cloudflare/opaque-ts": "^0.7.5",
 		"@ethersproject/hash": "5.7.0",
