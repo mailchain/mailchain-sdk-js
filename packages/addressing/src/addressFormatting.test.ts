@@ -28,19 +28,34 @@ const testCases: { address: MailchainAddress; expectedMail: string; expectedHuma
 		expectedHuman: 'account@mailchain',
 	},
 	{
-		address: createNameServiceAddress('alice.eth', 'mailchain.test'),
-		expectedMail: 'alice.eth@mailchain.test',
+		address: createNameServiceAddress('alice.eth', 'ens.mailchain.test'),
+		expectedMail: 'alice.eth@ens.mailchain.test',
 		expectedHuman: 'alice.eth',
 	},
 	{
-		address: createNameServiceAddress('alice', 'eth.mailchain.test'),
-		expectedMail: 'alice@eth.mailchain.test',
-		expectedHuman: 'alice@eth',
+		address: createNameServiceAddress('alice.eth', 'ens.ethereum.mailchain.test'),
+		expectedMail: 'alice.eth@ens.ethereum.mailchain.test',
+		expectedHuman: 'alice.eth',
 	},
 	{
-		address: createNameServiceAddress('billing.alice', 'eth.ethereum.mailchain.test'),
-		expectedMail: 'billing.alice@eth.ethereum.mailchain.test',
-		expectedHuman: 'billing.alice@eth.ethereum',
+		address: createNameServiceAddress('billing.alice.eth', 'ens.mailchain.test'),
+		expectedMail: 'billing.alice.eth@ens.mailchain.test',
+		expectedHuman: 'billing.alice.eth',
+	},
+	{
+		address: createNameServiceAddress('alice.crypto', 'unstoppable.mailchain.test'),
+		expectedMail: 'alice.crypto@unstoppable.mailchain.test',
+		expectedHuman: 'alice.crypto',
+	},
+	{
+		address: createNameServiceAddress('alice.bitcoin', 'unstoppable.mailchain.test'),
+		expectedMail: 'alice.bitcoin@unstoppable.mailchain.test',
+		expectedHuman: 'alice.bitcoin@unstoppable',
+	},
+	{
+		address: createNameServiceAddress('alice.bitcoin', 'unstoppable.ethereum.mailchain.test'),
+		expectedMail: 'alice.bitcoin@unstoppable.ethereum.mailchain.test',
+		expectedHuman: 'alice.bitcoin@unstoppable.ethereum',
 	},
 ];
 

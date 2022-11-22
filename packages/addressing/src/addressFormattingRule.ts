@@ -2,6 +2,8 @@ import { isEthereumAddress, isMailchainAccountAddress } from './addressPredicate
 import { decodeAddressByProtocol } from './encoding';
 import { formatMailLike } from './formatMailLike';
 import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
+import { matchesNameservice } from './nameservices/matchesNameservice';
+import { NAMESERVICE_DESCRIPTIONS } from './nameservices/nameserviceDescriptions';
 import { parseWalletAddress } from './parseWalletAddress';
 import { ETHEREUM } from './protocols';
 
@@ -45,15 +47,16 @@ const humanWalletAddress: NameServiceAddressFormatter = (address) => {
 };
 
 /**
- * - `alice.eth@mailchain.dom` into `alice.eth`
- * - `alice@eth.mailchain.dom` into `alice@eth`
+ * Address with matching NS description `alice.eth@ens.mailchain.com` into `alice.eth`
  */
-const humanEnsAddress: NameServiceAddressFormatter = (address) => {
-	const domainParts = address.domain.split('.');
-	if (domainParts.length >= 2) {
-		const domainPartsToInclude = domainParts.slice(0, domainParts.length - 2); // drop the last two
-		return formatMailLike(address.username, ...domainPartsToInclude);
+const humanNsAddress: NameServiceAddressFormatter = (address) => {
+	for (const desc of NAMESERVICE_DESCRIPTIONS) {
+		const matchingNsDomain = matchesNameservice(address, desc);
+		if (matchingNsDomain) {
+			return address.username;
+		}
 	}
+
 	return undefined;
 };
 
@@ -63,7 +66,7 @@ const humanCatchAll: NameServiceAddressFormatter = (address) => {
 	if (domainParts.length === 2) {
 		return formatMailLike(address.username, domainParts[0]);
 	} else if (domainParts.length > 2) {
-		const domainPartsToInclude = domainParts.slice(0, domainParts.length - 2); // drop the last two
+		const domainPartsToInclude = domainParts.slice(0, -2); // drop the last two
 		return formatMailLike(address.username, ...domainPartsToInclude);
 	}
 	return formatMailLike(address.username, address.domain);
@@ -72,6 +75,6 @@ const humanCatchAll: NameServiceAddressFormatter = (address) => {
 export const humanNameServiceFormatters = [
 	humanMailchainAccount,
 	humanWalletAddress,
-	humanEnsAddress,
+	humanNsAddress,
 	humanCatchAll,
 ] as const;
