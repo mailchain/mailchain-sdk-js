@@ -9,7 +9,7 @@ import { AliceWalletMailbox, BobWalletMailbox } from '../user/test.const';
 import { Nameservices } from './nameservices';
 
 describe('Nameservices', () => {
-	const aliceNs = createNameServiceAddress('alice.eth', 'mailchain.test');
+	const aliceNs = createNameServiceAddress('alice.eth', 'ens', 'mailchain.test');
 	let identityKeysApi: MockProxy<IdentityKeysApiInterface>;
 	let identityKeysService: MockProxy<IdentityKeys>;
 	let nameservices: Nameservices;
@@ -17,7 +17,7 @@ describe('Nameservices', () => {
 	beforeEach(() => {
 		identityKeysApi = mock();
 		identityKeysService = mock();
-		nameservices = new Nameservices(identityKeysApi, identityKeysService);
+		nameservices = new Nameservices(identityKeysApi, identityKeysService, 'mailchain.test');
 	});
 
 	it('should reverse resolve names by identity key', async () => {
@@ -36,7 +36,13 @@ describe('Nameservices', () => {
 		expect(identityKeysApi.getIdentityKeyResolvableNames).toHaveBeenCalledWith(
 			encodeHexZeroX(encodePublicKey(AliceWalletMailbox.identityKey)),
 		);
-		expect(result).toEqual(names);
+		expect(result).toEqual(
+			names.map(({ name, resolver }) => ({
+				name,
+				resolver,
+				address: createNameServiceAddress(name, resolver, 'mailchain.test'),
+			})),
+		);
 	});
 
 	it('should match alice.eth to AliceWallet mailbox', async () => {
@@ -45,9 +51,9 @@ describe('Nameservices', () => {
 			protocol: ETHEREUM,
 		});
 
-		const matches = await nameservices.nameResolvesToMailbox(aliceNs, AliceWalletMailbox);
+		const matchedNs = await nameservices.nameResolvesToMailbox(aliceNs.username, AliceWalletMailbox);
 
-		expect(matches).toBe(true);
+		expect(matchedNs).toEqual(aliceNs);
 		expect(identityKeysService.getAddressIdentityKey).toHaveBeenCalledWith(aliceNs);
 	});
 
@@ -57,18 +63,18 @@ describe('Nameservices', () => {
 			protocol: ETHEREUM,
 		});
 
-		const matches = await nameservices.nameResolvesToMailbox(aliceNs, AliceWalletMailbox);
+		const matches = await nameservices.nameResolvesToMailbox(aliceNs.username, AliceWalletMailbox);
 
-		expect(matches).toBe(false);
+		expect(matches).toBeNull();
 		expect(identityKeysService.getAddressIdentityKey).toHaveBeenCalledWith(aliceNs);
 	});
 
 	it('should NOT match alice.eth because no identity key found', async () => {
 		identityKeysService.getAddressIdentityKey.mockResolvedValue(null);
 
-		const matches = await nameservices.nameResolvesToMailbox(aliceNs, AliceWalletMailbox);
+		const matches = await nameservices.nameResolvesToMailbox(aliceNs.username, AliceWalletMailbox);
 
-		expect(matches).toBe(false);
+		expect(matches).toBeNull();
 		expect(identityKeysService.getAddressIdentityKey).toHaveBeenCalledWith(aliceNs);
 	});
 });

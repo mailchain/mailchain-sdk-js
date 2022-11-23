@@ -5,7 +5,9 @@ export function matchesNameservice(
 	address: NameServiceAddress,
 	nameserviceDescription: NameserviceDescription,
 ): string | undefined {
-	if (!address.domain.startsWith(nameserviceDescription.name)) return undefined;
+	const domainParts = address.domain.split('.');
+	if (domainParts[0] !== nameserviceDescription.name) return undefined;
 
-	return nameserviceDescription.domains.find((domain) => address.username.endsWith(domain));
+	const usernameParts = address.username.split('.');
+	return nameserviceDescription.domains.find((domain) => usernameParts[usernameParts.length - 1] === domain);
 }

@@ -33,3 +33,18 @@ For the purposes of offering better user experience for when the users want to s
 ### Version 5 - nameservice aliases
 
 Not data structural changes in this version, it is migration version that tries to reverse resolve the nameservice names for all of the user mailboxes.
+
+### Version 5 legacy - legacy alias address format
+
+We decided to change the address format for NS addresses to include the NS name. The migrator v4-v5 also was adding the legacy format, the implementation has been updated to use the new format so there is no need to run the v6 migration for these addresses (less error prone and more accurate).
+
+-   `alice.eth@mailchain.com` into `alice.eth@ens.mailchain.com`
+-   `alice.crypto@mailchain.com` into `alice.crypto@unstoppable.com`
+
+This "legacy" annotated version represents this alias format.
+
+### Version 6
+
+Consolidate the legacy and non-legacy V5 mailbox into v6 to be sure that the alias address is formatted correctly.
+
+Current resolution looks into `packages/addressing/src/nameservices/NAMESERVICE_DESCRIPTIONS` for known NS names and domains to figure it out. Good enough for now and no need to look it up via the API.

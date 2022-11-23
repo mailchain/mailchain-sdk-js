@@ -4,6 +4,7 @@ import {
 	AliceSECP256K1PublicAddress,
 	AliceSECP256K1PublicAddressStr,
 } from '@mailchain/addressing/protocols/ethereum/test.const';
+import { createNameServiceAddress } from '@mailchain/addressing';
 import { user } from '../protobuf/user/user';
 import { IdentityKeys } from '../identityKeys';
 import { Nameservices } from '../nameservices';
@@ -12,6 +13,7 @@ import {
 	createV3LabelMigration,
 	createV4AliasesMigration,
 	createV5NsMigration,
+	createV6FixNsAliasFormatMigration,
 	UserMailboxMigrationRule,
 } from './migrations';
 import { AliceWalletMailbox } from './test.const';
@@ -45,10 +47,23 @@ const v5Mailbox = user.Mailbox.create({
 	...v4Mailbox,
 	aliases: [
 		...v4Mailbox.aliases,
-		{ address: 'alice.eth@mailchain.test', blockSending: false, blockReceiving: false },
-		{ address: '👩🏼‍💻.alice.eth@mailchain.test', blockSending: false, blockReceiving: false },
+		{ address: 'alice.eth@ens.mailchain.test', blockSending: false, blockReceiving: false },
+		{ address: 'alice.crypto@unstoppable.mailchain.test', blockSending: false, blockReceiving: false },
 	],
 });
+
+// We have changed how addresses are formatted from `alice.eth@mailchain.com` into `alice.eth@ens.mailchain.com`.
+// This is that legacy format that needs to be migrated if encountered.
+const v5LegacyMailbox = user.Mailbox.create({
+	...v4Mailbox,
+	aliases: [
+		...v4Mailbox.aliases,
+		{ address: 'alice.eth@mailchain.test', blockSending: false, blockReceiving: false },
+		{ address: 'alice.crypto@mailchain.test', blockSending: false, blockReceiving: false },
+	],
+});
+
+const v6Mailbox = user.Mailbox.create({ ...v5Mailbox });
 
 describe('UserProfile migrations', () => {
 	let migration: UserMailboxMigrationRule;
@@ -122,7 +137,7 @@ describe('UserProfile migrations', () => {
 
 		beforeEach(() => {
 			nameservices = mock();
-			migration = createV5NsMigration(nameservices, 'mailchain.test');
+			migration = createV5NsMigration(nameservices);
 		});
 
 		it('should apply for version 4', async () => {
@@ -132,9 +147,22 @@ describe('UserProfile migrations', () => {
 
 		it('should add found nameservice names as aliases to the mailbox', async () => {
 			nameservices.reverseResolveNames.mockResolvedValue([
-				{ name: 'alice.eth', resolver: 'ens' },
-				{ name: '👩🏼‍💻.alice.eth', resolver: 'ens' },
-				{ name: 'alice.eth', resolver: 'ens' }, // duplicate
+				{
+					name: 'alice.eth',
+					resolver: 'ens',
+					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
+				},
+				{
+					name: 'alice.crypto',
+					resolver: 'unstoppable',
+					address: createNameServiceAddress('alice.crypto', 'unstoppable', 'mailchain.test'),
+				},
+				{
+					// duplicate
+					name: 'alice.eth',
+					resolver: 'ens',
+					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
+				},
 			]);
 
 			const migrated = await migration.apply({ version: 4, protoMailbox: v4Mailbox });
@@ -142,10 +170,18 @@ describe('UserProfile migrations', () => {
 			expect(migrated).toEqual({ version: 5, protoMailbox: v5Mailbox });
 		});
 
-		it('should not add duplicate nameservice names as aliases', async () => {
+		it('should not add duplicate nameservice names as aliases that already exist', async () => {
 			nameservices.reverseResolveNames.mockResolvedValue([
-				{ name: 'alice.eth', resolver: 'ens' },
-				{ name: '👩🏼‍💻.alice.eth', resolver: 'ens' },
+				{
+					name: 'alice.eth',
+					resolver: 'ens',
+					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
+				},
+				{
+					name: 'alice.crypto',
+					resolver: 'unstoppable',
+					address: createNameServiceAddress('alice.crypto', 'unstoppable', 'mailchain.test'),
+				},
 			]);
 
 			const migrated = await migration.apply({ version: 4, protoMailbox: v5Mailbox }); // v5 already has the aliases
@@ -159,6 +195,20 @@ describe('UserProfile migrations', () => {
 			const migrated = await migration.apply({ version: 4, protoMailbox: v4Mailbox });
 
 			expect(migrated).toEqual({ version: 5, protoMailbox: v4Mailbox });
+		});
+	});
+
+	describe('v5 legacy to v6 - fix alias address formats', () => {
+		beforeEach(() => {
+			migration = createV6FixNsAliasFormatMigration('mailchain.test');
+		});
+
+		it('should set encoded address as alias', async () => {
+			const shouldApply = await migration.shouldApply({ version: 5, protoMailbox: v5LegacyMailbox });
+			expect(shouldApply).toBe(true);
+
+			const migrated = await migration.apply({ version: 5, protoMailbox: v5LegacyMailbox });
+			expect(migrated).toEqual({ version: 6, protoMailbox: v6Mailbox });
 		});
 	});
 });

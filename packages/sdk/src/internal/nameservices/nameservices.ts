@@ -1,6 +1,7 @@
 import { encodePublicKey, isPublicKeyEqual, PublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { NameServiceAddress } from '@mailchain/addressing';
+import { createNameServiceAddress, NameServiceAddress } from '@mailchain/addressing';
+import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { Configuration } from '../../mailchain';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface } from '../api';
 import { createAxiosConfiguration } from '../axios/config';
@@ -10,32 +11,47 @@ import { IdentityKeys } from '../identityKeys';
 export type ResolvedName = {
 	name: string;
 	resolver: string;
+	address: NameServiceAddress;
 };
 
 export class Nameservices {
 	constructor(
 		private readonly identityKeysApi: IdentityKeysApiInterface,
 		private readonly identityKeysService: IdentityKeys,
+		private readonly mailchainAddressDomain: string,
 	) {}
 
 	public static create(config: Configuration) {
 		const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config));
 		const identityKeysService = IdentityKeys.create(config);
 
-		return new Nameservices(identityKeysApi, identityKeysService);
+		return new Nameservices(identityKeysApi, identityKeysService, config.mailchainAddressDomain);
 	}
 
 	async reverseResolveNames(identityKey: PublicKey): Promise<ResolvedName[]> {
-		return this.identityKeysApi
-			.getIdentityKeyResolvableNames(encodeHexZeroX(encodePublicKey(identityKey)))
-			.then(({ data }) => data.resolvableNames ?? []);
+		return this.identityKeysApi.getIdentityKeyResolvableNames(encodeHexZeroX(encodePublicKey(identityKey))).then(
+			({ data }) =>
+				data.resolvableNames?.map((resolved) => ({
+					...resolved,
+					address: createNameServiceAddress(resolved.name, resolved.resolver, this.mailchainAddressDomain),
+				})) ?? [],
+			(e) => {
+				console.error(e);
+				return [];
+			},
+		);
 	}
 
-	async nameResolvesToMailbox(nsAddress: NameServiceAddress, mailbox: UserMailbox): Promise<boolean> {
-		const addressIdentityKey = await this.identityKeysService.getAddressIdentityKey(nsAddress);
+	async nameResolvesToMailbox(nsName: string, mailbox: UserMailbox): Promise<NameServiceAddress | null> {
+		for (const nsDesc of NAMESERVICE_DESCRIPTIONS) {
+			const nsAddress = createNameServiceAddress(nsName, nsDesc.name, this.mailchainAddressDomain);
+			const addressIdentityKey = await this.identityKeysService.getAddressIdentityKey(nsAddress);
 
-		if (addressIdentityKey == null) return false;
+			if (addressIdentityKey != null && isPublicKeyEqual(addressIdentityKey.identityKey, mailbox.identityKey)) {
+				return nsAddress;
+			}
+		}
 
-		return isPublicKeyEqual(addressIdentityKey.identityKey, mailbox.identityKey);
+		return null;
 	}
 }

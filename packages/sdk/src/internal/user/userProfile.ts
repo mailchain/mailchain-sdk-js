@@ -30,6 +30,7 @@ import {
 	createV3LabelMigration,
 	createV4AliasesMigration,
 	createV5NsMigration,
+	createV6FixNsAliasFormatMigration,
 	UserMailboxMigrationRule,
 } from './migrations';
 import { Alias, UserMailbox } from './types';
@@ -44,7 +45,7 @@ export class UserNotFoundError extends Error {
 	}
 }
 
-const CURRENT_MAILBOX_VERSION = 5 as const;
+const CURRENT_MAILBOX_VERSION = 6 as const;
 
 export type NewUserMailbox = Omit<UserMailbox, 'id' | 'type'>;
 
@@ -80,7 +81,8 @@ export class MailchainUserProfile implements UserProfile {
 			createV2IdentityKey(identityKeys, config.mailchainAddressDomain),
 			createV3LabelMigration(config.mailchainAddressDomain),
 			createV4AliasesMigration(config.mailchainAddressDomain),
-			createV5NsMigration(nameservice, config.mailchainAddressDomain),
+			createV5NsMigration(nameservice),
+			createV6FixNsAliasFormatMigration(config.mailchainAddressDomain),
 		);
 		return new MailchainUserProfile(
 			config.mailchainAddressDomain,

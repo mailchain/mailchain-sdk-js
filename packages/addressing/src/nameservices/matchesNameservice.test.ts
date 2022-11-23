@@ -16,9 +16,21 @@ describe('matchesNameservice', () => {
 			expectedMatch: undefined,
 		},
 		{
+			testName: "should not match because the domain doesn't start with exact NS name",
+			address: createNameServiceAddress('alice.eth', 'ens.mailchain.test'),
+			nsDescription: { name: 'en', domains: ['eth'] },
+			expectedMatch: undefined,
+		},
+		{
 			testName: "should not match because the username doesn't end with NS domain",
 			address: createNameServiceAddress('alice.crypto', 'ens.mailchain.test'),
 			nsDescription: { name: 'ens', domains: ['eth'] },
+			expectedMatch: undefined,
+		},
+		{
+			testName: "should not match because the username doesn't end with exact NS domain",
+			address: createNameServiceAddress('alice.eth', 'ens.mailchain.test'),
+			nsDescription: { name: 'ens', domains: ['th'] },
 			expectedMatch: undefined,
 		},
 	];

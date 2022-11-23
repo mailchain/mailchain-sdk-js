@@ -3,8 +3,10 @@ import {
 	createWalletAddress,
 	encodeAddressByProtocol,
 	formatAddress,
+	parseNameServiceAddress,
 	ProtocolType,
 } from '@mailchain/addressing';
+import { matchesNameservice, NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { IdentityKeys } from '../identityKeys';
@@ -83,10 +85,7 @@ export function createV4AliasesMigration(mailchainAddressDomain: string): UserMa
 	};
 }
 
-export function createV5NsMigration(
-	nameservices: Nameservices,
-	mailchainAddressDomain: string,
-): UserMailboxMigrationRule {
+export function createV5NsMigration(nameservices: Nameservices): UserMailboxMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 4),
 		apply: async ({ protoMailbox }) => {
@@ -95,8 +94,7 @@ export function createV5NsMigration(
 				const foundNames = await nameservices.reverseResolveNames(identityKey);
 
 				const aliases = [...protoMailbox.aliases];
-				for (const { name } of foundNames) {
-					const address = createNameServiceAddress(name, mailchainAddressDomain);
+				for (const { address } of foundNames) {
 					const aliasAddress = formatAddress(address, 'mail');
 					if (aliases.some((alias) => alias.address === aliasAddress)) continue;
 
@@ -117,6 +115,38 @@ export function createV5NsMigration(
 				);
 				return { version: 5, protoMailbox };
 			}
+		},
+	};
+}
+
+export function createV6FixNsAliasFormatMigration(mailchainAddressDomain: string): UserMailboxMigrationRule {
+	return {
+		shouldApply: (data) => Promise.resolve(data.version === 5),
+		apply: (data) => {
+			const aliases = data.protoMailbox.aliases.map((a) => {
+				// Shouldn't happen, mostly making TS happy
+				if (a.address == null) return a;
+
+				const address = parseNameServiceAddress(a.address);
+				// Ignore correct alias formatting like `alice.eth@ens.mailchain.com`
+				if (address.domain !== mailchainAddressDomain) return a;
+
+				for (const nsDesc of NAMESERVICE_DESCRIPTIONS) {
+					const nsAddress = createNameServiceAddress(address.username, nsDesc.name, address.domain);
+					const matchingDomain = matchesNameservice(nsAddress, nsDesc);
+					if (matchingDomain != null) {
+						return user.Mailbox.Alias.create({ ...a, address: formatAddress(nsAddress, 'mail') });
+					}
+				}
+
+				// no match found, meaning no need for migration
+				return a;
+			});
+
+			return Promise.resolve({
+				version: 6,
+				protoMailbox: user.Mailbox.create({ ...data.protoMailbox, aliases }),
+			});
 		},
 	};
 }
