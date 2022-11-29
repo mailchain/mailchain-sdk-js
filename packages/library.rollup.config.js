@@ -81,7 +81,7 @@ const createConfig = (build, options) => {
 		],
 		onwarn(warning, rollupWarn) {
 			rollupWarn(warning);
-			if (!bundle && warning.code === 'CIRCULAR_DEPENDENCY') {
+			if (warning.code === 'CIRCULAR_DEPENDENCY') {
 				const msg = 'Please eliminate the circular dependencies listed above and retry the build';
 				throw new Error(msg);
 			}
@@ -108,7 +108,7 @@ export const getBundlingConfigs = (name, pkg, options = {}) => [
 				bundle: true,
 				browser: true,
 				dir: `${outDir}/packages/${name}/browser`,
-				format: 'cjs',
+				format: 'es',
 				plugins: [
 					polyfillNode(),
 					replaceImportsPlugin('browser', pkg),

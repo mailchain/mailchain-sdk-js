@@ -1,7 +1,7 @@
 import { encodeBase64UrlSafe } from '@mailchain/encoding';
 import axios, { AxiosInstance } from 'axios';
-import utils from 'axios/lib/utils';
 import { SignerWithPublicKey } from '@mailchain/crypto';
+import isArrayBuffer from 'lodash/isArrayBuffer';
 
 export const getToken = async (requestKey: SignerWithPublicKey, payload: TokenPayload, exp: number) => {
 	const headerSegment = encodeBase64UrlSafe(Buffer.from(JSON.stringify({ alg: 'EdDSA', typ: 'JWT' })));
@@ -52,9 +52,9 @@ export function createTokenPayload(url: URL, method: string, data: any): TokenPa
 	if (data != null && ['POST', 'PUT', 'PATCH'].some((m) => m === method.toUpperCase())) {
 		if (Buffer.isBuffer(data)) {
 			len = data.length;
-		} else if (utils.isArrayBuffer(data)) {
+		} else if (isArrayBuffer(data)) {
 			len = Buffer.byteLength(new Uint8Array(data));
-		} else if (utils.isString(data)) {
+		} else if (typeof data === 'string') {
 			len = Buffer.byteLength(data, 'utf-8');
 		} else if (toString.call(data) === '[object Uint8Array]') {
 			len = data.length;
