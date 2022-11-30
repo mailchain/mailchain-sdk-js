@@ -8,7 +8,7 @@ export interface ProofParams {
 	Variant: string;
 }
 
-export function getLatestProofParams(protocol: ProtocolType, network: string, locale: string): ProofParams {
+export function getLatestProofParams(protocol: ProtocolType, locale: string): ProofParams {
 	if (protocol !== ETHEREUM) {
 		// TODO: implement other protocols
 		throw new Error('must be ethereum');

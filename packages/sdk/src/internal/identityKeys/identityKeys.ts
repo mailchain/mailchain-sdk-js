@@ -44,8 +44,11 @@ export class IdentityKeys {
 			});
 	}
 
-	async putAddressIdentityKey(addressProofParams: PutMsgKeyByIDKeyRequestBody, identityKey: PublicKey): Promise<any> {
+	async putAddressMessagingKey(
+		addressProofParams: PutMsgKeyByIDKeyRequestBody,
+		identityKey: PublicKey,
+	): Promise<void> {
 		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(identityKey));
-		return this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, addressProofParams);
+		await this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, addressProofParams);
 	}
 }
