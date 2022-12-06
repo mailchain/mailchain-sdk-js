@@ -4,7 +4,7 @@ import { ED25519PrivateKey, PrivateKeyDecrypter } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
 import { fromEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
-import { AuthApiInterface, EncryptedAccountSecret, EncryptedAccountSecretEncryptionIdEnum } from '../api';
+import { AuthApiInterface, EncryptedAccountSecret, EncryptedAccountSecretSecretKindEnum } from '../api';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
 
@@ -107,13 +107,13 @@ export async function decryptAccountSecret(
 
 	const decryptedSecret = await decrypter.decrypt(decodeBase64(encryptedAccountSecret.encryptedAccountSecret));
 
-	switch (encryptedAccountSecret.encryptionId) {
-		case EncryptedAccountSecretEncryptionIdEnum.Account:
+	switch (encryptedAccountSecret.secretKind) {
+		case EncryptedAccountSecretSecretKindEnum.Account:
 			return { kind: 'key-seed', value: decryptedSecret };
-		case EncryptedAccountSecretEncryptionIdEnum.Mnemonic:
+		case EncryptedAccountSecretSecretKindEnum.Mnemonic:
 			return { kind: 'mnemonic-phrase', value: decryptedSecret };
 		default:
-			throw new Error(`unknown encryptionId [${encryptedAccountSecret.encryptionId}]`);
+			throw new Error(`unknown secretKind [${encryptedAccountSecret.secretKind}]`);
 	}
 }
 

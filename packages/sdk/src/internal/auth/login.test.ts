@@ -8,8 +8,9 @@ import { sha256 } from '@noble/hashes/sha256';
 import { fromEntropy, generate, toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
 import {
 	AuthApiInterface,
-	EncryptedAccountSecretEncryptionIdEnum,
+	EncryptedAccountSecretSecretKindEnum,
 	EncryptedAccountSecretEncryptionKindEnum,
+	EncryptedAccountSecret,
 } from '../api';
 import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit, createRootAccountKey, decryptAccountSecret } from './login';
@@ -73,8 +74,8 @@ describe('isolated login tests', () => {
 				data: {
 					encryptedAccountSecret: {
 						encryptedAccountSecret: encodeBase64(encryptedAccountKeySeed),
-						encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
-					},
+						secretKind: EncryptedAccountSecretSecretKindEnum.Mnemonic,
+					} as EncryptedAccountSecret,
 				},
 			};
 			mockAuthApi.accountAuthFinalize.mockResolvedValue(mockAuthFinalizeResponse as AxiosResponse);
@@ -119,7 +120,7 @@ describe('decryptAccountSecret', () => {
 
 		const rootAccountKey = await decryptAccountSecret(clientSecretKey, {
 			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
-			encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
+			secretKind: EncryptedAccountSecretSecretKindEnum.Mnemonic,
 			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
 			encryptionVersion: 1,
 		});
@@ -133,7 +134,7 @@ describe('decryptAccountSecret', () => {
 
 		const accountSecret = await decryptAccountSecret(clientSecretKey, {
 			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
-			encryptionId: EncryptedAccountSecretEncryptionIdEnum.Account,
+			secretKind: EncryptedAccountSecretSecretKindEnum.Account,
 			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
 			encryptionVersion: 1,
 		});

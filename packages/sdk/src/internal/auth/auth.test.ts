@@ -10,7 +10,7 @@ import {
 	AccountAuthInitResponseBody,
 	AuthApiInterface,
 	EncryptedAccountSecret,
-	EncryptedAccountSecretEncryptionIdEnum,
+	EncryptedAccountSecretSecretKindEnum,
 	UsersApiInterface,
 } from '../api';
 import { OpaqueConfig } from './opaque';
@@ -78,7 +78,7 @@ describe('login', () => {
 		const accountEntropy = toEntropy(generate());
 		const accountAuthFinalizeResponse = {
 			encryptedAccountSecret: {
-				encryptionId: EncryptedAccountSecretEncryptionIdEnum.Mnemonic,
+				secretKind: EncryptedAccountSecretSecretKindEnum.Mnemonic,
 				encryptedAccountSecret: encodeBase64(
 					await PrivateKeyEncrypter.fromPrivateKey(clientSeedEncryptKey).encrypt(accountEntropy),
 				),
