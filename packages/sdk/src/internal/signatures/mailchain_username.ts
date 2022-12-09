@@ -24,8 +24,8 @@ export async function signMailchainUsername(signer: Signer, username: Uint8Array
  */
 export async function verifyMailchainUsername(
 	key: PublicKey,
-	username: Uint8Array,
 	signature: Uint8Array,
+	username: Uint8Array,
 ): Promise<boolean> {
 	return verifyRawEd25519(key, mailchainUsernameMessage(username), signature);
 }

@@ -16,6 +16,7 @@ import { OpaqueConfig } from './opaque';
 import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
 import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';
 import { AuthenticatedResponse } from './response';
+import { passwordResetCreate, passwordResetFinalize, passwordResetInit, ResetError } from './reset';
 
 type LoginParams = {
 	username: string;
@@ -32,12 +33,21 @@ type RegisterParams = {
 	reservedNameSignature?: string;
 };
 
+type ResetParams = {
+	username: string;
+	password: string;
+	captcha: string;
+	mnemonicPhrase: string;
+};
+
 type UsernameAvailabilityCause = {
 	type: 'username-availability';
 	reason: 'reserved' | 'invalid' | 'taken' | 'unavailable';
 };
+
 type SeedPhraseCause = { type: 'seed-phrase'; reason: 'already-used' };
 type RegisterErrorCause = UsernameAvailabilityCause | SeedPhraseCause;
+
 export class RegisterError extends Error {
 	constructor(public readonly regCause: RegisterErrorCause) {
 		super(`[${regCause.type}]-[${regCause.reason}]`);
@@ -156,6 +166,67 @@ export class Authentication {
 			params.mnemonicPhrase,
 			identityKey,
 			messagingPublicKey,
+			params.username,
+			registerCreateResponse.authStartResponse,
+			registerCreateResponse.state,
+			registerInitResponse.registrationSession,
+			this.authApi,
+			this.opaqueConfig,
+			opaqueLoginClient,
+		);
+
+		return {
+			...finalizeResponse,
+			rootAccountKey,
+		};
+	}
+
+	async resetPassword(params: ResetParams): Promise<AuthenticatedResponse> {
+		params.username = params.username.trim().toLowerCase();
+
+		const opaqueRegisterClient = new OpaqueClient(this.opaqueConfig.parameters);
+		const opaqueLoginClient = new OpaqueClient(this.opaqueConfig.parameters);
+
+		if (!validate(params.mnemonicPhrase)) {
+			throw new Error('invalid mnemonic phrase');
+		}
+
+		const rootAccountKey = ED25519PrivateKey.fromMnemonicPhrase(params.mnemonicPhrase);
+		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
+		const identityKey = keyRing.accountIdentityKey();
+		const registerInitResponse = await passwordResetInit(
+			params.username,
+			params.password,
+			params.captcha,
+			identityKey,
+			this.authApi,
+			this.opaqueConfig,
+			opaqueRegisterClient,
+		).catch((e) => {
+			if (Axios.isAxiosError(e)) {
+				switch (e.response?.data.message) {
+					case 'identity key does not match username':
+						throw new ResetError({
+							type: 'identity-key-miss-match',
+							reason: 'incorrect-identity-key-for-username',
+						});
+				}
+			}
+			throw e;
+		});
+		const registerCreateResponse = await passwordResetCreate(
+			params.username,
+			params.password,
+			registerInitResponse.registrationResponse,
+			this.authApi,
+			this.opaqueConfig,
+			opaqueRegisterClient,
+			opaqueLoginClient,
+		);
+
+		const finalizeResponse = await passwordResetFinalize(
+			params.mnemonicPhrase,
+			identityKey,
 			params.username,
 			registerCreateResponse.authStartResponse,
 			registerCreateResponse.state,

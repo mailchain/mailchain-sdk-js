@@ -87,7 +87,7 @@ describe('VerifyMailchainUsername()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = verifyMailchainUsername(test.args.key, test.args.message, test.args.signature);
+		const target = verifyMailchainUsername(test.args.key, test.args.signature, test.args.message);
 		if (test.shouldThrow) {
 			expect.assertions(1);
 			return target.catch((e) => expect(e).toEqual(test.shouldThrow));
