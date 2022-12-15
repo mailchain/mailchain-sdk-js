@@ -48,12 +48,6 @@ export async function passwordResetInit(
 		Buffer.from(username, 'utf-8'),
 		new Date(expires * 1000),
 	);
-	await verifyMailchainPasswordReset(
-		identityKey.publicKey,
-		signature,
-		Buffer.from(username, 'utf-8'),
-		new Date(expires),
-	);
 
 	const response = await authApi.passwordResetInit({
 		identityKey: encodeHexZeroX(encodePublicKey(identityKey.publicKey)),
