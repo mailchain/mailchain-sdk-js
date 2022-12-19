@@ -1,18 +1,11 @@
 import { AuthClient, KE2, RegistrationClient, RegistrationResponse } from '@cloudflare/opaque-ts';
-import {
-	Signer,
-	SignerWithPublicKey,
-	ED25519PrivateKey,
-	encodePublicKey,
-	PrivateKeyEncrypter,
-} from '@mailchain/crypto';
+import { Signer, SignerWithPublicKey, encodePublicKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
-import { toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
-import { sha256 } from '@noble/hashes/sha256';
 import { AuthApiInterface } from '../api';
 import { signMailchainPasswordReset, verifyMailchainPasswordReset } from '../signatures/mailchain_password_reset';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
+import { encryptAccountSecret } from './accountSecretCrypto';
 
 type ResetErrorCause = { type: 'identity-key-miss-match'; reason: 'incorrect-identity-key-for-username' };
 
@@ -117,7 +110,7 @@ export async function passwordResetCreate(
 }
 
 export async function passwordResetFinalize(
-	mnemonicPhrase: string,
+	accountSecret: AuthenticatedResponse['accountSecret'],
 	identityKey: Signer,
 	username: string,
 	authStartResponse: Uint8Array,
@@ -140,35 +133,24 @@ export async function passwordResetFinalize(
 		throw new Error(`client failed to authFinish: ${authFinishResponse}`);
 	}
 	const clientSessionKey = authFinishResponse.session_key;
-
-	const seed = sha256(Uint8Array.from(authFinishResponse.export_key));
-	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
-	const encrypter = PrivateKeyEncrypter.fromPrivateKey(encryptionKey);
-
-	// encrypt entropy so mnemonic phrase can be recovered later
-	const encryptedMnemonicEntropy = await encrypter.encrypt(toEntropy(mnemonicPhrase));
+	const { encryptedAccountSecret } = await encryptAccountSecret(
+		Uint8Array.from(authFinishResponse.export_key),
+		accountSecret,
+	);
 	const signedResetSession = await identityKey.sign(resetSession);
 
-	const response = await authApi.passwordResetFinalize(
-		{
-			username,
-			authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
-			authState: encodeBase64(state),
-			encryptedMnemonicEntropy: encodeBase64(encryptedMnemonicEntropy),
-			session: encodeBase64(Uint8Array.from(clientSessionKey)),
-			signedResetSession: encodeBase64(signedResetSession),
-		},
-		{ withCredentials: true },
-	);
+	const response = await authApi.passwordResetFinalize({
+		username,
+		authFinalizeParams: encodeBase64(Uint8Array.from(authFinishResponse.ke3.serialize())),
+		authState: encodeBase64(state),
+		encryptedMnemonicEntropy: encryptedAccountSecret,
+		session: encodeBase64(Uint8Array.from(clientSessionKey)),
+		signedResetSession: encodeBase64(signedResetSession),
+	});
 
 	if (response.status !== 200) {
 		throw new Error(`failed to finalize registration status: ${response.status}`);
 	}
-
-	const accountSecret: AuthenticatedResponse['accountSecret'] = {
-		kind: 'mnemonic-phrase',
-		value: toEntropy(mnemonicPhrase),
-	};
 
 	return {
 		clientSecretKey: new Uint8Array(authFinishResponse.export_key),

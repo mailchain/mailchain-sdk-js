@@ -6,14 +6,9 @@ import { PrivateKeyEncrypter, secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { sha256 } from '@noble/hashes/sha256';
 import { fromEntropy, generate, toEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
-import {
-	AuthApiInterface,
-	EncryptedAccountSecretSecretKindEnum,
-	EncryptedAccountSecretEncryptionKindEnum,
-	EncryptedAccountSecret,
-} from '../api';
+import { AuthApiInterface, EncryptedAccountSecretSecretKindEnum, EncryptedAccountSecret } from '../api';
 import { OpaqueConfig } from './opaque';
-import { accountAuthFinalize, accountAuthInit, createRootAccountKey, decryptAccountSecret } from './login';
+import { accountAuthFinalize, accountAuthInit } from './login';
 
 describe('isolated login tests', () => {
 	let mockAuthApi: MockProxy<AuthApiInterface>;
@@ -107,56 +102,5 @@ describe('isolated login tests', () => {
 				{ withCredentials: true },
 			);
 		});
-	});
-});
-
-describe('decryptAccountSecret', () => {
-	const clientSecretKey = secureRandom(32);
-	const encrypter = PrivateKeyEncrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sha256(clientSecretKey)));
-
-	it('should decrypt the account secret based on mnemonic phrase', async () => {
-		const mnemonicPhrase = generate();
-		const encryptedMnemonicPhrase = await encrypter.encrypt(toEntropy(mnemonicPhrase));
-
-		const rootAccountKey = await decryptAccountSecret(clientSecretKey, {
-			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
-			secretKind: EncryptedAccountSecretSecretKindEnum.Mnemonic,
-			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
-			encryptionVersion: 1,
-		});
-
-		expect(rootAccountKey).toEqual({ kind: 'mnemonic-phrase', value: toEntropy(mnemonicPhrase) });
-	});
-
-	it('should decrypt the account secret based on key seed', async () => {
-		const seed = secureRandom(32);
-		const encryptedMnemonicPhrase = await encrypter.encrypt(seed);
-
-		const accountSecret = await decryptAccountSecret(clientSecretKey, {
-			encryptedAccountSecret: encodeBase64(encryptedMnemonicPhrase),
-			secretKind: EncryptedAccountSecretSecretKindEnum.Account,
-			encryptionKind: EncryptedAccountSecretEncryptionKindEnum.Opaque,
-			encryptionVersion: 1,
-		});
-
-		expect(accountSecret).toEqual({ kind: 'key-seed', value: seed });
-	});
-});
-
-describe('createRootAccountKey', () => {
-	it('create key from mnemonic phrase', () => {
-		const mnemonicPhrase = generate();
-
-		const key = createRootAccountKey({ kind: 'mnemonic-phrase', value: toEntropy(mnemonicPhrase) });
-
-		expect(key).toEqual(ED25519PrivateKey.fromMnemonicPhrase(mnemonicPhrase));
-	});
-
-	it('create key from seed', () => {
-		const seed = secureRandom(32);
-
-		const key = createRootAccountKey({ kind: 'key-seed', value: seed });
-
-		expect(key).toEqual(ED25519PrivateKey.fromSeed(seed));
 	});
 });

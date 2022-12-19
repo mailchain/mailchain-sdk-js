@@ -1,12 +1,10 @@
 import { AuthClient, KE2 } from '@cloudflare/opaque-ts';
-import { sha256 } from '@noble/hashes/sha256';
-import { ED25519PrivateKey, PrivateKeyDecrypter } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import Axios from 'axios';
-import { fromEntropy } from '@mailchain/crypto/mnemonic/mnemonic';
-import { AuthApiInterface, EncryptedAccountSecret, EncryptedAccountSecretSecretKindEnum } from '../api';
+import { AuthApiInterface } from '../api';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
+import { createRootAccountKey, decryptAccountSecret } from './accountSecretCrypto';
 
 export class LoginError extends Error {
 	constructor(public readonly kind: 'invalid-username' | 'failed-auth' | 'network-error', details: string) {
@@ -95,33 +93,4 @@ export async function accountAuthFinalize(
 		rootAccountKey,
 		accountSecret,
 	};
-}
-
-export async function decryptAccountSecret(
-	clientSecretKey: Uint8Array,
-	encryptedAccountSecret: EncryptedAccountSecret,
-): Promise<AuthenticatedResponse['accountSecret']> {
-	const seed = sha256(clientSecretKey);
-	const encryptionKey = ED25519PrivateKey.fromSeed(seed);
-	const decrypter = PrivateKeyDecrypter.fromPrivateKey(encryptionKey);
-
-	const decryptedSecret = await decrypter.decrypt(decodeBase64(encryptedAccountSecret.encryptedAccountSecret));
-
-	switch (encryptedAccountSecret.secretKind) {
-		case EncryptedAccountSecretSecretKindEnum.Account:
-			return { kind: 'key-seed', value: decryptedSecret };
-		case EncryptedAccountSecretSecretKindEnum.Mnemonic:
-			return { kind: 'mnemonic-phrase', value: decryptedSecret };
-		default:
-			throw new Error(`unknown secretKind [${encryptedAccountSecret.secretKind}]`);
-	}
-}
-
-export function createRootAccountKey({ kind, value }: AuthenticatedResponse['accountSecret']) {
-	switch (kind) {
-		case 'key-seed':
-			return ED25519PrivateKey.fromSeed(value);
-		case 'mnemonic-phrase':
-			return ED25519PrivateKey.fromMnemonicPhrase(fromEntropy(value));
-	}
 }

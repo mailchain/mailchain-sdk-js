@@ -17,6 +17,7 @@ import { accountAuthFinalize, accountAuthInit, LoginError } from './login';
 import { accountRegisterCreate, accountRegisterFinalize, accountRegisterInit } from './register';
 import { AuthenticatedResponse } from './response';
 import { passwordResetCreate, passwordResetFinalize, passwordResetInit, ResetError } from './reset';
+import { createRootAccountKey } from './accountSecretCrypto';
 
 type LoginParams = {
 	username: string;
@@ -37,7 +38,7 @@ type ResetParams = {
 	username: string;
 	password: string;
 	captcha: string;
-	mnemonicPhrase: string;
+	accountSecret: AuthenticatedResponse['accountSecret'];
 };
 
 type UsernameAvailabilityCause = {
@@ -187,11 +188,8 @@ export class Authentication {
 		const opaqueRegisterClient = new OpaqueClient(this.opaqueConfig.parameters);
 		const opaqueLoginClient = new OpaqueClient(this.opaqueConfig.parameters);
 
-		if (!validate(params.mnemonicPhrase)) {
-			throw new Error('invalid mnemonic phrase');
-		}
+		const rootAccountKey = createRootAccountKey(params.accountSecret);
 
-		const rootAccountKey = ED25519PrivateKey.fromMnemonicPhrase(params.mnemonicPhrase);
 		const keyRing = KeyRing.fromPrivateKey(rootAccountKey);
 		const identityKey = keyRing.accountIdentityKey();
 		const registerInitResponse = await passwordResetInit(
@@ -225,7 +223,7 @@ export class Authentication {
 		);
 
 		const finalizeResponse = await passwordResetFinalize(
-			params.mnemonicPhrase,
+			params.accountSecret,
 			identityKey,
 			params.username,
 			registerCreateResponse.authStartResponse,
