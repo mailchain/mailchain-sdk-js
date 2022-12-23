@@ -208,6 +208,11 @@ export class Authentication {
 							type: 'identity-key-miss-match',
 							reason: 'incorrect-identity-key-for-username',
 						});
+					case 'identity key not found':
+						throw new ResetError({
+							type: 'unregistered-recovery-phrase',
+							reason: 'not-registered',
+						});
 				}
 			}
 			throw e;

@@ -2,15 +2,17 @@ import { AuthClient, KE2, RegistrationClient, RegistrationResponse } from '@clou
 import { Signer, SignerWithPublicKey, encodePublicKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
 import { AuthApiInterface } from '../api';
-import { signMailchainPasswordReset, verifyMailchainPasswordReset } from '../signatures/mailchain_password_reset';
+import { signMailchainPasswordReset } from '../signatures/mailchain_password_reset';
 import { OpaqueConfig } from './opaque';
 import { AuthenticatedResponse } from './response';
 import { encryptAccountSecret } from './accountSecretCrypto';
 
-type ResetErrorCause = { type: 'identity-key-miss-match'; reason: 'incorrect-identity-key-for-username' };
+type IdentityKeyMismatch = { type: 'identity-key-miss-match'; reason: 'incorrect-identity-key-for-username' };
+type InvalidRecoveryPhrase = { type: 'recovery-phrase'; reason: 'invalid' };
+type UnregisteredRecoveryPhrase = { type: 'unregistered-recovery-phrase'; reason: 'not-registered' };
 
 export class ResetError extends Error {
-	constructor(public readonly regCause: ResetErrorCause) {
+	constructor(public readonly regCause: IdentityKeyMismatch | InvalidRecoveryPhrase | UnregisteredRecoveryPhrase) {
 		super(`[${regCause.type}]-[${regCause.reason}]`);
 	}
 }
