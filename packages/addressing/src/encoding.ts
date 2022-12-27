@@ -7,7 +7,7 @@ import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, ProtocolType, SUBSTRATE }
 export function encodeAddressByProtocol(
 	address: Uint8Array,
 	protocol: ProtocolType,
-): { encoded: string; encoding: string } {
+): { encoded: string; encoding: EncodingType } {
 	const encoding = encodingByProtocol(protocol);
 	const encoded = encode(encoding, address);
 

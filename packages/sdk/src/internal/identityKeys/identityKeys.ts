@@ -1,16 +1,30 @@
-import { formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
+import { encodeAddressByProtocol, formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
-import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
+import { decodeHexZeroX, encodeHexZeroX, EncodingType, EncodingTypes } from '@mailchain/encoding';
 import Axios from 'axios';
 import { Configuration } from '../../mailchain';
 import {
+	AddressEncodingEnum,
 	AddressesApiFactory,
 	AddressesApiInterface,
 	IdentityKeysApiFactory,
 	IdentityKeysApiInterface,
-	PutMsgKeyByIDKeyRequestBody,
 } from '../api';
+import { CryptoKeyConvert } from '../apiHelpers';
 import { createAxiosConfiguration } from '../axios/config';
+
+export type SignProofResult = {
+	identityKey: PublicKey;
+	address: Uint8Array;
+	protocol: ProtocolType;
+	network: string;
+	locale: string;
+	messageVariant: string;
+	nonce: number;
+	signature: Uint8Array;
+	signatureMethod: 'ethereum_personal_message';
+	messagingKey: PublicKey;
+};
 
 export class IdentityKeys {
 	constructor(
@@ -44,11 +58,34 @@ export class IdentityKeys {
 			});
 	}
 
-	async putAddressMessagingKey(
-		addressProofParams: PutMsgKeyByIDKeyRequestBody,
-		identityKey: PublicKey,
-	): Promise<void> {
-		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(identityKey));
-		await this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, addressProofParams);
+	async putAddressMessagingKey(signProofRes: SignProofResult): Promise<void> {
+		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(signProofRes.identityKey));
+		const encodedAddress = encodeAddressByProtocol(signProofRes.address, signProofRes.protocol);
+		await this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, {
+			address: {
+				encoding: encodingTypeToEncodingEnum(encodedAddress.encoding),
+				value: encodedAddress.encoded,
+				network: signProofRes.network,
+				protocol: signProofRes.protocol,
+			},
+			locale: signProofRes.locale,
+			messageVariant: signProofRes.messageVariant,
+			messagingKey: CryptoKeyConvert.public(signProofRes.messagingKey),
+			nonce: signProofRes.nonce,
+			signature: encodeHexZeroX(signProofRes.signature),
+			signatureMethod: signProofRes.signatureMethod,
+		});
 	}
+}
+
+function encodingTypeToEncodingEnum(encoding: EncodingType): AddressEncodingEnum {
+	switch (encoding) {
+		case EncodingTypes.Hex:
+			return AddressEncodingEnum.HexPlain;
+		case EncodingTypes.Hex0xPrefix:
+			return AddressEncodingEnum.Hex0xPrefix;
+		case EncodingTypes.Utf8:
+			return AddressEncodingEnum.TextUtf8;
+	}
+	throw new Error(`unsupported encoding by API of [${encoding}]`);
 }

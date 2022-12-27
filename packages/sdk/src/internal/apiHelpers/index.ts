@@ -1,5 +1,13 @@
-import { convertPrivate, convertPublic } from './apiKeyToCryptoKey';
+import * as apiKeyToCryptoKey from './apiKeyToCryptoKey';
+import * as cryptoKeyToApiKey from './cryptoKeyToApiKey';
 
-const ApiKeyConvert = { private: convertPrivate, public: convertPublic } as const;
+const ApiKeyConvert = {
+	private: apiKeyToCryptoKey.convertPrivate,
+	public: apiKeyToCryptoKey.convertPublic,
+} as const;
+const CryptoKeyConvert = {
+	public: cryptoKeyToApiKey.convertPublic,
+	private: cryptoKeyToApiKey.convertPrivate,
+} as const;
 
-export { ApiKeyConvert };
+export { ApiKeyConvert, CryptoKeyConvert };

@@ -15,7 +15,7 @@ import {
 	PublicKeyCurveEnum,
 	PublicKeyEncodingEnum,
 } from '../api';
-import { ApiKeyConvert } from '.';
+import { ApiKeyConvert, CryptoKeyConvert } from '.';
 
 const publicKeyTestCases = [
 	{
@@ -25,30 +25,34 @@ const publicKeyTestCases = [
 			encoding: PublicKeyEncodingEnum._0xPrefix,
 			value: encode('hex/0x-prefix', AliceED25519PublicKey.bytes),
 		} as ApiPublicKey,
-		resultPublicKey: AliceED25519PublicKey,
+		cryptoPublicKey: AliceED25519PublicKey,
 	},
 	{
 		name: 'Convert SECP256K1 Public key',
 		apiPublicKey: {
 			curve: PublicKeyCurveEnum.Secp256k1,
-			encoding: PublicKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceSECP256K1PublicKey.bytes),
+			encoding: PublicKeyEncodingEnum._0xPrefix,
+			value: encode('hex/0x-prefix', AliceSECP256K1PublicKey.bytes),
 		} as ApiPublicKey,
-		resultPublicKey: AliceSECP256K1PublicKey,
+		cryptoPublicKey: AliceSECP256K1PublicKey,
 	},
 	{
 		name: 'Convert Sr25519 Public key',
 		apiPublicKey: {
 			curve: PublicKeyCurveEnum.Sr25519,
-			encoding: PublicKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceSR25519PublicKey.bytes),
+			encoding: PublicKeyEncodingEnum._0xPrefix,
+			value: encode('hex/0x-prefix', AliceSR25519PublicKey.bytes),
 		} as ApiPublicKey,
-		resultPublicKey: AliceSR25519PublicKey,
+		cryptoPublicKey: AliceSR25519PublicKey,
 	},
 ] as const;
 
-test.each(publicKeyTestCases)('$name', ({ apiPublicKey, resultPublicKey }) => {
-	expect(ApiKeyConvert.public(apiPublicKey)).toEqual(resultPublicKey);
+test.each(publicKeyTestCases)('API->Crypto $name', ({ apiPublicKey, cryptoPublicKey }) => {
+	expect(ApiKeyConvert.public(apiPublicKey)).toEqual(cryptoPublicKey);
+});
+
+test.each(publicKeyTestCases)('Crypto->API $name', ({ apiPublicKey, cryptoPublicKey }) => {
+	expect(CryptoKeyConvert.public(cryptoPublicKey)).toEqual(apiPublicKey);
 });
 
 test('public key convert should fail for unsupported curve', () => {
@@ -62,33 +66,37 @@ const privateKeyTestCases = [
 		name: 'Convert Ed25519 Private key',
 		apiPrivateKey: {
 			curve: PrivateKeyCurveEnum.Ed25519,
-			encoding: PrivateKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceED25519PrivateKeyBytes),
+			encoding: PrivateKeyEncodingEnum._0xPrefix,
+			value: encode('hex/0x-prefix', AliceED25519PrivateKeyBytes),
 		} as ApiPrivateKey,
-		resultPrivateKey: AliceED25519PrivateKey,
+		cryptoPrivateKey: AliceED25519PrivateKey,
 	},
 	{
 		name: 'Convert SECP256K1 Private key',
 		apiPrivateKey: {
 			curve: PrivateKeyCurveEnum.Secp256k1,
-			encoding: PrivateKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceSECP256K1PrivateKey.bytes),
+			encoding: PrivateKeyEncodingEnum._0xPrefix,
+			value: encode('hex/0x-prefix', AliceSECP256K1PrivateKey.bytes),
 		} as ApiPublicKey,
-		resultPrivateKey: AliceSECP256K1PrivateKey,
+		cryptoPrivateKey: AliceSECP256K1PrivateKey,
 	},
 	{
 		name: 'Convert Sr25519 Private key',
 		apiPrivateKey: {
 			curve: PrivateKeyCurveEnum.Sr25519,
-			encoding: PrivateKeyEncodingEnum.Plain,
-			value: encode('hex/plain', AliceSR25519PrivateKey.bytes),
+			encoding: PrivateKeyEncodingEnum._0xPrefix,
+			value: encode('hex/0x-prefix', AliceSR25519PrivateKey.bytes),
 		} as ApiPublicKey,
-		resultPrivateKey: AliceSR25519PrivateKey,
+		cryptoPrivateKey: AliceSR25519PrivateKey,
 	},
 ] as const;
 
-test.each(privateKeyTestCases)('$name', ({ apiPrivateKey, resultPrivateKey }) => {
-	expect(ApiKeyConvert.private(apiPrivateKey)).toEqual(resultPrivateKey);
+test.each(privateKeyTestCases)('API->Crypto $name', ({ apiPrivateKey, cryptoPrivateKey }) => {
+	expect(ApiKeyConvert.private(apiPrivateKey)).toEqual(cryptoPrivateKey);
+});
+
+test.each(privateKeyTestCases)('Crypto->API $name', ({ apiPrivateKey, cryptoPrivateKey }) => {
+	expect(CryptoKeyConvert.private(cryptoPrivateKey)).toEqual(apiPrivateKey);
 });
 
 test('private key convert should fail for unsupported Sr25519 curve', () => {
