@@ -9,4 +9,8 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		name: 'unstoppable',
 		domains: ['crypto', 'wallet', 'blockchain', 'x', '888', 'nft', 'dao'],
 	},
+	{
+		name: 'freename',
+		domains: ['aurora'],
+	},
 ];
