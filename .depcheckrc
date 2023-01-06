@@ -1,0 +1,3 @@
+ignores: ["protobufjs", "jest-environment-jsdom"]
+ignorePatterns: [".rollup.cache"]
+

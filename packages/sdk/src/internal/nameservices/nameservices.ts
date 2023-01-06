@@ -2,9 +2,8 @@ import { encodePublicKey, isPublicKeyEqual, PublicKey } from '@mailchain/crypto'
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createNameServiceAddress, NameServiceAddress } from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
+import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../../mailchain';
-import { IdentityKeysApiFactory, IdentityKeysApiInterface } from '../api';
-import { createAxiosConfiguration } from '../axios/config';
 import { UserMailbox } from '../user';
 import { IdentityKeys } from '../identityKeys';
 
@@ -22,7 +21,7 @@ export class Nameservices {
 	) {}
 
 	public static create(config: Configuration) {
-		const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config));
+		const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config.apiPath));
 		const identityKeysService = IdentityKeys.create(config);
 
 		return new Nameservices(identityKeysApi, identityKeysService, config.mailchainAddressDomain);

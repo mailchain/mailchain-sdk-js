@@ -1,14 +1,12 @@
 import { KeyRingDecrypter } from '@mailchain/keyring';
 import { encodeHexZeroX, decodeHexZeroX } from '@mailchain/encoding';
-import { signMailchainDeliveryConfirmation } from '../signatures/mailchain_message_confirmation';
-import { TransportApiFactory } from '../api';
-import { getAxiosWithSigner } from '../auth/jwt';
+import { TransportApiFactory, createAxiosConfiguration, getAxiosWithSigner } from '@mailchain/api';
+import { signMailchainDeliveryConfirmation } from '@mailchain/signatures';
 import { Configuration } from '../../mailchain';
-import { createAxiosConfiguration } from '../axios/config';
 
 export async function confirmDelivery(configuration: Configuration, messagingKey: KeyRingDecrypter, hash: string) {
 	const transportApi = TransportApiFactory(
-		createAxiosConfiguration(configuration),
+		createAxiosConfiguration(configuration.apiPath),
 		undefined,
 		getAxiosWithSigner(messagingKey),
 	);

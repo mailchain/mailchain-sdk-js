@@ -18,21 +18,18 @@
 	},
 	"homepage": "https://docs.mailchain.com/developer",
 	"dependencies": {
-		"@cloudflare/opaque-ts": "^0.7.5",
-		"@ethersproject/hash": "5.7.0",
 		"@mailchain/addressing": "0.11.2",
+		"@mailchain/api": "0.11.2",
 		"@mailchain/crypto": "0.11.2",
 		"@mailchain/encoding": "0.11.2",
 		"@mailchain/keyring": "0.11.2",
 		"@mailchain/message-composer": "0.11.2",
+		"@mailchain/signatures": "0.11.2",
 		"@noble/hashes": "^1.0.0",
-		"@types/secp256k1": "^4.0.2",
-		"axios": "^0.26.1",
 		"email-addresses": "5.0.0",
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
-		"protobufjs": "7.1.1",
-		"secp256k1": "^4.0.2"
+		"protobufjs": "7.1.1"
 	},
 	"engines": {
 		"node": ">=15.0.0"
@@ -45,6 +42,7 @@
 	},
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
+		"axios": "^0.26.1",
 		"axios-mock-adapter": "^1.21.1",
 		"jest-mock-extended": "^3.0.1"
 	}

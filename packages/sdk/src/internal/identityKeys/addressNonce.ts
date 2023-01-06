@@ -5,13 +5,13 @@ import {
 	IdentityKeysApiInterface,
 	MessagingKeysApiFactory,
 	MessagingKeysApiInterface,
-} from '../api';
-import { createAxiosConfiguration } from '../axios/config';
+	createAxiosConfiguration,
+} from '@mailchain/api';
 import { Configuration } from '../../mailchain';
 
 export async function getAddressNonce(config: Configuration, address: string, protocol: ProtocolType) {
-	const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config));
-	const messagingKeysApi = MessagingKeysApiFactory(createAxiosConfiguration(config));
+	const identityKeysApi = IdentityKeysApiFactory(createAxiosConfiguration(config.apiPath));
+	const messagingKeysApi = MessagingKeysApiFactory(createAxiosConfiguration(config.apiPath));
 
 	return getAddressNonceWithFactories(identityKeysApi, messagingKeysApi, address, protocol);
 }

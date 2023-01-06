@@ -1,11 +1,6 @@
 import { decodeHexZeroX, decode } from '@mailchain/encoding';
 import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
-import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
-import { AddressVerificationFailed, PublicKeyNotFoundFailed } from '../signatures/errors';
-import { createProofMessage, ProofParams } from '../keyreg';
-import { verify } from '../signatures/verify';
-import { ApiKeyConvert } from '../apiHelpers';
 import {
 	MessagingKeysApi,
 	ProvidedKeyProof,
@@ -14,9 +9,17 @@ import {
 	MessagingKeysApiFactory,
 	Address,
 	AddressesApi,
-} from '../api';
+	createAxiosConfiguration,
+	ApiKeyConvert,
+} from '@mailchain/api';
+import {
+	verifyMailchainProvidedMessagingKey,
+	AddressVerificationFailed,
+	PublicKeyNotFoundFailed,
+	verify,
+} from '@mailchain/signatures';
+import { createProofMessage, ProofParams } from '@mailchain/signatures/keyreg';
 import { Configuration } from '../../mailchain';
-import { createAxiosConfiguration } from '../axios/config';
 
 export const getAddressFromApiResponse = (address: Address) => {
 	return decode(address.encoding!, address.value);
@@ -101,8 +104,8 @@ export class Lookup {
 
 	static create(configuration: Configuration) {
 		return new Lookup(
-			AddressesApiFactory(createAxiosConfiguration(configuration)) as AddressesApi,
-			MessagingKeysApiFactory(createAxiosConfiguration(configuration)) as MessagingKeysApi,
+			AddressesApiFactory(createAxiosConfiguration(configuration.apiPath)) as AddressesApi,
+			MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)) as MessagingKeysApi,
 		);
 	}
 }

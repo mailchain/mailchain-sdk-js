@@ -1,10 +1,8 @@
 import { decodeHexZeroX } from '@mailchain/encoding';
 import { createWalletAddress, formatAddress, ProtocolType } from '@mailchain/addressing';
-import { verifyMailchainProvidedMessagingKey } from '../signatures/mailchain_msgkey';
-import { ApiKeyConvert } from '../apiHelpers';
-import { AddressesApiFactory, MessagingKeysApiFactory } from '../api';
+import { AddressesApiFactory, MessagingKeysApiFactory, ApiKeyConvert, createAxiosConfiguration } from '@mailchain/api';
+import { verifyMailchainProvidedMessagingKey } from '@mailchain/signatures';
 import { Configuration } from '../../mailchain';
-import { createAxiosConfiguration } from '../axios/config';
 
 export async function verify(
 	config: Configuration,
@@ -12,8 +10,8 @@ export async function verify(
 	protocol: ProtocolType,
 	mailchainMailDomain: string,
 ): Promise<Boolean> {
-	const addressApi = AddressesApiFactory(createAxiosConfiguration(config));
-	const verificationApi = MessagingKeysApiFactory(createAxiosConfiguration(config));
+	const addressApi = AddressesApiFactory(createAxiosConfiguration(config.apiPath));
+	const verificationApi = MessagingKeysApiFactory(createAxiosConfiguration(config.apiPath));
 	const mailchainPublicKeyResponse = await verificationApi.getMailchainPublicKey();
 	if (!mailchainPublicKeyResponse.data.key?.value) return false;
 

@@ -8,3 +8,4 @@ export * from './private';
 export * from './rand';
 export * from './hd';
 export * from './cipher';
+export * from './errors';

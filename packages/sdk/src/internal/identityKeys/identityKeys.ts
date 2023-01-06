@@ -2,16 +2,16 @@ import { encodeAddressByProtocol, formatAddress, MailchainAddress, ProtocolType 
 import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeHexZeroX, encodeHexZeroX, EncodingType, EncodingTypes } from '@mailchain/encoding';
 import Axios from 'axios';
-import { Configuration } from '../../mailchain';
 import {
 	AddressEncodingEnum,
 	AddressesApiFactory,
 	AddressesApiInterface,
 	IdentityKeysApiFactory,
 	IdentityKeysApiInterface,
-} from '../api';
-import { CryptoKeyConvert } from '../apiHelpers';
-import { createAxiosConfiguration } from '../axios/config';
+	createAxiosConfiguration,
+	CryptoKeyConvert,
+} from '@mailchain/api';
+import { Configuration } from '../../mailchain';
 
 export type SignProofResult = {
 	identityKey: PublicKey;
@@ -34,8 +34,8 @@ export class IdentityKeys {
 
 	static create(config: Configuration) {
 		return new IdentityKeys(
-			AddressesApiFactory(createAxiosConfiguration(config)),
-			IdentityKeysApiFactory(createAxiosConfiguration(config)),
+			AddressesApiFactory(createAxiosConfiguration(config.apiPath)),
+			IdentityKeysApiFactory(createAxiosConfiguration(config.apiPath)),
 		);
 	}
 

@@ -6,16 +6,16 @@ import { mock } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { sha256 } from '@noble/hashes/sha256';
-import * as protoInbox from '../protobuf/inbox/inbox';
-import { createMimeMessage } from '../formatters/generate';
-import { Payload } from '../transport/payload/content/payload';
 import {
 	GetMessageResponseBody,
 	GetMessagesInViewResponseBody,
 	InboxApi,
 	PostPayloadResponseBody,
 	PutEncryptedMessageRequestBodyFolderEnum,
-} from '../api';
+} from '@mailchain/api';
+import * as protoInbox from '../protobuf/inbox/inbox';
+import { createMimeMessage } from '../formatters/generate';
+import { Payload } from '../transport/payload/content/payload';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
 import { dummyMailData } from '../test.const';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';

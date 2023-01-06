@@ -1,0 +1,35 @@
+{
+	"name": "@mailchain/api",
+	"version": "0.11.2",
+	"description": "Mailchain api tools",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Mailchain",
+		"email": "support@mailchain.co",
+		"url": "https://mailchain.com/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "api"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
+	"dependencies": {
+		"@mailchain/crypto": "0.11.2",
+		"@mailchain/encoding": "0.11.2"
+	},
+	"devDependencies": {
+		"@mailchain/keyring": "0.11.2",
+		"axios": "^0.26.1",
+		"axios-mock-adapter": "^1.21.1",
+		"lodash": "^4.17.21"
+	},
+	"scripts": {
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"test": "run -T jest",
+		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
+	}
+}

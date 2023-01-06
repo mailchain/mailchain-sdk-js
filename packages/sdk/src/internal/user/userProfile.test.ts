@@ -8,13 +8,13 @@ import {
 	AliceSECP256K1PublicAddressStr,
 	BobSECP256K1PublicAddressStr,
 } from '@mailchain/addressing/protocols/ethereum/test.const';
-import { user } from '../protobuf/user/user';
 import {
 	GetUserMailboxesResponseBody,
 	GetUsernameResponseBody,
 	PostUserMailboxResponseBody,
 	UserApiInterface,
-} from '../api';
+} from '@mailchain/api';
+import { user } from '../protobuf/user/user';
 import { nopMigration } from '../migration';
 import { MailchainUserProfile, UserProfile } from './userProfile';
 import { UserMailboxMigrationRule } from './migrations';

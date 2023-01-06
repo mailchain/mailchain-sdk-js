@@ -17,11 +17,15 @@ import {
 	SignerWithPublicKey,
 } from '@mailchain/crypto';
 import { AxiosError } from 'axios';
+import {
+	Setting,
+	UserApiFactory,
+	UserApiInterface,
+	createAxiosConfiguration,
+	getAxiosWithSigner,
+} from '@mailchain/api';
 import { user } from '../protobuf/user/user';
-import { Setting, UserApiFactory, UserApiInterface } from '../api';
 import { Configuration } from '../../mailchain';
-import { createAxiosConfiguration } from '../axios/config';
-import { getAxiosWithSigner } from '../auth/jwt';
 import { combineMigrations } from '../migration';
 import { IdentityKeys } from '../identityKeys';
 import { Nameservices } from '../nameservices';
@@ -73,7 +77,7 @@ export class MailchainUserProfile implements UserProfile {
 		accountIdentityKey: SignerWithPublicKey,
 		mailboxCrypto: Encrypter & Decrypter,
 	): MailchainUserProfile {
-		const axiosConfig = createAxiosConfiguration(config);
+		const axiosConfig = createAxiosConfiguration(config.apiPath);
 		const identityKeys = IdentityKeys.create(config);
 		const userApi = UserApiFactory(axiosConfig, undefined, getAxiosWithSigner(accountIdentityKey));
 		const nameservice = Nameservices.create(config);

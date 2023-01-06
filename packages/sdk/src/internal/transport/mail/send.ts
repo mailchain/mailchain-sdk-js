@@ -1,8 +1,8 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
+import { createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../../../';
-import { createAxiosConfiguration } from '../../axios/config';
 import { MailAddress, MailData } from '../../formatters/types';
 import { Lookup, LookupResult } from '../../identityKeys';
 import { Payload } from '../payload/content/payload';
@@ -89,7 +89,7 @@ export class MailSender {
 
 	static create(configuration: Configuration, signer: SignerWithPublicKey) {
 		return new MailSender(
-			PayloadSender.create(createAxiosConfiguration(configuration), signer),
+			PayloadSender.create(createAxiosConfiguration(configuration.apiPath), signer),
 			(address: string) => Lookup.create(configuration).messageKey(address),
 		);
 	}

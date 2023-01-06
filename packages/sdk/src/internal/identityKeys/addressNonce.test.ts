@@ -8,7 +8,7 @@ describe('getAddressNonce', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		jest.mock('../api', () => ({
+		jest.mock('@mailchain/api', () => ({
 			IdentityKeysApiFactory: jest.fn(() => 'tote'),
 			MessagingKeysApiFactory: jest.fn(() => 'mote'),
 		}));

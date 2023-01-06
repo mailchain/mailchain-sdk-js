@@ -1,0 +1,36 @@
+{
+	"name": "@mailchain/signatures",
+	"version": "0.11.2",
+	"description": "Mailchain signatures",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Mailchain",
+		"email": "support@mailchain.co",
+		"url": "https://mailchain.com/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "signatures"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
+	"dependencies": {
+		"@ethersproject/hash": "5.7.0",
+		"@mailchain/crypto": "0.11.2",
+		"@mailchain/encoding": "0.11.2",
+		"@types/secp256k1": "^4.0.2",
+		"secp256k1": "^4.0.2"
+	},
+	"devDependencies": {
+		"@mailchain/addressing": "0.11.2",
+		"@mailchain/keyring": "0.11.2"
+	},
+	"scripts": {
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"test": "run -T jest",
+		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
+	}
+}

@@ -2,19 +2,19 @@ import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
 import { formatAddress, MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
-import { Configuration } from '../..';
 import {
 	InboxApiInterface,
 	PutEncryptedMessageRequestBodyFolderEnum,
 	Message as ApiMessagePreview,
 	InboxApiFactory,
-} from '../api';
+	createAxiosConfiguration,
+	getAxiosWithSigner,
+} from '@mailchain/api';
+import { Configuration } from '../..';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { parseMimeText } from '../formatters/parse';
 import { MailData } from '../formatters/types';
-import { getAxiosWithSigner } from '../auth/jwt';
 import { Payload } from '../transport/payload/content/payload';
-import { createAxiosConfiguration } from '../axios/config';
 import { UserMailbox } from '../user/types';
 import { IdentityKeys } from '../identityKeys';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
@@ -96,7 +96,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	) {}
 
 	static create(sdkConfig: Configuration, keyRing: KeyRing): MailboxOperations {
-		const axiosConfig = createAxiosConfiguration(sdkConfig);
+		const axiosConfig = createAxiosConfiguration(sdkConfig.apiPath);
 		const axiosClient = getAxiosWithSigner(keyRing.accountMessagingKey());
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
 		const messagePreviewCrypto = keyRing.inboxKey();

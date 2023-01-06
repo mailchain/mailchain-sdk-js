@@ -3,7 +3,7 @@ import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto/
 import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
-import { PostDeliveryRequestResponseBody, TransportApiInterface } from '../../api';
+import { PostDeliveryRequestResponseBody, TransportApiInterface } from '@mailchain/api';
 import { PayloadSender } from './send';
 import { Payload } from './content/payload';
 import { decryptPayload } from './content/decrypt';

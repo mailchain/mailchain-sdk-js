@@ -6,9 +6,8 @@ import {
 	PublicKey,
 } from '@mailchain/crypto';
 import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { Configuration, TransportApiInterface, TransportApiFactory, getAxiosWithSigner } from '@mailchain/api';
 import { protocol } from '../../protobuf/protocol/protocol';
-import { Configuration, TransportApiInterface, TransportApiFactory } from '../../api';
-import { getAxiosWithSigner } from '../../auth/jwt';
 import { CHUNK_LENGTH_1MB } from './content/chunk';
 import { encryptPayload } from './content/encrypt';
 import { Payload } from './content/payload';
