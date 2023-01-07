@@ -1,15 +1,15 @@
 import { encodeAddressByProtocol, formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
-import { decodeHexZeroX, encodeHexZeroX, EncodingType, EncodingTypes } from '@mailchain/encoding';
+import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
 import Axios from 'axios';
 import {
-	AddressEncodingEnum,
 	AddressesApiFactory,
 	AddressesApiInterface,
 	IdentityKeysApiFactory,
 	IdentityKeysApiInterface,
 	createAxiosConfiguration,
 	CryptoKeyConvert,
+	encodingTypeToEncodingEnum,
 } from '@mailchain/api';
 import { Configuration } from '../../mailchain';
 
@@ -76,16 +76,4 @@ export class IdentityKeys {
 			signatureMethod: signProofRes.signatureMethod,
 		});
 	}
-}
-
-function encodingTypeToEncodingEnum(encoding: EncodingType): AddressEncodingEnum {
-	switch (encoding) {
-		case EncodingTypes.Hex:
-			return AddressEncodingEnum.HexPlain;
-		case EncodingTypes.Hex0xPrefix:
-			return AddressEncodingEnum.Hex0xPrefix;
-		case EncodingTypes.Utf8:
-			return AddressEncodingEnum.TextUtf8;
-	}
-	throw new Error(`unsupported encoding by API of [${encoding}]`);
 }
