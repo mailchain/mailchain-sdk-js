@@ -7,7 +7,7 @@ import {
 	PrepareResult,
 	SendResult,
 } from './internal/transport/mail/send';
-import { Lookup } from './internal/identityKeys';
+import { MessagingKeys } from './internal/messagingKeys';
 import { MailchainUserProfile, UserNotFoundError, UserProfile } from './internal/user';
 import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
@@ -111,7 +111,7 @@ export class Mailchain {
 	 */
 	async sendMail(params: SendMailParams): Promise<SendMailResult> {
 		const senderMailbox = await this.getSenderMailbox(params.from, {
-			lookup: Lookup.create(this.config),
+			messagingKeys: MessagingKeys.create(this.config),
 			userProfile: this._userProfile,
 		});
 		const senderMessagingKey = this.keyRing.addressMessagingKey(
@@ -190,11 +190,11 @@ export class Mailchain {
 
 	private async getSenderMailbox(
 		fromAddress: Address,
-		config: { lookup: Lookup; userProfile: UserProfile },
+		config: { messagingKeys: MessagingKeys; userProfile: UserProfile },
 	): Promise<UserMailbox> {
 		const mailboxes = await config.userProfile.mailboxes();
 
-		const { identityKey } = await config.lookup.messageKey(fromAddress);
+		const { identityKey } = await config.messagingKeys.resolve(fromAddress);
 		if (identityKey == null) {
 			throw Error(`${fromAddress} is not registered with Mailchain services`);
 		}

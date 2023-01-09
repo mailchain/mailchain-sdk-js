@@ -3,7 +3,7 @@ import { ED25519PublicKey } from '@mailchain/crypto';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import { Configuration } from '../mailchain';
 import { MailData } from './formatters/types';
-import { LookupResult } from './identityKeys';
+import { GetMessagingKeyResponse } from './messagingKeys';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox, BobWalletMailbox } from './user/test.const';
 
 export const dummyMailData: MailData = {
@@ -42,7 +42,7 @@ export const dummyMailData: MailData = {
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque vitae tempus quam pellentesque nec nam. Quam nulla porttitor massa id. Nisl rhoncus mattis rhoncus urna. Tortor posuere ac ut consequat semper viverra nam. Facilisis mauris sit amet massa. Et molestie ac feugiat sed lectus vestibulum. Id cursus metus aliquam eleifend mi in nulla posuere sollicitudin. A diam sollicitudin tempor id. Mauris ultrices eros in cursus turpis massa. Elementum facilisis leo vel fringilla est ullamcorper. Aliquam sem et tortor consequat id porta.	',
 };
 
-export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map([
+export const dummyMailDataResolvedAddresses: Map<string, GetMessagingKeyResponse> = new Map([
 	[
 		formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 		{
@@ -159,7 +159,7 @@ export const dummyMailDataResolvedAddresses: Map<string, LookupResult> = new Map
 
 export const dummyMailDataResolvedAddressesWithoutMessagingKey: Map<
 	string,
-	Omit<LookupResult, 'messagingKey'>
+	Omit<GetMessagingKeyResponse, 'messagingKey'>
 > = new Map(
 	[...dummyMailDataResolvedAddresses].map(([address, result]) => {
 		const tmp = { ...result };

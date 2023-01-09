@@ -1,6 +1,6 @@
 import { ETHEREUM } from '@mailchain/addressing/protocols';
 import { AxiosError } from 'axios';
-import { getAddressNonceWithFactories } from './addressNonce';
+import { MessagingKeyNonces } from './addressNonce';
 
 describe('getAddressNonce', () => {
 	const mockIdentityKeysApi = { getIdentityKey: jest.fn() };
@@ -19,12 +19,8 @@ describe('getAddressNonce', () => {
 			Promise.reject({ isAxiosError: true, response: { status: 404 } } as AxiosError),
 		);
 
-		const resultNonce = await getAddressNonceWithFactories(
-			mockIdentityKeysApi as any,
-			mockMessagingKeysApi as any,
-			'0x1337',
-			ETHEREUM,
-		);
+		const target = new MessagingKeyNonces(mockMessagingKeysApi as any, mockIdentityKeysApi as any);
+		const resultNonce = await target.getAddressNonce('0x1337', ETHEREUM);
 
 		expect(mockIdentityKeysApi.getIdentityKey.mock.calls[0][0]).toEqual('0x1337');
 		expect(mockIdentityKeysApi.getIdentityKey.mock.calls[0][1]).toEqual(ETHEREUM);
@@ -36,12 +32,8 @@ describe('getAddressNonce', () => {
 		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.resolve({ data: { identityKey: '0xIdentityKey' } }));
 		mockMessagingKeysApi.getIdentityKeyNonce.mockReturnValue(Promise.resolve({ data: { nonce: 9 } }));
 
-		const resultNonce = await getAddressNonceWithFactories(
-			mockIdentityKeysApi as any,
-			mockMessagingKeysApi as any,
-			'0x1337',
-			ETHEREUM,
-		);
+		const target = new MessagingKeyNonces(mockMessagingKeysApi as any, mockIdentityKeysApi as any);
+		const resultNonce = await target.getAddressNonce('0x1337', ETHEREUM);
 
 		expect(mockMessagingKeysApi.getIdentityKeyNonce.mock.calls[0][0]).toEqual('0xIdentityKey');
 		expect(resultNonce).toEqual(9);
@@ -50,8 +42,7 @@ describe('getAddressNonce', () => {
 	it('should throw error when unexpected error appears', async () => {
 		mockIdentityKeysApi.getIdentityKey.mockReturnValue(Promise.reject(new Error('unexpected error')));
 
-		await expect(
-			getAddressNonceWithFactories(mockIdentityKeysApi as any, mockMessagingKeysApi as any, '0x1337', ETHEREUM),
-		).rejects.toThrow();
+		const target = new MessagingKeyNonces(mockMessagingKeysApi as any, mockIdentityKeysApi as any);
+		await expect(target.getAddressNonce('0x1337', ETHEREUM)).rejects.toThrow();
 	});
 });

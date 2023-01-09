@@ -12,3 +12,4 @@ const CryptoKeyConvert = {
 
 export { ApiKeyConvert, CryptoKeyConvert };
 export * from './encoding';
+export * from './address';

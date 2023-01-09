@@ -2,13 +2,13 @@ import { encodePublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createMessageComposer } from '@mailchain/message-composer';
 import { HeaderAttribute } from '@mailchain/message-composer/types';
-import { LookupResult } from '../identityKeys';
+import { GetMessagingKeyResponse } from '../messagingKeys';
 import { X_IDENTITY_KEYS } from './conts';
 import { MailAddress, MailData } from './types';
 
 export const createMimeMessage = async (
 	mailData: MailData,
-	resolvedAddresses: Map<string, LookupResult>,
+	resolvedAddresses: Map<string, GetMessagingKeyResponse>,
 ): Promise<{
 	original: string;
 	visibleRecipients: string;
@@ -77,7 +77,7 @@ export const createMimeMessage = async (
 
 function putIdentityKeyAttr(
 	address: string,
-	resolvedAddresses: Map<string, LookupResult>,
+	resolvedAddresses: Map<string, GetMessagingKeyResponse>,
 	attrs: HeaderAttribute[],
 ): HeaderAttribute | undefined {
 	const lookupResult = resolvedAddresses.get(address);

@@ -3,7 +3,7 @@ import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
-import { LookupResult } from '../../identityKeys';
+import { MessagingKeys } from '../../messagingKeys';
 import { PayloadSender } from '../payload/send';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
 import { Payload } from '../payload/content/payload';
@@ -36,7 +36,7 @@ jest.mock('./payload', () => ({
 
 describe('MailSender', () => {
 	let mockPayloadSender: MockProxy<PayloadSender>;
-	let mockAddressResolver: jest.Mock<Promise<LookupResult>, [string]>;
+	let mockMessagingKeys: MockProxy<MessagingKeys>;
 	let mailSender: MailSender;
 
 	beforeAll(() => {
@@ -44,14 +44,14 @@ describe('MailSender', () => {
 	});
 
 	beforeEach(() => {
-		mockAddressResolver = jest.fn();
-		mockAddressResolver.mockImplementation(
+		mockMessagingKeys = mock();
+		mockMessagingKeys.resolve.mockImplementation(
 			async (address) =>
 				dummyMailDataResolvedAddresses.get(address) ?? fail(`invalid mock call with address [${address}]`),
 		);
 
 		mockPayloadSender = mock();
-		mailSender = new MailSender(mockPayloadSender, mockAddressResolver);
+		mailSender = new MailSender(mockPayloadSender, mockMessagingKeys);
 	});
 
 	it('should prepare distributions for sending', async () => {

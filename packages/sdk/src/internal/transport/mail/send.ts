@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import { createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../../../';
 import { MailAddress, MailData } from '../../formatters/types';
-import { Lookup, LookupResult } from '../../identityKeys';
+import { GetMessagingKeyResponse, MessagingKeys } from '../../messagingKeys';
 import { Payload } from '../payload/content/payload';
 import { SendPayloadDeliveryResult, PayloadSender, PreparePayloadResult } from '../payload/send';
 import { createMailPayloads, Distribution } from './payload';
@@ -74,28 +74,23 @@ type PreparedDistribution = {
 
 export type SendResult = SendResultFailedPrepare | SendResultFullyCompleted | SendResultPartiallyCompleted;
 
-export type LookupMessageKeyResolver = (address: string) => Promise<LookupResult>;
-
 export type ResolvedAddressResult = {
-	resolved: Map<string, LookupResult>;
+	resolved: Map<string, GetMessagingKeyResponse>;
 	failed: FailedAddressResolutionError[];
 };
 
 export class MailSender {
-	constructor(
-		private readonly sender: PayloadSender,
-		private readonly lookupMessageKeyResolver: LookupMessageKeyResolver,
-	) {}
+	constructor(private readonly sender: PayloadSender, private readonly messagingKeys: MessagingKeys) {}
 
 	static create(configuration: Configuration, signer: SignerWithPublicKey) {
 		return new MailSender(
 			PayloadSender.create(createAxiosConfiguration(configuration.apiPath), signer),
-			(address: string) => Lookup.create(configuration).messageKey(address),
+			MessagingKeys.create(configuration),
 		);
 	}
 
 	private async verifySender(fromAddress: MailAddress, senderMessagingKey: SignerWithPublicKey): Promise<boolean> {
-		const resolvedMessagingKey = await this.lookupMessageKeyResolver(fromAddress.address);
+		const resolvedMessagingKey = await this.messagingKeys.resolve(fromAddress.address);
 
 		const resolvedMessagingKeyBytes = resolvedMessagingKey.messagingKey.bytes;
 		const paramsMessagingKey = senderMessagingKey.publicKey.bytes;
@@ -185,18 +180,18 @@ export class MailSender {
 
 	private async resolveAddresses(mailAddresses: MailAddress[]): Promise<ResolvedAddressResult> {
 		const addresses = [...new Set(mailAddresses.map((r) => r.address))];
-		const lookupResults = await Promise.allSettled(
+		const getMessagingKeyResponses = await Promise.allSettled(
 			addresses.map(async (address) => {
-				const lookupResult = await this.lookupMessageKeyResolver(address).catch((e: Error) => {
+				const getMessagingKeyResponse = await this.messagingKeys.resolve(address).catch((e: Error) => {
 					throw new FailedAddressResolutionError(address, e);
 				});
-				return { address, ...lookupResult };
+				return { address, ...getMessagingKeyResponse };
 			}),
 		);
 
 		const resolved: ResolvedAddressResult['resolved'] = new Map();
 		const failed: ResolvedAddressResult['failed'] = [];
-		for (const result of lookupResults) {
+		for (const result of getMessagingKeyResponses) {
 			if (result.status === 'fulfilled') {
 				const { messagingKey, identityKey, protocol, network } = result.value;
 				resolved.set(result.value.address, { messagingKey, identityKey, protocol, network });

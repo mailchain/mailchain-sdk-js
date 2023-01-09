@@ -3,7 +3,7 @@ import { EncodingTypes } from '@mailchain/encoding';
 import { MailData, MailAddress } from '../../formatters/types';
 import { Payload } from '../../transport/payload/content/payload';
 import { createMimeMessage } from '../../formatters/generate';
-import { LookupResult } from '../../identityKeys';
+import { GetMessagingKeyResponse } from '../../messagingKeys';
 
 export type Distribution = {
 	recipients: MailAddress[];
@@ -12,7 +12,7 @@ export type Distribution = {
 
 export async function createMailPayloads(
 	senderMessagingKey: SignerWithPublicKey,
-	resolvedAddresses: Map<string, LookupResult>,
+	resolvedAddresses: Map<string, GetMessagingKeyResponse>,
 	mailData: MailData,
 ): Promise<{
 	original: Payload;
