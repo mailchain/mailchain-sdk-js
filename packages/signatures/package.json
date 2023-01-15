@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/signatures",
-	"version": "0.12.0",
+	"version": "0.13.0",
 	"description": "Mailchain signatures",
 	"license": "Apache-2.0",
 	"author": {
@@ -18,14 +18,14 @@
 	},
 	"dependencies": {
 		"@ethersproject/hash": "5.7.0",
-		"@mailchain/crypto": "0.12.0",
-		"@mailchain/encoding": "0.12.0",
+		"@mailchain/crypto": "0.13.0",
+		"@mailchain/encoding": "0.13.0",
 		"@types/secp256k1": "^4.0.2",
 		"secp256k1": "^4.0.2"
 	},
 	"devDependencies": {
-		"@mailchain/addressing": "0.12.0",
-		"@mailchain/keyring": "0.12.0"
+		"@mailchain/addressing": "0.13.0",
+		"@mailchain/keyring": "0.13.0"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
