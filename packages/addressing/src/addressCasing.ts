@@ -10,5 +10,7 @@ export function casingByProtocol(value: string, protocol: ProtocolType): string 
 			return value; // substrate encoding is case sensitive
 		case ALGORAND:
 			return value.toLowerCase(); // case insensitive
+		default:
+			throw new Error(`casing for protocol [${protocol}] not defined`);
 	}
 }

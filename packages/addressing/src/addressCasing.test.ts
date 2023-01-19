@@ -21,7 +21,7 @@ const formatMailchainValueTests: { testName: string; value: string; protocol: Pr
 		expected: '5F3sa2TJAWMqDhXG6jhV4N8ko9SxwGy8TpaNS1repo5EYjQX',
 	},
 	{
-		testName: 'should have upper case for algorand protocol',
+		testName: 'should have lower case for algorand protocol',
 		value: 'Z4X3PU5L6X3IPHE3CB5IEIS52TE5GU3GZFOOWW7BOTVXK5BCYR3444OQDW',
 		protocol: ALGORAND,
 		expected: 'z4x3pu5l6x3iphe3cb5ieis52te5gu3gzfooww7botvxk5bcyr3444oqdw',
