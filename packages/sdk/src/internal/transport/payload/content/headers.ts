@@ -2,8 +2,10 @@ import { kindFromPublicKey, publicKeyFromKind, PublicKey } from '@mailchain/cryp
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 
 type ContentType = 'application/json' | 'message/x.mailchain';
+/**
+ * PayloadHeaders are the headers provide information about the payload.
+ */
 export type PayloadHeaders = {
-	// Origin?: Uint8Array;
 	/**
 	 * public key of sender to verify the contents
 	 */
