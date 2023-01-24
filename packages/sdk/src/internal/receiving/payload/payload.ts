@@ -24,19 +24,19 @@ export type UndeliveredPayload = UndeliveredPayloadOk | UndeliveredPayloadPayloa
 export type UndeliveredPayloadOk = {
 	status: 'ok';
 	payload: Payload;
-	hash: Uint8Array;
+	deliveryRequestHash: Uint8Array;
 };
 
 export type UndeliveredPayloadPayloadError = {
 	status: 'error-payload';
 	cause: Error;
-	hash: Uint8Array;
+	deliveryRequestHash: Uint8Array;
 };
 
 export type UndeliveredPayloadError = {
 	status: 'error-delivery-request';
 	cause: Error;
-	hash: Uint8Array;
+	deliveryRequestHash: Uint8Array;
 };
 
 export class PayloadReceiver {
@@ -67,7 +67,7 @@ export class PayloadReceiver {
 					case 'error':
 						return {
 							cause: result.cause,
-							hash: result.hash,
+							deliveryRequestHash: result.deliveryRequestHash,
 							status: 'error-delivery-request',
 						} as UndeliveredPayloadError;
 				}
@@ -108,19 +108,19 @@ function processReceivedPayload(payloadResponse: ReceivedPayload, result: Undeli
 			return {
 				status: 'ok',
 				payload: payloadResponse.payload,
-				hash: result.hash,
+				deliveryRequestHash: result.deliveryRequestHash,
 			} as UndeliveredPayloadOk;
 		case 'error':
 			return {
 				status: 'error-payload',
 				cause: payloadResponse.cause,
-				hash: result.hash,
+				deliveryRequestHash: result.deliveryRequestHash,
 			} as UndeliveredPayloadPayloadError;
 		default:
 			return {
 				status: 'error-payload',
 				cause: new Error('Unknown payload response status'),
-				hash: result.hash,
+				deliveryRequestHash: result.deliveryRequestHash,
 			} as UndeliveredPayloadPayloadError;
 	}
 }

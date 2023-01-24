@@ -1,6 +1,6 @@
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey, SignerWithPublicKey, PublicKey } from '@mailchain/crypto';
 import { Configuration, TransportApiInterface, TransportApiFactory, getAxiosWithSigner } from '@mailchain/api';
-import { CHUNK_LENGTH_1MB, encryptPayload, Payload, serialize } from '../../transport';
+import { Payload, serializeAndEncryptPayload } from '../../transport';
 
 export type PreparePayloadResult = {
 	payloadUri: string;
@@ -31,7 +31,8 @@ export class PayloadSender {
 	async prepare(payload: Payload): Promise<PreparePayloadResult> {
 		// create root encryption key that will be used to encrypt message content.
 		const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate());
-		const serializedContent = serialize(await encryptPayload(payload, payloadRootEncryptionKey, CHUNK_LENGTH_1MB));
+
+		const serializedContent = await serializeAndEncryptPayload(payload, payloadRootEncryptionKey);
 
 		const { uri: payloadUri } = await this.transportApi.postEncryptedPayload(serializedContent).then((r) => r.data);
 

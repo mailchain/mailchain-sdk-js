@@ -1,0 +1,1 @@
+export { MailReceiver } from './mail';

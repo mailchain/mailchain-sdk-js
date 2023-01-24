@@ -10,17 +10,35 @@ import { DeliveryRequests } from '../deliveryRequests';
 export type ReadonlyMailPayload = ReadonlyMailerPayload | Payload;
 export type ReceivedMail = ReceivedMailOk | ReceivedMailError;
 
+/**
+ * Success type for a mail that was received.
+ */
 export type ReceivedMailOk = {
 	status: 'ok';
+	/**
+	 * Payload of the mail.
+	 */
 	payload: ReadonlyMailPayload;
-	hash: Uint8Array;
+	/**
+	 * Hash of delivery request.
+	 */
+	deliveryRequestHash: Uint8Array;
 };
 
+/**
+ * Error type for a mail that could not be received.
+ */
 export type ReceivedMailError = {
 	status: 'error';
+	/**
+	 * Reason the mail could not be received.
+	 */
 	cause: Error;
 };
 
+/**
+ * Receive mail from the Mailchain network.
+ */
 export class MailReceiver {
 	constructor(
 		private readonly deliveryRequests: DeliveryRequests,
@@ -40,10 +58,18 @@ export class MailReceiver {
 		);
 	}
 
-	async confirmDelivery(hash: Uint8Array) {
-		await this.deliveryRequests.confirmDelivery(hash);
+	/**
+	 * Confirm the delivery of a mail has been completed.
+	 * @param hash of the delivery request.
+	 */
+	async confirmDelivery(deliveryRequestHash: Uint8Array) {
+		await this.deliveryRequests.confirmDelivery(deliveryRequestHash);
 	}
 
+	/**
+	 * Get all undelivered mail.
+	 * @returns the mail that has been received.
+	 */
 	async getUndelivered(): Promise<ReceivedMail[]> {
 		const undeliveredPayloads = await this.payloadReceiver.getUndelivered();
 
@@ -54,7 +80,7 @@ export class MailReceiver {
 						return {
 							status: 'ok',
 							payload: await this.processReceivedPayload(result.payload),
-							hash: result.hash,
+							deliveryRequestHash: result.deliveryRequestHash,
 						};
 					case 'error-payload':
 						return {
@@ -76,7 +102,12 @@ export class MailReceiver {
 		);
 	}
 
-	async processReceivedPayload(payload: Payload): Promise<ReadonlyMailPayload> {
+	/**
+	 * creates the mail content from the payload.
+	 * @param payload the decrypted payload received from the network.
+	 * @returns
+	 */
+	private async processReceivedPayload(payload: Payload): Promise<ReadonlyMailPayload> {
 		switch (payload.Headers.ContentType) {
 			case 'message/x.mailchain':
 				return payload;

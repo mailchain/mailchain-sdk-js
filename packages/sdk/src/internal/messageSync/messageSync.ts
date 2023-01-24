@@ -62,18 +62,25 @@ export class MessageSync {
 			const savedMessages = await this.mailboxOperations
 				.saveReceivedMessage({ payload: messageResult.payload, userMailbox: mailbox })
 				.catch((e) => {
-					console.warn(`Failed saving received message with hash ${messageResult.hash}`, e);
+					console.warn(`Failed saving received message with hash ${messageResult.deliveryRequestHash}`, e);
 					return undefined;
 				});
 
 			if (savedMessages && savedMessages.length > 0) {
 				messages.push(...savedMessages);
 				await receiver
-					.confirmDelivery(messageResult.hash)
+					.confirmDelivery(messageResult.deliveryRequestHash)
 					.then(() => {
-						console.debug(`Successfully confirmed delivery message hash ${messageResult.hash}`);
+						console.debug(
+							`Successfully confirmed delivery message hash ${messageResult.deliveryRequestHash}`,
+						);
 					})
-					.catch((e) => console.warn(`Failed saving received message with hash ${messageResult.hash}`, e));
+					.catch((e) =>
+						console.warn(
+							`Failed saving received message with hash ${messageResult.deliveryRequestHash}`,
+							e,
+						),
+					);
 			}
 		}
 		return { type: 'success', mailbox, messages };

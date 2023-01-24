@@ -15,13 +15,13 @@ export type UndeliveredDeliveryRequestSuccess = {
 	status: 'ok';
 	payloadRootEncryptionKey: ED25519ExtendedPrivateKey;
 	payloadUri: string;
-	hash: Uint8Array;
+	deliveryRequestHash: Uint8Array;
 };
 
 export type UndeliveredDeliveryRequestFailed = {
 	status: 'error';
 	cause: Error;
-	hash: Uint8Array;
+	deliveryRequestHash: Uint8Array;
 };
 
 export type UndeliveredDeliveryRequest = UndeliveredDeliveryRequestSuccess | UndeliveredDeliveryRequestFailed;
@@ -66,7 +66,7 @@ export class DeliveryRequests {
 	private async processDeliveryRequest(
 		messagingKey: KeyRingDecrypter,
 		delivery: protocol.Delivery,
-		hash: Uint8Array,
+		deliveryRequestHash: Uint8Array,
 	): Promise<UndeliveredDeliveryRequest> {
 		try {
 			const { envelope } = delivery;
@@ -116,13 +116,13 @@ export class DeliveryRequests {
 				status: 'ok',
 				payloadRootEncryptionKey,
 				payloadUri,
-				hash,
+				deliveryRequestHash,
 			};
 		} catch (error) {
 			return {
 				status: 'error',
 				cause: error as Error,
-				hash,
+				deliveryRequestHash,
 			};
 		}
 	}

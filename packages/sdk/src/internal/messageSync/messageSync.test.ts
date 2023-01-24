@@ -47,12 +47,12 @@ describe('MessageSync', () => {
 		const undeliveredMessages: ReceivedMailOk[] = [
 			{
 				payload: { Headers: { ContentSignature: secureRandom() } } as Payload,
-				hash: Uint8Array.from([0x01]),
+				deliveryRequestHash: Uint8Array.from([0x01]),
 				status: 'ok',
 			},
 			{
 				payload: { Headers: { ContentSignature: secureRandom() } } as Payload,
-				hash: Uint8Array.from([0x02]),
+				deliveryRequestHash: Uint8Array.from([0x02]),
 				status: 'ok',
 			},
 		];
