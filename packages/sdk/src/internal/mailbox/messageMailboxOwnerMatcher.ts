@@ -2,10 +2,10 @@ import { MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing
 import { isPublicKeyEqual } from '@mailchain/crypto';
 import uniqBy from 'lodash/uniqBy';
 import { ParseMimeTextResult } from '../formatters/parse';
-import { MailData } from '../formatters/types';
 import { IdentityKeys } from '../identityKeys';
 import { UserMailbox } from '../user/types';
 import { Configuration } from '../../mailchain';
+import { MailData } from '../transport';
 import {
 	AddressIdentityKeyResolver,
 	createMailchainApiAddressIdentityKeyResolver,

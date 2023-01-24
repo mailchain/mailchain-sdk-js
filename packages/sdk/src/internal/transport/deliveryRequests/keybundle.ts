@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { PublicKey, RandomFunction, secureRandom, encodePublicKey, ED25519KeyExchange } from '@mailchain/crypto';
-import { protocol } from '../../../protobuf/protocol/protocol';
+import { protocol } from '../../protobuf/protocol/protocol';
 
 export async function createECDHKeyBundle(
 	recipientMessagingKey: PublicKey,

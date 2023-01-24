@@ -15,12 +15,29 @@ import { Configuration } from '../../mailchain';
 import { Verifier } from './verify';
 import { MessagingKeyProof } from './proof';
 
-export type GetMessagingKeyResponse = {
+export type ResolvedAddress = {
 	messagingKey: PublicKey;
 	identityKey?: PublicKey;
 	protocol: ProtocolType;
 	network?: string;
 };
+
+export type ResolvedManyAddresses = {
+	resolved: Map<string, ResolvedAddress>;
+	failed: FailedAddressResolutionError[];
+};
+
+export class FailedAddressMessageKeyResolutionsError extends Error {
+	constructor(public readonly failedResolutions: FailedAddressResolutionError[]) {
+		super(`at least one address resolution has failed`);
+	}
+}
+
+export class FailedAddressResolutionError extends Error {
+	constructor(readonly address: string, readonly cause: Error) {
+		super(`resolution for ${address} has failed`);
+	}
+}
 
 export class MessagingKeys {
 	constructor(
@@ -37,7 +54,7 @@ export class MessagingKeys {
 		);
 	}
 
-	async resolve(address: string): Promise<GetMessagingKeyResponse> {
+	async resolve(address: string): Promise<ResolvedAddress> {
 		const { data } = await this.addressApi.getAddressMessagingKey(address);
 
 		const verifyResult = await this.verifier.verifyAddressMessagingKey(data);
@@ -51,6 +68,31 @@ export class MessagingKeys {
 		}
 
 		return { messagingKey: verifyResult.messagingKey, identityKey: verifyResult.identityKey, protocol };
+	}
+
+	async resolveMany(addresses: string[]): Promise<ResolvedManyAddresses> {
+		const deduplicatedAddresses = [...new Set(addresses)];
+		const resolvedAddresses = await Promise.allSettled(
+			deduplicatedAddresses.map(async (address) => {
+				const resolvedAddress = await this.resolve(address).catch((e: Error) => {
+					throw new FailedAddressResolutionError(address, e);
+				});
+				return { address, ...resolvedAddress };
+			}),
+		);
+
+		const resolved: Map<string, ResolvedAddress> = new Map();
+		const failed: ResolvedManyAddresses['failed'] = [];
+		for (const result of resolvedAddresses) {
+			if (result.status === 'fulfilled') {
+				const { messagingKey, identityKey, protocol, network } = result.value;
+				resolved.set(result.value.address, { messagingKey, identityKey, protocol, network });
+			} else {
+				failed.push(result.reason as FailedAddressResolutionError);
+			}
+		}
+
+		return { resolved, failed };
 	}
 
 	async update(proof: MessagingKeyProof): Promise<void> {

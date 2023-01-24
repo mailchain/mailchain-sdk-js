@@ -12,7 +12,7 @@ test('should split message into headers', async () => {
 	expect(result).toMatchInlineSnapshot(`
 		Map {
 		  "MIME-Version" => "1.0",
-		  "Date" => "Mon, 06 Jun 2022 00:00:00 +0000",
+		  "Date" => "Tue, 14 Jun 2022 00:00:00 +0000",
 		  "Message-ID" => "mail-data-id@mailchain.test",
 		  "Subject" => "=?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=",
 		  "From" => ""alice@mailchain" <alice@mailchain.test>",

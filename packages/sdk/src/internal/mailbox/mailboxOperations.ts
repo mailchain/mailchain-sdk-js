@@ -13,10 +13,10 @@ import {
 import { Configuration } from '../..';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { parseMimeText } from '../formatters/parse';
-import { MailData } from '../formatters/types';
-import { Payload } from '../transport/payload/content/payload';
 import { UserMailbox } from '../user/types';
 import { IdentityKeys } from '../identityKeys';
+import { MailData, Payload } from '../transport';
+import { ReadonlyMailPayload } from '../receiving/mail';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
@@ -229,7 +229,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			.then((res) => res.data as ArrayBuffer);
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
-		const { mailData } = await parseMimeText(messageData.Content.toString());
+		const { mailData } = await parseMimeText(messageData);
 		const to = mailData.recipients.map((r) => r.address);
 		const cc = mailData.carbonCopyRecipients.map((r) => r.address);
 		const bcc = mailData.blindCarbonCopyRecipients.map((r) => r.address);
@@ -256,7 +256,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		userMailbox,
 		payload,
 	}: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]> {
-		const { mailData, addressIdentityKeys } = await parseMimeText(payload.Content.toString());
+		const { mailData, addressIdentityKeys } = await parseMimeText(payload);
 		const owners = await this.messageMailboxOwnerMatcher
 			.withMessageIdentityKeys(addressIdentityKeys)
 			.findMatches(mailData, userMailbox);
@@ -283,14 +283,15 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	private async saveMessage(
 		messageId: string,
-		payload: Payload,
+		payload: ReadonlyMailPayload,
 		content: MailData,
 		userMailbox: UserMailbox,
 		owner: MailchainAddress,
 		folder: 'inbox' | 'outbox',
 	): Promise<MessagePreview> {
 		const ownerAddress = formatAddress(owner, 'mail');
-		const messagePreview = createMessagePreview(userMailbox, owner, payload, content);
+
+		const messagePreview = createMessagePreview(userMailbox, owner, content);
 		const encodedMessagePreview = protoInbox.preview.MessagePreview.encode(messagePreview).finish();
 
 		const encryptedMessagePreview = await this.messagePreviewCrypto.encrypt(encodedMessagePreview);
@@ -380,7 +381,6 @@ export class MailchainMailboxOperations implements MailboxOperations {
 function createMessagePreview(
 	userMailbox: UserMailbox,
 	owner: MailchainAddress,
-	payload: Payload,
 	content: MailData,
 	snippetLength = 100,
 ): protoInbox.preview.MessagePreview {
@@ -394,6 +394,6 @@ function createMessagePreview(
 		subject: content.subject,
 		snippet: content.plainTextMessage.substring(0, snippetLength - 1).trim(),
 		hasAttachment: false, // TODO: replace with value from content.attachment when available,
-		timestamp: Math.round(payload.Headers.Created.getTime() / 1000),
+		timestamp: Math.round(content.date.getTime() / 1000),
 	});
 }

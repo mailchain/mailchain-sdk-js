@@ -29,7 +29,7 @@ export type ComposedMessage = {
 	forBlindedRecipients: [Address, string][];
 };
 
-class MessageComposer {
+export class MessageComposer {
 	private readonly _headers: Map<string, Header<any>> = new Map();
 	private readonly _overrideHeaders: Map<string, Map<string, Header<any>>> = new Map();
 	private readonly _messages: Map<string, ContentPart> = new Map();
@@ -60,7 +60,7 @@ class MessageComposer {
 	 *
 	 * Note: will override any pre-existing recipients for the given `type` when reinvoked with the same `type`.
 	 */
-	recipients(type: typeof HEADER_LABELS['To' | 'Cc' | 'Bcc'], ...recipients: Address[]): MessageComposer {
+	recipients(type: (typeof HEADER_LABELS)['To' | 'Cc' | 'Bcc'], ...recipients: Address[]): MessageComposer {
 		this._headers.set(type, createHeader(type, [...recipients]));
 		return this;
 	}

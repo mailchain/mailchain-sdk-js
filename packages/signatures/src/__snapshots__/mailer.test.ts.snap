@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createMailerProofParamsForSigning() version-1.0 1`] = `"{"authorContentSignature":"05060708","expires":1654473600,"mailerMessagingKey":"e22e322f8740c60172111ac8eadcdda2512f90d06d0e503ef189979a159bece1e8"}"`;

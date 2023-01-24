@@ -1,14 +1,15 @@
 import { encodePublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createMessageComposer } from '@mailchain/message-composer';
+import { MessageComposer } from '@mailchain/message-composer/messageComposer';
 import { HeaderAttribute } from '@mailchain/message-composer/types';
-import { GetMessagingKeyResponse } from '../messagingKeys';
+import { ResolvedAddress } from '../messagingKeys';
+import { MailAddress, MailData } from '../transport';
 import { X_IDENTITY_KEYS } from './conts';
-import { MailAddress, MailData } from './types';
 
 export const createMimeMessage = async (
 	mailData: MailData,
-	resolvedAddresses: Map<string, GetMessagingKeyResponse>,
+	resolvedAddresses: Map<string, ResolvedAddress>,
 ): Promise<{
 	original: string;
 	visibleRecipients: string;
@@ -25,13 +26,38 @@ export const createMimeMessage = async (
 		.message('html', Buffer.from(mailData.message))
 		.message('plain', Buffer.from(mailData.plainTextMessage));
 
-	const visibleIdentityKeyAttrs: HeaderAttribute[] = [];
 	const visibleIdentityKeyAddresses = [mailData.from, ...mailData.recipients, ...mailData.carbonCopyRecipients];
-
 	if (mailData.replyTo) {
 		msg.replyTo(mailData.replyTo);
 		visibleIdentityKeyAddresses.push(mailData.replyTo);
 	}
+
+	const msgWithIdentityAttributes = addAllIdentityKeyAttr(
+		msg,
+		visibleIdentityKeyAddresses,
+		mailData.blindCarbonCopyRecipients,
+		resolvedAddresses,
+	);
+
+	const builtMsg = await msgWithIdentityAttributes.build();
+
+	return {
+		original: builtMsg.forSender,
+		visibleRecipients: builtMsg.forVisibleRecipients,
+		blindRecipients: builtMsg.forBlindedRecipients.map(([recipient, content]) => ({
+			recipient: { name: recipient.name!, address: recipient.address },
+			content,
+		})),
+	};
+};
+
+function addAllIdentityKeyAttr(
+	msg: MessageComposer,
+	visibleIdentityKeyAddresses: MailAddress[],
+	blindCarbonCopyRecipients: MailAddress[],
+	resolvedAddresses: Map<string, ResolvedAddress>,
+) {
+	const visibleIdentityKeyAttrs: HeaderAttribute[] = [];
 
 	// Add the X-IdentityKeys for the visible recipients
 	for (const { address } of visibleIdentityKeyAddresses) {
@@ -43,7 +69,7 @@ export const createMimeMessage = async (
 
 	// Add the X-IdentityKeys for the blind recipients
 	const allBlindIdentityKeyAttrs: HeaderAttribute[] = [];
-	for (const { address } of mailData.blindCarbonCopyRecipients) {
+	for (const { address } of blindCarbonCopyRecipients) {
 		const bccIdentityKeyAttrs = [...visibleIdentityKeyAttrs];
 		const putAttr = putIdentityKeyAttr(address, resolvedAddresses, bccIdentityKeyAttrs);
 		if (putAttr) {
@@ -63,21 +89,12 @@ export const createMimeMessage = async (
 		);
 	}
 
-	const builtMsg = await msg.build();
-
-	return {
-		original: builtMsg.forSender,
-		visibleRecipients: builtMsg.forVisibleRecipients,
-		blindRecipients: builtMsg.forBlindedRecipients.map(([recipient, content]) => ({
-			recipient: { name: recipient.name!, address: recipient.address },
-			content,
-		})),
-	};
-};
+	return msg;
+}
 
 function putIdentityKeyAttr(
 	address: string,
-	resolvedAddresses: Map<string, GetMessagingKeyResponse>,
+	resolvedAddresses: Map<string, ResolvedAddress>,
 	attrs: HeaderAttribute[],
 ): HeaderAttribute | undefined {
 	const lookupResult = resolvedAddresses.get(address);

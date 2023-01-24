@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createContentBuffer example payload: original 1`] = `"{"authorMailAddress":"alice@mailchain.com","authorMessagingKey":"e2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671","contentUri":"https://example.com","date":1591401600000,"mailerProof":{"params":{"authorContentSignature":"05060708","expires":1654473600000,"mailerMessagingKey":"e22e322f8740c60172111ac8eadcdda2512f90d06d0e503ef189979a159bece1e8"},"signature":"0a0b0c0d"},"messageId":"message-id-0","to":["bob@mailchain.com"],"version":"1"}"`;

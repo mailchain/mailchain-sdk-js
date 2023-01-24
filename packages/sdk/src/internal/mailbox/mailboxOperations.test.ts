@@ -15,7 +15,7 @@ import {
 } from '@mailchain/api';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { createMimeMessage } from '../formatters/generate';
-import { Payload } from '../transport/payload/content/payload';
+import { Payload } from '../transport';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
 import { dummyMailData } from '../test.const';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
@@ -53,7 +53,7 @@ describe('mailbox', () => {
 		mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
 		snippet: 'Message from Bob to Alice',
 		hasAttachment: true,
-		timestamp: 1653991533,
+		timestamp: new Date('2022-6-6').getTime() / 1000,
 		to: ['0x4321@ethereum.mailchain.local', '0xabcd@ethereum.mailchain.local'],
 	});
 	const msg2Preview = { ...msg1Preview, snippet: 'Another message from Bob to Alice' };
@@ -92,7 +92,7 @@ describe('mailbox', () => {
 			Headers: {
 				Origin: keyRing.accountMessagingKey().publicKey,
 				ContentSignature: new Uint8Array([1, 3, 3, 7]),
-				Created: new Date('06/14/2022'),
+				Created: new Date('2022-6-14'),
 				ContentLength: 1337,
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,

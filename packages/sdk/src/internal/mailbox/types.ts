@@ -39,5 +39,5 @@ export const SYSTEM_MESSAGE_LABELS = [
 	'unread',
 	'outbox',
 ] as const;
-export type SystemMessageLabel = typeof SYSTEM_MESSAGE_LABELS[number];
+export type SystemMessageLabel = (typeof SYSTEM_MESSAGE_LABELS)[number];
 export type UserMessageLabel = string;

@@ -2,7 +2,7 @@ import { dummyMailData, dummyMailDataResolvedAddresses } from '../test.const';
 import { createMimeMessage } from './generate';
 
 describe('createMimeMessage', () => {
-	it('should generate correct message', async () => {
+	it('should generate mail message', async () => {
 		const messages = await createMimeMessage(dummyMailData, dummyMailDataResolvedAddresses);
 
 		expect(removeRandomBoundaries(messages.original)).toMatchSnapshot('ORIGINAL');

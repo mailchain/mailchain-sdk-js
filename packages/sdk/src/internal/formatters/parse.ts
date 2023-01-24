@@ -2,8 +2,10 @@ import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
 import { HEADER_LABELS } from '@mailchain/message-composer';
+import { ReadonlyMailPayload } from '../receiving/mail';
+import { MailAddress, MailData } from '../transport';
+import { ReadonlyMailerPayload } from '../transport/mailer/payload';
 import { X_IDENTITY_KEYS } from './conts';
-import { MailAddress, MailData } from './types';
 import { simpleMimeHeaderParser } from './simpleMimeHeaderParser';
 
 type MimeHeaderValue = {
@@ -93,8 +95,9 @@ export type ParseMimeTextResult = {
 	addressIdentityKeys: Map<string, { identityKey: PublicKey; protocol: ProtocolType; network?: string }>;
 };
 
-export async function parseMimeText(text: string): Promise<ParseMimeTextResult> {
+export async function parseMimeText(payload: ReadonlyMailPayload): Promise<ParseMimeTextResult> {
 	const parse = (await import('emailjs-mime-parser')).default;
+	const text = getPayloadContent(payload).toString();
 	const headersMap = simpleMimeHeaderParser(text);
 
 	const parsedParticipants = await parseParticipants(headersMap);
@@ -119,6 +122,21 @@ export async function parseMimeText(text: string): Promise<ParseMimeTextResult> 
 	};
 
 	return { mailData, addressIdentityKeys };
+}
+
+function getPayloadContent(payload: ReadonlyMailPayload): Buffer {
+	switch (payload.Headers.ContentType) {
+		case 'message/x.mailchain':
+			return payload.Content;
+		case 'message/x.mailchain-mailer':
+			const mailerContent = payload as ReadonlyMailerPayload;
+			if (!mailerContent.RenderedContent) {
+				throw new Error('message/x.mailchain-mailer missing rendered content');
+			}
+			return mailerContent.RenderedContent;
+		default:
+			throw new Error('payload content not supported');
+	}
 }
 
 async function parseParticipants(

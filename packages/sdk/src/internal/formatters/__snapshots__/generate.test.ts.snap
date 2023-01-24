@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`createMimeMessage should generate correct message: BLIND jane@mailchain.test 1`] = `
+exports[`createMimeMessage should generate mail message: BLIND jane@mailchain.test 1`] = `
 "MIME-Version: 1.0
-Date: Mon, 06 Jun 2022 00:00:00 +0000
+Date: Tue, 14 Jun 2022 00:00:00 +0000
 Message-ID: mail-data-id@mailchain.test
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
@@ -47,9 +47,9 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
-exports[`createMimeMessage should generate correct message: BLIND maria@mailchain.test 1`] = `
+exports[`createMimeMessage should generate mail message: BLIND maria@mailchain.test 1`] = `
 "MIME-Version: 1.0
-Date: Mon, 06 Jun 2022 00:00:00 +0000
+Date: Tue, 14 Jun 2022 00:00:00 +0000
 Message-ID: mail-data-id@mailchain.test
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
@@ -94,9 +94,9 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
-exports[`createMimeMessage should generate correct message: ORIGINAL 1`] = `
+exports[`createMimeMessage should generate mail message: ORIGINAL 1`] = `
 "MIME-Version: 1.0
-Date: Mon, 06 Jun 2022 00:00:00 +0000
+Date: Tue, 14 Jun 2022 00:00:00 +0000
 Message-ID: mail-data-id@mailchain.test
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
@@ -143,9 +143,9 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 --boundary"
 `;
 
-exports[`createMimeMessage should generate correct message: VISIBLE 1`] = `
+exports[`createMimeMessage should generate mail message: VISIBLE 1`] = `
 "MIME-Version: 1.0
-Date: Mon, 06 Jun 2022 00:00:00 +0000
+Date: Tue, 14 Jun 2022 00:00:00 +0000
 Message-ID: mail-data-id@mailchain.test
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>

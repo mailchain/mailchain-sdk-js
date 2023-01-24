@@ -21,6 +21,7 @@
 		"@mailchain/crypto": "0.13.0",
 		"@mailchain/encoding": "0.13.0",
 		"@types/secp256k1": "^4.0.2",
+		"canonicalize": "^1.0.8",
 		"secp256k1": "^4.0.2"
 	},
 	"devDependencies": {

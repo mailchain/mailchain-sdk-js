@@ -1,13 +1,8 @@
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { EncodingTypes, ensureDecoded } from '@mailchain/encoding';
-import {
-	FailedAddressMessageKeyResolutionsError,
-	MailSender,
-	PrepareResult,
-	SendResult,
-} from './internal/transport/mail/send';
-import { MessagingKeys } from './internal/messagingKeys';
+import { MailSender, PrepareResult, SendResult } from './internal/sending/mail';
+import { MessagingKeys, FailedAddressMessageKeyResolutionsError } from './internal/messagingKeys';
 import { MailchainUserProfile, UserNotFoundError, UserProfile } from './internal/user';
 import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';

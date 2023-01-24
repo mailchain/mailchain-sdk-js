@@ -2,12 +2,12 @@ import { ETHEREUM, formatAddress, MAILCHAIN } from '@mailchain/addressing';
 import { ED25519PublicKey } from '@mailchain/crypto';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import { Configuration } from '../mailchain';
-import { MailData } from './formatters/types';
-import { GetMessagingKeyResponse } from './messagingKeys';
+import { ResolvedAddress } from './messagingKeys';
+import { MailData } from './transport';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox, BobWalletMailbox } from './user/test.const';
 
 export const dummyMailData: MailData = {
-	date: new Date('2022-06-06'),
+	date: new Date('2022-6-14'),
 	id: 'mail-data-id@mailchain.test',
 	subject: '💌 Dummy MailData subject 😉',
 	from: {
@@ -42,7 +42,7 @@ export const dummyMailData: MailData = {
 		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque vitae tempus quam pellentesque nec nam. Quam nulla porttitor massa id. Nisl rhoncus mattis rhoncus urna. Tortor posuere ac ut consequat semper viverra nam. Facilisis mauris sit amet massa. Et molestie ac feugiat sed lectus vestibulum. Id cursus metus aliquam eleifend mi in nulla posuere sollicitudin. A diam sollicitudin tempor id. Mauris ultrices eros in cursus turpis massa. Elementum facilisis leo vel fringilla est ullamcorper. Aliquam sem et tortor consequat id porta.	',
 };
 
-export const dummyMailDataResolvedAddresses: Map<string, GetMessagingKeyResponse> = new Map([
+export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new Map([
 	[
 		formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
 		{
@@ -159,7 +159,7 @@ export const dummyMailDataResolvedAddresses: Map<string, GetMessagingKeyResponse
 
 export const dummyMailDataResolvedAddressesWithoutMessagingKey: Map<
 	string,
-	Omit<GetMessagingKeyResponse, 'messagingKey'>
+	Omit<ResolvedAddress, 'messagingKey'>
 > = new Map(
 	[...dummyMailDataResolvedAddresses].map(([address, result]) => {
 		const tmp = { ...result };

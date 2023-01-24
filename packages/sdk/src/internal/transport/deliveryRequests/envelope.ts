@@ -8,7 +8,7 @@ import {
 	ED25519PrivateKey,
 	encodePrivateKey,
 } from '@mailchain/crypto';
-import { protocol } from '../../../protobuf/protocol/protocol';
+import { protocol } from '../../protobuf/protocol/protocol';
 import { createECDHKeyBundle } from './keybundle';
 
 /**

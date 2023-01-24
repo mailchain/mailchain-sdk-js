@@ -6,3 +6,4 @@ export * from './mailchain_password_reset';
 export * from './mailchain_username';
 export * from './raw_ed25519';
 export * from './verify';
+export * from './mailer';

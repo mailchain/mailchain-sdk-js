@@ -3,12 +3,17 @@ import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
-import { MessagingKeys } from '../../messagingKeys';
-import { PayloadSender } from '../payload/send';
+import flatten from 'lodash/flatten';
+import { MessagingKeys, ResolvedAddress, ResolvedManyAddresses } from '../../messagingKeys';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
-import { Payload } from '../payload/content/payload';
+import {
+	SendPayloadDeliveryRequestResult,
+	SendPayloadDeliveryRequestResultSuccess,
+} from '../deliveryRequests/deliveryRequests';
+import { Distribution, Payload, MailSenderVerifier } from '../../transport';
 import { MailSender } from './send';
-import { Distribution } from './payload';
+import { MailPayloadSender, PreparedDistribution } from './payload';
+import { MailDeliveryRequests, SendResult, SendResultFullyCompleted } from './deliveryRequests';
 
 const dummyPayload = { Content: Buffer.from('Payload') } as Payload;
 const dummyPayload1 = { Content: Buffer.from('Payload1') } as Payload;
@@ -35,8 +40,10 @@ jest.mock('./payload', () => ({
 }));
 
 describe('MailSender', () => {
-	let mockPayloadSender: MockProxy<PayloadSender>;
+	let mockMailPayloadSender: MockProxy<MailPayloadSender>;
 	let mockMessagingKeys: MockProxy<MessagingKeys>;
+	let mockMailDeliveryRequests: MockProxy<MailDeliveryRequests>;
+	let mockMailSenderVerifier: MockProxy<MailSenderVerifier>;
 	let mailSender: MailSender;
 
 	beforeAll(() => {
@@ -50,17 +57,29 @@ describe('MailSender', () => {
 				dummyMailDataResolvedAddresses.get(address) ?? fail(`invalid mock call with address [${address}]`),
 		);
 
-		mockPayloadSender = mock();
-		mailSender = new MailSender(mockPayloadSender, mockMessagingKeys);
+		mockMailSenderVerifier = mock();
+		mockMailPayloadSender = mock();
+		mockMailDeliveryRequests = mock();
+		mailSender = new MailSender(
+			mockMailPayloadSender,
+			mockMessagingKeys,
+			mockMailSenderVerifier,
+			mockMailDeliveryRequests,
+		);
 	});
 
 	it('should prepare distributions for sending', async () => {
+		mockMessagingKeys.resolveMany.mockResolvedValue({
+			resolved: dummyMailDataResolvedAddresses,
+		} as ResolvedManyAddresses);
+		mockMailSenderVerifier.verifySenderOwnsFromAddress.mockResolvedValue(true);
+
 		const result = await mailSender.prepare({
 			message: dummyMailData,
 			senderMessagingKey: aliceKeyRing.accountMessagingKey(),
 		});
 
-		expect(result.status).toEqual('prepare-success');
+		expect(result.status).toEqual('ok');
 		expect(result['message']).toEqual(dummyPayload);
 		expect(result['distributions']).toEqual(dummyDistributions);
 		expect(result['resolvedAddresses']).toEqual(dummyMailDataResolvedAddresses);
@@ -73,38 +92,69 @@ describe('MailSender', () => {
 	});
 
 	it('should send the distributions via payload sender', async () => {
-		mockPayloadSender.prepare.mockResolvedValue({
-			payloadUri: 'payloadUri',
-			payloadRootEncryptionKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
+		mockMailSenderVerifier.verifySenderOwnsFromAddress.mockResolvedValue(true);
+		mockMailPayloadSender.prepare.mockImplementation(async (distributions: Distribution[]) => {
+			return {
+				successfulDistributions: distributions.map((distribution) => ({
+					distribution,
+					preparedPayload: {
+						payloadUri: 'payloadUri',
+						payloadRootEncryptionKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
+					},
+				})),
+				failedDistributions: [],
+			};
 		});
+
 		const distributions: Distribution[] = [
 			{
 				recipients: [...dummyMailData.recipients, ...dummyMailData.carbonCopyRecipients],
 				payload: dummyPayload,
 			},
 			{
-				recipients: [dummyMailData.blindCarbonCopyRecipients[0]],
+				recipients: dummyMailData.blindCarbonCopyRecipients,
 				payload: dummyPayload,
 			},
 		];
-		mockPayloadSender.send.mockImplementation(async ({ recipients }) => {
-			return recipients.map((recipient) => ({
-				status: 'success',
-				deliveryRequestId: encodeBase64(secureRandom()),
-				recipient,
-			}));
-		});
+
+		mockMailDeliveryRequests.send.mockImplementation(
+			async (
+				successfulDistributions: PreparedDistribution[],
+				resolvedAddresses: Map<string, ResolvedAddress>,
+			) => {
+				return {
+					status: 'success',
+					deliveries: flatten(
+						successfulDistributions.map((distribution) =>
+							distribution.distribution.recipients.map((recipient) => {
+								return {
+									status: 'success',
+									deliveryRequestId: encodeBase64(secureRandom()),
+									recipientMessageKey:
+										resolvedAddresses.get(recipient.address)?.messagingKey ??
+										fail(`invalid mock call with address [${recipient.address}]`),
+								} as SendPayloadDeliveryRequestResult;
+							}),
+						),
+					),
+				} as SendResult;
+			},
+		);
 
 		const result = await mailSender.send({ distributions, resolvedAddresses: dummyMailDataResolvedAddresses });
 
-		expect(mockPayloadSender.prepare).toHaveBeenCalledWith(dummyPayload);
+		expect(mockMailDeliveryRequests.send).toHaveBeenCalledTimes(1);
 		expect(result.status).toEqual('success');
-		expect(result['deliveries']).toHaveLength(6);
-		for (const delivery of result['deliveries']) {
+		expect(result['deliveries']).toHaveLength(7);
+
+		const fullyCompletedResult = result as SendResultFullyCompleted;
+		for (const delivery of fullyCompletedResult.deliveries) {
 			expect([...dummyMailDataResolvedAddresses.values()].map((r) => r.messagingKey)).toContain(
-				delivery.recipient,
+				delivery.recipientMessageKey,
 			);
-			expect(delivery.deliveryRequestId).toBeDefined();
+			expect(delivery.status).toEqual('success');
+			const successfulDelivery = delivery as SendPayloadDeliveryRequestResultSuccess;
+			expect(successfulDelivery.deliveryRequestId).toBeDefined();
 		}
 	});
 });

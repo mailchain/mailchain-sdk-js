@@ -1,10 +1,6 @@
 import { EncryptedContent, ED25519ExtendedPrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
-import { CHUNK_LENGTH_1MB } from '../transport/payload/content/chunk';
-import { decryptPayload } from '../transport/payload/content/decrypt';
-import { encryptPayload } from '../transport/payload/content/encrypt';
-import { Payload } from '../transport/payload/content/payload';
-import { deserialize, serialize } from '../transport/payload/content/serialization';
+import { CHUNK_LENGTH_1MB, decryptPayload, encryptPayload, deserialize, serialize, Payload } from '../transport';
 
 /**
  * Used for encryption and decryption of the full message content.

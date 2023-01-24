@@ -1,6 +1,6 @@
 import { secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
-import { MailAddress, MailData } from './internal/formatters/types';
+import { MailAddress, MailData } from './internal/transport';
 import { SendMailParams } from './types';
 
 /**
@@ -29,7 +29,7 @@ export function toMailData(params: SendMailParams): MailData {
  *
  * @deprecated This will be removed in favor of removing the internal params and accepting these params.
  */
-function createMailAddress(address: string): MailAddress {
+export function createMailAddress(address: string): MailAddress {
 	const name = address.split('@')[0];
 	return { name, address };
 }

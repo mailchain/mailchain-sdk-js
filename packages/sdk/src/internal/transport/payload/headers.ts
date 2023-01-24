@@ -1,7 +1,7 @@
 import { kindFromPublicKey, publicKeyFromKind, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 
-type ContentType = 'application/json' | 'message/x.mailchain';
+type ContentType = 'application/json' | 'message/x.mailchain' | 'message/x.mailchain-mailer';
 /**
  * PayloadHeaders are the headers provide information about the payload.
  */
