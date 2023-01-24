@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/addressing",
-	"version": "0.13.0",
+	"version": "0.14.0",
 	"description": "Mailchain addressing",
 	"license": "Apache-2.0",
 	"author": {
@@ -18,8 +18,8 @@
 	},
 	"dependencies": {
 		"@ethersproject/transactions": "^5.7.0",
-		"@mailchain/crypto": "0.13.0",
-		"@mailchain/encoding": "0.13.0"
+		"@mailchain/crypto": "0.14.0",
+		"@mailchain/encoding": "0.14.0"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",

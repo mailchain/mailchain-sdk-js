@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/sdk",
-	"version": "0.13.0",
+	"version": "0.14.0",
 	"description": "Mailchain sdk for sending messages to web3 addresses",
 	"license": "Apache-2.0",
 	"author": {
@@ -18,13 +18,13 @@
 	},
 	"homepage": "https://docs.mailchain.com/developer",
 	"dependencies": {
-		"@mailchain/addressing": "0.13.0",
-		"@mailchain/api": "0.13.0",
-		"@mailchain/crypto": "0.13.0",
-		"@mailchain/encoding": "0.13.0",
-		"@mailchain/keyring": "0.13.0",
-		"@mailchain/message-composer": "0.13.0",
-		"@mailchain/signatures": "0.13.0",
+		"@mailchain/addressing": "0.14.0",
+		"@mailchain/api": "0.14.0",
+		"@mailchain/crypto": "0.14.0",
+		"@mailchain/encoding": "0.14.0",
+		"@mailchain/keyring": "0.14.0",
+		"@mailchain/message-composer": "0.14.0",
+		"@mailchain/signatures": "0.14.0",
 		"@noble/hashes": "^1.0.0",
 		"canonicalize": "^1.0.8",
 		"email-addresses": "5.0.0",
