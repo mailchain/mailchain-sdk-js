@@ -54,7 +54,7 @@ export class MailReceiver {
 		return new MailReceiver(
 			DeliveryRequests.create(configuration, receiverMessagingKeyDecrypter),
 			MailerContentResolver.create(configuration, axiosInstance),
-			PayloadReceiver.create(configuration, receiverMessagingKeyDecrypter),
+			PayloadReceiver.create(configuration, receiverMessagingKeyDecrypter, axiosInstance),
 		);
 	}
 

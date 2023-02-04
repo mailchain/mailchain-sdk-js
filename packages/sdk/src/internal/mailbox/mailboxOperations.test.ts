@@ -264,7 +264,7 @@ describe('mailbox', () => {
 		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
 		const messages = await mailboxOperations.saveReceivedMessage({
-			payload,
+			receivedTransportPayload: payload,
 			userMailbox: AliceWalletMailbox,
 		});
 

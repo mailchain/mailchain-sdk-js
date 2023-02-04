@@ -4,7 +4,7 @@ import { Payload } from '../payload';
 import { createContentBuffer, MailerContent } from './content';
 
 export type ReadonlyMailerPayload = {
-	RenderedContent: Buffer;
+	MailerContent: MailerContent;
 	Headers: {
 		ContentType: 'message/x.mailchain-mailer';
 	} & Payload['Headers'];

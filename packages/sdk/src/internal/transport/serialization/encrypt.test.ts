@@ -1,9 +1,10 @@
 import { KindNaClSecretKey } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519';
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
+import { Payload } from '../payload';
+import { PayloadHeaders, SerializableTransportPayloadHeaders } from '../payload/headers';
 import { encryptBuffer, encryptChunks, encryptPayload } from './encrypt';
-import { PayloadHeaders } from './headers';
-import { EncryptedPayload, Payload } from './payload';
+import { EncryptedPayload } from './payload';
 
 describe('encryptBuffer', () => {
 	const tests = [
@@ -136,15 +137,20 @@ describe('encryptPayload', () => {
 	tests.forEach((test) => {
 		it(test.name, async () => {
 			const target = encryptPayload;
+			const headers = SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders(
+				test.input.Headers,
+			).ToBuffer();
+			const content = test.input.Content;
 			if (test.shouldThrow) {
 				expect.assertions(1);
+				SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders(test.input.Headers).ToBuffer();
 				try {
-					target(test.input, test.privateKey, test.chunkSize, test.rand);
+					target(headers, content, test.privateKey, test.chunkSize, test.rand);
 				} catch (e) {
 					expect(e).toBeDefined();
 				}
 			} else {
-				return target(test.input, test.privateKey, test.chunkSize, test.rand).then((actual) => {
+				return target(headers, content, test.privateKey, test.chunkSize, test.rand).then((actual) => {
 					expect(actual).toEqual(test.expected);
 				});
 			}

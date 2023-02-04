@@ -1,7 +1,7 @@
 import { KindNaClSecretKey } from '@mailchain/crypto';
-import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
+import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { EncodingTypes } from '@mailchain/encoding';
-import { PayloadHeaders, SerializableTransportPayloadHeaders } from './headers';
+import { MailPayloadHeaders, SerializableMailPayloadHeaders } from './headers';
 
 describe('RoundTripTest', () => {
 	const tests = [
@@ -15,21 +15,52 @@ describe('RoundTripTest', () => {
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
-			} as PayloadHeaders,
+			} as MailPayloadHeaders,
+			shouldThrow: false,
+		},
+		{
+			name: 'mailer headers',
+			input: {
+				Origin: AliceED25519PublicKey,
+				ContentSignature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+				Created: new Date(1000),
+				ContentLength: 5000,
+				ContentType: 'message/x.mailchain',
+				ContentEncoding: EncodingTypes.Base64,
+				ContentEncryption: KindNaClSecretKey,
+				MailerContent: {
+					authorMailAddress: { address: 'author@mailchain.com', name: '' },
+					authorMessagingKey: BobED25519PublicKey,
+					contentUri: 'https://example.com/content',
+					date: new Date('2020-01-01T00:00:01.000Z'),
+					mailerProof: {
+						params: {
+							authorContentSignature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+							expires: new Date('2020-01-01T00:00:01.000Z'),
+							mailerMessagingKey: BobED25519PublicKey,
+						},
+						signature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+						version: '1.0',
+					},
+					messageId: 'message-id',
+					to: [{ address: 'recipient@mailchain.com', name: '' }],
+					version: '1.0',
+				},
+			} as MailPayloadHeaders,
 			shouldThrow: false,
 		},
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			const original = SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders(test.input);
+			const original = SerializableMailPayloadHeaders.FromEncryptedMailPayloadHeaders(test.input);
 			const bufferedHeaders = original.ToBuffer();
-			const deserializedHeaders = SerializableTransportPayloadHeaders.FromBuffer(bufferedHeaders);
+			const deserializedHeaders = SerializableMailPayloadHeaders.FromBuffer(bufferedHeaders);
 			expect(original).toEqual(deserializedHeaders);
 		});
 	});
 });
 
-describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
+describe('SerializableMailPayloadHeaders.FromEncryptedMailPayloadHeaders', () => {
 	const tests = [
 		{
 			name: 'regular headers',
@@ -41,7 +72,7 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
-			} as PayloadHeaders,
+			} as MailPayloadHeaders,
 			expected: {
 				headers: {
 					Origin: AliceED25519PublicKey,
@@ -52,13 +83,13 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 					ContentEncoding: EncodingTypes.Base64,
 					ContentEncryption: KindNaClSecretKey,
 				},
-			} as SerializableTransportPayloadHeaders,
+			} as SerializableMailPayloadHeaders,
 			shouldThrow: false,
 		},
 	];
 	tests.forEach((test) => {
 		it(test.name, () => {
-			const target = SerializableTransportPayloadHeaders;
+			const target = SerializableMailPayloadHeaders;
 
 			if (test.shouldThrow) {
 				expect(() => {
@@ -71,11 +102,11 @@ describe('SerializablePayloadHeaders.FromEncryptedPayloadHeaders', () => {
 	});
 });
 
-describe('SerializablePayloadHeaders.ToBuffer', () => {
+describe('SerializableMailPayloadHeaders.ToBuffer', () => {
 	const tests = [
 		{
 			name: 'regular headers',
-			input: SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders({
+			input: SerializableMailPayloadHeaders.FromEncryptedMailPayloadHeaders({
 				Origin: AliceED25519PublicKey,
 				ContentSignature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
 				Created: new Date(1000),
@@ -83,7 +114,7 @@ describe('SerializablePayloadHeaders.ToBuffer', () => {
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
-			} as PayloadHeaders),
+			} as MailPayloadHeaders),
 			expected: `Content-Encoding: base64/plain\r\nContent-Encryption: nacl-secret-key\r\nContent-Length: 5000\r\nContent-Signature: data=AAECAwQFBgcI; alg=ed25519\r\nContent-Type: message/x.mailchain\r\nCreated: 1970-01-01T00:00:01.000Z\r\nOrigin: data=cjyqI6W1Ea9a17fvYHbkFKt+danckQ6mDkF6K3cKVnE=; alg=ed25519`,
 			shouldThrow: false,
 		},
@@ -103,12 +134,12 @@ describe('SerializablePayloadHeaders.ToBuffer', () => {
 	});
 });
 
-describe('SerializablePayloadHeaders.FromBuffer', () => {
+describe('SerializableMailPayloadHeaders.FromBuffer', () => {
 	const tests = [
 		{
 			name: 'regular headers',
 			input: `Content-Encoding: base64/plain\r\nContent-Encryption: nacl-secret-key\r\nContent-Length: 5000\r\nContent-Signature: data=AAECAwQFBgcI; alg=ed25519\r\nContent-Type: message/x.mailchain\r\nCreated: 1970-01-01T00:00:01.000Z\r\nOrigin: data=cjyqI6W1Ea9a17fvYHbkFKt+danckQ6mDkF6K3cKVnE=; alg=ed25519`,
-			expected: SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders({
+			expected: SerializableMailPayloadHeaders.FromEncryptedMailPayloadHeaders({
 				Origin: AliceED25519PublicKey,
 				ContentSignature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
 				Created: new Date(1000),
@@ -116,7 +147,7 @@ describe('SerializablePayloadHeaders.FromBuffer', () => {
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
-			} as PayloadHeaders),
+			} as MailPayloadHeaders),
 			shouldThrow: false,
 		},
 	];
@@ -124,10 +155,10 @@ describe('SerializablePayloadHeaders.FromBuffer', () => {
 		it(test.name, () => {
 			if (test.shouldThrow) {
 				expect(() => {
-					SerializableTransportPayloadHeaders.FromBuffer(Buffer.from(test.input));
+					SerializableMailPayloadHeaders.FromBuffer(Buffer.from(test.input));
 				}).toThrow();
 			} else {
-				expect(SerializableTransportPayloadHeaders.FromBuffer(Buffer.from(test.input))).toEqual(test.expected);
+				expect(SerializableMailPayloadHeaders.FromBuffer(Buffer.from(test.input))).toEqual(test.expected);
 			}
 		});
 	});

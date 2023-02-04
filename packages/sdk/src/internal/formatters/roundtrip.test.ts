@@ -32,10 +32,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	it('should create ORIGINAL mime mail message and parse it its entirety', async () => {
 		const messages = await createMimeMessage(mailData, dummyMailDataResolvedAddresses);
 
-		const result = await parseMimeText({
-			Content: Buffer.from(messages.original),
-			Headers: { ContentType: 'message/x.mailchain' },
-		} as any);
+		const result = await parseMimeText(Buffer.from(messages.original));
 
 		expect(result.mailData).toEqual(mailData);
 		expect(result.addressIdentityKeys).toEqual(dummyMailDataResolvedAddressesWithoutMessagingKey);
@@ -44,10 +41,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 	it('should create mime mail message for visible recipients and parse it', async () => {
 		const messages = await createMimeMessage(mailData, dummyMailDataResolvedAddresses);
 
-		const result = await parseMimeText({
-			Content: Buffer.from(messages.visibleRecipients),
-			Headers: { ContentType: 'message/x.mailchain' },
-		} as any);
+		const result = await parseMimeText(Buffer.from(messages.visibleRecipients));
 
 		expect(result.mailData).toEqual({ ...mailData, blindCarbonCopyRecipients: [] });
 		const visibleIdentityKeys = new Map(dummyMailDataResolvedAddressesWithoutMessagingKey);
@@ -61,10 +55,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 		const resultBlind = await Promise.all(
 			messages.blindRecipients.map(async (message) => ({
 				recipient: message.recipient,
-				parsed: await parseMimeText({
-					Content: Buffer.from(message.content),
-					Headers: { ContentType: 'message/x.mailchain' },
-				} as any),
+				parsed: await parseMimeText(Buffer.from(message.content)),
 			})),
 		);
 
@@ -104,10 +95,7 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 		);
 
 		const { original } = await createMimeMessage(mailData, identityKeys);
-		const parsed = await parseMimeText({
-			Content: Buffer.from(original),
-			Headers: { ContentType: 'message/x.mailchain' },
-		} as any);
+		const parsed = await parseMimeText(Buffer.from(original));
 
 		expect(parsed.mailData).toEqual(mailData);
 		expect(parsed.addressIdentityKeys.get(unicodeAlice.address)?.identityKey).toEqual(

@@ -67,7 +67,7 @@ describe('Receiving payload tests', () => {
 });
 
 async function testReceive(payloadRootEncryptionKey: ED25519ExtendedPrivateKey, expected: ReceivedPayload) {
-	const receiver = new PayloadReceiver(mockAxios, mockDeliveryRequests, mockPayloadOriginVerifier);
+	const receiver = new PayloadReceiver(mockDeliveryRequests, mockPayloadOriginVerifier, mockAxios);
 	const result = await receiver.get(payloadRootEncryptionKey, 'http://example.com');
 
 	expect(result).toEqual(expected);

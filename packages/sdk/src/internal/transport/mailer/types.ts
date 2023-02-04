@@ -12,7 +12,7 @@ export type MailerData = {
 	/**
 	 * HTML formatted message, this will become the `text/html` part of the email.
 	 */
-	message: string;
+	html: string;
 	/**
 	 * Plain text formatted message, this will become the `text/plain` part of the email.
 	 */

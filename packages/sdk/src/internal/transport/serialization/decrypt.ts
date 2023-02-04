@@ -1,6 +1,5 @@
 import { PrivateKey, ED25519ExtendedPrivateKey, PrivateKeyDecrypter, deriveHardenedKey } from '@mailchain/crypto';
-import { SerializablePayloadHeaders } from './headers';
-import { EncryptedPayload, Payload } from './payload';
+import { EncryptedPayload } from '../serialization/payload';
 
 /**
  * Decrypt a payload
@@ -12,17 +11,15 @@ import { EncryptedPayload, Payload } from './payload';
 export async function decryptPayload(
 	input: EncryptedPayload,
 	payloadRootKey: ED25519ExtendedPrivateKey,
-): Promise<Payload> {
+): Promise<{ headers: Buffer; content: Buffer }> {
 	const decryptedContentChunks = await decryptChunks(input.EncryptedContentChunks, payloadRootKey);
 
 	const headersEncryptionKey = deriveHardenedKey(payloadRootKey, 'headers');
 	const decryptedHeaders = await decryptBuffer(input.EncryptedHeaders, headersEncryptionKey.privateKey);
 
-	const headers = SerializablePayloadHeaders.FromBuffer(decryptedHeaders);
-
 	return {
-		Headers: headers.headers,
-		Content: Buffer.concat(decryptedContentChunks),
+		headers: decryptedHeaders,
+		content: Buffer.concat(decryptedContentChunks),
 	};
 }
 

@@ -95,9 +95,9 @@ export type ParseMimeTextResult = {
 	addressIdentityKeys: Map<string, { identityKey: PublicKey; protocol: ProtocolType; network?: string }>;
 };
 
-export async function parseMimeText(payload: ReadonlyMailPayload): Promise<ParseMimeTextResult> {
+export async function parseMimeText(content: Buffer): Promise<ParseMimeTextResult> {
 	const parse = (await import('emailjs-mime-parser')).default;
-	const text = getPayloadContent(payload).toString();
+	const text = content.toString('utf-8');
 	const headersMap = simpleMimeHeaderParser(text);
 
 	const parsedParticipants = await parseParticipants(headersMap);
@@ -122,21 +122,6 @@ export async function parseMimeText(payload: ReadonlyMailPayload): Promise<Parse
 	};
 
 	return { mailData, addressIdentityKeys };
-}
-
-function getPayloadContent(payload: ReadonlyMailPayload): Buffer {
-	switch (payload.Headers.ContentType) {
-		case 'message/x.mailchain':
-			return payload.Content;
-		case 'message/x.mailchain-mailer':
-			const mailerContent = payload as ReadonlyMailerPayload;
-			if (!mailerContent.RenderedContent) {
-				throw new Error('message/x.mailchain-mailer missing rendered content');
-			}
-			return mailerContent.RenderedContent;
-		default:
-			throw new Error('payload content not supported');
-	}
 }
 
 async function parseParticipants(

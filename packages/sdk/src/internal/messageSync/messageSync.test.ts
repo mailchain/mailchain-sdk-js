@@ -33,13 +33,13 @@ describe('MessageSync', () => {
 	it('should sync multiple recipients', async () => {
 		const mockSyncMailbox = jest.spyOn(messageSync as any, 'syncMailbox');
 		mockSyncMailbox
-			.mockResolvedValueOnce({ type: 'success', mailbox: AliceAccountMailbox, messages: [] })
+			.mockResolvedValueOnce({ status: 'ok', mailbox: AliceAccountMailbox, messages: [] })
 			.mockRejectedValueOnce(new Error('expected'));
 
 		const syncRes = await messageSync.sync([AliceAccountMailbox, AliceWalletMailbox]);
 
-		expect(syncRes[0]).toEqual({ type: 'success', mailbox: AliceAccountMailbox, messages: [] });
-		expect(syncRes[1]).toEqual({ type: 'fail', mailbox: AliceWalletMailbox, cause: new Error('expected') });
+		expect(syncRes[0]).toEqual({ status: 'ok', mailbox: AliceAccountMailbox, messages: [] });
+		expect(syncRes[1]).toEqual({ status: 'fail', mailbox: AliceWalletMailbox, cause: new Error('expected') });
 		expect(mockSyncMailbox).toHaveBeenCalledTimes(2);
 	});
 
@@ -73,17 +73,17 @@ describe('MessageSync', () => {
 		const syncRes = await messageSync['syncMailbox'](AliceAccountMailbox);
 
 		expect(syncRes).toEqual({
-			type: 'success',
+			status: 'ok',
 			mailbox: AliceAccountMailbox,
 			messages: dummyMessages.flatMap((m) => m),
 		});
 		expect(aliceAccountMailReceiver.getUndelivered).toHaveBeenCalledTimes(1);
 		expect(mockMailboxOperations.saveReceivedMessage).toHaveBeenNthCalledWith(1, {
-			payload: undeliveredMessages[0].payload,
+			receivedTransportPayload: undeliveredMessages[0].payload,
 			userMailbox: AliceAccountMailbox,
 		});
 		expect(mockMailboxOperations.saveReceivedMessage).toHaveBeenNthCalledWith(2, {
-			payload: undeliveredMessages[1].payload,
+			receivedTransportPayload: undeliveredMessages[1].payload,
 			userMailbox: AliceAccountMailbox,
 		});
 

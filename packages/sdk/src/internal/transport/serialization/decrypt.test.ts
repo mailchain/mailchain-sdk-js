@@ -1,9 +1,10 @@
 import { KindNaClSecretKey } from '@mailchain/crypto';
 import { ED25519ExtendedPrivateKey } from '@mailchain/crypto/ed25519/hd';
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
+import { Payload } from '../payload';
+import { PayloadHeaders, SerializableTransportPayloadHeaders } from '../payload/headers';
 import { decryptBuffer, decryptChunks, decryptPayload } from './decrypt';
-import { PayloadHeaders } from './headers';
-import { EncryptedPayload, Payload } from './payload';
+import { EncryptedPayload } from './payload';
 
 describe('decryptBuffer', () => {
 	const tests = [
@@ -109,8 +110,8 @@ describe('decryptPayload', () => {
 			} as EncryptedPayload,
 			privateKey: ED25519ExtendedPrivateKey.fromPrivateKey(AliceED25519PrivateKey),
 			expected: {
-				Content: Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
-				Headers: {
+				content: Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+				headers: SerializableTransportPayloadHeaders.FromEncryptedPayloadHeaders({
 					Origin: AliceED25519PublicKey,
 					ContentSignature: Uint8Array.from([0, 1, 2, 3, 4, 5, 6, 7, 8]),
 					Created: new Date(1000),
@@ -118,8 +119,8 @@ describe('decryptPayload', () => {
 					ContentType: 'message/x.mailchain',
 					ContentEncoding: 'base64/plain',
 					ContentEncryption: KindNaClSecretKey,
-				} as PayloadHeaders,
-			} as Payload,
+				} as PayloadHeaders).ToBuffer(),
+			},
 			shouldThrow: false,
 		},
 	];

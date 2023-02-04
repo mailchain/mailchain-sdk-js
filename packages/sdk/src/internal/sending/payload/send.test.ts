@@ -4,8 +4,10 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { TransportApiInterface } from '@mailchain/api';
-import { Payload, decryptPayload, deserialize } from '../../transport';
+import { Payload } from '../../transport';
+import { decryptPayload, deserialize } from '../../transport/serialization';
 import { PayloadSender } from './send';
+import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
 
 const payload: Payload = {
 	Headers: {
@@ -73,7 +75,14 @@ describe('PayloadSender', () => {
 		});
 		expect(mockTransportApi.postEncryptedPayload).toHaveBeenCalledTimes(1);
 		const encryptedPayload = mockTransportApi.postEncryptedPayload.mock.calls[0][0] as Buffer;
-		const decryptedPayload = await decryptPayload(deserialize(encryptedPayload), result.payloadRootEncryptionKey);
-		expect(decryptedPayload).toEqual(payload);
+		const { headers, content } = await decryptPayload(
+			deserialize(encryptedPayload),
+			result.payloadRootEncryptionKey,
+		);
+
+		expect({
+			Headers: SerializableTransportPayloadHeaders.FromBuffer(headers).headers,
+			Content: content,
+		}).toEqual(payload);
 	});
 });

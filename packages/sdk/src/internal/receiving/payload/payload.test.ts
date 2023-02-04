@@ -272,7 +272,7 @@ describe('Receiving payload tests', () => {
 		if (test.initMock) {
 			test.initMock();
 		}
-		const receiver = new PayloadReceiver(mockAxios, mockDeliveryRequests, mockPayloadOriginVerifier);
+		const receiver = new PayloadReceiver(mockDeliveryRequests, mockPayloadOriginVerifier, mockAxios);
 		if (test.shouldThrow) {
 			expect(() => {
 				receiver.get(test.payloadRootEncryptionKey, 'http://example.com');

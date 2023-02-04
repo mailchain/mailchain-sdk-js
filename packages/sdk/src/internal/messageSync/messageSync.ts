@@ -1,23 +1,24 @@
 import { KeyRing } from '@mailchain/keyring';
 import { KeyRingDecrypter } from '@mailchain/keyring/functions';
+import axios, { AxiosInstance } from 'axios';
 import { Configuration } from '../..';
 import { MailboxOperations, MessagePreview } from '../mailbox';
 import { MailReceiver } from '../receiving/mail';
 import { UserMailbox } from '../user/types';
 
-type SuccessSyncResult = {
-	type: 'success';
+type SyncResultOk = {
+	status: 'ok';
 	mailbox: UserMailbox;
 	messages: MessagePreview[];
 };
 
-type FailedSyncResult = {
-	type: 'fail';
+type SyncResultFailed = {
+	status: 'fail';
 	mailbox: UserMailbox;
 	cause: Error;
 };
 
-export type SyncResult = SuccessSyncResult | FailedSyncResult;
+export type SyncResult = SyncResultOk | SyncResultFailed;
 
 export class MessageSync {
 	constructor(
@@ -25,16 +26,22 @@ export class MessageSync {
 		private readonly receiverFactory: (typeof MailReceiver)['create'],
 		private readonly keyRing: KeyRing,
 		private readonly mailboxOperations: MailboxOperations,
+		private readonly axiosInstance: AxiosInstance = axios.create(),
 	) {}
 
-	static create(sdkConfig: Configuration, keyRing: KeyRing, mailboxOperations: MailboxOperations) {
-		return new MessageSync(sdkConfig, MailReceiver.create, keyRing, mailboxOperations);
+	static create(
+		sdkConfig: Configuration,
+		keyRing: KeyRing,
+		mailboxOperations: MailboxOperations,
+		axiosInstance: AxiosInstance = axios.create(),
+	) {
+		return new MessageSync(sdkConfig, MailReceiver.create, keyRing, mailboxOperations, axiosInstance);
 	}
 
 	async sync(mailboxes: UserMailbox[]): Promise<SyncResult[]> {
 		return Promise.all<SyncResult>(
 			mailboxes.map((mailbox) =>
-				this.syncMailbox(mailbox).catch((cause: Error) => ({ type: 'fail', mailbox, cause })),
+				this.syncMailbox(mailbox).catch((cause: Error) => ({ status: 'fail', mailbox, cause })),
 			),
 		);
 	}
@@ -49,7 +56,7 @@ export class MessageSync {
 	}
 
 	async syncWithMessagingKey(mailbox: UserMailbox, messagingKey: KeyRingDecrypter): Promise<SyncResult> {
-		const receiver = this.receiverFactory(this.sdkConfig, messagingKey);
+		const receiver = this.receiverFactory(this.sdkConfig, messagingKey, this.axiosInstance);
 
 		const messageResults = await receiver.getUndelivered();
 		const messages: MessagePreview[] = [];
@@ -60,7 +67,7 @@ export class MessageSync {
 			}
 
 			const savedMessages = await this.mailboxOperations
-				.saveReceivedMessage({ payload: messageResult.payload, userMailbox: mailbox })
+				.saveReceivedMessage({ receivedTransportPayload: messageResult.payload, userMailbox: mailbox })
 				.catch((e) => {
 					console.warn(`Failed saving received message with hash ${messageResult.deliveryRequestHash}`, e);
 					return undefined;
@@ -83,6 +90,6 @@ export class MessageSync {
 					);
 			}
 		}
-		return { type: 'success', mailbox, messages };
+		return { status: 'ok', mailbox, messages };
 	}
 }

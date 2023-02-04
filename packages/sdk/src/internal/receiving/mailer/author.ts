@@ -1,7 +1,6 @@
 import { Configuration } from '../../..';
 import { parseMimeText } from '../../formatters/parse';
-import { parseMailerContentFromJSON, MailSenderVerifier } from '../../transport';
-import { ReadonlyMailerPayload } from '../../transport/mailer/payload';
+import { parseMailerContentFromJSON, MailSenderVerifier, Payload } from '../../transport';
 
 export class MailerAuthorVerifier {
 	constructor(private readonly mailSenderVerifier: MailSenderVerifier) {}
@@ -15,9 +14,9 @@ export class MailerAuthorVerifier {
 	 * @param payload - The mailer payload
 	 * @returns
 	 */
-	async verifyAuthorOwnsFromAddress(payload: ReadonlyMailerPayload): Promise<boolean> {
+	async verifyAuthorOwnsFromAddress(payload: Payload, rfcMail: Buffer): Promise<boolean> {
 		const mailerContent = parseMailerContentFromJSON(payload.Content.toString());
-		const parsedContent = await parseMimeText(payload);
+		const parsedContent = await parseMimeText(rfcMail);
 
 		if (mailerContent.authorMailAddress.address !== parsedContent.mailData.from.address) {
 			throw new Error('author address does not match from address');

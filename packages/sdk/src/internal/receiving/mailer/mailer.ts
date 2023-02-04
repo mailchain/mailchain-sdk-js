@@ -46,10 +46,14 @@ export class MailerContentResolver {
 
 		const mailerPayload = {
 			...payload,
-			RenderedContent: Buffer.from(processedContent, 'utf8'),
+			Content: Buffer.from(processedContent, 'utf8'),
+			MailerContent: mailerContent,
 		} as ReadonlyMailerPayload;
 
-		const senderOwnsFromAddress = await this.sender.verifyAuthorOwnsFromAddress(mailerPayload);
+		const senderOwnsFromAddress = await this.sender.verifyAuthorOwnsFromAddress(
+			payload,
+			Buffer.from(processedContent),
+		);
 
 		// done here to check that the from address isn't manipulated during rendering
 		if (!senderOwnsFromAddress) {
@@ -69,7 +73,7 @@ async function processContent(mailerContent: MailerContent, mailerData: MailerDa
 			date: mailerContent.date,
 			from: mailerContent.authorMailAddress,
 			id: mailerContent.messageId,
-			message: mailerData.message,
+			message: mailerData.html,
 			plainTextMessage: mailerData.plainTextMessage,
 			recipients: mailerContent.to,
 			subject: mailerData.subject,

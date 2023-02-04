@@ -6,9 +6,8 @@ import {
 	PrivateKeyEncrypter,
 	ED25519ExtendedPrivateKey,
 } from '@mailchain/crypto';
+import { EncryptedPayload } from '../serialization/payload';
 import { chunkBuffer, CHUNK_LENGTH_1MB } from './chunk';
-import { SerializablePayloadHeaders } from './headers';
-import { EncryptedPayload, Payload } from './payload';
 
 /**
  * Encrypts a payload
@@ -19,17 +18,17 @@ import { EncryptedPayload, Payload } from './payload';
  * @returns
  */
 export async function encryptPayload(
-	input: Payload,
+	headers: Buffer,
+	content: Buffer,
 	payloadRootKey: ED25519ExtendedPrivateKey,
 	chunkSize: number = CHUNK_LENGTH_1MB,
 	rand: RandomFunction = secureRandom,
 ): Promise<EncryptedPayload> {
-	const chunks = chunkBuffer(input.Content, chunkSize);
+	const chunks = chunkBuffer(content, chunkSize);
 	const encryptedContentChunks = await encryptChunks(chunks, payloadRootKey, rand);
 
-	const serializedHeaders = new SerializablePayloadHeaders(input.Headers).ToBuffer();
 	const headersEncryptionKey = deriveHardenedKey(payloadRootKey, 'headers');
-	const encryptedHeaders = await encryptBuffer(serializedHeaders, headersEncryptionKey.privateKey, rand);
+	const encryptedHeaders = await encryptBuffer(headers, headersEncryptionKey.privateKey, rand);
 
 	return {
 		EncryptedHeaders: encryptedHeaders,

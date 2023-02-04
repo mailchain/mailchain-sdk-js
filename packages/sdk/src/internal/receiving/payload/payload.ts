@@ -2,10 +2,12 @@ import { ED25519ExtendedPrivateKey } from '@mailchain/crypto';
 import { decodeBase64 } from '@mailchain/encoding';
 import axios, { AxiosInstance } from 'axios';
 import { KeyRingDecrypter } from '@mailchain/keyring';
-import { decryptPayload, deserialize, Payload } from '../../transport';
-import { DeliveryRequests, UndeliveredDeliveryRequestSuccess } from '../deliveryRequests';
+import { Payload } from '../../transport';
+import { DeliveryRequests } from '../deliveryRequests';
 import { Configuration } from '../../../';
 import { PayloadOriginVerifier } from '../../transport/payload/verifier';
+import { deserialize, decryptPayload } from '../../transport/serialization';
+import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
 
 export type ReceivedPayload = ReceivedPayloadOk | ReceivedPayloadError;
 
@@ -41,16 +43,20 @@ export type UndeliveredPayloadError = {
 
 export class PayloadReceiver {
 	constructor(
-		private readonly axiosInstance: AxiosInstance,
 		private readonly deliveryRequests: DeliveryRequests,
 		private readonly payloadOriginVerifier: PayloadOriginVerifier,
+		private readonly axiosInstance: AxiosInstance,
 	) {}
 
-	static create(configuration: Configuration, receiverMessagingKeyDecrypter: KeyRingDecrypter) {
+	static create(
+		configuration: Configuration,
+		receiverMessagingKeyDecrypter: KeyRingDecrypter,
+		axiosInstance: AxiosInstance = axios.create(),
+	) {
 		return new PayloadReceiver(
-			axios.create(),
 			DeliveryRequests.create(configuration, receiverMessagingKeyDecrypter),
 			PayloadOriginVerifier.create(),
+			axiosInstance,
 		);
 	}
 
@@ -62,7 +68,7 @@ export class PayloadReceiver {
 				switch (result.status) {
 					case 'ok':
 						const payloadResponse = await this.get(result.payloadRootEncryptionKey, result.payloadUri);
-						return processReceivedPayload(payloadResponse, result);
+						return processReceivedPayload(payloadResponse, result.deliveryRequestHash);
 
 					case 'error':
 						return {
@@ -85,7 +91,12 @@ export class PayloadReceiver {
 
 			const encryptedPayload = deserialize(encryptedMessageBody);
 
-			const payload = await decryptPayload(encryptedPayload, payloadRootEncryptionKey);
+			const { headers, content } = await decryptPayload(encryptedPayload, payloadRootEncryptionKey);
+
+			const payload = {
+				Headers: SerializableTransportPayloadHeaders.FromBuffer(headers).headers,
+				Content: content,
+			};
 
 			await this.payloadOriginVerifier.verifyPayloadOrigin(payload);
 
@@ -102,25 +113,25 @@ export class PayloadReceiver {
 	}
 }
 
-function processReceivedPayload(payloadResponse: ReceivedPayload, result: UndeliveredDeliveryRequestSuccess) {
+function processReceivedPayload(payloadResponse: ReceivedPayload, deliveryRequestHash: Uint8Array) {
 	switch (payloadResponse.status) {
 		case 'ok':
 			return {
 				status: 'ok',
 				payload: payloadResponse.payload,
-				deliveryRequestHash: result.deliveryRequestHash,
+				deliveryRequestHash,
 			} as UndeliveredPayloadOk;
 		case 'error':
 			return {
 				status: 'error-payload',
 				cause: payloadResponse.cause,
-				deliveryRequestHash: result.deliveryRequestHash,
+				deliveryRequestHash,
 			} as UndeliveredPayloadPayloadError;
 		default:
 			return {
 				status: 'error-payload',
 				cause: new Error('Unknown payload response status'),
-				deliveryRequestHash: result.deliveryRequestHash,
+				deliveryRequestHash,
 			} as UndeliveredPayloadPayloadError;
 	}
 }

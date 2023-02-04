@@ -16,7 +16,6 @@ import { parseMimeText } from '../formatters/parse';
 import { UserMailbox } from '../user/types';
 import { IdentityKeys } from '../identityKeys';
 import { MailData, Payload } from '../transport';
-import { ReadonlyMailPayload } from '../receiving/mail';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
@@ -25,6 +24,7 @@ import { createMailchainUserMailboxHasher, UserMailboxHasher } from './userMailb
 import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
 import { getAllMessagePreviewMigrations, MessagePreviewMigrationRule } from './migrations';
+import { MailPayload, convertPayload } from './payload/payload';
 
 type SaveSentMessageParam = {
 	/** The {@link UserMailbox} that is sending this message */
@@ -36,7 +36,7 @@ type SaveSentMessageParam = {
 type SaveReceivedMessageParam = {
 	/** The {@link UserMailbox} that is receiving this message */
 	userMailbox: UserMailbox;
-	payload: Payload;
+	receivedTransportPayload: Payload;
 };
 
 export interface MailboxOperations {
@@ -229,7 +229,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			.then((res) => res.data as ArrayBuffer);
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
-		const { mailData } = await parseMimeText(messageData);
+		const { mailData } = await parseMimeText(messageData.Content);
 		const to = mailData.recipients.map((r) => r.address);
 		const cc = mailData.carbonCopyRecipients.map((r) => r.address);
 		const bcc = mailData.blindCarbonCopyRecipients.map((r) => r.address);
@@ -239,7 +239,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			to,
 			replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
 			subject: mailData.subject,
-			timestamp: messageData.Headers.Created,
+			timestamp: mailData.date,
 			body: mailData.message,
 			cc,
 			bcc,
@@ -254,9 +254,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	async saveReceivedMessage({
 		userMailbox,
-		payload,
+		receivedTransportPayload,
 	}: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]> {
-		const { mailData, addressIdentityKeys } = await parseMimeText(payload);
+		const payload = convertPayload(receivedTransportPayload);
+		const { mailData, addressIdentityKeys } = await parseMimeText(payload.Content);
 		const owners = await this.messageMailboxOwnerMatcher
 			.withMessageIdentityKeys(addressIdentityKeys)
 			.findMatches(mailData, userMailbox);
@@ -283,7 +284,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	private async saveMessage(
 		messageId: string,
-		payload: ReadonlyMailPayload,
+		payload: MailPayload,
 		content: MailData,
 		userMailbox: UserMailbox,
 		owner: MailchainAddress,
