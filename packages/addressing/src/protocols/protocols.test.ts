@@ -29,6 +29,16 @@ describe('guessProtocolsFromAddress', () => {
 			expected: [],
 		},
 		{
+			name: 'alice',
+			address: 'alice',
+			expected: [MAILCHAIN],
+		},
+		{
+			name: 'hi',
+			address: 'hi',
+			expected: [MAILCHAIN],
+		},
+		{
 			name: '0x-hex-len-4',
 			address: '0x91',
 			expected: [MAILCHAIN],

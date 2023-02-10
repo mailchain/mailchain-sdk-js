@@ -15,7 +15,7 @@ export function guessProtocolsFromAddress(address: string): ProtocolType[] {
 	if (isAddressHex && address.length === 42 && address.startsWith('0x')) {
 		protocols.add(ETHEREUM);
 	}
-	if (address.length <= 20 && address.length >= 3 && new RegExp('^[a-zA-Z0-9_-]+$').test(address)) {
+	if (address.length <= 20 && address.length >= 2 && new RegExp('^[a-zA-Z0-9_-]+$').test(address)) {
 		protocols.add(MAILCHAIN);
 	}
 
