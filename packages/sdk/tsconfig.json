@@ -1,7 +1,10 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"outDir": "./dist"
+		"outDir": "./dist",
+		"allowJs": true
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"typeRoots": ["./src/internal/protobuf/"]
+
 }

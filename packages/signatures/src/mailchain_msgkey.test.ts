@@ -3,7 +3,7 @@ import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypt
 import { AliceED25519PublicKey, BobED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
 import { EthereumAlice, EthereumBob } from '@mailchain/addressing/test.constants';
-import { ProtocolType } from '@mailchain/addressing/protocols';
+import { ProtocolType } from '@mailchain/addressing';
 import { ErrorUnsupportedKey } from '@mailchain/crypto';
 import {
 	mailchainProvidedMessagingKeyMessage,

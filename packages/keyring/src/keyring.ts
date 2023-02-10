@@ -12,7 +12,7 @@ import {
 	ED25519ExtendedPrivateKey,
 } from '@mailchain/crypto';
 import { encodeHex, encodeHexZeroX } from '@mailchain/encoding';
-import { MAILCHAIN, ProtocolType } from '@mailchain/addressing/protocols';
+import { MAILCHAIN, ProtocolType } from '@mailchain/addressing';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,

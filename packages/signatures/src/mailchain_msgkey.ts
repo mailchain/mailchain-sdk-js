@@ -1,6 +1,6 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { PublicKey, PrivateKey, KindED25519, encodePublicKey, ErrorUnsupportedKey } from '@mailchain/crypto';
-import { ProtocolType } from '@mailchain/addressing/protocols';
+import { ProtocolType } from '@mailchain/addressing';
 import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty } from './errors';
 
 export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address: string, protocol: ProtocolType) {

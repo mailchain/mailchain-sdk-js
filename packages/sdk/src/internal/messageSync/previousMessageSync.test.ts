@@ -81,7 +81,7 @@ describe('PreviousMessageSync', () => {
 				},
 			} as AxiosResponse);
 		const mockSyncResult: SyncResult = {
-			type: 'success',
+			status: 'ok',
 			mailbox: AliceWalletMailbox,
 			messages: [{ messageId: 'messageId' } as any],
 		};
