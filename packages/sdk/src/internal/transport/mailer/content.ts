@@ -57,6 +57,7 @@ export function createContentBuffer(content: MailerContent): string {
 				mailerMessagingKey: encodeHex(encodePublicKey(content.mailerProof.params.mailerMessagingKey)),
 			},
 			signature: encodeHex(content.mailerProof.signature),
+			version: content.mailerProof.version,
 		},
 		messageId: content.messageId,
 		to: content.to.map((recipient) => recipient.address),
@@ -83,6 +84,7 @@ export function parseMailerContentFromJSON(content: string): MailerContent {
 				authorContentSignature: string;
 			};
 			signature: string;
+			version: string;
 		};
 		messageId: string;
 		to: string[];

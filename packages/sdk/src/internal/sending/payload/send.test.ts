@@ -6,8 +6,8 @@ import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { TransportApiInterface } from '@mailchain/api';
 import { Payload } from '../../transport';
 import { decryptPayload, deserialize } from '../../transport/serialization';
-import { PayloadSender } from './send';
 import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
+import { PayloadSender } from './send';
 
 const payload: Payload = {
 	Headers: {
