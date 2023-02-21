@@ -11,7 +11,7 @@ import { ETHEREUM, addressFromPublicKey } from '@mailchain/addressing';
  * @param message the message being signed
  * @param signature the signature of the message made with the private key part of the public key we are trying to extract
  */
-export async function publicKeyFromSignature(
+export async function ethereumPublicKeyFromSignature(
 	message: Uint8Array,
 	signature: Uint8Array,
 	expectedAddress: Uint8Array,
