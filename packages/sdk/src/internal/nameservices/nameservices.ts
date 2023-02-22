@@ -5,7 +5,7 @@ import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../../mailchain';
 import { UserMailbox } from '../user';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 
 export type ResolvedName = {
 	name: string;

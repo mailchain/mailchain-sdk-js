@@ -2,7 +2,7 @@ import { PublicKey } from '@mailchain/crypto';
 import { parseNameServiceAddress, ProtocolType } from '@mailchain/addressing';
 import { KeyRing } from '@mailchain/keyring';
 import { sha3_256 } from '@noble/hashes/sha3';
-import { MailAddress } from '../transport';
+import { MailAddress } from '../../transport';
 import { AddressIdentityKeyResolver } from './addressIdentityKeyResolver';
 
 export type AddressHash = { hash: Uint8Array; type: 'username' | 'identity-key' };

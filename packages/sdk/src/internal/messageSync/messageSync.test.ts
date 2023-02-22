@@ -5,9 +5,9 @@ import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { TestSdkConfig } from '../test.const';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
-import { Payload } from '../transport';
+import { Payload } from '../../transport';
 import { MailboxOperations, MessagePreview } from '../mailbox';
-import { MailReceiver, ReceivedMailOk } from '../receiving/mail';
+import { MailReceiver, ReceivedMailOk } from '../../receiving/mail';
 import { MessageSync } from './messageSync';
 
 describe('MessageSync', () => {

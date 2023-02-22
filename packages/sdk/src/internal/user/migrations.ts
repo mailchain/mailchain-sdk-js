@@ -9,7 +9,7 @@ import {
 import { matchesNameservice, NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 import { MigrationRule } from '../migration';
 import { Nameservices } from '../nameservices';
 import { user } from '../protobuf/user/user';

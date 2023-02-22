@@ -5,7 +5,7 @@ import { isMailchainAccountAddress, parseNameServiceAddress } from '@mailchain/a
 import { combineMigrations, MigrationRule } from '../migration';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { Configuration } from '../..';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 
 type MessagePreviewData = {
 	version: number;

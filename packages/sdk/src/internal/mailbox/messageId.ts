@@ -2,7 +2,7 @@ import { encodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeUtf8, encodeHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
 import { sha3_256 } from '@noble/hashes/sha3';
-import { MailData } from '../transport';
+import { MailData } from '../../transport';
 
 export type MessageIdCreator = (
 	params:

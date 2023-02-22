@@ -1,7 +1,7 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { formatAddress, MAILCHAIN } from '@mailchain/addressing';
 import { encodePublicKey, secureRandom } from '@mailchain/crypto';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
 import { dummyMailData } from '../test.const';

@@ -8,7 +8,7 @@ import {
 import { PublicKey } from '@mailchain/crypto';
 import isEqual from 'lodash/isEqual';
 import { ParseMimeTextResult } from '../formatters/parse';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 
 type Resolved = { identityKey: PublicKey; protocol: ProtocolType };
 

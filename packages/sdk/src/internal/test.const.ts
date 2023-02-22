@@ -2,8 +2,8 @@ import { ETHEREUM, formatAddress, MAILCHAIN } from '@mailchain/addressing';
 import { ED25519PublicKey } from '@mailchain/crypto';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import { Configuration } from '../mailchain';
-import { ResolvedAddress } from './messagingKeys';
-import { MailData } from './transport';
+import { ResolvedAddress } from '../messagingKeys';
+import { MailData } from '../transport';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox, BobWalletMailbox } from './user/test.const';
 
 export const dummyMailData: MailData = {

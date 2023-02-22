@@ -3,9 +3,9 @@ import { encodeHexZeroX } from '@mailchain/encoding';
 import { createMessageComposer } from '@mailchain/message-composer';
 import { MessageComposer } from '@mailchain/message-composer/messageComposer';
 import { HeaderAttribute } from '@mailchain/message-composer/types';
-import { ResolvedAddress } from '../messagingKeys';
-import { MailAddress, MailData } from '../transport';
-import { X_IDENTITY_KEYS } from './conts';
+import { ResolvedAddress } from '../../messagingKeys';
+import { MailAddress, MailData } from '../../transport';
+import { X_IDENTITY_KEYS } from './consts';
 
 export const createMimeMessage = async (
 	mailData: MailData,

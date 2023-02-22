@@ -1,6 +1,12 @@
 import { EncryptedContent, ED25519ExtendedPrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
-import { deserialize, serialize, CHUNK_LENGTH_1MB, decryptPayload, encryptPayload } from '../transport/serialization';
+import {
+	deserialize,
+	serialize,
+	CHUNK_LENGTH_1MB,
+	decryptPayload,
+	encryptPayload,
+} from '../../transport/serialization';
 import { SerializableMailPayloadHeaders } from './payload/headers';
 import { MailPayload } from './payload/payload';
 

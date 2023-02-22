@@ -27,7 +27,7 @@ import {
 import { user } from '../protobuf/user/user';
 import { Configuration } from '../../mailchain';
 import { combineMigrations } from '../migration';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 import { Nameservices } from '../nameservices';
 import {
 	createV2IdentityKey,

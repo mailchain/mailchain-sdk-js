@@ -1,5 +1,5 @@
-import { ReadonlyMailPayload } from '../../receiving/mail';
-import { ReadonlyMailerPayload } from '../../transport';
+import { ReadonlyMailPayload } from '../../../receiving/mail';
+import { ReadonlyMailerPayload } from '../../../transport';
 import { MailPayloadHeaders } from './headers';
 
 /**

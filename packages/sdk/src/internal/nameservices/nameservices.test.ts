@@ -4,7 +4,7 @@ import { encodeHexZeroX } from '@mailchain/encoding';
 import { AxiosResponse } from 'axios';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { GetIdentityKeyResolvableNamesResponseBody, IdentityKeysApiInterface } from '@mailchain/api';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 import { AliceWalletMailbox, BobWalletMailbox } from '../user/test.const';
 import { Nameservices } from './nameservices';
 

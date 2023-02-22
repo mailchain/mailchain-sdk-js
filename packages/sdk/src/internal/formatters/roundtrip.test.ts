@@ -4,7 +4,7 @@ import {
 	dummyMailDataResolvedAddresses,
 	dummyMailDataResolvedAddressesWithoutMessagingKey,
 } from '../test.const';
-import { MailData } from '../transport';
+import { MailData } from '../../transport';
 import { AliceAccountMailbox, BobAccountMailbox } from '../user/test.const';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';

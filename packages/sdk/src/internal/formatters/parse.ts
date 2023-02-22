@@ -2,10 +2,8 @@ import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
 import { decodePublicKey, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
 import { HEADER_LABELS } from '@mailchain/message-composer';
-import { ReadonlyMailPayload } from '../receiving/mail';
-import { MailAddress, MailData } from '../transport';
-import { ReadonlyMailerPayload } from '../transport/mailer/payload';
-import { X_IDENTITY_KEYS } from './conts';
+import { MailAddress, MailData } from '../../transport';
+import { X_IDENTITY_KEYS } from './consts';
 import { simpleMimeHeaderParser } from './simpleMimeHeaderParser';
 
 type MimeHeaderValue = {

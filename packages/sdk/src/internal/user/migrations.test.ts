@@ -6,7 +6,7 @@ import {
 } from '@mailchain/addressing/protocols/ethereum/test.const';
 import { createNameServiceAddress } from '@mailchain/addressing';
 import { user } from '../protobuf/user/user';
-import { IdentityKeys } from '../identityKeys';
+import { IdentityKeys } from '../../identityKeys';
 import { Nameservices } from '../nameservices';
 import {
 	createV2IdentityKey,

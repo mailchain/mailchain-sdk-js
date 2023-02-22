@@ -15,7 +15,7 @@ import {
 } from '@mailchain/api';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { createMimeMessage } from '../formatters/generate';
-import { Payload } from '../transport';
+import { Payload } from '../../transport';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
 import { dummyMailData } from '../test.const';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';

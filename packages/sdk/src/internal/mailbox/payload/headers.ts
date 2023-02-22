@@ -1,5 +1,5 @@
 import { PublicKey } from '@mailchain/crypto';
-import { createContentBuffer, MailerContent, parseMailerContentFromJSON } from '../../transport';
+import { createContentBuffer, MailerContent, parseMailerContentFromJSON } from '../../../transport';
 import {
 	createOriginHeader,
 	createSignatureHeader,
@@ -7,7 +7,7 @@ import {
 	parseOriginHeader,
 	parseSignatureHeader,
 	SerializablePayloadHeaders,
-} from '../../transport/serialization';
+} from '../../../transport/serialization';
 
 type ContentType = 'application/json' | 'message/x.mailchain' | 'message/x.mailchain-mailer';
 /**
@@ -76,7 +76,7 @@ export class SerializableMailPayloadHeaders implements SerializablePayloadHeader
 	}
 
 	static FromBuffer(buffer: Buffer): SerializableMailPayloadHeaders {
-		const { headers, invalidHeaders } = headersMapFromBuffers(buffer, [
+		const { headers } = headersMapFromBuffers(buffer, [
 			HEADER_CONTENT_ENCODING,
 			HEADER_CONTENT_ENCRYPTION,
 			HEADER_CONTENT_LENGTH,

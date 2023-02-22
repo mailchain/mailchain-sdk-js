@@ -3,7 +3,7 @@ import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import axios, { AxiosInstance } from 'axios';
 import { Configuration } from '../..';
 import { MailboxOperations, MessagePreview } from '../mailbox';
-import { MailReceiver } from '../receiving/mail';
+import { MailReceiver } from '../../receiving/mail';
 import { UserMailbox } from '../user/types';
 
 type SyncResultOk = {

@@ -1,6 +1,6 @@
 import { secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
-import { MailAddress, MailData } from './internal/transport';
+import { MailAddress, MailData } from './transport';
 import { SendMailParams } from './types';
 
 /**
