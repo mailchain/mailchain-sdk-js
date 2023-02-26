@@ -1,7 +1,6 @@
 import { PrivateKey } from '@mailchain/crypto';
 import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { ETHEREUM } from '@mailchain/addressing/protocols';
 import { ecdhKeyRingDecrypter, KeyRingDecrypter } from '@mailchain/keyring/functions';
 import {
 	Address as ApiAddress,
@@ -14,6 +13,7 @@ import {
 	getAxiosWithSigner,
 } from '@mailchain/api';
 import { KeyRing } from '@mailchain/keyring';
+import { ETHEREUM } from '@mailchain/addressing/protocols';
 import { Configuration } from '../..';
 import { UserMailbox } from '../user/types';
 import { MessageSync, SyncResult } from './messageSync';
