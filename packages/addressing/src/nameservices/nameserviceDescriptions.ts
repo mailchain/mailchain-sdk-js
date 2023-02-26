@@ -13,4 +13,8 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		name: 'freename',
 		domains: ['aurora', 'hodl'],
 	},
+	{
+		name: 'lens',
+		domains: ['lens'],
+	},
 ];
