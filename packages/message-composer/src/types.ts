@@ -3,6 +3,11 @@ export type Address = {
 	address: string;
 };
 
+export type MessageIds = {
+	type: 'message-ids';
+	ids: string[];
+};
+
 /**
  * Define single attribute of a header. First element is the `key` and the second is the `value`. A attribute is not required to have a key.
  */
@@ -27,6 +32,11 @@ export function isDateHeader(header: Header<any>): header is DateHeader {
 export type AddressHeader = Header<Address[]>;
 export function isAddressHeader(header: Header<any>): header is AddressHeader {
 	return Array.isArray(header.value) && header.value.every((a: any) => typeof a.address === 'string');
+}
+
+export type MessageIdsHeader = Header<MessageIds>;
+export function isMessageIdHeader(header: Header<any>): header is MessageIdsHeader {
+	return header.value.type === 'message-ids';
 }
 
 export type ContentPart = {

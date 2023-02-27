@@ -1,7 +1,7 @@
 import { HEADER_LABELS } from './consts';
-import { createHeader } from './headerFactories';
+import { createHeader, createMessageIdHeader } from './headerFactories';
 import { MessageComposerContext } from './messageComposerContext';
-import { Address, DateHeader, Header, StringHeader } from './types';
+import { Address, DateHeader, Header, MessageIdsHeader } from './types';
 
 export async function concludeHeaders(
 	headers: Map<string, Header<any>>,
@@ -24,10 +24,10 @@ export async function concludeHeaders(
 	return finalHeaders;
 }
 
-export async function fallbackMessageId(from: Address, ctx: MessageComposerContext): Promise<StringHeader> {
+export async function fallbackMessageId(from: Address, ctx: MessageComposerContext): Promise<MessageIdsHeader> {
 	const senderDomain = from.address.split('@')[1];
 	const idValue = await ctx.encodeBase64(ctx.random(32));
-	return createHeader(HEADER_LABELS.MessageId, `<${idValue}@${senderDomain}>`);
+	return createMessageIdHeader(HEADER_LABELS.MessageId, [`${idValue}@${senderDomain}`]);
 }
 
 export async function fallbackDate(ctx: MessageComposerContext): Promise<DateHeader> {

@@ -3,14 +3,14 @@
 exports[`createMimeMessage should generate mail message: BLIND jane@mailchain.test 1`] = `
 "MIME-Version: 1.0
 Date: Tue, 14 Jun 2022 00:00:00 +0000
-Message-ID: mail-data-id@mailchain.test
+Message-ID: <mail-data-id@mailchain.test>
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
 To: "bob@mailchain" <bob@mailchain.test>,
- "0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
- "tim.eth" <tim@eth.mailchain.test>
+	"0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
+	"tim.eth" <tim@eth.mailchain.test>
 Cc: "0x92d8...1efb@ethereum" <0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test>,
- "john" <john@mailchain.test>
+	"john" <john@mailchain.test>
 Bcc: "jane" <jane@mailchain.test>
 X-IdentityKeys: v="1";
 	alice@mailchain.test="0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain";
@@ -50,14 +50,14 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 exports[`createMimeMessage should generate mail message: BLIND maria@mailchain.test 1`] = `
 "MIME-Version: 1.0
 Date: Tue, 14 Jun 2022 00:00:00 +0000
-Message-ID: mail-data-id@mailchain.test
+Message-ID: <mail-data-id@mailchain.test>
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
 To: "bob@mailchain" <bob@mailchain.test>,
- "0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
- "tim.eth" <tim@eth.mailchain.test>
+	"0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
+	"tim.eth" <tim@eth.mailchain.test>
 Cc: "0x92d8...1efb@ethereum" <0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test>,
- "john" <john@mailchain.test>
+	"john" <john@mailchain.test>
 Bcc: "maria" <maria@mailchain.test>
 X-IdentityKeys: v="1";
 	alice@mailchain.test="0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain";
@@ -97,16 +97,16 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 exports[`createMimeMessage should generate mail message: ORIGINAL 1`] = `
 "MIME-Version: 1.0
 Date: Tue, 14 Jun 2022 00:00:00 +0000
-Message-ID: mail-data-id@mailchain.test
+Message-ID: <mail-data-id@mailchain.test>
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
 To: "bob@mailchain" <bob@mailchain.test>,
- "0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
- "tim.eth" <tim@eth.mailchain.test>
+	"0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
+	"tim.eth" <tim@eth.mailchain.test>
 Cc: "0x92d8...1efb@ethereum" <0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test>,
- "john" <john@mailchain.test>
+	"john" <john@mailchain.test>
 Bcc: "jane" <jane@mailchain.test>,
- "maria" <maria@mailchain.test>
+	"maria" <maria@mailchain.test>
 X-IdentityKeys: v="1";
 	alice@mailchain.test="0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain";
 	bob@mailchain.test="0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain";
@@ -146,14 +146,14 @@ IHNlbSBldCB0b3J0b3IgY29uc2VxdWF0IGlkIHBvcnRhLgk=
 exports[`createMimeMessage should generate mail message: VISIBLE 1`] = `
 "MIME-Version: 1.0
 Date: Tue, 14 Jun 2022 00:00:00 +0000
-Message-ID: mail-data-id@mailchain.test
+Message-ID: <mail-data-id@mailchain.test>
 Subject: =?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=
 From: "alice@mailchain" <alice@mailchain.test>
 To: "bob@mailchain" <bob@mailchain.test>,
- "0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
- "tim.eth" <tim@eth.mailchain.test>
+	"0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>,
+	"tim.eth" <tim@eth.mailchain.test>
 Cc: "0x92d8...1efb@ethereum" <0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test>,
- "john" <john@mailchain.test>
+	"john" <john@mailchain.test>
 X-IdentityKeys: v="1";
 	alice@mailchain.test="0xe237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b:mailchain";
 	bob@mailchain.test="0xe2bc41b25646850c31e0c87ebeebc859e02387149b510e3b6087a2e98737d0703f:mailchain";

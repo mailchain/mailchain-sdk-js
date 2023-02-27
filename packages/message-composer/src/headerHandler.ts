@@ -8,10 +8,12 @@ import {
 	Header,
 	isAddressHeader,
 	isDateHeader,
+	isMessageIdHeader,
 	isStringHeader,
+	MessageIdsHeader,
 	StringHeader,
 } from './types';
-import { CRLF, LINE_LENGTH_FOLD } from './consts';
+import { CRLF, HTAB, LINE_LENGTH_FOLD } from './consts';
 import { MessageComposerContext } from './messageComposerContext';
 
 /**
@@ -47,6 +49,7 @@ export async function exportHeaderValue(header: Header<any>, ctx: MessageCompose
 	if (isStringHeader(header)) return exportStringHeader(header, ctx);
 	if (isDateHeader(header)) return exportDateHeader(header, ctx);
 	if (isAddressHeader(header)) return exportAddressHeader(header, ctx);
+	if (isMessageIdHeader(header)) return exportMessageIdHeader(header, ctx);
 
 	throw new Error(`cannot export value for header [${header.label}]`);
 }
@@ -113,5 +116,11 @@ export async function exportAddressHeader(header: AddressHeader, ctx: MessageCom
 		.map((r) => {
 			return Boolean(r.name?.length) ? `"${r.name}" <${r.address}>` : `<${r.address}>`;
 		})
-		.join(`,${CRLF} `);
+		.join(`,${CRLF}${HTAB}`);
+}
+
+export async function exportMessageIdHeader(header: MessageIdsHeader, ctx: MessageComposerContext): Promise<string> {
+	return header.value.ids
+		.map((id) => (id.startsWith('<') && id.endsWith('>') ? id : `<${id}>`))
+		.join(`${CRLF}${HTAB}`);
 }

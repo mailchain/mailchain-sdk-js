@@ -111,7 +111,7 @@ export async function parseMimeText(content: Buffer): Promise<ParseMimeTextResul
 			: extractContent([parsedMessage]);
 
 	const mailData: MailData = {
-		id: headers['message-id'][0].value,
+		id: parseMessageId(headers['message-id'][0].initial),
 		date: new Date(headers['date'][0].value),
 		...parsedParticipants,
 		subject: parseSubjectHeader(headers.subject?.[0].initial),
@@ -172,6 +172,13 @@ function isParsedMailbox(
 	mailboxOrGroup: emailAddresses.ParsedMailbox | emailAddresses.ParsedGroup,
 ): mailboxOrGroup is emailAddresses.ParsedMailbox {
 	return mailboxOrGroup.type === 'mailbox';
+}
+
+function parseMessageId(messageIdHeader: string): string {
+	if (messageIdHeader.startsWith('<') && messageIdHeader.endsWith('>')) {
+		return messageIdHeader.slice(1, -1);
+	}
+	return messageIdHeader;
 }
 
 function parseSubjectHeader(rawSubject: string): string {

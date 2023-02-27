@@ -1,5 +1,5 @@
 import { CRLF, HTAB, LINE_LENGTH_FOLD } from './consts';
-import { createHeader } from './headerFactories';
+import { createHeader, createMessageIdHeader } from './headerFactories';
 import { exportHeader, exportHeaderAttributes, exportStringHeader } from './headerHandler';
 import { defaultMessageComposerContext } from './messageComposerContext';
 
@@ -47,7 +47,7 @@ describe('headerHandler', () => {
 			const res = await exportHeader(header, defaultMessageComposerContext());
 
 			expect(res).toEqual(
-				`Label: "Alice" <alice@mailchain.co>,${CRLF} "Bob" <bob@mailchain.co>,${CRLF} "Rob" <rob@mailchain.xyz>`,
+				`Label: "Alice" <alice@mailchain.co>,${CRLF}${HTAB}"Bob" <bob@mailchain.co>,${CRLF}${HTAB}"Rob" <rob@mailchain.xyz>`,
 			);
 		});
 
@@ -153,6 +153,23 @@ describe('headerHandler', () => {
 				}
 			});
 			expect(res).toMatchSnapshot();
+		});
+	});
+
+	describe('exportMessageIdHeader', () => {
+		it('should export single id', async () => {
+			const res = await exportHeader(createMessageIdHeader('Label', ['my-id']), defaultMessageComposerContext());
+
+			expect(res).toEqual('Label: <my-id>');
+		});
+
+		it('should export multiple ids', async () => {
+			const res = await exportHeader(
+				createMessageIdHeader('Label', ['my-id-1', 'my-id-2', 'my-id-3']),
+				defaultMessageComposerContext(),
+			);
+
+			expect(res).toEqual(`Label: <my-id-1>${CRLF}${HTAB}<my-id-2>${CRLF}${HTAB}<my-id-3>`);
 		});
 	});
 });

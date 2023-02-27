@@ -13,7 +13,7 @@ test('should split message into headers', async () => {
 		Map {
 		  "MIME-Version" => "1.0",
 		  "Date" => "Tue, 14 Jun 2022 00:00:00 +0000",
-		  "Message-ID" => "mail-data-id@mailchain.test",
+		  "Message-ID" => "<mail-data-id@mailchain.test>",
 		  "Subject" => "=?UTF-8?B?8J+SjCBEdW1teSBNYWlsRGF0YSBzdWJqZWN0IPCfmIk=?=",
 		  "From" => ""alice@mailchain" <alice@mailchain.test>",
 		  "To" => ""bob@mailchain" <bob@mailchain.test>, "0xd5ab...7fe6@ethereum" <0xd5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6@ethereum.mailchain.test>, "tim.eth" <tim@eth.mailchain.test>",

@@ -2,7 +2,7 @@ import { CRLF, HEADER_LABELS } from './consts';
 import { buildMessageAndAttachments, BuiltContentPart } from './contentHandler';
 import { concludeHeaders } from './fallback';
 import { hasOnlyPrintableUsAscii } from './hasOnlyAscii';
-import { createHeader } from './headerFactories';
+import { createHeader, createMessageIdHeader } from './headerFactories';
 import { buildHeaders } from './headerHandler';
 import { byHeaderOrder } from './headerOrder';
 import { defaultMessageComposerContext, MessageComposerContext } from './messageComposerContext';
@@ -39,7 +39,7 @@ export class MessageComposer {
 
 	/** Set the `Message-ID` field for the message. If not set, random one would be generated. */
 	id(value: string): MessageComposer {
-		this._headers.set(HEADER_LABELS.MessageId, createHeader(HEADER_LABELS.MessageId, value));
+		this._headers.set(HEADER_LABELS.MessageId, createMessageIdHeader(HEADER_LABELS.MessageId, [value]));
 		return this;
 	}
 
