@@ -49,7 +49,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 			messagingKey: aliceKeyRing.accountMessagingKey().publicKey,
 			identityKey: AliceAccountMailbox.identityKey,
 			protocol: MAILCHAIN,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		formatAddress(BobAccountMailbox.aliases[0].address, 'mail'),
@@ -57,7 +57,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 			messagingKey: bobKeyRing.accountMessagingKey().publicKey,
 			identityKey: bobKeyRing.accountIdentityKey().publicKey,
 			protocol: MAILCHAIN,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
@@ -69,7 +69,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 			).publicKey,
 			identityKey: AliceWalletMailbox.identityKey,
 			protocol: AliceWalletMailbox.messagingKeyParams.protocol,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		formatAddress(BobWalletMailbox.aliases[0].address, 'mail'),
@@ -81,7 +81,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 			).publicKey,
 			identityKey: BobWalletMailbox.identityKey,
 			protocol: BobWalletMailbox.messagingKeyParams.protocol,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		'tim@eth.mailchain.test',
@@ -99,7 +99,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 				]),
 			),
 			protocol: ETHEREUM,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		'john@mailchain.test',
@@ -117,7 +117,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 				]),
 			),
 			protocol: MAILCHAIN,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		'jane@mailchain.test',
@@ -135,7 +135,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 				]),
 			),
 			protocol: MAILCHAIN,
-		},
+		} as ResolvedAddress,
 	],
 	[
 		'maria@mailchain.test',
@@ -153,7 +153,7 @@ export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new 
 				]),
 			),
 			protocol: MAILCHAIN,
-		},
+		} as ResolvedAddress,
 	],
 ]);
 

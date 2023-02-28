@@ -20,6 +20,7 @@ export type ResolvedAddress = {
 	identityKey?: PublicKey;
 	protocol: ProtocolType;
 	network?: string;
+	status: 'registered' | 'vended';
 };
 
 export type ResolvedManyAddresses = {
@@ -56,6 +57,7 @@ export class MessagingKeys {
 
 	async resolve(address: string): Promise<ResolvedAddress> {
 		const { data } = await this.addressApi.getAddressMessagingKey(address);
+		const status = data.registeredKeyProof ? 'registered' : 'vended';
 
 		const verifyResult = await this.verifier.verifyAddressMessagingKey(data);
 		if (!verifyResult.result) {
@@ -67,7 +69,7 @@ export class MessagingKeys {
 			throw new Error(`invalid address protocol of [${data.protocol}]`);
 		}
 
-		return { messagingKey: verifyResult.messagingKey, identityKey: verifyResult.identityKey, protocol };
+		return { messagingKey: verifyResult.messagingKey, identityKey: verifyResult.identityKey, protocol, status };
 	}
 
 	async resolveMany(addresses: string[]): Promise<ResolvedManyAddresses> {
@@ -85,8 +87,7 @@ export class MessagingKeys {
 		const failed: ResolvedManyAddresses['failed'] = [];
 		for (const result of resolvedAddresses) {
 			if (result.status === 'fulfilled') {
-				const { messagingKey, identityKey, protocol, network } = result.value;
-				resolved.set(result.value.address, { messagingKey, identityKey, protocol, network });
+				resolved.set(result.value.address, result.value);
 			} else {
 				failed.push(result.reason as FailedAddressResolutionError);
 			}
