@@ -32,11 +32,15 @@ export function decodeHex(input: string): Uint8Array {
 	return output;
 }
 
+export function isHex(input: string): boolean {
+	return new RegExp('^[a-fA-F0-9]+$').test(input);
+}
+
 export function isAnyHex(input: string): boolean {
 	if (input.startsWith('0x')) {
 		input = input.substring(2);
 	}
-	return new RegExp('^[a-fA-F0-9]+$').test(input);
+	return isHex(input);
 }
 
 export function decodeHexAny(input: string): Uint8Array {

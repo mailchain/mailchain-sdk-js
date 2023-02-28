@@ -1,24 +1,37 @@
 import { formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
-import { decodePublicKey, PublicKey } from '@mailchain/crypto';
-import { decodeHexZeroX } from '@mailchain/encoding';
+import { encodePublicKey, PublicKey } from '@mailchain/crypto';
 import Axios from 'axios';
-import { AddressesApiFactory, AddressesApiInterface, createAxiosConfiguration } from '@mailchain/api';
+import {
+	AddressesApiFactory,
+	AddressesApiInterface,
+	createAxiosConfiguration,
+	IdentityKeysApiFactory,
+	IdentityKeysApiInterface,
+} from '@mailchain/api';
+import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
+import { encodeHexZeroX } from '@mailchain/encoding';
 import { Configuration } from '../mailchain';
 
 export class IdentityKeys {
-	constructor(private readonly addressesApi: AddressesApiInterface) {}
+	constructor(
+		private readonly addressesApi: AddressesApiInterface,
+		private readonly identityKeyApi: IdentityKeysApiInterface,
+	) {}
 
 	static create(config: Configuration) {
-		return new IdentityKeys(AddressesApiFactory(createAxiosConfiguration(config.apiPath)));
+		const axiosConfig = createAxiosConfiguration(config.apiPath);
+		return new IdentityKeys(AddressesApiFactory(axiosConfig), IdentityKeysApiFactory(axiosConfig));
 	}
 
-	async getAddressIdentityKey(
-		address: MailchainAddress,
-	): Promise<{ identityKey: PublicKey; protocol: ProtocolType } | null> {
+	async getAddressIdentityKey(address: MailchainAddress) {
+		return this.resolve(formatAddress(address, 'mail'));
+	}
+
+	async resolve(address: string): Promise<{ identityKey: PublicKey; protocol: ProtocolType } | null> {
 		return this.addressesApi
-			.getAddressIdentityKey(formatAddress(address, 'mail'))
+			.getAddressIdentityKey(address)
 			.then(({ data }) => ({
-				identityKey: decodePublicKey(decodeHexZeroX(data.identityKey)),
+				identityKey: convertPublic(data.identityKey),
 				protocol: data.protocol as ProtocolType,
 			}))
 			.catch((e) => {
@@ -29,5 +42,13 @@ export class IdentityKeys {
 				}
 				throw e;
 			});
+	}
+
+	async reverse(identityKey: PublicKey) {
+		const { addresses } = (
+			await this.identityKeyApi.getIdentityKeyAddresses(encodeHexZeroX(encodePublicKey(identityKey)))
+		).data;
+
+		return addresses;
 	}
 }

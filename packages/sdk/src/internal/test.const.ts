@@ -171,4 +171,5 @@ export const dummyMailDataResolvedAddressesWithoutMessagingKey: Map<
 export const TestSdkConfig: Configuration = {
 	apiPath: 'https://api.mailchain.test',
 	mailchainAddressDomain: 'mailchain.test',
+	nearRpcUrl: 'http://localhost:3333',
 };

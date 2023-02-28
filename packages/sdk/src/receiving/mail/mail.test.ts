@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto';
-import { mock, MockProxy, mockReset } from 'jest-mock-extended';
+import { mock, MockProxy } from 'jest-mock-extended';
 import { BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { PayloadReceiver, ReceivedPayload } from '../payload';
 import { DeliveryRequests } from '../deliveryRequests';
@@ -33,8 +33,7 @@ const mailData = {
 };
 describe('Receiving payload tests', () => {
 	beforeEach(() => {
-		mockReset(mockAxios);
-		mockReset(mockDeliveryRequests);
+		jest.resetAllMocks();
 	});
 	it('alice receives messages', async () => {
 		const message = await createMimeMessage(mailData, new Map());

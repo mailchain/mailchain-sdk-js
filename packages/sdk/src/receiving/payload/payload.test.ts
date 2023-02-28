@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
-import { mock, MockProxy, mockReset } from 'jest-mock-extended';
+import { mock, MockProxy } from 'jest-mock-extended';
 import { DeliveryRequests } from '../deliveryRequests';
 import { ErrorPayloadSignatureInvalid, PayloadOriginVerifier } from '../../transport/payload/verifier';
 import { PayloadReceiver, ReceivedPayload } from './payload';
@@ -20,9 +20,7 @@ interface TestDetails {
 
 describe('Receiving payload tests', () => {
 	beforeEach(() => {
-		mockReset(mockAxios);
-		mockReset(mockDeliveryRequests);
-		mockReset(mockPayloadOriginVerifier);
+		jest.resetAllMocks();
 	});
 	const tests: TestDetails[] = [
 		{

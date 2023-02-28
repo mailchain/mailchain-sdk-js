@@ -12,11 +12,13 @@ import { UserMailbox } from './internal/user/types';
 export type Configuration = {
 	apiPath: string;
 	mailchainAddressDomain: string;
+	nearRpcUrl: string;
 };
 
 const defaultConfiguration: Configuration = {
 	apiPath: 'https://api.mailchain.com',
 	mailchainAddressDomain: 'mailchain.com',
+	nearRpcUrl: 'https://rpc.near.org',
 };
 
 type MailSenderResult = SendResult | PrepareResult;

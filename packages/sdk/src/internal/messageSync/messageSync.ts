@@ -1,3 +1,4 @@
+import { encodeHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
 import { KeyRingDecrypter } from '@mailchain/keyring/functions';
 import axios, { AxiosInstance } from 'axios';
@@ -79,12 +80,14 @@ export class MessageSync {
 					.confirmDelivery(messageResult.deliveryRequestHash)
 					.then(() => {
 						console.debug(
-							`Successfully confirmed delivery message hash ${messageResult.deliveryRequestHash}`,
+							`Successfully confirmed delivery message hash ${encodeHex(
+								messageResult.deliveryRequestHash,
+							)}`,
 						);
 					})
 					.catch((e) =>
 						console.warn(
-							`Failed saving received message with hash ${messageResult.deliveryRequestHash}`,
+							`Failed saving received message with hash ${encodeHex(messageResult.deliveryRequestHash)}`,
 							e,
 						),
 					);

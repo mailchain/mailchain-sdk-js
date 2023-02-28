@@ -10,10 +10,10 @@ import {
 	IdentityKeysApiInterface,
 	AddressesApiInterface,
 } from '@mailchain/api';
-import { AddressVerificationFailed } from '@mailchain/signatures';
+import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { Configuration } from '../mailchain';
-import { Verifier } from './verify';
 import { MessagingKeyProof } from './proof';
+import { MessagingKeyContractCall } from './messagingKeyContract';
 
 export type ResolvedAddress = {
 	messagingKey: PublicKey;
@@ -42,34 +42,37 @@ export class FailedAddressResolutionError extends Error {
 
 export class MessagingKeys {
 	constructor(
-		private readonly verifier: Verifier,
 		private readonly addressApi: AddressesApiInterface,
 		private readonly identityKeysApi: IdentityKeysApiInterface,
+		private readonly messagingKeyContractCall: MessagingKeyContractCall,
 	) {}
 
 	static create(configuration: Configuration) {
 		return new MessagingKeys(
-			Verifier.create(configuration),
 			AddressesApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			IdentityKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),
+			MessagingKeyContractCall.create(configuration),
 		);
 	}
 
 	async resolve(address: string): Promise<ResolvedAddress> {
 		const { data } = await this.addressApi.getAddressMessagingKey(address);
-		const status = data.registeredKeyProof ? 'registered' : 'vended';
-
-		const verifyResult = await this.verifier.verifyAddressMessagingKey(data);
-		if (!verifyResult.result) {
-			throw new AddressVerificationFailed();
-		}
 
 		const protocol = data.protocol as ProtocolType;
 		if (!ALL_PROTOCOLS.includes(protocol)) {
-			throw new Error(`invalid address protocol of [${data.protocol}]`);
+			throw new Error(`unsupported protocol [${data.protocol}]`);
 		}
 
-		return { messagingKey: verifyResult.messagingKey, identityKey: verifyResult.identityKey, protocol, status };
+		if (!data.contractCall) {
+			throw new Error(`expected contract call`);
+		}
+
+		return this.messagingKeyContractCall.resolve(
+			data.localPart,
+			data.protocol as ProtocolType,
+			data.contractCall,
+			data.identityKey ? convertPublic(data.identityKey) : undefined,
+		);
 	}
 
 	async resolveMany(addresses: string[]): Promise<ResolvedManyAddresses> {

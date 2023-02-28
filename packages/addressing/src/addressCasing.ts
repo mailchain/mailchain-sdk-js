@@ -1,4 +1,4 @@
-import { ALGORAND, ETHEREUM, MAILCHAIN, ProtocolType, SUBSTRATE } from './protocols';
+import { ALGORAND, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE } from './protocols';
 
 export function casingByProtocol(value: string, protocol: ProtocolType): string {
 	switch (protocol) {
@@ -10,6 +10,8 @@ export function casingByProtocol(value: string, protocol: ProtocolType): string 
 			return value; // substrate encoding is case sensitive
 		case ALGORAND:
 			return value.toLowerCase(); // case insensitive
+		case NEAR:
+			return value.toLowerCase();
 		default:
 			throw new Error(`casing for protocol [${protocol}] not defined`);
 	}

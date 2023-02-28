@@ -1,11 +1,9 @@
 import { PrivateKey } from '@mailchain/crypto';
 import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { encodeHexZeroX } from '@mailchain/encoding';
+import { ETHEREUM, NEAR } from '@mailchain/addressing/protocols';
 import { ecdhKeyRingDecrypter, KeyRingDecrypter } from '@mailchain/keyring/functions';
 import {
-	Address as ApiAddress,
-	IdentityKeysApiFactory,
-	IdentityKeysApiInterface,
 	MessagingKeysApiFactory,
 	MessagingKeysApiInterface,
 	ApiKeyConvert,
@@ -13,16 +11,21 @@ import {
 	getAxiosWithSigner,
 } from '@mailchain/api';
 import { KeyRing } from '@mailchain/keyring';
-import { ETHEREUM } from '@mailchain/addressing/protocols';
+import uniqBy from 'lodash/uniqBy';
+import { IdentityKeys } from '../../identityKeys';
 import { Configuration } from '../..';
 import { UserMailbox } from '../user/types';
 import { MessageSync, SyncResult } from './messageSync';
 
-export type PrevSyncResult = SyncResult & { address: ApiAddress };
+type Address = {
+	protocol: string;
+	address: string;
+};
+export type PrevSyncResult = SyncResult & { address: Address };
 
 export class PreviousMessageSync {
 	constructor(
-		private readonly identityKeysApi: IdentityKeysApiInterface,
+		private readonly identityKeys: IdentityKeys,
 		private readonly messagingKeysApiFactory: (messagingKey: KeyRingDecrypter) => MessagingKeysApiInterface,
 		private readonly keyRing: KeyRing,
 		private readonly messageSync: MessageSync,
@@ -31,7 +34,7 @@ export class PreviousMessageSync {
 	static create(sdkConfig: Configuration, keyRing: KeyRing, messageSync: MessageSync) {
 		const axiosConfig = createAxiosConfiguration(sdkConfig.apiPath);
 		return new PreviousMessageSync(
-			IdentityKeysApiFactory(axiosConfig),
+			IdentityKeys.create(sdkConfig),
 			(messagingKey) => MessagingKeysApiFactory(axiosConfig, undefined, getAxiosWithSigner(messagingKey)),
 			keyRing,
 			messageSync,
@@ -39,41 +42,67 @@ export class PreviousMessageSync {
 	}
 
 	async sync(mailbox: UserMailbox): Promise<PrevSyncResult[]> {
-		const messagingKey = this.keyRing.addressMessagingKey(
-			mailbox.messagingKeyParams.address,
-			mailbox.messagingKeyParams.protocol,
-			mailbox.messagingKeyParams.nonce,
+		const messagingKeysApi = this.messagingKeysApiFactory(
+			this.keyRing.addressMessagingKey(
+				mailbox.messagingKeyParams.address,
+				mailbox.messagingKeyParams.protocol,
+				mailbox.messagingKeyParams.nonce,
+			),
 		);
 
-		const messagingKeysApi = this.messagingKeysApiFactory(messagingKey);
-
 		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(mailbox.identityKey));
-		const { addresses } = await this.identityKeysApi
-			.getIdentityKeyAddresses(encodedIdentityKey)
-			.then((r) => r.data);
+		const addresses = await this.identityKeys.reverse(mailbox.identityKey);
 
-		const aliasMessagingKeys: [ApiAddress, PrivateKey][] = await Promise.all(
-			addresses.map(async (address) => {
-				if (address.protocol !== ETHEREUM) {
-					// TODO: MessagingKeysApi.getPrivateMessagingKey demands 'ethereum' as protocol.
-					throw new Error(`unsupported protocol of [${address.protocol}] for [${address.value}]`);
+		// add all address found by identity key and also registered
+		const allAddresses = uniqBy(
+			[
+				...addresses.map(
+					(x) =>
+						({
+							protocol: x.protocol,
+							address: x.value,
+						} as Address),
+				),
+				...mailbox.aliases.map(
+					(x) =>
+						({
+							address: x.address.username,
+							protocol: mailbox.messagingKeyParams.protocol,
+						} as Address),
+				),
+			],
+			(x) => x.address + x.protocol,
+		);
+
+		type AddressToCheck = { address: Address; messagingKey: PrivateKey };
+		// type Address
+		// const aliasMessagingKeyss: [Address, PrivateKey][] = [];
+
+		const aliasMessagingKeys = await Promise.allSettled(
+			allAddresses.map(async (x) => {
+				if (x.protocol !== ETHEREUM && x.protocol !== NEAR) {
+					throw new Error(`unsupported protocol of [${x.protocol}] for [${x.address}]`);
 				}
 				// TODO: https://github.com/mailchain/monorepo/issues/405, the private key should be invalidated at the end of the sync
 				const { privateKey: apiPrivateKey } = await messagingKeysApi
-					.getPrivateMessagingKey(address.value, address.protocol, encodedIdentityKey)
+					.getVendedPrivateMessagingKey(x.address, x.protocol, encodedIdentityKey)
 					.then((r) => r.data);
-				const privateKey = ApiKeyConvert.private(apiPrivateKey);
 
-				return [address, privateKey];
+				return { address: x, messagingKey: ApiKeyConvert.private(apiPrivateKey) } as AddressToCheck;
 			}),
 		);
 
+		const filteredAliasMessagingKeys: AddressToCheck[] = [];
+		aliasMessagingKeys.forEach((x) => {
+			if (x.status === 'fulfilled') {
+				filteredAliasMessagingKeys.push(x.value);
+			}
+		});
+
 		const results: PrevSyncResult[] = [];
-		for (const [address, aliasMessagingKey] of aliasMessagingKeys) {
-			const tmpResult = await this.messageSync.syncWithMessagingKey(
-				mailbox,
-				ecdhKeyRingDecrypter(aliasMessagingKey),
-			);
+		for (const x of filteredAliasMessagingKeys) {
+			const { address, messagingKey } = x;
+			const tmpResult = await this.messageSync.syncWithMessagingKey(mailbox, ecdhKeyRingDecrypter(messagingKey));
 			results.push({ ...tmpResult, address });
 		}
 		return results;

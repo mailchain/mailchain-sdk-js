@@ -57,6 +57,47 @@ const testCases: { address: MailchainAddress; expectedMail: string; expectedHuma
 		expectedMail: 'alice.bitcoin@unstoppable.ethereum.mailchain.test',
 		expectedHuman: 'alice.bitcoin@unstoppable.ethereum',
 	},
+	{
+		address: createNameServiceAddress(
+			'244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06',
+			'near.mailchain.test',
+		),
+		expectedMail: '244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06@near.mailchain.test',
+		expectedHuman: '244a6b...1e06@near',
+	},
+	{
+		address: createNameServiceAddress(
+			'98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de.testnet',
+			'near.mailchain.test',
+		),
+		expectedMail: '98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de.testnet@near.mailchain.test',
+		expectedHuman: '98793c...d6de@near',
+	},
+	{
+		address: createNameServiceAddress('alice.near', 'near.mailchain.test'),
+		expectedMail: 'alice.near@near.mailchain.test',
+		expectedHuman: 'alice.near',
+	},
+	{
+		address: createNameServiceAddress('alice.testnet', 'near.mailchain.test'),
+		expectedMail: 'alice.testnet@near.mailchain.test',
+		expectedHuman: 'alice.testnet@near',
+	},
+	{
+		address: createNameServiceAddress('alice.aurora', 'near.mailchain.test'),
+		expectedMail: 'alice.aurora@near.mailchain.test',
+		expectedHuman: 'alice.aurora@near',
+	},
+	{
+		address: createNameServiceAddress('alice-very-long-name-alice.near', 'near.mailchain.test'),
+		expectedMail: 'alice-very-long-name-alice.near@near.mailchain.test',
+		expectedHuman: 'alice-very-long-name-alice.near',
+	},
+	{
+		address: createNameServiceAddress('alice-very-long-name-alice.testnet', 'near.mailchain.test'),
+		expectedMail: 'alice-very-long-name-alice.testnet@near.mailchain.test',
+		expectedHuman: 'alice-very-long-name-alice.testnet@near',
+	},
 ];
 
 describe('addressFormatting', () => {

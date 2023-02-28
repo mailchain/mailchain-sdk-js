@@ -1,19 +1,13 @@
 import { secureRandom } from '@mailchain/crypto';
 import { ED25519PrivateKey } from '@mailchain/crypto/ed25519';
-import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import {
-	Address,
-	IdentityKeysApiInterface,
-	MessagingKeysApiInterface,
-	PrivateKey,
-	ApiKeyConvert,
-} from '@mailchain/api';
+import { Address, MessagingKeysApiInterface, PrivateKey, ApiKeyConvert } from '@mailchain/api';
 import { AxiosResponse } from 'axios';
-import { MockProxy, mock } from 'jest-mock-extended';
+import { mock } from 'jest-mock-extended';
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ETHEREUM } from '@mailchain/addressing';
+import { IdentityKeys } from '../../identityKeys';
 import { AliceWalletMailbox, BobWalletMailbox } from '../user/test.const';
 import { PreviousMessageSync } from './previousMessageSync';
 import { MessageSync, SyncResult } from './messageSync';
@@ -45,18 +39,17 @@ describe('PreviousMessageSync', () => {
 		value: encodeHexZeroX(ED25519PrivateKey.fromSeed(secureRandom(32)).bytes),
 	} as PrivateKey;
 
-	let mockIdentityKeysApi: MockProxy<IdentityKeysApiInterface>;
-	let mockMessagingKeysApi: MockProxy<MessagingKeysApiInterface>;
-	let mockMessageSync: MockProxy<MessageSync>;
+	const mockIdentityKeys = mock<IdentityKeys>();
+	const mockMessagingKeysApi = mock<MessagingKeysApiInterface>();
+	const mockMessageSync = mock<MessageSync>();
 
 	let previousMessageSync: PreviousMessageSync;
 
 	beforeEach(() => {
-		mockIdentityKeysApi = mock();
-		mockMessagingKeysApi = mock();
-		mockMessageSync = mock();
+		jest.clearAllMocks();
+
 		previousMessageSync = new PreviousMessageSync(
-			mockIdentityKeysApi,
+			mockIdentityKeys,
 			() => mockMessagingKeysApi,
 			keyRing,
 			mockMessageSync,
@@ -64,12 +57,8 @@ describe('PreviousMessageSync', () => {
 	});
 
 	it('should get previous delivered messages and sync them', async () => {
-		mockIdentityKeysApi.getIdentityKeyAddresses.mockResolvedValue({
-			data: {
-				addresses: [mockAddress1, mockAddress2],
-			},
-		} as AxiosResponse);
-		mockMessagingKeysApi.getPrivateMessagingKey
+		mockIdentityKeys.reverse.mockResolvedValue([mockAddress1, mockAddress2]);
+		mockMessagingKeysApi.getVendedPrivateMessagingKey
 			.mockResolvedValueOnce({
 				data: {
 					privateKey: mockPrivateMessagingKey1,
@@ -90,8 +79,8 @@ describe('PreviousMessageSync', () => {
 		const syncRes = await previousMessageSync.sync(AliceWalletMailbox);
 
 		expect(syncRes).toEqual([
-			{ ...mockSyncResult, address: mockAddress1 },
-			{ ...mockSyncResult, address: mockAddress2 },
+			{ ...mockSyncResult, address: { address: mockAddress1.value, protocol: mockAddress1.protocol } },
+			{ ...mockSyncResult, address: { address: mockAddress2.value, protocol: mockAddress2.protocol } },
 		]);
 		const firstSync = mockMessageSync.syncWithMessagingKey.mock.calls[0];
 		expect(firstSync[0]).toEqual(AliceWalletMailbox);
@@ -99,8 +88,6 @@ describe('PreviousMessageSync', () => {
 		const secondSync = mockMessageSync.syncWithMessagingKey.mock.calls[1];
 		expect(secondSync[0]).toEqual(AliceWalletMailbox);
 		expect(secondSync[1].publicKey).toEqual(ApiKeyConvert.private(mockPrivateMessagingKey2).publicKey);
-		expect(mockIdentityKeysApi.getIdentityKeyAddresses).toBeCalledWith(
-			encodeHexZeroX(encodePublicKey(AliceWalletMailbox.identityKey)),
-		);
+		expect(mockIdentityKeys.reverse).toBeCalledWith(AliceWalletMailbox.identityKey);
 	});
 });

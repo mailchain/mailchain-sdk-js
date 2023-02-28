@@ -1,11 +1,11 @@
-import { isEthereumAddress, isMailchainAccountAddress } from './addressPredicates';
+import { isEthereumAddress, isMailchainAccountAddress, isNearImplicitAccount } from './addressPredicates';
 import { decodeAddressByProtocol } from './encoding';
 import { formatMailLike } from './formatMailLike';
 import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
 import { matchesNameservice } from './nameservices/matchesNameservice';
 import { NAMESERVICE_DESCRIPTIONS } from './nameservices/nameserviceDescriptions';
 import { parseWalletAddress } from './parseWalletAddress';
-import { ETHEREUM } from './protocols';
+import { ETHEREUM, NEAR } from './protocols';
 
 /** If the rule is applicable,format the provided address. If not applicable, return `undefined`  */
 export type AddressFormattingRule<T extends MailchainAddress> = (address: T) => string | undefined;
@@ -21,6 +21,29 @@ const humanMailchainAccount: NameServiceAddressFormatter = (address) => {
 		return formatMailLike(address.username, domainParts[0]);
 	}
 	return undefined;
+};
+
+const humanNearAddress: NameServiceAddressFormatter = (address) => {
+	const props = parseWalletAddress(address);
+	if (props == null || props.protocol !== NEAR) return;
+
+	// TODO: this is just simple case of simple accounts without sub-accounts (not supporting `billing.alice.near`)
+	const [nearUsername, nearDomain] = address.username.split('.');
+
+	if (
+		isNearImplicitAccount({
+			domain: address.domain,
+			username: nearUsername,
+		})
+	) {
+		return formatMailLike(`${nearUsername.slice(0, 6)}...${nearUsername.slice(-4)}`, props.protocol);
+	}
+
+	if (nearDomain !== 'near') {
+		// Handle cases of other domains like '.testnet' or maybe custom ones like '.aurora'
+		return formatMailLike(`${nearUsername}.${nearDomain}`, props.protocol);
+	}
+	return formatMailLike(`${nearUsername}.${nearDomain}`);
 };
 
 /**
@@ -74,6 +97,7 @@ const humanCatchAll: NameServiceAddressFormatter = (address) => {
 
 export const humanNameServiceFormatters = [
 	humanMailchainAccount,
+	humanNearAddress,
 	humanWalletAddress,
 	humanNsAddress,
 	humanCatchAll,

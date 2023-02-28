@@ -8,15 +8,15 @@ export type NameServiceAddress = {
 	/**
 	 * The username part of the address (the part before the "@").
 	 *
-	 * - Example 1: the 'alice.eth' out of 'alice.eth@mailchain.com'
-	 * - Example 2: the 'alice' out of 'alice@eth.mailchain.com'
+	 * - Example 1: the 'alice.eth' out of 'alice.ens@eth.mailchain.com'
+	 * - Example 2: the '0xaB15101053d4382118797EBb3FF6cD1C83d15A03' out of '0xaB15101053d4382118797EBb3FF6cD1C83d15A03@ethereum.mailchain.com'
 	 */
 	username: string;
 	/**
 	 * The domain part of the address (the part after the "@").
 	 *
 	 * - Example 1: the 'mailchain.com' out of 'alice.eth@mailchain.com'
-	 * - Example 2: the 'eth.mailchain.com' out of 'alice.eth@mailchain.com'
+	 * - Example 2: the 'ethereum.mailchain.com' out of '0xaB15101053d4382118797EBb3FF6cD1C83d15A03@ethereum.mailchain.com'
 	 */
 	domain: string;
 };

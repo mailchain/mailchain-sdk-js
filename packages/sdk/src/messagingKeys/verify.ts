@@ -6,7 +6,6 @@ import {
 	createAxiosConfiguration,
 	RegisteredKeyProof,
 	ProvidedKeyProof,
-	GetAddressMessagingKeyResponseBody,
 	getAddressFromApiResponse,
 	MessagingKeysApiInterface,
 } from '@mailchain/api';
@@ -27,11 +26,11 @@ export interface VerifyAddressMessagingKeyResult {
 	result: boolean;
 }
 
-export class Verifier {
+export class MessagingKeyVerifier {
 	constructor(private readonly messagingKeysApi: MessagingKeysApiInterface) {}
 
 	static create(configuration: Configuration) {
-		return new Verifier(MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)));
+		return new MessagingKeyVerifier(MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)));
 	}
 
 	async verifyRegisteredKeyProof(
@@ -41,13 +40,14 @@ export class Verifier {
 		identityKey?: PublicKey;
 		result: boolean;
 	}> {
+		if (!registeredKeyProof) throw new AddressVerificationFailed();
 		if (registeredKeyProof.signature == null) throw new AddressVerificationFailed();
 
 		const params = {
-			AddressEncoding: registeredKeyProof?.address.encoding,
-			PublicKeyEncoding: registeredKeyProof?.messagingKeyEncoding,
-			Locale: registeredKeyProof?.locale,
-			Variant: registeredKeyProof?.variant,
+			AddressEncoding: registeredKeyProof.address.encoding,
+			PublicKeyEncoding: registeredKeyProof.messagingKeyEncoding,
+			Locale: registeredKeyProof.locale,
+			Variant: registeredKeyProof.variant,
 		} as ProofParams;
 
 		const message = createProofMessage(
@@ -77,7 +77,7 @@ export class Verifier {
 		if (!mailchainPublicKeyResponse.data.key?.value) throw new PublicKeyNotFoundFailed();
 		const mailchainPublicKey = ApiKeyConvert.public(mailchainPublicKeyResponse.data.key);
 
-		if (!providedKeyProof?.signature) throw new AddressVerificationFailed();
+		if (!providedKeyProof.signature) throw new AddressVerificationFailed();
 
 		return await verifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,
@@ -86,28 +86,5 @@ export class Verifier {
 			providedKeyProof.address!,
 			providedKeyProof.protocol as ProtocolType,
 		);
-	}
-
-	async verifyAddressMessagingKey(
-		response: GetAddressMessagingKeyResponseBody,
-	): Promise<VerifyAddressMessagingKeyResult> {
-		const { registeredKeyProof, providedKeyProof, messagingKey: apiMessagingKey } = response;
-		const messagingKey = ApiKeyConvert.public(apiMessagingKey);
-
-		if (providedKeyProof) {
-			return {
-				identityKey: undefined,
-				method: 'provided',
-				messagingKey,
-				result: await this.verifyProvidedKeyProof(providedKeyProof, messagingKey),
-			};
-		} else if (registeredKeyProof) {
-			return {
-				method: 'registered',
-				messagingKey,
-				...(await this.verifyRegisteredKeyProof(registeredKeyProof, messagingKey)),
-			};
-		}
-		throw new Error(`no proof provided`);
 	}
 }
