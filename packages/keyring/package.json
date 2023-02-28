@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/keyring",
-	"version": "0.16.0",
+	"version": "0.16.1",
 	"description": "Mailchain keyring",
 	"license": "Apache-2.0",
 	"author": {
@@ -17,9 +17,9 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@mailchain/addressing": "0.16.0",
-		"@mailchain/crypto": "0.16.0",
-		"@mailchain/encoding": "0.16.0"
+		"@mailchain/addressing": "0.16.1",
+		"@mailchain/crypto": "0.16.1",
+		"@mailchain/encoding": "0.16.1"
 	},
 	"scripts": {
 		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",

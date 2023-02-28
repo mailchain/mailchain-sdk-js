@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/api",
-	"version": "0.16.0",
+	"version": "0.16.1",
 	"description": "Mailchain api tools",
 	"license": "Apache-2.0",
 	"author": {
@@ -17,11 +17,11 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@mailchain/crypto": "0.16.0",
-		"@mailchain/encoding": "0.16.0"
+		"@mailchain/crypto": "0.16.1",
+		"@mailchain/encoding": "0.16.1"
 	},
 	"devDependencies": {
-		"@mailchain/keyring": "0.16.0",
+		"@mailchain/keyring": "0.16.1",
 		"axios": "^0.26.1",
 		"axios-mock-adapter": "^1.21.1",
 		"lodash": "^4.17.21"

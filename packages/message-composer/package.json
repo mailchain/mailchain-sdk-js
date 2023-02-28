@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/message-composer",
-	"version": "0.16.0",
+	"version": "0.16.1",
 	"description": "Mailchain MIME message composer. RFC-5322 compliant",
 	"license": "Apache-2.0",
 	"author": {
@@ -17,7 +17,7 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@mailchain/encoding": "0.16.0",
+		"@mailchain/encoding": "0.16.1",
 		"date-fns": "^2.29.2"
 	},
 	"scripts": {
