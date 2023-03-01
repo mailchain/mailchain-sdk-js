@@ -17,8 +17,9 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		name: 'lens',
 		domains: ['lens'],
 	},
-	{
-		name: 'near',
-		domains: ['near'],
-	},
+	// TODO: NEAR uncomment to support
+	// {
+	// 	name: 'near',
+	// 	domains: ['near'],
+	// },
 ];
