@@ -1,5 +1,5 @@
 import { formatAddress, MailchainAddress, ProtocolType } from '@mailchain/addressing';
-import { encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
 import Axios from 'axios';
 import {
 	AddressesApiFactory,
@@ -8,8 +8,7 @@ import {
 	IdentityKeysApiFactory,
 	IdentityKeysApiInterface,
 } from '@mailchain/api';
-import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
-import { encodeHexZeroX } from '@mailchain/encoding';
+import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
 import { Configuration } from '../mailchain';
 
 export class IdentityKeys {
@@ -31,7 +30,7 @@ export class IdentityKeys {
 		return this.addressesApi
 			.getAddressIdentityKey(address)
 			.then(({ data }) => ({
-				identityKey: convertPublic(data.identityKey),
+				identityKey: decodePublicKey(decodeHexZeroX(data.identityKey)),
 				protocol: data.protocol as ProtocolType,
 			}))
 			.catch((e) => {
