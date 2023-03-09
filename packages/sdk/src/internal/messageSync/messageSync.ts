@@ -8,7 +8,7 @@ import { MailReceiver } from '../../receiving/mail';
 import { UserMailbox } from '../user/types';
 
 type SyncResultOk = {
-	status: 'ok';
+	status: 'success';
 	mailbox: UserMailbox;
 	messages: MessagePreview[];
 };
@@ -62,7 +62,7 @@ export class MessageSync {
 		const messageResults = await receiver.getUndelivered();
 		const messages: MessagePreview[] = [];
 		for (const messageResult of messageResults) {
-			if (messageResult.status !== 'ok') {
+			if (messageResult.status !== 'success') {
 				console.warn('failed to get undelivered message', messageResult.cause);
 				continue;
 			}
@@ -93,6 +93,6 @@ export class MessageSync {
 					);
 			}
 		}
-		return { status: 'ok', mailbox, messages };
+		return { status: 'success', mailbox, messages };
 	}
 }

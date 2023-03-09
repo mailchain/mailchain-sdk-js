@@ -25,7 +25,7 @@ import {
 	getAxiosWithSigner,
 } from '@mailchain/api';
 import { user } from '../protobuf/user/user';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { combineMigrations } from '../migration';
 import { IdentityKeys } from '../../identityKeys';
 import { Nameservices } from '../nameservices';

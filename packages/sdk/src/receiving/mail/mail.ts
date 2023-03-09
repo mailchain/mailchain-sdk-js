@@ -14,7 +14,7 @@ export type ReceivedMail = ReceivedMailOk | ReceivedMailError;
  * Success type for a mail that was received.
  */
 export type ReceivedMailOk = {
-	status: 'ok';
+	status: 'success';
 	/**
 	 * Payload of the mail.
 	 */
@@ -29,7 +29,7 @@ export type ReceivedMailOk = {
  * Error type for a mail that could not be received.
  */
 export type ReceivedMailError = {
-	status: 'error';
+	status: 'failure';
 	/**
 	 * Reason the mail could not be received.
 	 */
@@ -76,25 +76,25 @@ export class MailReceiver {
 		return Promise.all(
 			undeliveredPayloads.map(async (result) => {
 				switch (result.status) {
-					case 'ok':
+					case 'success':
 						return {
-							status: 'ok',
+							status: 'success',
 							payload: await this.processReceivedPayload(result.payload),
 							deliveryRequestHash: result.deliveryRequestHash,
 						};
 					case 'error-payload':
 						return {
-							status: 'error',
+							status: 'failure',
 							cause: result.cause,
 						};
 					case 'error-delivery-request':
 						return {
-							status: 'error',
+							status: 'failure',
 							cause: result.cause,
 						};
 					default:
 						return {
-							status: 'error',
+							status: 'failure',
 							cause: new Error('unknown status'),
 						};
 				}

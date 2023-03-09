@@ -1,14 +1,11 @@
 import { ContractCall, GetIdentityKeyNonceResponseBody, GetMsgKeyResponseBody } from '@mailchain/api';
 import axios, { AxiosInstance } from 'axios';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
-import { Configuration } from '../../mailchain';
+import { MessagingKeyVerificationError } from '@mailchain/signatures';
+import { Configuration } from '../../configuration';
 import { MessagingKeyVerifier } from '../verify';
-import {
-	ContractCallLatestNonce,
-	ContractCallMessagingKeyResolver,
-	ContractLatestNonceResponse,
-	ContractMessagingKeyResponse,
-} from './resolver';
+import { ContractCallLatestNonce, ContractCallMessagingKeyResolver, ContractCallResolveResult } from './resolver';
+import { MessagingKeyNotFoundInContractError } from './errors';
 
 export class MailchainKeyRegContractCallResolver implements ContractCallMessagingKeyResolver, ContractCallLatestNonce {
 	constructor(
@@ -21,11 +18,9 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 		return new this(MessagingKeyVerifier.create(configuration), configuration.apiPath, axiosInstance);
 	}
 
-	async resolve(contract: ContractCall): Promise<ContractMessagingKeyResponse> {
+	async resolve(contract: ContractCall): Promise<ContractCallResolveResult> {
 		if (contract.path === '/identity-keys/0/messaging-key') {
-			return {
-				status: 'not-found',
-			};
+			return { error: new MessagingKeyNotFoundInContractError() };
 		}
 
 		const rpcResponse = await this.callGetMessagingKeyContract(contract);
@@ -33,23 +28,20 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 		const messagingKey = convertPublic(rpcResponse.messagingKey);
 		const verified = await this.messagingKeyVerifier.verifyRegisteredKeyProof(rpcResponse.proof, messagingKey);
 		if (!verified) {
-			return {
-				status: 'proof-verification-failed',
-			};
+			return { error: new MessagingKeyVerificationError() };
 		}
 
 		return {
-			status: 'ok',
-			messagingKey,
-			protocol: contract.protocol as any,
+			data: {
+				messagingKey,
+				protocol: contract.protocol as any,
+			},
 		};
 	}
 
-	async latestNonce(contract: ContractCall): Promise<ContractLatestNonceResponse> {
+	async latestNonce(contract: ContractCall): Promise<number> {
 		if (contract.path === '/identity-keys/0/nonce') {
-			return {
-				status: 'not-found',
-			};
+			throw new MessagingKeyNotFoundInContractError();
 		}
 
 		try {
@@ -60,15 +52,10 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 
 			const { nonce } = data;
 
-			return {
-				status: 'ok',
-				nonce,
-			};
+			return nonce;
 		} catch (error) {
 			if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
-				return {
-					status: 'not-found',
-				};
+				throw new MessagingKeyNotFoundInContractError();
 			}
 			throw error;
 		}

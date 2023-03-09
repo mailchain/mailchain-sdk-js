@@ -13,11 +13,11 @@ import { PublicKey } from '@mailchain/crypto';
 import { createProofMessage, ProofParams } from '@mailchain/signatures/keyreg';
 import {
 	verifyMailchainProvidedMessagingKey,
-	AddressVerificationFailed,
-	PublicKeyNotFoundFailed,
+	MessagingKeyVerificationError,
+	PublicKeyNotFoundError,
 	verify,
 } from '@mailchain/signatures';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../configuration';
 
 export interface VerifyAddressMessagingKeyResult {
 	messagingKey: PublicKey;
@@ -40,8 +40,8 @@ export class MessagingKeyVerifier {
 		identityKey?: PublicKey;
 		result: boolean;
 	}> {
-		if (!registeredKeyProof) throw new AddressVerificationFailed();
-		if (registeredKeyProof.signature == null) throw new AddressVerificationFailed();
+		if (!registeredKeyProof) throw new MessagingKeyVerificationError();
+		if (registeredKeyProof.signature == null) throw new MessagingKeyVerificationError();
 
 		const params = {
 			AddressEncoding: registeredKeyProof.address.encoding,
@@ -74,10 +74,10 @@ export class MessagingKeyVerifier {
 	async verifyProvidedKeyProof(providedKeyProof: ProvidedKeyProof, messagingKey: PublicKey) {
 		const mailchainPublicKeyResponse = await this.messagingKeysApi.getMailchainPublicKey();
 
-		if (!mailchainPublicKeyResponse.data.key?.value) throw new PublicKeyNotFoundFailed();
+		if (!mailchainPublicKeyResponse.data.key?.value) throw new PublicKeyNotFoundError();
 		const mailchainPublicKey = ApiKeyConvert.public(mailchainPublicKeyResponse.data.key);
 
-		if (!providedKeyProof.signature) throw new AddressVerificationFailed();
+		if (!providedKeyProof.signature) throw new MessagingKeyVerificationError();
 
 		return await verifyMailchainProvidedMessagingKey(
 			mailchainPublicKey,

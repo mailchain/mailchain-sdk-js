@@ -1,6 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { DeliveryRequests, SendPayloadDeliveryRequestResult } from '../deliveryRequests/deliveryRequests';
 import { ResolvedAddress } from '../../messagingKeys';
 import { FailedDistributionError, PreparedDistribution } from './payload';

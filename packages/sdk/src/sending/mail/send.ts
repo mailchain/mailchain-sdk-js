@@ -1,6 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { Configuration } from '../../';
-import { FailedAddressResolutionError, MessagingKeys, ResolvedAddress } from '../../messagingKeys';
+import { MessagingKeys, ResolvedAddress, ResolvedAddressError } from '../../messagingKeys';
 import { Distribution, MailData, Payload, MailSenderVerifier } from '../../transport';
 import { createMailPayloads, MailPayloadSender } from './payload';
 import { MailDeliveryRequests, SendResult } from './deliveryRequests';
@@ -17,11 +17,11 @@ export interface SendParams {
 
 export type PrepareResultFailedResolveRecipients = {
 	status: 'failed-resolve-recipients';
-	failedRecipients: FailedAddressResolutionError[];
+	failedRecipients: ResolvedAddressError[];
 };
 
 export type PrepareResultSuccess = {
-	status: 'ok';
+	status: 'success';
 	distributions: Distribution[];
 	message: Payload;
 	resolvedAddresses: Map<string, ResolvedAddress>;
@@ -97,7 +97,7 @@ export class MailSender {
 		);
 
 		return {
-			status: 'ok',
+			status: 'success',
 			distributions: messagePayloads.distributions,
 			message: messagePayloads.original,
 			resolvedAddresses: resolvedAddresses.resolved,

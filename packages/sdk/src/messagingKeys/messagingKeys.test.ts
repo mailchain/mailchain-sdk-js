@@ -39,17 +39,23 @@ describe('MessagingKeys', () => {
 		} as any);
 
 		mockContractCallResolvers.resolve.mockResolvedValue({
-			protocol: 'near',
-			messagingKey: messagingKey.publicKey,
-			identityKey: identityKey.publicKey,
+			data: {
+				protocol: 'near',
+				messagingKey: messagingKey.publicKey,
+				identityKey: identityKey.publicKey,
+				type: 'registered',
+			},
 		});
 
 		const actual = await messagingKeys.resolve('alice.near@near.mailchain.com');
 
 		expect(actual).toEqual({
-			identityKey: identityKey.publicKey,
-			messagingKey: messagingKey.publicKey,
-			protocol: 'near',
+			data: {
+				identityKey: identityKey.publicKey,
+				messagingKey: messagingKey.publicKey,
+				protocol: 'near',
+				type: 'registered',
+			},
 		});
 	});
 });

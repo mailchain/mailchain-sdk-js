@@ -80,7 +80,7 @@ describe('Receiving payload tests', () => {
 				),
 			),
 			expected: {
-				status: 'ok',
+				status: 'success',
 				payload: {
 					Content: Buffer.from([
 						68, 97, 116, 101, 58, 32, 50, 48, 50, 50, 45, 48, 55, 45, 49, 51, 84, 49, 56, 58, 52, 52, 58,
@@ -170,7 +170,7 @@ describe('Receiving payload tests', () => {
 				),
 			),
 			expected: {
-				status: 'ok',
+				status: 'success',
 				payload: {
 					Content: Buffer.from([
 						68, 97, 116, 101, 58, 32, 50, 48, 50, 50, 45, 48, 55, 45, 49, 51, 84, 49, 56, 58, 52, 52, 58,
@@ -261,7 +261,7 @@ describe('Receiving payload tests', () => {
 			),
 			expected: {
 				cause: new ErrorPayloadSignatureInvalid(),
-				status: 'error',
+				status: 'failure',
 			},
 		},
 	];

@@ -3,6 +3,7 @@ import { GetProtocolAddressNonceResponseBody, MessagingKeysApiInterface } from '
 import { AxiosResponse } from 'axios';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { MessagingKeyNonces } from './addressNonce';
+import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
 import { ContractCallLatestNonce } from './contractResolvers/resolver';
 
 describe('getAddressNonce', () => {
@@ -31,7 +32,7 @@ describe('getAddressNonce', () => {
 	});
 
 	it('should return nonce for Ethereum address of 0 contract response is not-found', async () => {
-		mockEthereumResolver.latestNonce.mockResolvedValue({ status: 'not-found' });
+		mockEthereumResolver.latestNonce.mockRejectedValue(new MessagingKeyNotFoundInContractError());
 
 		const resultNonce = await messagingKeyNonces.getAddressNonce('0x1337', ETHEREUM);
 
@@ -42,7 +43,7 @@ describe('getAddressNonce', () => {
 	});
 
 	it('should return nonce for Ethereum address based on resolution', async () => {
-		mockEthereumResolver.latestNonce.mockResolvedValue({ status: 'ok', nonce: 9 });
+		mockEthereumResolver.latestNonce.mockResolvedValue(9);
 
 		const resultNonce = await messagingKeyNonces.getAddressNonce('0x1337', ETHEREUM);
 
@@ -53,7 +54,7 @@ describe('getAddressNonce', () => {
 	});
 
 	it('should return nonce for Near address based on resolution', async () => {
-		mockNearResolver.latestNonce.mockResolvedValue({ status: 'ok', nonce: 9 });
+		mockNearResolver.latestNonce.mockResolvedValue(9);
 
 		const resultNonce = await messagingKeyNonces.getAddressNonce('alice.near', NEAR);
 
@@ -64,7 +65,7 @@ describe('getAddressNonce', () => {
 	});
 
 	it('should throw error when resolutions fails', async () => {
-		mockEthereumResolver.latestNonce.mockResolvedValue({ status: 'error', cause: new Error() });
+		mockEthereumResolver.latestNonce.mockRejectedValue(new Error());
 
 		expect(() => messagingKeyNonces.getAddressNonce('0x1337', ETHEREUM)).rejects.toThrow();
 	});

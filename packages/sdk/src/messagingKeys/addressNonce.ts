@@ -1,10 +1,11 @@
 import { ETHEREUM, NEAR, ProtocolType } from '@mailchain/addressing';
 import axios, { AxiosInstance } from 'axios';
 import { MessagingKeysApiFactory, MessagingKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../configuration';
 import { ContractCallLatestNonce } from './contractResolvers/resolver';
 import { NearContractCallResolver } from './contractResolvers/near';
 import { MailchainKeyRegContractCallResolver } from './contractResolvers/mailchain';
+import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
 
 export class MessagingKeyNonces {
 	constructor(
@@ -22,7 +23,7 @@ export class MessagingKeyNonces {
 		);
 	}
 
-	async getAddressNonce(address: string, protocol: ProtocolType) {
+	async getAddressNonce(address: string, protocol: ProtocolType): Promise<number> {
 		const resolver = this.resolvers.get(protocol);
 		if (!resolver) {
 			throw new Error(`No resolver for protocol ${protocol}`);
@@ -33,17 +34,13 @@ export class MessagingKeyNonces {
 
 		const nonceContractResponse = await this.messagingKeysApi.getProtocolAddressNonce(address, protocol);
 
-		const contractResponse = await resolver.latestNonce(nonceContractResponse.data.contractCall);
-
-		switch (contractResponse.status) {
-			case 'ok':
-				return contractResponse.nonce;
-			case 'not-found':
+		try {
+			return await resolver.latestNonce(nonceContractResponse.data.contractCall);
+		} catch (error) {
+			if (error instanceof MessagingKeyNotFoundInContractError) {
 				return 0;
-			case 'error':
-				throw contractResponse.cause;
-			default:
-				throw new Error(`unknown contract contract response status of [${contractResponse['status']}]`);
+			}
+			throw error;
 		}
 	}
 }

@@ -3,13 +3,9 @@ import { publicKeyFromKind } from '@mailchain/crypto';
 import { ContractCall } from '@mailchain/api';
 import axios, { AxiosInstance } from 'axios';
 import { NEAR } from '@mailchain/addressing';
-import { Configuration } from '../../mailchain';
-import {
-	ContractCallLatestNonce,
-	ContractCallMessagingKeyResolver,
-	ContractLatestNonceResponse,
-	ContractMessagingKeyResponse,
-} from './resolver';
+import { Configuration } from '../../configuration';
+import { ContractCallLatestNonce, ContractCallMessagingKeyResolver, ContractCallResolveResult } from './resolver';
+import { InvalidContractResponseError, MessagingKeyNotFoundInContractError } from './errors';
 
 type NearRPCResponseResult = {
 	block_hash: string;
@@ -43,63 +39,38 @@ export class NearContractCallResolver implements ContractCallMessagingKeyResolve
 		return new NearContractCallResolver(config.nearRpcUrl, axiosInstance);
 	}
 
-	async resolve(contract: ContractCall): Promise<ContractMessagingKeyResponse> {
-		let rpcResponse: NearRPCResponseResult;
-		try {
-			rpcResponse = await this.callContract(contract);
-		} catch (error) {
-			return {
-				status: 'failed-to-call-contract',
-				cause: error as Error,
-			};
-		}
-
-		const result = encodeUtf8(Uint8Array.from(rpcResponse.result));
-
-		if (result === 'null') {
-			return {
-				status: 'not-found',
-			};
-		}
-
-		try {
-			const parsedResult = parseMessagingKeyContractResult(result);
-
-			return {
-				status: 'ok',
-				messagingKey: parsedResult.messagingKey,
-				protocol: NEAR,
-			};
-		} catch (error) {
-			return {
-				status: 'invalid-key',
-				cause: error as Error,
-			};
-		}
-	}
-
-	async latestNonce(contract: ContractCall): Promise<ContractLatestNonceResponse> {
+	async resolve(contract: ContractCall): Promise<ContractCallResolveResult> {
 		const rpcResponse = await this.callContract(contract);
 
 		const result = encodeUtf8(Uint8Array.from(rpcResponse.result));
 
 		if (result === 'null') {
-			return {
-				status: 'not-found',
-			};
+			return { error: new MessagingKeyNotFoundInContractError() };
 		}
 
-		try {
-			return {
-				status: 'ok',
-				nonce: parseInt(result, 10),
-			};
-		} catch (error) {
-			return {
-				status: 'error',
-				cause: error as Error,
-			};
+		const parsedResult = parseMessagingKeyContractResult(result);
+		if (parsedResult.error != null) {
+			return parsedResult;
 		}
+
+		return {
+			data: {
+				messagingKey: parsedResult.data.messagingKey,
+				protocol: NEAR,
+			},
+		};
+	}
+
+	async latestNonce(contract: ContractCall): Promise<number> {
+		const rpcResponse = await this.callContract(contract);
+
+		const result = encodeUtf8(Uint8Array.from(rpcResponse.result));
+
+		if (result === 'null') {
+			throw new MessagingKeyNotFoundInContractError();
+		}
+
+		return parseInt(result, 10);
 	}
 
 	private async callContract(contract: ContractCall): Promise<NearRPCResponseResult> {
@@ -139,21 +110,21 @@ export class NearContractCallResolver implements ContractCallMessagingKeyResolve
 function parseMessagingKeyContractResult(result: string) {
 	const parsedResult = JSON.parse(result);
 	if (typeof parsedResult !== 'object') {
-		throw new Error('Invalid result from contract');
+		return { error: new InvalidContractResponseError('Object expected.') };
 	}
 
 	const [curve, messageKey] = parsedResult as [string, string];
 	if (curve == null || messageKey == null) {
-		throw new Error('Invalid result length from contract');
+		return { error: new InvalidContractResponseError('Result does not have correct number of elements.') };
 	}
 
 	if (typeof curve !== 'string') {
-		throw new Error('Invalid curve format from contract');
+		return { error: new InvalidContractResponseError('Curve format must be string.') };
 	}
 
 	if (typeof messageKey !== 'string') {
-		throw new Error('Invalid key format from contract');
+		return { error: new InvalidContractResponseError('Message key format must be string.') };
 	}
 
-	return { messagingKey: publicKeyFromKind(curve, decodeHex(messageKey)) };
+	return { data: { messagingKey: publicKeyFromKind(curve, decodeHex(messageKey)) } };
 }

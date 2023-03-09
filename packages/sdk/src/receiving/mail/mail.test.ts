@@ -57,7 +57,7 @@ describe('Receiving payload tests', () => {
 		});
 
 		const expected = {
-			status: 'ok',
+			status: 'success',
 			payload,
 		} as ReceivedPayload;
 

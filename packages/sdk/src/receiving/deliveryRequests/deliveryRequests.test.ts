@@ -52,7 +52,7 @@ describe('Receiving delivery requests', () => {
 			expected: [
 				{
 					cause: new Error('secretbox: could not decrypt data with private key'),
-					status: 'error',
+					status: 'failure',
 					deliveryRequestHash: decodeHexZeroX(
 						'0xc2d9b269b60304759c8d4cfc503607da152c5143b069f692f6b6cd2727c3c2b9',
 					),
@@ -76,7 +76,7 @@ describe('Receiving delivery requests', () => {
 			keyRing: aliceKeyRing,
 			expected: [
 				{
-					status: 'ok',
+					status: 'success',
 					deliveryRequestHash: decodeHexZeroX('0x00000000'),
 					payloadUri: 'abracadabra',
 					payloadRootEncryptionKey: ED25519ExtendedPrivateKey.fromPrivateKey(
@@ -109,7 +109,7 @@ describe('Receiving delivery requests', () => {
 			keyRing: bobKeyRing,
 			expected: [
 				{
-					status: 'ok',
+					status: 'success',
 					deliveryRequestHash: decodeHexZeroX('0x00000000'),
 					payloadUri: 'abracadabra',
 					payloadRootEncryptionKey: ED25519ExtendedPrivateKey.fromPrivateKey(

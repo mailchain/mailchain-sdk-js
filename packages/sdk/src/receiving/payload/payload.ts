@@ -12,19 +12,19 @@ import { SerializableTransportPayloadHeaders } from '../../transport/payload/hea
 export type ReceivedPayload = ReceivedPayloadOk | ReceivedPayloadError;
 
 type ReceivedPayloadOk = {
-	status: 'ok';
+	status: 'success';
 	payload: Payload;
 };
 
 type ReceivedPayloadError = {
-	status: 'error';
+	status: 'failure';
 	cause: Error;
 };
 
 export type UndeliveredPayload = UndeliveredPayloadOk | UndeliveredPayloadPayloadError | UndeliveredPayloadError;
 
 export type UndeliveredPayloadOk = {
-	status: 'ok';
+	status: 'success';
 	payload: Payload;
 	deliveryRequestHash: Uint8Array;
 };
@@ -66,11 +66,11 @@ export class PayloadReceiver {
 		return Promise.all(
 			deliveryRequests.map(async (result) => {
 				switch (result.status) {
-					case 'ok':
+					case 'success':
 						const payloadResponse = await this.get(result.payloadRootEncryptionKey, result.payloadUri);
 						return processReceivedPayload(payloadResponse, result.deliveryRequestHash);
 
-					case 'error':
+					case 'failure':
 						return {
 							cause: result.cause,
 							deliveryRequestHash: result.deliveryRequestHash,
@@ -101,12 +101,12 @@ export class PayloadReceiver {
 			await this.payloadOriginVerifier.verifyPayloadOrigin(payload);
 
 			return {
-				status: 'ok',
+				status: 'success',
 				payload,
 			};
 		} catch (error) {
 			return {
-				status: 'error',
+				status: 'failure',
 				cause: error as Error,
 			};
 		}
@@ -115,13 +115,13 @@ export class PayloadReceiver {
 
 function processReceivedPayload(payloadResponse: ReceivedPayload, deliveryRequestHash: Uint8Array) {
 	switch (payloadResponse.status) {
-		case 'ok':
+		case 'success':
 			return {
-				status: 'ok',
+				status: 'success',
 				payload: payloadResponse.payload,
 				deliveryRequestHash,
 			} as UndeliveredPayloadOk;
-		case 'error':
+		case 'failure':
 			return {
 				status: 'error-payload',
 				cause: payloadResponse.cause,

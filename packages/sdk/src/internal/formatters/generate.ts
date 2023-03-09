@@ -98,12 +98,12 @@ function putIdentityKeyAttr(
 	attrs: HeaderAttribute[],
 ): HeaderAttribute | undefined {
 	const lookupResult = resolvedAddresses.get(address);
-	if (lookupResult?.identityKey != null) {
-		const { identityKey, protocol } = lookupResult;
-		const attrValue = `${encodeHexZeroX(encodePublicKey(identityKey))}:${protocol}`;
-		const attr: HeaderAttribute = [address, attrValue];
-		attrs.push(attr);
-		return attr;
-	}
-	return undefined;
+	if (!lookupResult) return undefined;
+	if (lookupResult.identityKey == null) return undefined;
+
+	const { identityKey, protocol } = lookupResult;
+	const attrValue = `${encodeHexZeroX(encodePublicKey(identityKey))}:${protocol}`;
+	const attr: HeaderAttribute = [address, attrValue];
+	attrs.push(attr);
+	return attr;
 }

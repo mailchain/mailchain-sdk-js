@@ -17,7 +17,10 @@ export class MailSenderVerifier {
 	 * @returns
 	 */
 	async verifySenderOwnsFromAddress(fromAddress: MailAddress, senderMessagingKey: PublicKey): Promise<boolean> {
-		const resolvedSenderMessagingKey = await this.messagingKeys.resolve(fromAddress.address);
+		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress.address);
+		if (error != null) {
+			return false;
+		}
 
 		return isEqual(resolvedSenderMessagingKey.messagingKey, senderMessagingKey);
 	}

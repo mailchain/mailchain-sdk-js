@@ -1,7 +1,7 @@
 import { KindNaClSecretKey, SignerWithPublicKey } from '@mailchain/crypto';
 import { EncodingTypes } from '@mailchain/encoding';
 import { createAxiosConfiguration } from '@mailchain/api';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { MailData, Payload } from '../../transport';
 import { createMimeMessage } from '../../internal/formatters/generate';
 import { ResolvedAddress } from '../../messagingKeys';

@@ -26,6 +26,7 @@
 		"@mailchain/message-composer": "0.16.1",
 		"@mailchain/signatures": "0.16.1",
 		"@noble/hashes": "^1.0.0",
+		"axios": "1.3.4",
 		"canonicalize": "^1.0.8",
 		"email-addresses": "5.0.0",
 		"emailjs-mime-parser": "^2.0.7",
@@ -43,7 +44,7 @@
 	},
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
-		"axios": "^0.26.1",
+		"axios": "1.3.4",
 		"jest-mock-extended": "^3.0.1"
 	}
 }

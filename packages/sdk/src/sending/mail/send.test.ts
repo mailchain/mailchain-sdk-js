@@ -4,6 +4,7 @@ import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import flatten from 'lodash/flatten';
+import { ProtocolNotSupportedError } from '@mailchain/addressing';
 import { MessagingKeys, ResolvedAddress, ResolvedManyAddresses } from '../../messagingKeys';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../internal/test.const';
 import {
@@ -52,10 +53,12 @@ describe('MailSender', () => {
 
 	beforeEach(() => {
 		mockMessagingKeys = mock();
-		mockMessagingKeys.resolve.mockImplementation(
-			async (address) =>
-				dummyMailDataResolvedAddresses.get(address) ?? fail(`invalid mock call with address [${address}]`),
-		);
+		mockMessagingKeys.resolve.mockImplementation(async (address) => {
+			const resolvedAddress = dummyMailDataResolvedAddresses.get(address);
+			return resolvedAddress
+				? { data: resolvedAddress }
+				: { error: new ProtocolNotSupportedError(`invalid mock call with address [${address}]`) };
+		});
 
 		mockMailSenderVerifier = mock();
 		mockMailPayloadSender = mock();
@@ -79,7 +82,7 @@ describe('MailSender', () => {
 			senderMessagingKey: aliceKeyRing.accountMessagingKey(),
 		});
 
-		expect(result.status).toEqual('ok');
+		expect(result.status).toEqual('success');
 		expect(result['message']).toEqual(dummyPayload);
 		expect(result['distributions']).toEqual(dummyDistributions);
 		expect(result['resolvedAddresses']).toEqual(dummyMailDataResolvedAddresses);

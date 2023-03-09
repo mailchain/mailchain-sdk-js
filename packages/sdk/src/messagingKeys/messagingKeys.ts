@@ -1,5 +1,5 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { ALL_PROTOCOLS, encodeAddressByProtocol, ProtocolType } from '@mailchain/addressing';
+import { ALL_PROTOCOLS, encodeAddressByProtocol, ProtocolNotSupportedError, ProtocolType } from '@mailchain/addressing';
 import { encodePublicKey, PublicKey } from '@mailchain/crypto';
 import {
 	AddressesApiFactory,
@@ -9,34 +9,62 @@ import {
 	encodingTypeToEncodingEnum,
 	IdentityKeysApiInterface,
 	AddressesApiInterface,
+	GetAddressMessagingKeyResponseBody,
 } from '@mailchain/api';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
-import { Configuration } from '../mailchain';
+import { MessagingKeyVerificationError } from '@mailchain/signatures';
+import { isAxiosError } from 'axios';
+import { Configuration } from '../configuration';
+import { MailchainResult } from '../mailchainResult';
+import {
+	MessagingKeyContactError,
+	NameserviceAddressNotFoundError,
+	NameserviceAddressUnresolvableError,
+	UnexpectedMailchainError,
+} from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
 
-export type ResolvedAddress = {
+type BaseResolvedAddress = {
+	/** Messaging key to be used when communicate with the resolved address. See {@link PublicKey} */
 	messagingKey: PublicKey;
-	identityKey?: PublicKey;
+	/** Protocol of resolved address. Protocol is determined when resolving the address. */
 	protocol: ProtocolType;
-	network?: string;
-	status: 'registered' | 'vended';
+	/** Identity key of resolved address. Identity key might be undefined in the case of `vended` messaging key. */
+	identityKey?: PublicKey;
 };
+
+export type RegisteredResolvedAddress = BaseResolvedAddress & {
+	/** Indicates the messaging key has been registered by a user. */
+	type: 'registered';
+};
+
+export type VendedResolvedAddress = BaseResolvedAddress & {
+	/** Indicates the messaging key has been vended by Mailchain. */
+	type: 'vended';
+};
+
+/**
+ * Resolved address response containing a proven messaging key.
+ */
+export type ResolvedAddress = RegisteredResolvedAddress | VendedResolvedAddress;
+export type ResolvedAddressError =
+	| ProtocolNotSupportedError
+	| MessagingKeyContactError
+	| MessagingKeyVerificationError
+	| NameserviceAddressNotFoundError
+	| NameserviceAddressUnresolvableError
+	| UnexpectedMailchainError;
+export type ResolveAddressResult = MailchainResult<ResolvedAddress, ResolvedAddressError>;
 
 export type ResolvedManyAddresses = {
 	resolved: Map<string, ResolvedAddress>;
-	failed: FailedAddressResolutionError[];
+	failed: ResolvedAddressError[];
 };
 
 export class FailedAddressMessageKeyResolutionsError extends Error {
-	constructor(public readonly failedResolutions: FailedAddressResolutionError[]) {
+	constructor(public readonly failedResolutions: ResolvedAddressError[]) {
 		super(`at least one address resolution has failed`);
-	}
-}
-
-export class FailedAddressResolutionError extends Error {
-	constructor(readonly address: string, readonly cause: Error) {
-		super(`resolution for ${address} has failed`);
 	}
 }
 
@@ -55,20 +83,26 @@ export class MessagingKeys {
 		);
 	}
 
-	async resolve(address: string): Promise<ResolvedAddress> {
-		const { data } = await this.addressApi.getAddressMessagingKey(address);
-
-		const protocol = data.protocol as ProtocolType;
-		if (!ALL_PROTOCOLS.includes(protocol)) {
-			throw new Error(`unsupported protocol [${data.protocol}]`);
-		}
-
-		if (!data.contractCall) {
-			throw new Error(`expected contract call`);
+	/**
+	 * Resolve the messaging key for the given address.
+	 * @param address Address to resolve.
+	 *
+	 * @returns A {@link ResolvedAddress resolved address}.
+	 *
+	 * @example
+	 * import { messagingKeys } from '@mailchain/sdk';
+	 *
+	 * const resolvedAddress = await messagingKeys.resolve(address);
+	 * console.log(resolvedAddress);
+	 *
+	 */
+	async resolve(address: string): Promise<ResolveAddressResult> {
+		const { data, error } = await this.getAddressMessagingKey(address);
+		if (error != null) {
+			return { error };
 		}
 
 		return this.messagingKeyContractCall.resolve(
-			data.localPart,
 			data.protocol as ProtocolType,
 			data.contractCall,
 			data.identityKey ? convertPublic(data.identityKey) : undefined,
@@ -77,11 +111,9 @@ export class MessagingKeys {
 
 	async resolveMany(addresses: string[]): Promise<ResolvedManyAddresses> {
 		const deduplicatedAddresses = [...new Set(addresses)];
-		const resolvedAddresses = await Promise.allSettled(
+		const resolvedAddresses = await Promise.all(
 			deduplicatedAddresses.map(async (address) => {
-				const resolvedAddress = await this.resolve(address).catch((e: Error) => {
-					throw new FailedAddressResolutionError(address, e);
-				});
+				const resolvedAddress = await this.resolve(address);
 				return { address, ...resolvedAddress };
 			}),
 		);
@@ -89,10 +121,10 @@ export class MessagingKeys {
 		const resolved: Map<string, ResolvedAddress> = new Map();
 		const failed: ResolvedManyAddresses['failed'] = [];
 		for (const result of resolvedAddresses) {
-			if (result.status === 'fulfilled') {
-				resolved.set(result.value.address, result.value);
+			if (result.data != null) {
+				resolved.set(result.address, result.data);
 			} else {
-				failed.push(result.reason as FailedAddressResolutionError);
+				failed.push(result.error);
 			}
 		}
 
@@ -117,5 +149,44 @@ export class MessagingKeys {
 			signature: encodeHexZeroX(proof.signature),
 			signatureMethod: proof.signatureMethod,
 		});
+	}
+
+	private async getAddressMessagingKey(
+		address: string,
+	): Promise<
+		MailchainResult<
+			GetAddressMessagingKeyResponseBody,
+			| ProtocolNotSupportedError
+			| UnexpectedMailchainError
+			| NameserviceAddressNotFoundError
+			| NameserviceAddressUnresolvableError
+		>
+	> {
+		try {
+			const { data } = await this.addressApi.getAddressMessagingKey(address);
+
+			const protocol = data.protocol as ProtocolType;
+			if (!ALL_PROTOCOLS.includes(protocol)) {
+				return { error: new ProtocolNotSupportedError(protocol) };
+			}
+
+			return { data };
+		} catch (e) {
+			if (isAxiosError(e)) {
+				switch (e.response?.status) {
+					case 404:
+						return {
+							error: new NameserviceAddressNotFoundError(),
+						};
+					case 422:
+						return {
+							error: new NameserviceAddressUnresolvableError(),
+						};
+				}
+			}
+			return {
+				error: new UnexpectedMailchainError(`Failed to resolve messaging key of address ${address}`, e),
+			};
+		}
 	}
 }

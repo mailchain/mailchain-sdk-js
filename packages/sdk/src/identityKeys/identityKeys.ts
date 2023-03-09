@@ -9,7 +9,7 @@ import {
 	IdentityKeysApiInterface,
 } from '@mailchain/api';
 import { decodeHexZeroX, encodeHexZeroX } from '@mailchain/encoding';
-import { Configuration } from '../mailchain';
+import { Configuration } from '../configuration';
 
 export class IdentityKeys {
 	constructor(

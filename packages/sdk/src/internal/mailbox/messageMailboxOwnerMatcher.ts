@@ -4,7 +4,7 @@ import uniqBy from 'lodash/uniqBy';
 import { ParseMimeTextResult } from '../formatters/parse';
 import { IdentityKeys } from '../../identityKeys';
 import { UserMailbox } from '../user/types';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { MailData } from '../../transport';
 import {
 	AddressIdentityKeyResolver,

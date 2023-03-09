@@ -1,31 +1,17 @@
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { EncodingTypes, ensureDecoded } from '@mailchain/encoding';
-import { MailSender, PrepareResult, SendResult } from './sending/mail';
+import { MailSender, SendResult } from './sending/mail';
 import { MessagingKeys, FailedAddressMessageKeyResolutionsError } from './messagingKeys';
-import { MailchainUserProfile, UserNotFoundError, UserProfile } from './internal/user';
+import { MailchainUserProfile, UserProfile } from './internal/user';
 import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
 import { Address, SendMailParams } from './types';
 import { toMailData } from './convertSendMailParams';
 import { UserMailbox } from './internal/user/types';
-
-export type Configuration = {
-	apiPath: string;
-	mailchainAddressDomain: string;
-	nearRpcUrl: string;
-};
-
-const defaultConfiguration: Configuration = {
-	apiPath: 'https://api.mailchain.com',
-	mailchainAddressDomain: 'mailchain.com',
-	nearRpcUrl: 'https://rpc.near.org',
-};
-
-type MailSenderResult = SendResult | PrepareResult;
-
-export type SendMailResult = {
-	messageID: string;
-} & MailSenderResult;
+import { Configuration } from './configuration';
+import { defaultConfiguration } from './internal/configuration';
+import { MailData, Payload } from './transport';
+import { MailchainResult } from './mailchainResult';
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
@@ -77,17 +63,18 @@ export class Mailchain {
 	/**
 	 * Send a mail to any blockchain or Mailchain address.
 	 *
-	 * @param params {@link SendMailParams} Information about message to send.
+	 * @param params {@link SendMailParams} information about message to send.
 	 * Required:
 	 * - `from` the address that the mail is being sent from.
 	 * - At least one of `to`, `cc`, or `bcc`, who will receive the mail.
 	 * - `subject` of the mail.
 	 * - `content` both `html` and `text`.
+	 * @param options {@link SendMailOptions} additional options for sending mail.
 	 *
 	 * @example
 	 * import { Mailchain } from '@mailchain/sdk';
 	 *
-	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
+	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 24 word mnemonicPhrase
 	 *
 	 * const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 	 *
@@ -103,10 +90,13 @@ export class Mailchain {
 	 *
 	 * console.log(result)
 	 *
-	 * @returns Status of the messaging sending request. {@link SendMailResult} contains different data
+	 * @returns Status of the messaging sending request. {@link SentMail} contains different data
 	 * depending on the status of the request.
 	 */
-	async sendMail(params: SendMailParams): Promise<SendMailResult> {
+	async sendMail(
+		params: SendMailParams,
+		options: SendMailOptions = defaultSendMailOptions,
+	): Promise<MailchainResult<SentMail>> {
 		const senderMailbox = await this.getSenderMailbox(params.from, {
 			messagingKeys: MessagingKeys.create(this.config),
 			userProfile: this._userProfile,
@@ -131,12 +121,12 @@ export class Mailchain {
 			throw new FailedAddressMessageKeyResolutionsError(prepareResult.failedRecipients);
 		}
 
-		// save the message in the outbox while the sending is happening
-		const outboxMessage = await this._mailboxOperations.saveSentMessage({
-			userMailbox: senderMailbox,
-			payload: prepareResult.message,
-			content: mailData,
-		});
+		const savedMessageId = await this.saveSentMessage(
+			senderMailbox,
+			prepareResult.message,
+			mailData,
+			options.saveToSentFolder,
+		);
 
 		const sendResult = await sender.send({
 			distributions: prepareResult.distributions,
@@ -146,7 +136,9 @@ export class Mailchain {
 		// update folder
 		switch (sendResult.status) {
 			case 'success':
-				await this._mailboxOperations.markOutboxMessageAsSent(outboxMessage.messageId);
+				if (options.saveToSentFolder && savedMessageId) {
+					await this._mailboxOperations.markOutboxMessageAsSent(savedMessageId);
+				}
 				break;
 
 			case 'partially-completed':
@@ -154,8 +146,10 @@ export class Mailchain {
 				break;
 		}
 		return {
-			messageID: outboxMessage.messageId,
-			...sendResult,
+			data: {
+				savedMessageId,
+				...sendResult,
+			},
 		};
 	}
 
@@ -172,7 +166,7 @@ export class Mailchain {
 	 *
 	 * import { Mailchain } from "@mailchain/sdk";
 	 *
-	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
+	 * const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 24 word mnemonicPhrase
 	 *
 	 * const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 	 *
@@ -191,7 +185,11 @@ export class Mailchain {
 	): Promise<UserMailbox> {
 		const mailboxes = await config.userProfile.mailboxes();
 
-		const { identityKey } = await config.messagingKeys.resolve(fromAddress);
+		const { data, error } = await config.messagingKeys.resolve(fromAddress);
+		if (error) {
+			throw error;
+		}
+		const { identityKey } = data;
 		if (identityKey == null) {
 			throw Error(`${fromAddress} is not registered with Mailchain services`);
 		}
@@ -206,4 +204,47 @@ export class Mailchain {
 
 		return foundMailbox;
 	}
+
+	private async saveSentMessage(
+		senderMailbox: UserMailbox,
+		payload: Payload,
+		content: MailData,
+		saveToSentFolder?: boolean,
+	) {
+		if (saveToSentFolder) {
+			const { messageId } = await this._mailboxOperations.saveSentMessage({
+				userMailbox: senderMailbox,
+				payload,
+				content,
+			});
+
+			return messageId;
+		}
+		// no message id to return as not saved
+		return;
+	}
 }
+
+export type SentMail = {
+	/**
+	 * The message ID of the message saved to the outbox/sent folder.
+	 * This is only available when the message is saved to the outbox/sent folder.
+	 * Saving to the outbox/sent folder is enabled by default and controlled by {@link SendMailOptions}.
+	 */
+	savedMessageId: string | undefined;
+} & SendResult;
+
+/**
+ * Additional options for sending mail.
+ */
+export type SendMailOptions = {
+	/**
+	 * Prevents saving the sent message to the sent folder.
+	 * This is useful when sending messages you don't want to be saved in the sent folder.
+	 */
+	saveToSentFolder?: boolean;
+};
+
+const defaultSendMailOptions: SendMailOptions = {
+	saveToSentFolder: true,
+};

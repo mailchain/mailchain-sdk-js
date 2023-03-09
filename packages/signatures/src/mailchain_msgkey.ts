@@ -1,14 +1,14 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { PublicKey, PrivateKey, KindED25519, encodePublicKey, ErrorUnsupportedKey } from '@mailchain/crypto';
 import { ProtocolType } from '@mailchain/addressing';
-import { AddressMustBeProtocolAddress, ErrorAddressIsEmpty, ErrorProtocolIsEmpty } from './errors';
+import { AddressMustBeProtocolAddressError, AddressIsEmptyError, ProtocolIsEmptyError } from './errors';
 
 export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address: string, protocol: ProtocolType) {
-	if (address.length === 0) throw new ErrorAddressIsEmpty();
-	if (protocol.length === 0) throw new ErrorProtocolIsEmpty();
+	if (address.length === 0) throw new AddressIsEmptyError();
+	if (protocol.length === 0) throw new ProtocolIsEmptyError();
 
 	if (address.includes('@')) {
-		throw new AddressMustBeProtocolAddress();
+		throw new AddressMustBeProtocolAddressError();
 	}
 
 	switch (msgKey.curve) {

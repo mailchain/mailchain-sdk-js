@@ -7,14 +7,18 @@ import {
 import axios, { AxiosInstance } from 'axios';
 import { ETHEREUM, NEAR, ProtocolType } from '@mailchain/addressing';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
-import { AddressVerificationFailed } from '@mailchain/signatures';
+import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
-import { Configuration } from '../mailchain';
+import { ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
+import { Configuration } from '../configuration';
+import { MailchainResult } from '../mailchainResult';
 import { NearContractCallResolver } from './contractResolvers/near';
-import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
+import { ContractCallMessagingKeyResolver, ContractMessagingKeyError } from './contractResolvers/resolver';
 import { MessagingKeyVerifier } from './verify';
-import { ResolvedAddress } from './messagingKeys';
 import { MailchainKeyRegContractCallResolver } from './contractResolvers/mailchain';
+import { InvalidContractResponseError, MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
+import { ResolvedAddress, ResolvedAddressError } from './messagingKeys';
+import { MessagingKeyContactError } from './errors';
 
 export class MessagingKeyContractCall {
 	constructor(
@@ -35,50 +39,46 @@ export class MessagingKeyContractCall {
 	}
 
 	async resolve(
-		protocolAddress: string,
 		protocol: ProtocolType,
 		contractCall: ContractCall,
 		identityKey?: PublicKey,
-	): Promise<ResolvedAddress> {
+	): Promise<MailchainResult<ResolvedAddress, ResolvedAddressError>> {
 		const resolver = this.resolvers.get(protocol);
 		if (!resolver) {
-			throw new Error(`No resolver for protocol ${protocol}`);
+			return { error: new ProtocolNotSupportedError(protocol) };
 		}
 
-		const contractResponse = await resolver.resolve(contractCall);
-		switch (contractResponse.status) {
-			case 'ok':
-				return {
-					messagingKey: contractResponse.messagingKey,
-					identityKey,
-					protocol: contractResponse.protocol,
-					status: 'registered',
-				};
-			case 'not-found':
+		const { data, error } = await resolver.resolve(contractCall);
+		if (error != null) {
+			if (error instanceof MessagingKeyNotFoundInContractError) {
 				const vendedKeyResponse = await this.messagingKeysApi.getVendedPublicMessagingKey(
 					contractCall.address,
 					contractCall.protocol as any,
 				);
-
 				const verified = await this.messagingKeyVerifier.verifyProvidedKeyProof(
 					vendedKeyResponse.data.proof,
 					convertPublic(vendedKeyResponse.data.messagingKey),
 				);
 				if (!verified) {
-					throw new AddressVerificationFailed();
+					return { error: new MessagingKeyVerificationError() };
 				}
-
 				return {
-					messagingKey: convertPublic(vendedKeyResponse.data.messagingKey),
-					identityKey,
-					protocol,
-					status: 'vended',
+					data: {
+						messagingKey: convertPublic(vendedKeyResponse.data.messagingKey),
+						identityKey,
+						protocol,
+						type: 'vended',
+					},
 				};
-			case 'invalid-key':
-			case 'failed-to-call-contract':
-				throw contractResponse.cause;
-			default:
-				throw new Error(`contract call failed with status ${contractResponse.status}`);
+			} else if (error instanceof InvalidContractResponseError) {
+				return { error: new MessagingKeyContactError(error) };
+			}
+			return {
+				error: new MessagingKeyContactError(error),
+			};
 		}
+
+		const { messagingKey } = data;
+		return { data: { type: 'registered', messagingKey, identityKey, protocol } };
 	}
 }

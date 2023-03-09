@@ -17,7 +17,7 @@ Try sending your first message a message to `0xbb56FbD7A2caC3e4C1793602710234412
 ```ts
 import { Mailchain } from '@mailchain/sdk';
 
-const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 25 word mnemonicPhrase
+const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 24 word mnemonicPhrase
 
 const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 

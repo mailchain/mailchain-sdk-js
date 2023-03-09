@@ -1,11 +1,13 @@
-import { ETHEREUM, NEAR, ProtocolType } from '@mailchain/addressing/protocols';
-import { ContractCall, MessagingKeysApiInterface } from '@mailchain/api';
+import { ETHEREUM, NEAR, ProtocolNotSupportedError, ProtocolType } from '@mailchain/addressing/protocols';
+import { ContractCall, GetMessagingKeyResponseBody, MessagingKeysApiInterface } from '@mailchain/api';
 import { convertPublic } from '@mailchain/api/helpers/cryptoKeyToApiKey';
 import { ED25519PrivateKey } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
+import { AxiosResponse } from 'axios';
 import { MessagingKeyContractCall } from './messagingKeyContract';
-import { ContractCallMessagingKeyResolver, ContractMessagingKeyResponse } from './contractResolvers/resolver';
+import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
 import { MessagingKeyVerifier } from './verify';
+import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
 
 let messagingKeyContractCall: MessagingKeyContractCall;
 describe('MessagingKeyContractCall', () => {
@@ -26,17 +28,15 @@ describe('MessagingKeyContractCall', () => {
 
 	it('found from contract', async () => {
 		nearResolver.resolve.mockResolvedValueOnce({
-			status: 'ok',
-			address: 'address',
-			protocol: NEAR,
-			messagingKey: messagingKey.publicKey,
-			identityKey: identityKey.publicKey,
-		} as ContractMessagingKeyResponse);
+			data: {
+				protocol: NEAR,
+				messagingKey: messagingKey.publicKey,
+			},
+		});
 
 		resolvers.set(NEAR, nearResolver);
 
 		const actual = await messagingKeyContractCall.resolve(
-			'alice.near',
 			NEAR,
 			{
 				body: 'body',
@@ -46,17 +46,17 @@ describe('MessagingKeyContractCall', () => {
 		);
 
 		expect(actual).toEqual({
-			identityKey: identityKey.publicKey,
-			messagingKey: messagingKey.publicKey,
-			protocol: 'near',
-			status: 'registered',
+			data: {
+				identityKey: identityKey.publicKey,
+				messagingKey: messagingKey.publicKey,
+				protocol: 'near',
+				type: 'registered',
+			},
 		});
 	});
 
 	it('not found from contract', async () => {
-		nearResolver.resolve.mockResolvedValueOnce({
-			status: 'not-found',
-		} as ContractMessagingKeyResponse);
+		nearResolver.resolve.mockResolvedValueOnce({ error: new MessagingKeyNotFoundInContractError() });
 
 		mockMessagingKeyVerifier.verifyProvidedKeyProof.mockResolvedValueOnce(true);
 		mockMessagingKeysApi.getVendedPublicMessagingKey.mockResolvedValueOnce({
@@ -68,12 +68,11 @@ describe('MessagingKeyContractCall', () => {
 					signature: 'signature',
 				},
 			},
-		} as any);
+		} as AxiosResponse<GetMessagingKeyResponseBody>);
 
 		resolvers.set(NEAR, nearResolver);
 
 		const actual = await messagingKeyContractCall.resolve(
-			'alice.near',
 			NEAR,
 			{
 				body: 'body',
@@ -83,20 +82,20 @@ describe('MessagingKeyContractCall', () => {
 		);
 
 		expect(actual).toEqual({
-			identityKey: identityKey.publicKey,
-			messagingKey: messagingKey.publicKey,
-			protocol: 'near',
-			status: 'vended',
+			data: {
+				identityKey: identityKey.publicKey,
+				messagingKey: messagingKey.publicKey,
+				protocol: 'near',
+				type: 'vended',
+			},
 		});
 	});
 
 	it('no contract for protocol', async () => {
 		resolvers.set(NEAR, nearResolver);
 
-		expect.assertions(1);
-
-		await expect(
-			messagingKeyContractCall.resolve('alice.near', ETHEREUM, {
+		expect(
+			await messagingKeyContractCall.resolve(ETHEREUM, {
 				body: 'body',
 				method: 'POST',
 				identityKey: convertPublic(identityKey.publicKey),
@@ -105,6 +104,6 @@ describe('MessagingKeyContractCall', () => {
 				path: '/',
 				protocol: 'near',
 			} as ContractCall),
-		).rejects.toThrow('No resolver for protocol ethereum');
+		).toEqual({ error: new ProtocolNotSupportedError(ETHEREUM) });
 	});
 });

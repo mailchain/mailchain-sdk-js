@@ -12,14 +12,14 @@ import { protocol } from '../../internal/protobuf/protocol/protocol';
 import { Configuration } from '../../';
 
 export type UndeliveredDeliveryRequestSuccess = {
-	status: 'ok';
+	status: 'success';
 	payloadRootEncryptionKey: ED25519ExtendedPrivateKey;
 	payloadUri: string;
 	deliveryRequestHash: Uint8Array;
 };
 
 export type UndeliveredDeliveryRequestFailed = {
-	status: 'error';
+	status: 'failure';
 	cause: Error;
 	deliveryRequestHash: Uint8Array;
 };
@@ -113,14 +113,14 @@ export class DeliveryRequests {
 			const payloadUri = encodeUtf8(payloadUriBytes);
 
 			return {
-				status: 'ok',
+				status: 'success',
 				payloadRootEncryptionKey,
 				payloadUri,
 				deliveryRequestHash,
 			};
 		} catch (error) {
 			return {
-				status: 'error',
+				status: 'failure',
 				cause: error as Error,
 				deliveryRequestHash,
 			};

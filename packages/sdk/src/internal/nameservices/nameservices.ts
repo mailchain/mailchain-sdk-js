@@ -3,7 +3,7 @@ import { encodeHexZeroX } from '@mailchain/encoding';
 import { createNameServiceAddress, NameServiceAddress } from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { UserMailbox } from '../user';
 import { IdentityKeys } from '../../identityKeys';
 

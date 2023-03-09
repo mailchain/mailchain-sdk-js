@@ -6,7 +6,7 @@ import {
 	getAxiosWithSigner,
 	createAxiosConfiguration,
 } from '@mailchain/api';
-import { Configuration } from '../../mailchain';
+import { Configuration } from '../../configuration';
 import { createDelivery } from '../../transport';
 import { protocol } from '../../internal/protobuf/protocol/protocol';
 

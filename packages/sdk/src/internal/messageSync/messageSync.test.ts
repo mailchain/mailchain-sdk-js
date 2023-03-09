@@ -33,12 +33,12 @@ describe('MessageSync', () => {
 	it('should sync multiple recipients', async () => {
 		const mockSyncMailbox = jest.spyOn(messageSync as any, 'syncMailbox');
 		mockSyncMailbox
-			.mockResolvedValueOnce({ status: 'ok', mailbox: AliceAccountMailbox, messages: [] })
+			.mockResolvedValueOnce({ status: 'success', mailbox: AliceAccountMailbox, messages: [] })
 			.mockRejectedValueOnce(new Error('expected'));
 
 		const syncRes = await messageSync.sync([AliceAccountMailbox, AliceWalletMailbox]);
 
-		expect(syncRes[0]).toEqual({ status: 'ok', mailbox: AliceAccountMailbox, messages: [] });
+		expect(syncRes[0]).toEqual({ status: 'success', mailbox: AliceAccountMailbox, messages: [] });
 		expect(syncRes[1]).toEqual({ status: 'fail', mailbox: AliceWalletMailbox, cause: new Error('expected') });
 		expect(mockSyncMailbox).toHaveBeenCalledTimes(2);
 	});
@@ -48,12 +48,12 @@ describe('MessageSync', () => {
 			{
 				payload: { Headers: { ContentSignature: secureRandom() } } as Payload,
 				deliveryRequestHash: Uint8Array.from([0x01]),
-				status: 'ok',
+				status: 'success',
 			},
 			{
 				payload: { Headers: { ContentSignature: secureRandom() } } as Payload,
 				deliveryRequestHash: Uint8Array.from([0x02]),
-				status: 'ok',
+				status: 'success',
 			},
 		];
 		aliceAccountMailReceiver.confirmDelivery.mockResolvedValue();
@@ -73,7 +73,7 @@ describe('MessageSync', () => {
 		const syncRes = await messageSync['syncMailbox'](AliceAccountMailbox);
 
 		expect(syncRes).toEqual({
-			status: 'ok',
+			status: 'success',
 			mailbox: AliceAccountMailbox,
 			messages: dummyMessages.flatMap((m) => m),
 		});
