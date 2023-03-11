@@ -88,7 +88,13 @@ export class Mailchain {
 	 * 		},
 	 * });
 	 *
-	 * console.log(result)
+	 * if (error) {
+	 *   // handle error
+	 *   console.warn('Mailchain error', error);
+	 *   return;
+	 * }
+	 * // handle success send mail result
+	 * console.log(data);
 	 *
 	 * @returns Status of the messaging sending request. {@link SentMail} contains different data
 	 * depending on the status of the request.

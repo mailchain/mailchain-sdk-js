@@ -31,7 +31,7 @@ const secretRecoveryPhrase = process.env.SECRET_RECOVERY_PHRASE!; // 24 word mne
 
 const mailchain = Mailchain.fromSecretRecoveryPhrase(secretRecoveryPhrase);
 
-const result = await mailchain.sendMail({
+const { data, error } = await mailchain.sendMail({
 	from: `yoursername@mailchain.com`, // sender address
 	to: [`0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`], // list of recipients (blockchain or mailchain addresses)
 	subject: 'My first message', // subject line
@@ -41,7 +41,13 @@ const result = await mailchain.sendMail({
 	},
 });
 
-console.log(result);
+if (error) {
+	// handle error
+	console.warn('Mailchain error', error);
+	return;
+}
+// handle success send mail result
+console.log(data);
 ```
 
 _You can send a message to yourself your `username@mailchain` if you've registered an ethereum address you can send a message to it `0x.....@mailchain.com`, or try sending a message to `0xbb56FbD7A2caC3e4C17936027102344127b7a112@ethereum.mailchain.com`, that's us at Mailchain, we own the private key for `0xbb56FbD7A2caC3e4C17936027102344127b7a112`._
