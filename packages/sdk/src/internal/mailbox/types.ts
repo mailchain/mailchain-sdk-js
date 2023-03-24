@@ -27,7 +27,7 @@ export type Message = {
 	body: string;
 };
 
-/** Copy from cmd/inbox/internal/datastore/labels.go */
+/** Copy from services/inbox/internal/datastore/labels.go */
 export const SYSTEM_MESSAGE_LABELS = [
 	'archive',
 	'draft',
