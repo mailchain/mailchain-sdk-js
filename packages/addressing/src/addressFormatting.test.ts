@@ -71,7 +71,12 @@ const testCases: { address: MailchainAddress; expectedMail: string; expectedHuma
 			'near.mailchain.test',
 		),
 		expectedMail: '98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de.testnet@near.mailchain.test',
-		expectedHuman: '98793c...d6de@near',
+		expectedHuman: '98793c...d6de.testnet@near',
+	},
+	{
+		address: createNameServiceAddress('alice.mailchain.near', 'near.mailchain.test'),
+		expectedMail: 'alice.mailchain.near@near.mailchain.test',
+		expectedHuman: 'alice.mailchain.near',
 	},
 	{
 		address: createNameServiceAddress('alice.near', 'near.mailchain.test'),
@@ -82,6 +87,11 @@ const testCases: { address: MailchainAddress; expectedMail: string; expectedHuma
 		address: createNameServiceAddress('alice.testnet', 'near.mailchain.test'),
 		expectedMail: 'alice.testnet@near.mailchain.test',
 		expectedHuman: 'alice.testnet@near',
+	},
+	{
+		address: createNameServiceAddress('alice.mailchain.testnet', 'near.mailchain.test'),
+		expectedMail: 'alice.mailchain.testnet@near.mailchain.test',
+		expectedHuman: 'alice.mailchain.testnet@near',
 	},
 	{
 		address: createNameServiceAddress('alice.aurora', 'near.mailchain.test'),

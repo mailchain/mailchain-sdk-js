@@ -27,23 +27,21 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 	const props = parseWalletAddress(address);
 	if (props == null || props.protocol !== NEAR) return;
 
-	// TODO: this is just simple case of simple accounts without sub-accounts (not supporting `billing.alice.near`)
-	const [nearUsername, nearDomain] = address.username.split('.');
-
+	const usernameParts = address.username.split('.');
 	if (
+		usernameParts.length <= 2 &&
 		isNearImplicitAccount({
 			domain: address.domain,
-			username: nearUsername,
+			username: usernameParts[0],
 		})
 	) {
-		return formatMailLike(`${nearUsername.slice(0, 6)}...${nearUsername.slice(-4)}`, props.protocol);
+		return formatMailLike(
+			[`${usernameParts[0].slice(0, 6)}...${usernameParts[0].slice(-4)}`, ...usernameParts.slice(1)].join('.'),
+			props.protocol,
+		);
 	}
-
-	if (nearDomain !== 'near') {
-		// Handle cases of other domains like '.testnet' or maybe custom ones like '.aurora'
-		return formatMailLike(`${nearUsername}.${nearDomain}`, props.protocol);
-	}
-	return formatMailLike(`${nearUsername}.${nearDomain}`);
+	if (usernameParts.at(-1) === NEAR) return address.username;
+	return formatMailLike(address.username, NEAR);
 };
 
 /**
