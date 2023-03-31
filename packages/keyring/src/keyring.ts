@@ -12,7 +12,7 @@ import {
 	ED25519ExtendedPrivateKey,
 } from '@mailchain/crypto';
 import { encodeHex, encodeHexZeroX } from '@mailchain/encoding';
-import { MAILCHAIN, ProtocolType } from '@mailchain/addressing';
+import { decodeAddressByProtocol, MAILCHAIN, ProtocolType } from '@mailchain/addressing';
 import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
@@ -22,6 +22,8 @@ import {
 	DERIVATION_PATH_DATE_OFFSET,
 } from './constants';
 import { ecdhKeyRingDecrypter, InboxKey, KeyRingDecrypter } from './functions';
+
+export type PrivateMessagingKey = KeyRingDecrypter;
 
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
@@ -78,8 +80,12 @@ export class KeyRing {
 		);
 	}
 
-	static fromMnemonic(mnemonic: string, password?: string): KeyRing {
-		return new this(ED25519PrivateKey.fromMnemonicPhrase(mnemonic, password));
+	/**
+	 * Use your Secret Recovery Phrase to authenticate your keyring.
+	 * @param secretRecoveryPhrase a 24 word [BIP 39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) compatible mnemonic phrase.
+	 */
+	static fromSecretRecoveryPhrase(secretRecoveryPhrase: string, password?: string): KeyRing {
+		return new this(ED25519PrivateKey.fromMnemonicPhrase(secretRecoveryPhrase, password));
 	}
 
 	static fromPrivateKey(key: ED25519PrivateKey): KeyRing {
@@ -122,9 +128,39 @@ export class KeyRing {
 		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
 	}
 
-	addressMessagingKey(address: Uint8Array, protocol: ProtocolType, nonce: number): KeyRingDecrypter {
+	/**
+	 * Gets messaging key that can be used for signing and decrypting for a specific protocol address.
+	 * @param address protocol address e.g. 0x1234.... for ethereum
+	 * @param protocol a {@link ProtocolType}
+	 * @param nonce in most cases you will want to use the latest nonce.
+	 * @returns
+	 */
+	addressMessagingKey(address: string, protocol: ProtocolType, nonce: number): PrivateMessagingKey {
+		const decodedAddress = decodeAddressByProtocol(address, protocol).decoded;
+		return this.addressBytesMessagingKey(decodedAddress, protocol, nonce);
+	}
+
+	/**
+	 * Gets messaging key that can be exported for a specific protocol address.
+	 * @param address protocol address e.g. 0x1234.... for ethereum
+	 * @param protocol a {@link ProtocolType}
+	 * @param nonce in most cases you will want to use the latest nonce.
+	 * @returns
+	 */
+	addressExportableMessagingKey(address: string, protocol: ProtocolType, nonce: number): PrivateKey {
+		const decodedAddress = decodeAddressByProtocol(address, protocol).decoded;
+		return this.addressBytesExportableMessagingKey(decodedAddress, protocol, nonce);
+	}
+
+	addressBytesMessagingKey(address: Uint8Array, protocol: ProtocolType, nonce: number): PrivateMessagingKey {
+		// specific for the nonce
+		const addressKey = this.addressBytesExportableMessagingKey(address, protocol, nonce);
+		return ecdhKeyRingDecrypter(addressKey);
+	}
+
+	addressBytesExportableMessagingKey(address: Uint8Array, protocol: ProtocolType, nonce: number): PrivateKey {
 		if (protocol === MAILCHAIN) {
-			return this.accountMessagingKey();
+			return this.accountExportableMessagingKey();
 		}
 		// all addresses are encoded with hex regardless of protocol to ensure consistency
 		const addressKeyRoot = deriveHardenedKey(
@@ -133,25 +169,17 @@ export class KeyRing {
 		);
 
 		// specific for the nonce
-		const addressKey = deriveHardenedKey(addressKeyRoot, nonce).privateKey;
-		return ecdhKeyRingDecrypter(addressKey);
+		return deriveHardenedKey(addressKeyRoot, nonce).privateKey;
 	}
 
-	accountMessagingKey(): KeyRingDecrypter {
-		const key = this._accountMessagingKey.privateKey;
-		const keyEx = new ED25519KeyExchange();
+	accountExportableMessagingKey(): PrivateKey {
+		return this._accountMessagingKey.privateKey;
+	}
 
-		return {
-			curve: key.curve,
-			sign: (input) => key.sign(input),
-			publicKey: key.publicKey,
-			ecdhDecrypt: async (bundleEphemeralKey: PublicKey, input: Uint8Array) => {
-				const sharedSecret = await keyEx.SharedSecret(key, bundleEphemeralKey);
-				const decrypter = PrivateKeyDecrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(sharedSecret));
+	accountMessagingKey(): PrivateMessagingKey {
+		const key = this.accountExportableMessagingKey();
 
-				return decrypter.decrypt(input);
-			},
-		};
+		return ecdhKeyRingDecrypter(key);
 	}
 
 	accountIdentityKey(): SignerWithPublicKey {

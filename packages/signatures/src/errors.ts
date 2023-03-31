@@ -10,9 +10,9 @@ export class AddressIsEmptyError extends Error {
 }
 
 export class MessagingKeyVerificationError extends Error {
-	readonly type = 'messaging_key_verification_failed';
+	readonly type = 'messaging_key_validation_failed';
 	constructor() {
-		super('Messaging key signature failed to verify. Messaging key must not be used for this address.');
+		super('Messaging key validation failed and is not useable for this address.');
 	}
 }
 

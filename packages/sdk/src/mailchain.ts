@@ -1,17 +1,23 @@
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { EncodingTypes, ensureDecoded } from '@mailchain/encoding';
-import { MailSender, SendResult } from './sending/mail';
-import { MessagingKeys, FailedAddressMessageKeyResolutionsError } from './messagingKeys';
-import { MailchainUserProfile, UserProfile } from './internal/user';
-import { MailboxOperations, MailchainMailboxOperations } from './internal/mailbox';
-import { Address, SendMailParams } from './types';
-import { toMailData } from './convertSendMailParams';
-import { UserMailbox } from './internal/user/types';
-import { Configuration } from './configuration';
-import { defaultConfiguration } from './internal/configuration';
-import { MailData, Payload } from './transport';
-import { MailchainResult } from './mailchainResult';
+import {
+	DistributeMailError,
+	MailDistributor,
+	MailPreparer,
+	PrepareMailError,
+	SentMailDeliveryRequests,
+	Address,
+	SendMailParams,
+} from '@mailchain/internal/sending/mail';
+import { MessagingKeys } from '@mailchain/internal/messagingKeys';
+import { MailData, Payload } from '@mailchain/internal/transport';
+import { Configuration, MailchainResult } from '@mailchain/internal';
+import { toMailData } from '@mailchain/internal/sending/mail/convertSendMailParams';
+import { MailchainUserProfile, UserProfile } from '@mailchain/internal/user';
+import { MailboxOperations, MailchainMailboxOperations } from '@mailchain/internal/mailbox';
+import { UserMailbox } from '@mailchain/internal/user/types';
+import { defaultConfiguration } from '@mailchain/internal/configuration';
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
@@ -44,7 +50,7 @@ export class Mailchain {
 		password?: string,
 		config: Configuration = defaultConfiguration,
 	) {
-		const keyRing = KeyRing.fromMnemonic(secretRecoveryPhrase, password);
+		const keyRing = KeyRing.fromSecretRecoveryPhrase(secretRecoveryPhrase, password);
 
 		return Mailchain.fromKeyRing(keyRing, config);
 	}
@@ -61,7 +67,7 @@ export class Mailchain {
 	}
 
 	/**
-	 * Send a mail to any blockchain or Mailchain address.
+	 * Send a mail to any blockchain or Mailchain address using any wallet registered in your Mailchain account.
 	 *
 	 * @param params {@link SendMailParams} information about message to send.
 	 * Required:
@@ -102,59 +108,58 @@ export class Mailchain {
 	async sendMail(
 		params: SendMailParams,
 		options: SendMailOptions = defaultSendMailOptions,
-	): Promise<MailchainResult<SentMail>> {
+	): Promise<MailchainResult<SentMail, SendMailError>> {
 		const senderMailbox = await this.getSenderMailbox(params.from, {
 			messagingKeys: MessagingKeys.create(this.config),
 			userProfile: this._userProfile,
 		});
-		const senderMessagingKey = this.keyRing.addressMessagingKey(
+
+		const senderMessagingKey = this.keyRing.addressBytesMessagingKey(
 			senderMailbox.messagingKeyParams.address,
 			senderMailbox.messagingKeyParams.protocol,
 			senderMailbox.messagingKeyParams.nonce,
 		);
 
-		const sender = MailSender.create(this.config, senderMessagingKey);
+		const preparer = MailPreparer.create(this.config);
 
 		// prepare message
 		const mailData = toMailData(params);
 
-		const prepareResult = await sender.prepare({
+		const { data: preparedMail, error: preparedMailError } = await preparer.prepareMail({
 			message: mailData,
 			senderMessagingKey,
 		});
 
-		if (prepareResult.status === 'failed-resolve-recipients') {
-			throw new FailedAddressMessageKeyResolutionsError(prepareResult.failedRecipients);
+		if (preparedMailError) {
+			return { error: preparedMailError };
 		}
 
 		const savedMessageId = await this.saveSentMessage(
 			senderMailbox,
-			prepareResult.message,
+			preparedMail.message,
 			mailData,
 			options.saveToSentFolder,
 		);
 
-		const sendResult = await sender.send({
-			distributions: prepareResult.distributions,
-			resolvedAddresses: prepareResult.resolvedAddresses,
+		const distributor = MailDistributor.create(this.config, senderMessagingKey);
+
+		const { data: distributedMail, error: distributedMailError } = await distributor.distributeMail({
+			distributions: preparedMail.distributions,
+			resolvedAddresses: preparedMail.resolvedAddresses,
 		});
 
-		// update folder
-		switch (sendResult.status) {
-			case 'success':
-				if (options.saveToSentFolder && savedMessageId) {
-					await this._mailboxOperations.markOutboxMessageAsSent(savedMessageId);
-				}
-				break;
-
-			case 'partially-completed':
-				// leave in outbox
-				break;
+		if (distributedMailError) {
+			return { error: distributedMailError };
 		}
+
+		if (options.saveToSentFolder && savedMessageId) {
+			await this._mailboxOperations.markOutboxMessageAsSent(savedMessageId);
+		}
+
 		return {
 			data: {
 				savedMessageId,
-				...sendResult,
+				sentMailDeliveryRequests: distributedMail,
 			},
 		};
 	}
@@ -231,6 +236,8 @@ export class Mailchain {
 	}
 }
 
+export type SendMailError = PrepareMailError | DistributeMailError;
+
 export type SentMail = {
 	/**
 	 * The message ID of the message saved to the outbox/sent folder.
@@ -238,7 +245,8 @@ export type SentMail = {
 	 * Saving to the outbox/sent folder is enabled by default and controlled by {@link SendMailOptions}.
 	 */
 	savedMessageId: string | undefined;
-} & SendResult;
+	sentMailDeliveryRequests: SentMailDeliveryRequests;
+};
 
 /**
  * Additional options for sending mail.

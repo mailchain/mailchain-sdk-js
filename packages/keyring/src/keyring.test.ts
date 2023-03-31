@@ -7,10 +7,10 @@ describe('keyring', () => {
 		const kr = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 
 		expect(kr.inboxMessageDateOffset()).toEqual(204954984);
-		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
+		expect(kr.addressBytesMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
 			'addressMessagingKey',
 		);
-		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
+		expect(kr.addressBytesMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
 			kr.accountMessagingKey().publicKey,
 		);
 		expect(kr.rootInboxKey()).toMatchSnapshot('rootInboxKey');
@@ -25,10 +25,10 @@ describe('keyring', () => {
 		const kr = KeyRing.fromPrivateKey(BobED25519PrivateKey);
 
 		expect(kr.inboxMessageDateOffset()).toEqual(635667296);
-		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
+		expect(kr.addressBytesMessagingKey(new Uint8Array([1, 3, 3, 7]), ETHEREUM, 1)).toMatchSnapshot(
 			'addressMessagingKey',
 		);
-		expect(kr.addressMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
+		expect(kr.addressBytesMessagingKey(new Uint8Array([1, 3, 3, 7]), MAILCHAIN, 1).publicKey).toEqual(
 			kr.accountMessagingKey().publicKey,
 		);
 		expect(kr.rootInboxKey()).toMatchSnapshot('rootInboxKey');

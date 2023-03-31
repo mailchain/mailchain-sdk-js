@@ -1,0 +1,60 @@
+{
+	"name": "@mailchain/internal",
+	"version": "0.17.0",
+	"description": "Mailchain internal library",
+	"license": "Apache-2.0",
+	"author": {
+		"name": "Mailchain",
+		"email": "support@mailchain.co",
+		"url": "https://mailchain.com/"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mailchain/mailchain-sdk-js.git",
+		"directory": "internal"
+	},
+	"bugs": {
+		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
+	},
+	"dependencies": {
+		"@mailchain/addressing": "0.17.0",
+		"@mailchain/api": "0.17.0",
+		"@mailchain/crypto": "0.17.0",
+		"@mailchain/encoding": "0.17.0",
+		"@mailchain/keyring": "0.17.0",
+		"@mailchain/message-composer": "0.17.0",
+		"@mailchain/signatures": "0.17.0",
+		"@noble/hashes": "^1.3.0",
+		"axios": "1.3.4",
+		"canonicalize": "^1.0.8",
+		"email-addresses": "5.0.0",
+		"emailjs-mime-parser": "^2.0.7",
+		"lodash": "^4.17.21",
+		"protobufjs": "7.1.1"
+	},
+	"devDependencies": {
+		"jest-mock-extended": "^3.0.1"
+	},
+	"scripts": {
+		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"test": "run -T jest",
+		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
+		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
+	},
+	"typesVersions": {
+		"*": {
+			"identityKeys": [
+				"./types/identityKeys/index.d.ts"
+			],
+			"messagingKeys": [
+				"./types/messagingKeys/index.d.ts"
+			],
+			"sending": [
+				"./types/sending/index.d.ts"
+			],
+			"sending/mail": [
+				"./types/sending/mail/index.d.ts"
+			]
+		}
+	}
+}
