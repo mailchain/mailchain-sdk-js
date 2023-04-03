@@ -1,4 +1,4 @@
-import { KindED25519, KindSECP256K1, KindSR25519, PrivateKey, PublicKey } from '@mailchain/crypto';
+import { KindED25519, KindSECP256K1, KindSECP256R1, KindSR25519, PrivateKey, PublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import {
 	PublicKey as ApiPublicKey,
@@ -17,6 +17,8 @@ export function convertPublic(key: PublicKey): ApiPublicKey {
 			return { curve: PublicKeyCurveEnum.Secp256k1, value: encodeHexZeroX(key.bytes), encoding: 'hex/0x-prefix' };
 		case KindSR25519:
 			return { curve: PublicKeyCurveEnum.Sr25519, value: encodeHexZeroX(key.bytes), encoding: 'hex/0x-prefix' };
+		case KindSECP256R1:
+			return { curve: PublicKeyCurveEnum.Secp256r1, value: encodeHexZeroX(key.bytes), encoding: 'hex/0x-prefix' };
 		default:
 			throw new ErrorUnsupportedKey(key.curve);
 	}
@@ -35,6 +37,12 @@ export function convertPrivate(key: PrivateKey): ApiPrivateKey {
 			};
 		case KindSR25519:
 			return { curve: PrivateKeyCurveEnum.Sr25519, value: encodeHexZeroX(key.bytes), encoding: 'hex/0x-prefix' };
+		case KindSECP256R1:
+			return {
+				curve: PrivateKeyCurveEnum.Secp256r1,
+				value: encodeHexZeroX(key.bytes),
+				encoding: 'hex/0x-prefix',
+			};
 		default:
 			throw new ErrorUnsupportedKey(key.curve);
 	}

@@ -1,12 +1,13 @@
 import { PublicKey } from '../public';
 import { PrivateKey } from '../private';
-import { IdSECP256K1, IdED25519, IdSR25519 } from '../keys';
+import { IdSECP256K1, IdED25519, IdSR25519, IdSECP256R1 } from '../keys';
 import { SECP256K1PrivateKey } from '../secp256k1/private';
 import { SECP256K1PublicKey } from '../secp256k1/public';
 import { ED25519PrivateKey } from '../ed25519/private';
 import { ED25519PublicKey } from '../ed25519/public';
 import { SR25519PublicKey } from '../sr25519/public';
 import { SR25519PrivateKey } from '../sr25519/private';
+import { SECP256R1PrivateKey, SECP256R1PublicKey } from '../secp256r1';
 
 export function idFromPublicKey(key: PublicKey): number {
 	switch (key.constructor) {
@@ -16,6 +17,8 @@ export function idFromPublicKey(key: PublicKey): number {
 			return IdSECP256K1;
 		case SR25519PublicKey:
 			return IdSR25519;
+		case SECP256R1PublicKey:
+			return IdSECP256R1;
 		default:
 			throw RangeError('unknown public key type');
 	}
@@ -29,6 +32,8 @@ export function idFromPrivateKey(key: PrivateKey): number {
 			return IdSECP256K1;
 		case SR25519PrivateKey:
 			return IdSR25519;
+		case SECP256R1PrivateKey:
+			return IdSECP256R1;
 		default:
 			throw RangeError('unknown private key type');
 	}
@@ -42,6 +47,8 @@ export function publicKeyFromId(id: number, data: Uint8Array): PublicKey {
 			return new ED25519PublicKey(data);
 		case IdSR25519:
 			return new SR25519PublicKey(data);
+		case IdSECP256R1:
+			return new SECP256R1PublicKey(data);
 		default:
 			throw RangeError('unknown public key id');
 	}
@@ -55,6 +62,8 @@ export function privateKeyFromId(id: number, data: Uint8Array): PrivateKey {
 			return ED25519PrivateKey.fromSecretKey(data);
 		case IdSR25519:
 			return SR25519PrivateKey.fromBytes(data);
+		case IdSECP256R1:
+			return new SECP256R1PrivateKey(data);
 		default:
 			throw RangeError('unknown private key id');
 	}

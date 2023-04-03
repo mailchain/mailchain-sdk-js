@@ -1,10 +1,12 @@
 import { encodePublicKey, isPublicKeyEqual, PublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { createNameServiceAddress, NameServiceAddress } from '@mailchain/addressing';
+import { createNameServiceAddress, ETHEREUM, NameServiceAddress, TEZOS } from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
 import { IdentityKeys } from '../identityKeys';
+
+export const PROTOCOLS_SUPPORTING_NAMESERVICE = [ETHEREUM, TEZOS] as const;
 
 export type ResolvedName = {
 	name: string;

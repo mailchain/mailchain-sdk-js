@@ -1,5 +1,5 @@
 import { EncodingTypes, EncodingType, decode, encode } from '@mailchain/encoding';
-import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE } from './protocols';
+import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE, TEZOS } from './protocols';
 
 /**
  * Convert address from Uint8Array, selects the relevant encoding method and encodes it as string.
@@ -38,6 +38,7 @@ export function encodingByProtocol(protocol: ProtocolType): EncodingType {
 		case ETHEREUM:
 			return EncodingTypes.Hex0xPrefix;
 		case SUBSTRATE:
+		case TEZOS:
 			return EncodingTypes.Base58;
 		case MAILCHAIN:
 			return EncodingTypes.Utf8;

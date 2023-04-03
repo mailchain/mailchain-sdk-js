@@ -1,7 +1,7 @@
 import { PrivateKey } from '@mailchain/crypto';
 import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { ETHEREUM, NEAR } from '@mailchain/addressing/protocols';
+import { ETHEREUM, NEAR, TEZOS } from '@mailchain/addressing/protocols';
 import { ecdhKeyRingDecrypter, KeyRingDecrypter } from '@mailchain/keyring/functions';
 import {
 	MessagingKeysApiFactory,
@@ -82,7 +82,7 @@ export class PreviousMessageSync {
 
 		const aliasMessagingKeys = await Promise.allSettled(
 			allAddresses.map(async (x) => {
-				if (x.protocol !== ETHEREUM && x.protocol !== NEAR) {
+				if (x.protocol !== ETHEREUM && x.protocol !== NEAR && x.protocol !== TEZOS) {
 					throw new Error(`unsupported protocol of [${x.protocol}] for [${x.address}]`);
 				}
 				// TODO: https://github.com/mailchain/monorepo/issues/405, the private key should be invalidated at the end of the sync

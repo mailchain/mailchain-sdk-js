@@ -1,11 +1,16 @@
-import { isEthereumAddress, isMailchainAccountAddress, isNearImplicitAccount } from './addressPredicates';
+import {
+	isEthereumAddress,
+	isMailchainAccountAddress,
+	isNearImplicitAccount,
+	isTezosAddress,
+} from './addressPredicates';
 import { decodeAddressByProtocol } from './encoding';
 import { formatMailLike } from './formatMailLike';
 import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
 import { matchesNameservice } from './nameservices/matchesNameservice';
 import { NAMESERVICE_DESCRIPTIONS } from './nameservices/nameserviceDescriptions';
 import { parseWalletAddress } from './parseWalletAddress';
-import { ETHEREUM, NEAR } from './protocols';
+import { ETHEREUM, NEAR, TEZOS } from './protocols';
 
 /** If the rule is applicable,format the provided address. If not applicable, return `undefined`  */
 export type AddressFormattingRule<T extends MailchainAddress> = (address: T) => string | undefined;
@@ -42,6 +47,11 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 	}
 	if (usernameParts.at(-1) === NEAR) return address.username;
 	return formatMailLike(address.username, NEAR);
+};
+
+const humanTezosAddress: NameServiceAddressFormatter = (address) => {
+	if (!isTezosAddress(address)) return undefined;
+	return formatMailLike(`${address.username.slice(0, 7)}...${address.username.slice(-4)}`, TEZOS);
 };
 
 /**
@@ -96,6 +106,7 @@ const humanCatchAll: NameServiceAddressFormatter = (address) => {
 export const humanNameServiceFormatters = [
 	humanMailchainAccount,
 	humanNearAddress,
+	humanTezosAddress,
 	humanWalletAddress,
 	humanNsAddress,
 	humanCatchAll,

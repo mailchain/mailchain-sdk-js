@@ -61,7 +61,7 @@ export class MessagingKeyVerifier {
 		const isVerified = await verify(
 			registeredKeyProof.signingMethod,
 			identityKey,
-			Buffer.from(message),
+			message,
 			decodeHexZeroX(registeredKeyProof.signature),
 		);
 

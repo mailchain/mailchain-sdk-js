@@ -1,6 +1,14 @@
-import { isEthereumAddress, isMailchainAccountAddress } from './addressPredicates';
+import { isEthereumAddress, isMailchainAccountAddress, isTezosAddress } from './addressPredicates';
 import { createNameServiceAddress } from './nameServiceAddress';
-import { ETHEREUM, SUBSTRATE } from './protocols';
+import { ETHEREUM, SUBSTRATE, TEZOS } from './protocols';
+import {
+	AliceTz1AddressStr,
+	AliceTz2AddressStr,
+	AliceTz3AddressStr,
+	BobTz1AddressStr,
+	BobTz2AddressStr,
+	BobTz3AddressStr,
+} from './protocols/tezos/test.const';
 import { createWalletAddress } from './walletAddress';
 
 describe('mailchain account', () => {
@@ -75,6 +83,36 @@ describe('ethereum address', () => {
 	];
 
 	test.each(negativeCases)('%s should NOT be identified as ethereum address', (address) => {
+		expect(isEthereumAddress(address)).toBe(false);
+	});
+});
+
+describe('tezos address', () => {
+	const positiveCases = [
+		createWalletAddress(AliceTz1AddressStr, TEZOS, 'mailchain.com'),
+		createWalletAddress(BobTz1AddressStr, TEZOS, 'mailchain.dev'),
+		createWalletAddress(AliceTz2AddressStr, TEZOS, 'whatever.whatever'),
+		createWalletAddress(BobTz2AddressStr, TEZOS, 'whatever.mailchain.dev'),
+		createWalletAddress(AliceTz3AddressStr, TEZOS, 'whatever.mailchain.dev'),
+		createWalletAddress(BobTz3AddressStr, TEZOS, 'whatever.mailchain.dev'),
+	];
+
+	test.each(positiveCases)('%s should be identified as tezos address', (address) => {
+		expect(isTezosAddress(address)).toBe(true);
+	});
+
+	const negativeCases = [
+		createWalletAddress(AliceTz1AddressStr.slice(3), TEZOS, 'mailchain.com'), // missing tz1
+		createWalletAddress(AliceTz2AddressStr.slice(3), TEZOS, 'mailchain.com'), // missing tz2
+		createWalletAddress(AliceTz3AddressStr.slice(3), TEZOS, 'mailchain.com'), // missing tz3
+		createWalletAddress(AliceTz3AddressStr.slice(3), TEZOS, 'mailchain'), // missing domain .com
+		createWalletAddress('alice', TEZOS, 'mailchain.com'),
+		createWalletAddress('alice.tez', TEZOS, 'mailchain.com'),
+		createWalletAddress('alice', TEZOS, 'tez.mailchain.com'),
+		createWalletAddress('AliceTz1AddressStr', ETHEREUM, 'mailchain.com'), // invalid protocol
+	];
+
+	test.each(negativeCases)('%s should NOT be identified as tezos address', (address) => {
 		expect(isEthereumAddress(address)).toBe(false);
 	});
 });

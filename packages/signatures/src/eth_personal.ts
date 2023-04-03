@@ -4,7 +4,7 @@ import { decodeHexZeroX } from '@mailchain/encoding';
 
 export async function verifyEthereumPersonalMessage(
 	key: PublicKey,
-	message: Buffer,
+	message: Uint8Array,
 	signature: Uint8Array,
 ): Promise<boolean> {
 	switch (key.curve) {

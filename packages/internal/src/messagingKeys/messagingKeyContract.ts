@@ -5,7 +5,7 @@ import {
 	MessagingKeysApiInterface,
 } from '@mailchain/api';
 import axios, { AxiosInstance } from 'axios';
-import { ETHEREUM, NEAR, ProtocolType } from '@mailchain/addressing';
+import { ETHEREUM, NEAR, TEZOS, ProtocolType } from '@mailchain/addressing';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
@@ -31,6 +31,7 @@ export class MessagingKeyContractCall {
 			new Map<ProtocolType, ContractCallMessagingKeyResolver>([
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[ETHEREUM, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
+				[TEZOS, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
 				[MAILCHAIN, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
 			]),
 			MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),

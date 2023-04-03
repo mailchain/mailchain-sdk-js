@@ -9,6 +9,8 @@ export function encodingTypeToEncodingEnum(encoding: EncodingType): AddressEncod
 			return AddressEncodingEnum.Hex0xPrefix;
 		case EncodingTypes.Utf8:
 			return AddressEncodingEnum.TextUtf8;
+		case EncodingTypes.Base58:
+			return AddressEncodingEnum.Base58Plain;
 	}
 	throw new Error(`unsupported encoding by API of [${encoding}]`);
 }

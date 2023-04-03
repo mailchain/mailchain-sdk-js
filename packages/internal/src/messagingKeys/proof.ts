@@ -10,6 +10,6 @@ export type MessagingKeyProof = {
 	messageVariant: string;
 	nonce: number;
 	signature: Uint8Array;
-	signatureMethod: 'ethereum_personal_message';
+	signatureMethod: 'ethereum_personal_message' | 'tezos_signed_message_micheline';
 	messagingKey: PublicKey;
 };

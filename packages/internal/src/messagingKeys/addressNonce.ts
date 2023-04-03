@@ -1,4 +1,4 @@
-import { ETHEREUM, MAILCHAIN, NEAR, ProtocolNotSupportedError, ProtocolType } from '@mailchain/addressing';
+import { ETHEREUM, MAILCHAIN, NEAR, ProtocolNotSupportedError, ProtocolType, TEZOS } from '@mailchain/addressing';
 import axios, { AxiosInstance } from 'axios';
 import { MessagingKeysApiFactory, MessagingKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
@@ -24,6 +24,7 @@ export class AddressNonce {
 			new Map<ProtocolType, ContractCallLatestNonce>([
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[ETHEREUM, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
+				[TEZOS, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
 			]),
 		);
 	}
@@ -47,7 +48,8 @@ export class AddressNonce {
 		if (!resolver) {
 			return { error: new ProtocolNotSupportedError(protocol) };
 		}
-		if (protocol !== ETHEREUM && protocol !== NEAR) {
+
+		if (protocol !== ETHEREUM && protocol !== NEAR && protocol !== TEZOS) {
 			return { error: new ProtocolNotSupportedError(protocol) };
 		}
 
