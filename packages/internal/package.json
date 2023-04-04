@@ -83,6 +83,24 @@
 			"types": "./types/sending/mail/index.d.ts",
 			"import": "./browser/sending/mail/index.js",
 			"require": "./node/sending/mail/index.js"
+		},
+		"./node/configuration": {
+			"require": "./node/configuration.js"
+		},
+		"./node/mailchainResult": {
+			"require": "./node/mailchainResult.js"
+		},
+		"./node/messagingKeys": {
+			"require": "./node/messagingKeys/index.js"
+		},
+		"./node/identityKeys": {
+			"require": "./node/identityKeys/index.js"
+		},
+		"./node/sending": {
+			"require": "./node/sending/index.js"
+		},
+		"./node/sending/*": {
+			"require": "./node/sending/*/index.js"
 		}
 	}
 }
