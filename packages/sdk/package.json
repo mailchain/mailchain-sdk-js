@@ -42,5 +42,17 @@
 				"./types/internal/index.d.ts"
 			]
 		}
+	},
+	"exports": {
+		".": {
+			"import": "./browser/index.js",
+			"require": "./node/index.js",
+			"types": "./types/index.d.ts"
+		},
+		"./internal": {
+			"types": "./types/internal/index.d.ts",
+			"import": "./browser/internal/index.js",
+			"require": "./node/internal/index.js"
+		}
 	}
 }

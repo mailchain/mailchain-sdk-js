@@ -57,5 +57,32 @@
 				"./types/sending/mail/index.d.ts"
 			]
 		}
+	},
+	"exports": {
+		".": {
+			"import": "./browser/index.js",
+			"require": "./node/index.js",
+			"types": "./types/index.d.ts"
+		},
+		"./identityKeys": {
+			"types": "./types/identityKeys/index.d.ts",
+			"import": "./browser/identityKeys/index.js",
+			"require": "./node/identityKeys/index.js"
+		},
+		"./messagingKeys": {
+			"types": "./types/messagingKeys/index.d.ts",
+			"import": "./browser/messagingKeys/index.js",
+			"require": "./node/messagingKeys/index.js"
+		},
+		"./sending": {
+			"types": "./types/sending/index.d.ts",
+			"import": "./browser/sending/index.js",
+			"require": "./node/sending/index.js"
+		},
+		"./sending/mail": {
+			"types": "./types/sending/mail/index.d.ts",
+			"import": "./browser/sending/mail/index.js",
+			"require": "./node/sending/mail/index.js"
+		}
 	}
 }
