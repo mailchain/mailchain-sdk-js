@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/internal",
-	"version": "0.18.2",
+	"version": "0.18.3",
 	"description": "Mailchain internal library",
 	"license": "Apache-2.0",
 	"author": {
@@ -17,13 +17,13 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@mailchain/addressing": "0.18.2",
-		"@mailchain/api": "0.18.2",
-		"@mailchain/crypto": "0.18.2",
-		"@mailchain/encoding": "0.18.2",
-		"@mailchain/keyring": "0.18.2",
-		"@mailchain/message-composer": "0.18.2",
-		"@mailchain/signatures": "0.18.2",
+		"@mailchain/addressing": "0.18.3",
+		"@mailchain/api": "0.18.3",
+		"@mailchain/crypto": "0.18.3",
+		"@mailchain/encoding": "0.18.3",
+		"@mailchain/keyring": "0.18.3",
+		"@mailchain/message-composer": "0.18.3",
+		"@mailchain/signatures": "0.18.3",
 		"@noble/hashes": "^1.3.0",
 		"axios": "1.3.4",
 		"canonicalize": "^1.0.8",
@@ -96,11 +96,20 @@
 		"./node/identityKeys": {
 			"require": "./node/identityKeys/index.js"
 		},
+		"./node/mailbox": {
+			"require": "./node/mailbox/index.js"
+		},
 		"./node/sending": {
 			"require": "./node/sending/index.js"
 		},
-		"./node/sending/*": {
-			"require": "./node/sending/*/index.js"
+		"./node/sending/mail": {
+			"require": "./node/sending/mail/index.js"
+		},
+		"./node/sending/mail/convertSendMailParams": {
+			"require": "./node/sending/mail/convertSendMailParams.js"
+		},
+		"./node/user": {
+			"require": "./node/user/index.js"
 		}
 	}
 }
