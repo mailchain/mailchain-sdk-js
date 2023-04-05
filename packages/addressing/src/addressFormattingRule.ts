@@ -45,7 +45,7 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 			props.protocol,
 		);
 	}
-	if (usernameParts.at(-1) === NEAR) return address.username;
+	if (usernameParts[usernameParts.length - 1] === NEAR) return address.username;
 	return formatMailLike(address.username, NEAR);
 };
 
