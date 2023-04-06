@@ -1,4 +1,4 @@
-import { encodePublicKey, isPublicKeyEqual, PublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes, isPublicKeyEqual, PublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createNameServiceAddress, ETHEREUM, NameServiceAddress, TEZOS } from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
@@ -29,7 +29,7 @@ export class Nameservices {
 	}
 
 	async reverseResolveNames(identityKey: PublicKey): Promise<ResolvedName[]> {
-		return this.identityKeysApi.getIdentityKeyResolvableNames(encodeHexZeroX(encodePublicKey(identityKey))).then(
+		return this.identityKeysApi.getIdentityKeyResolvableNames(encodeHexZeroX(publicKeyToBytes(identityKey))).then(
 			({ data }) =>
 				data.resolvableNames?.map((resolved) => ({
 					...resolved,

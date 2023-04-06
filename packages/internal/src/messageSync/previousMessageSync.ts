@@ -1,5 +1,4 @@
-import { PrivateKey } from '@mailchain/crypto';
-import { encodePublicKey } from '@mailchain/crypto/multikey/encoding';
+import { PrivateKey, publicKeyToBytes } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { ETHEREUM, NEAR, TEZOS } from '@mailchain/addressing/protocols';
 import { ecdhKeyRingDecrypter, KeyRingDecrypter } from '@mailchain/keyring/functions';
@@ -52,7 +51,7 @@ export class PreviousMessageSync {
 			),
 		);
 
-		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(mailbox.identityKey));
+		const encodedIdentityKey = encodeHexZeroX(publicKeyToBytes(mailbox.identityKey));
 		const addresses = await this.identityKeys.reverse(mailbox.identityKey);
 
 		// add all address found by identity key and also registered

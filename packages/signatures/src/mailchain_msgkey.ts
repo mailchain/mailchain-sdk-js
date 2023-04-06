@@ -1,5 +1,5 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { PublicKey, PrivateKey, KindED25519, encodePublicKey, ErrorUnsupportedKey } from '@mailchain/crypto';
+import { PublicKey, PrivateKey, KindED25519, publicKeyToBytes, ErrorUnsupportedKey } from '@mailchain/crypto';
 import { ProtocolType } from '@mailchain/addressing';
 import { AddressMustBeProtocolAddressError, AddressIsEmptyError, ProtocolIsEmptyError } from './errors';
 
@@ -13,7 +13,7 @@ export function mailchainProvidedMessagingKeyMessage(msgKey: PublicKey, address:
 
 	switch (msgKey.curve) {
 		case KindED25519:
-			const encodedKey = encodeHexZeroX(encodePublicKey(msgKey));
+			const encodedKey = encodeHexZeroX(publicKeyToBytes(msgKey));
 
 			return new Uint8Array(
 				Buffer.from(

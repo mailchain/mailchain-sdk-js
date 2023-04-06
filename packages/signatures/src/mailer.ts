@@ -1,4 +1,4 @@
-import { encodePublicKey, PublicKey, Signer } from '@mailchain/crypto';
+import { publicKeyToBytes, PublicKey, Signer } from '@mailchain/crypto';
 import { decodeUtf8, encodeHex } from '@mailchain/encoding';
 import canonicalize from 'canonicalize';
 import { signRawEd25519, verifyRawEd25519 } from './raw_ed25519';
@@ -21,7 +21,7 @@ export function createMailerProofSigningData(mailerProofParams: MailerProofParam
 			const canonicalized = canonicalize({
 				authorContentSignature: encodeHex(mailerProofParams.authorContentSignature),
 				expires: Math.round(mailerProofParams.expires.getTime() / 1000),
-				mailerMessagingKey: encodeHex(encodePublicKey(mailerProofParams.mailerMessagingKey)),
+				mailerMessagingKey: encodeHex(publicKeyToBytes(mailerProofParams.mailerMessagingKey)),
 			});
 
 			if (!canonicalized) {

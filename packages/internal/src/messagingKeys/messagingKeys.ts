@@ -1,6 +1,6 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { ALL_PROTOCOLS, encodeAddressByProtocol, ProtocolNotSupportedError, ProtocolType } from '@mailchain/addressing';
-import { encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes, PublicKey } from '@mailchain/crypto';
 import {
 	AddressesApiFactory,
 	createAxiosConfiguration,
@@ -136,7 +136,7 @@ export class MessagingKeys {
 	}
 
 	async update(proof: MessagingKeyProof): Promise<void> {
-		const encodedIdentityKey = encodeHexZeroX(encodePublicKey(proof.identityKey));
+		const encodedIdentityKey = encodeHexZeroX(publicKeyToBytes(proof.identityKey));
 		const encodedAddress = encodeAddressByProtocol(proof.address, proof.protocol);
 
 		await this.identityKeysApi.putMsgKeyByIDKey(encodedIdentityKey, {

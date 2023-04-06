@@ -1,4 +1,4 @@
-import { encodePublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
 import {
 	AliceSECP256K1PublicAddress,
@@ -25,7 +25,7 @@ const v1Mailbox = user.Mailbox.create({
 	network: 'main',
 });
 
-const v2Mailbox = user.Mailbox.create({ ...v1Mailbox, identityKey: encodePublicKey(AliceWalletMailbox.identityKey) });
+const v2Mailbox = user.Mailbox.create({ ...v1Mailbox, identityKey: publicKeyToBytes(AliceWalletMailbox.identityKey) });
 
 const v3Mailbox = user.Mailbox.create({
 	...v2Mailbox,

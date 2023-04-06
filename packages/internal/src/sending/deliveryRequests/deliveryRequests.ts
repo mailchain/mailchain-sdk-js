@@ -1,4 +1,4 @@
-import { ED25519ExtendedPrivateKey, SignerWithPublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { ED25519ExtendedPrivateKey, SignerWithPublicKey, publicKeyToBytes, PublicKey } from '@mailchain/crypto';
 import { encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
 import {
 	TransportApiInterface,
@@ -111,7 +111,7 @@ export class DeliveryRequests {
 			const { deliveryRequestID: deliveryRequestId } = await this.transportApi
 				.postDeliveryRequest({
 					encryptedDeliveryRequest: encodeBase64(protocol.Delivery.encode(deliveryCreated).finish()),
-					recipientMessagingKey: encodeHexZeroX(encodePublicKey(recipientMessageKey)),
+					recipientMessagingKey: encodeHexZeroX(publicKeyToBytes(recipientMessageKey)),
 				})
 				.then((response) => response.data);
 

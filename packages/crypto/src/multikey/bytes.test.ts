@@ -18,9 +18,9 @@ import {
 	AliceED25519PublicKeyBytes,
 } from '../ed25519/test.const';
 import { IdED25519, IdSR25519, IdSECP256K1 } from '../keys';
-import { decodePrivateKey, decodePublicKey, encodePrivateKey, encodePublicKey } from './encoding';
+import { privateKeyFromBytes, publicKeyFromBytes, privateKeyToBytes, publicKeyToBytes } from './bytes';
 
-describe('EncodePublicKey()', () => {
+describe('publicKeyToBytes()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
@@ -46,15 +46,15 @@ describe('EncodePublicKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				encodePublicKey(test.arg);
+				publicKeyToBytes(test.arg);
 			}).toThrow();
 		} else {
-			expect(encodePublicKey(test.arg)).toEqual(test.expected);
+			expect(publicKeyToBytes(test.arg)).toEqual(test.expected);
 		}
 	});
 });
 
-describe('DecodePublicKey()', () => {
+describe('publicKeyFromBytes()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
@@ -86,15 +86,15 @@ describe('DecodePublicKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				decodePublicKey(test.arg);
+				publicKeyFromBytes(test.arg);
 			}).toThrow();
 		} else {
-			expect(decodePublicKey(test.arg)).toEqual(test.expected!);
+			expect(publicKeyFromBytes(test.arg)).toEqual(test.expected!);
 		}
 	});
 });
 
-describe('EncodePrivateKey()', () => {
+describe('privateKeyToBytes()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
@@ -118,15 +118,15 @@ describe('EncodePrivateKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				encodePrivateKey(test.arg);
+				privateKeyToBytes(test.arg);
 			}).toThrow();
 		} else {
-			expect(encodePrivateKey(test.arg)).toEqual(test.expected);
+			expect(privateKeyToBytes(test.arg)).toEqual(test.expected);
 		}
 	});
 });
 
-describe('DecodePrivateKey()', () => {
+describe('privateKeyFromBytes()', () => {
 	const tests = [
 		{
 			name: 'sr25519 alice',
@@ -156,12 +156,12 @@ describe('DecodePrivateKey()', () => {
 	test.each(tests)('$name', async (test) => {
 		if (test.shouldThrow) {
 			expect(() => {
-				decodePrivateKey(test.arg);
+				privateKeyFromBytes(test.arg);
 			}).toThrow();
 		} else {
 			const { sign, ...expected } = test.expected!;
 
-			expect(decodePrivateKey(test.arg)).toEqual(expected);
+			expect(privateKeyFromBytes(test.arg)).toEqual(expected);
 		}
 	});
 });

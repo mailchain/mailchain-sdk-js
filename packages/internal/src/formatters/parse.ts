@@ -1,5 +1,5 @@
 import { ALL_PROTOCOLS, ProtocolType } from '@mailchain/addressing';
-import { decodePublicKey, PublicKey } from '@mailchain/crypto';
+import { publicKeyFromBytes, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, decodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
 import { HEADER_LABELS } from '@mailchain/message-composer';
 import { MailAddress, MailData } from '../transport';
@@ -257,7 +257,7 @@ function parseIdentityKeys(attrStr: string): ParseMimeTextResult['addressIdentit
 				console.warn(`address [${attrKey}] has unsupported protocol [${protocol}]`);
 			}
 			try {
-				const identityKey = decodePublicKey(decodeHexZeroX(encodedIdentityKey));
+				const identityKey = publicKeyFromBytes(decodeHexZeroX(encodedIdentityKey));
 				result.set(attrKey, { ...{ identityKey, protocol: protocol as ProtocolType } });
 			} catch (e) {
 				console.warn(

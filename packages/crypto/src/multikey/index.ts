@@ -1,3 +1,3 @@
 export * from './names';
-export * from './encoding';
+export * from './bytes';
 export * from './ids';

@@ -1,7 +1,7 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { KeyRing, InboxKey } from '@mailchain/keyring';
 import { formatAddress, MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
-import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
+import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
 import {
 	InboxApiInterface,
 	PutEncryptedMessageRequestBodyFolderEnum,
@@ -207,7 +207,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const { messagePreview } = message;
 
 		return {
-			mailbox: decodePublicKey(messagePreview.mailbox),
+			mailbox: publicKeyFromBytes(messagePreview.mailbox),
 			messageId: apiMessage.messageId,
 			owner: messagePreview.owner,
 			to: messagePreview.to,
@@ -387,7 +387,7 @@ function createMessagePreview(
 ): protoInbox.preview.MessagePreview {
 	return protoInbox.preview.MessagePreview.create({
 		owner: formatAddress(owner, 'mail'),
-		mailbox: encodePublicKey(userMailbox.identityKey),
+		mailbox: publicKeyToBytes(userMailbox.identityKey),
 		to: content.recipients.map((it) => it.address),
 		cc: content.carbonCopyRecipients.map((it) => it.address),
 		bcc: content.blindCarbonCopyRecipients.map((it) => it.address),

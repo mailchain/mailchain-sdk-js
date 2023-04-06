@@ -1,4 +1,4 @@
-import { decodePublicKey, encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { publicKeyFromBytes, publicKeyToBytes, PublicKey } from '@mailchain/crypto';
 import { decodeHex, encodeHex } from '@mailchain/encoding';
 import { MailerProof } from '@mailchain/signatures';
 import canonicalize from 'canonicalize';
@@ -46,7 +46,7 @@ export type MailerContent = {
 export function createContentBuffer(content: MailerContent): string {
 	// fields are alphabetically ordered
 	const canonicalized = canonicalize({
-		authorMessagingKey: encodeHex(encodePublicKey(content.authorMessagingKey)),
+		authorMessagingKey: encodeHex(publicKeyToBytes(content.authorMessagingKey)),
 		contentUri: content.contentUri,
 		date: Math.round(content.date.getTime()),
 		authorMailAddress: content.authorMailAddress.address,
@@ -54,7 +54,7 @@ export function createContentBuffer(content: MailerContent): string {
 			params: {
 				authorContentSignature: encodeHex(content.mailerProof.params.authorContentSignature),
 				expires: Math.round(content.mailerProof.params.expires.getTime()),
-				mailerMessagingKey: encodeHex(encodePublicKey(content.mailerProof.params.mailerMessagingKey)),
+				mailerMessagingKey: encodeHex(publicKeyToBytes(content.mailerProof.params.mailerMessagingKey)),
 			},
 			signature: encodeHex(content.mailerProof.signature),
 			version: content.mailerProof.version,
@@ -110,7 +110,7 @@ export function parseMailerContentFromJSON(content: string): MailerContent {
 		throw new Error('authorMessagingKey is required');
 	}
 
-	const authorMessagingKey = decodePublicKey(decodeHex(rawMailerContent.authorMessagingKey));
+	const authorMessagingKey = publicKeyFromBytes(decodeHex(rawMailerContent.authorMessagingKey));
 
 	return {
 		authorMessagingKey,
@@ -121,7 +121,9 @@ export function parseMailerContentFromJSON(content: string): MailerContent {
 		mailerProof: {
 			params: {
 				expires: new Date(rawMailerContent.mailerProof.params.expires),
-				mailerMessagingKey: decodePublicKey(decodeHex(rawMailerContent.mailerProof.params.mailerMessagingKey)),
+				mailerMessagingKey: publicKeyFromBytes(
+					decodeHex(rawMailerContent.mailerProof.params.mailerMessagingKey),
+				),
 				authorContentSignature,
 			},
 			signature: decodeHex(rawMailerContent.mailerProof.signature),

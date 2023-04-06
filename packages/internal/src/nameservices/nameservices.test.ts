@@ -1,5 +1,5 @@
 import { createNameServiceAddress, ETHEREUM } from '@mailchain/addressing';
-import { encodePublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { AxiosResponse } from 'axios';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -34,7 +34,7 @@ describe('Nameservices', () => {
 		const result = await nameservices.reverseResolveNames(AliceSECP256K1PublicKey);
 
 		expect(identityKeysApi.getIdentityKeyResolvableNames).toHaveBeenCalledWith(
-			encodeHexZeroX(encodePublicKey(AliceSECP256K1PublicKey)),
+			encodeHexZeroX(publicKeyToBytes(AliceSECP256K1PublicKey)),
 		);
 		expect(result).toEqual(
 			names.map(({ name, resolver }) => ({

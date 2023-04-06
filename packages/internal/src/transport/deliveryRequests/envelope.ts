@@ -6,7 +6,7 @@ import {
 	secureRandom,
 	PrivateKeyEncrypter,
 	ED25519PrivateKey,
-	encodePrivateKey,
+	privateKeyToBytes,
 } from '@mailchain/crypto';
 import { protocol } from '../../protobuf/protocol/protocol';
 import { createECDHKeyBundle } from './keybundle';
@@ -25,7 +25,7 @@ export async function createEnvelope(
 	const keyBundle = await createECDHKeyBundle(recipientMessagingKey, rand);
 	const encrypter = PrivateKeyEncrypter.fromPrivateKey(ED25519PrivateKey.fromSeed(keyBundle.secret), rand);
 	const encryptedMessageKey = await encrypter.encrypt(
-		encodePrivateKey(messageRootEncryptionKey.privateKey as ED25519PrivateKey),
+		privateKeyToBytes(messageRootEncryptionKey.privateKey as ED25519PrivateKey),
 	); //TODO: look into encoding extended keys
 	const encryptedMessageURI = await encrypter.encrypt(Buffer.from(messageURI, 'utf8'));
 

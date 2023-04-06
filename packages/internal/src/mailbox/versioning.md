@@ -41,12 +41,12 @@ The initial implementation didn't have versioning information, so no `version` p
 ### Version 3 - `hashedOwner` added
 
 -   `ProtoMessagePreview`
-    -   MODIFIED `mailbox` field to represent encoded public key (with `encodePublicKey`) instead of the raw public key bytes
+    -   MODIFIED `mailbox` field to represent encoded public key (with `publicKeyToBytes`) instead of the raw public key bytes
 -   `MessageRequestBody`
     -   BUMPED `version` to `3`
     -   ADDED `hashedOwner` that is hash values corresponding to the address hashing algorithm
     -   MODIFIED `mailbox` the hashing algorithm changed from `accountKey.sign(mailbox.identityKey)` to `sha256` hashed value of it, `sha256(accountKey.sign(mailbox.identityKey))`.
-    -   MODIFIED `messageId` the hashing algorithm changed from `accountKey.sign(mailbox.identityKey.bytes)` to `sha256(accountKey(encodePublicKey(mailbox.identityKey)))`. Migration of `messageId` shall not be applied.
+    -   MODIFIED `messageId` the hashing algorithm changed from `accountKey.sign(mailbox.identityKey.bytes)` to `sha256(accountKey(publicKeyToBytes(mailbox.identityKey)))`. Migration of `messageId` shall not be applied.
 -   Other
     -   Around this time the payload message received `X-IdentityKeys` header that includes mapping of address->IdentityKey at the time of sending the message
 

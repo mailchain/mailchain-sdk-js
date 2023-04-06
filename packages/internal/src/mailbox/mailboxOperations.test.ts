@@ -1,6 +1,6 @@
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { encodePublicKey, KindNaClSecretKey } from '@mailchain/crypto';
+import { publicKeyToBytes, KindNaClSecretKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64, encodeHex, EncodingTypes } from '@mailchain/encoding';
 import { mock } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
@@ -50,7 +50,7 @@ describe('mailbox', () => {
 		from: 'Bob',
 		subject: 'Hey Alice!',
 		owner: 'ownerAddress',
-		mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
+		mailbox: publicKeyToBytes(AliceAccountMailbox.identityKey),
 		snippet: 'Message from Bob to Alice',
 		hasAttachment: true,
 		timestamp: new Date('2022-6-6').getTime() / 1000,
@@ -223,7 +223,7 @@ describe('mailbox', () => {
 
 		expect(decryptedPreview).toEqual({
 			owner: formatAddress(AliceAccountMailbox.aliases[0].address, 'mail'),
-			mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
+			mailbox: publicKeyToBytes(AliceAccountMailbox.identityKey),
 			from: dummyMailData.from.address,
 			hasAttachment: false,
 			snippet:
@@ -283,7 +283,7 @@ describe('mailbox', () => {
 			expect(decryptedPreview).toEqual({
 				from: dummyMailData.from.address,
 				owner: formatAddress(matchedOwner, 'mail'),
-				mailbox: encodePublicKey(AliceWalletMailbox.identityKey),
+				mailbox: publicKeyToBytes(AliceWalletMailbox.identityKey),
 				hasAttachment: false,
 				snippet:
 					'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',

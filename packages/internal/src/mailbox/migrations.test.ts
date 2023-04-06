@@ -1,6 +1,6 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { formatAddress, MAILCHAIN } from '@mailchain/addressing';
-import { encodePublicKey, secureRandom } from '@mailchain/crypto';
+import { publicKeyToBytes, secureRandom } from '@mailchain/crypto';
 import { IdentityKeys } from '../identityKeys';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { dummyMailData } from '../test.const';
@@ -27,7 +27,7 @@ describe('MailboxOperations migrations', () => {
 	});
 	const v3Message = protoInbox.preview.MessagePreview.create({
 		...v1Message,
-		mailbox: encodePublicKey(AliceAccountMailbox.identityKey),
+		mailbox: publicKeyToBytes(AliceAccountMailbox.identityKey),
 	});
 
 	describe('V1 -> V2 - add mailbox identity key', () => {
@@ -92,7 +92,7 @@ describe('MailboxOperations migrations', () => {
 				messagePreview: protoInbox.preview.MessagePreview.create({
 					...v3Message,
 					owner: formatAddress(AliceWalletMailbox.aliases[0].address, 'mail'),
-					mailbox: encodePublicKey(AliceWalletMailbox.identityKey),
+					mailbox: publicKeyToBytes(AliceWalletMailbox.identityKey),
 				}),
 			});
 		});

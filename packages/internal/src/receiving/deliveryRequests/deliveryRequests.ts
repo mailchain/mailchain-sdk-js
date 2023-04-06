@@ -4,7 +4,7 @@ import {
 	TransportApiFactory,
 	TransportApiInterface,
 } from '@mailchain/api';
-import { decodePrivateKey, decodePublicKey, ED25519ExtendedPrivateKey } from '@mailchain/crypto';
+import { privateKeyFromBytes, publicKeyFromBytes, ED25519ExtendedPrivateKey } from '@mailchain/crypto';
 import { KeyRingDecrypter } from '@mailchain/keyring';
 import { decodeBase64, decodeHexZeroX, encodeHexZeroX, encodeUtf8 } from '@mailchain/encoding';
 import { signMailchainDeliveryConfirmation } from '@mailchain/signatures';
@@ -89,7 +89,7 @@ export class DeliveryRequests {
 			}
 
 			const payloadRootEncryptionKeyBytes = await messagingKey.ecdhDecrypt(
-				decodePublicKey(ecdhKeyBundle.publicEphemeralKey),
+				publicKeyFromBytes(ecdhKeyBundle.publicEphemeralKey),
 				encryptedMessageKey,
 			);
 
@@ -98,11 +98,11 @@ export class DeliveryRequests {
 			}
 
 			const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
-				decodePrivateKey(payloadRootEncryptionKeyBytes),
+				privateKeyFromBytes(payloadRootEncryptionKeyBytes),
 			);
 
 			const payloadUriBytes = await messagingKey.ecdhDecrypt(
-				decodePublicKey(ecdhKeyBundle.publicEphemeralKey),
+				publicKeyFromBytes(ecdhKeyBundle.publicEphemeralKey),
 				encryptedMessageUri,
 			);
 

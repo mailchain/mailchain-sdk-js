@@ -9,9 +9,9 @@ import {
 	ProtocolType,
 } from '@mailchain/addressing';
 import {
-	decodePublicKey,
+	publicKeyFromBytes,
 	Decrypter,
-	encodePublicKey,
+	publicKeyToBytes,
 	Encrypter,
 	PublicKey,
 	SignerWithPublicKey,
@@ -174,7 +174,7 @@ export class MailchainUserProfile implements UserProfile {
 				resultMailboxes.push({
 					type: 'wallet',
 					id: apiMailbox.mailboxId,
-					identityKey: decodePublicKey(protoMailbox.identityKey),
+					identityKey: publicKeyFromBytes(protoMailbox.identityKey),
 					label: protoMailbox.label ?? null,
 					aliases: mailboxAliases.length > 0 ? (mailboxAliases as [Alias, ...Alias[]]) : [fallbackAlias],
 					messagingKeyParams: {
@@ -247,7 +247,7 @@ export class MailchainUserProfile implements UserProfile {
 
 function createProtoUserMailbox(mailbox: NewUserMailbox): user.Mailbox {
 	return user.Mailbox.create({
-		identityKey: encodePublicKey(mailbox.identityKey),
+		identityKey: publicKeyToBytes(mailbox.identityKey),
 		address: mailbox.messagingKeyParams.address,
 		protocol: mailbox.messagingKeyParams.protocol,
 		network: mailbox.messagingKeyParams.network,

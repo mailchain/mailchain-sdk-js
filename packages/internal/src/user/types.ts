@@ -25,7 +25,7 @@ export type UserMailbox = {
 	label: string | null;
 	/** Will contain at least one {@link Alias}. The first entry in the array is considered as 'default' alias. */
 	aliases: [Alias, ...Alias[]];
-	/** Ingredients for the creation of messaging private key via the keyring. */
+	/** Ingredients for the creation of private messaging key via the keyring. */
 	messagingKeyParams: {
 		address: Uint8Array;
 		protocol: ProtocolType;

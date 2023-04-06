@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { PublicKey, RandomFunction, secureRandom, encodePublicKey, ED25519KeyExchange } from '@mailchain/crypto';
+import { PublicKey, RandomFunction, secureRandom, publicKeyToBytes, ED25519KeyExchange } from '@mailchain/crypto';
 import { protocol } from '../../protobuf/protocol/protocol';
 
 export async function createECDHKeyBundle(
@@ -14,8 +14,8 @@ export async function createECDHKeyBundle(
 	const sharedSecret = await keyEx.SharedSecret(ephemeralKey, recipientMessagingKey);
 
 	const payload = {
-		publicMessagingKey: encodePublicKey(recipientMessagingKey),
-		publicEphemeralKey: encodePublicKey(ephemeralKey.publicKey),
+		publicMessagingKey: publicKeyToBytes(recipientMessagingKey),
+		publicEphemeralKey: publicKeyToBytes(ephemeralKey.publicKey),
 	} as protocol.IECDHKeyBundle;
 
 	var errMsg = protocol.ECDHKeyBundle.verify(payload);

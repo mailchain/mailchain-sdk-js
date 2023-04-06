@@ -1,4 +1,4 @@
-import { encodePublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { createMessageComposer } from '@mailchain/message-composer';
 import { MessageComposer } from '@mailchain/message-composer/messageComposer';
@@ -102,7 +102,7 @@ function putIdentityKeyAttr(
 	if (lookupResult.identityKey == null) return undefined;
 
 	const { identityKey, protocol } = lookupResult;
-	const attrValue = `${encodeHexZeroX(encodePublicKey(identityKey))}:${protocol}`;
+	const attrValue = `${encodeHexZeroX(publicKeyToBytes(identityKey))}:${protocol}`;
 	const attr: HeaderAttribute = [address, attrValue];
 	attrs.push(attr);
 	return attr;

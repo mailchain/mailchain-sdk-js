@@ -1,4 +1,4 @@
-import { encodePublicKey, PublicKey } from '@mailchain/crypto';
+import { publicKeyToBytes, PublicKey } from '@mailchain/crypto';
 import { ED25519PublicKey, ED25519PublicKeyLen } from '@mailchain/crypto/ed25519';
 import { SECP256K1PublicKey, SECP256K1PublicKeyLength } from '@mailchain/crypto/secp256k1/public';
 import { isMailchainAccountAddress, parseNameServiceAddress } from '@mailchain/addressing';
@@ -62,7 +62,7 @@ export function createV3EncodeIdentityKey(): MessagePreviewMigrationRule {
 				version: 3,
 				messagePreview: protoInbox.preview.MessagePreview.create({
 					...messagePreview,
-					mailbox: encodePublicKey(mailboxIdentityKey),
+					mailbox: publicKeyToBytes(mailboxIdentityKey),
 				}),
 			};
 		},

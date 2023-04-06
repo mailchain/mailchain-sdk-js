@@ -1,4 +1,4 @@
-import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
+import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
 import { decodeHex, encodeHex } from '@mailchain/encoding';
 import { MailerProof } from '@mailchain/signatures';
 import canonicalize from 'canonicalize';
@@ -9,7 +9,7 @@ export function createMailerProofBuffer(mailerProof: MailerProof): string {
 		params: {
 			authorContentSignature: encodeHex(mailerProof.params.authorContentSignature),
 			expires: Math.round(mailerProof.params.expires.getTime()),
-			mailerMessagingKey: encodeHex(encodePublicKey(mailerProof.params.mailerMessagingKey)),
+			mailerMessagingKey: encodeHex(publicKeyToBytes(mailerProof.params.mailerMessagingKey)),
 		},
 		signature: encodeHex(mailerProof.signature),
 		version: mailerProof.version,
@@ -52,7 +52,7 @@ export function parseMailerProofFromJSON(content: string): MailerProof {
 	return {
 		params: {
 			expires: new Date(rawRawMailerProof.params.expires),
-			mailerMessagingKey: decodePublicKey(decodeHex(rawRawMailerProof.params.mailerMessagingKey)),
+			mailerMessagingKey: publicKeyFromBytes(decodeHex(rawRawMailerProof.params.mailerMessagingKey)),
 			authorContentSignature,
 		},
 		signature: decodeHex(rawRawMailerProof.signature),

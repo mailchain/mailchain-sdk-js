@@ -7,7 +7,7 @@ import {
 	ProtocolType,
 } from '@mailchain/addressing';
 import { matchesNameservice, NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
-import { decodePublicKey, encodePublicKey } from '@mailchain/crypto';
+import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
 import { IdentityKeys } from '../identityKeys';
 import { Nameservices } from '../nameservices';
@@ -41,7 +41,7 @@ export function createV2IdentityKey(
 				version: 2,
 				protoMailbox: user.Mailbox.create({
 					...protoMailbox,
-					identityKey: encodePublicKey(result.identityKey),
+					identityKey: publicKeyToBytes(result.identityKey),
 				}),
 			};
 		},
@@ -89,7 +89,7 @@ export function createV5NsMigration(nameservices: Nameservices): UserMailboxMigr
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 4),
 		apply: async ({ protoMailbox }) => {
-			const identityKey = decodePublicKey(protoMailbox.identityKey);
+			const identityKey = publicKeyFromBytes(protoMailbox.identityKey);
 			try {
 				const foundNames = await nameservices.reverseResolveNames(identityKey);
 

@@ -1,6 +1,6 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { ED25519PublicKey, encodePublicKey, secureRandom } from '@mailchain/crypto';
+import { ED25519PublicKey, publicKeyToBytes, secureRandom } from '@mailchain/crypto';
 import { AxiosResponse } from 'axios';
 import { formatAddress } from '@mailchain/addressing';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
@@ -32,7 +32,7 @@ describe('userProfile', () => {
 			Promise.resolve({
 				protoMailbox: user.Mailbox.create({
 					...data.protoMailbox,
-					identityKey: encodePublicKey(migratedIdentityKey),
+					identityKey: publicKeyToBytes(migratedIdentityKey),
 				}),
 				version: 2,
 			}),
@@ -40,7 +40,7 @@ describe('userProfile', () => {
 
 	const protoMailbox1: user.Mailbox = user.Mailbox.create({
 		address: AliceWalletMailbox.messagingKeyParams.address,
-		identityKey: encodePublicKey(AliceWalletMailbox.identityKey),
+		identityKey: publicKeyToBytes(AliceWalletMailbox.identityKey),
 		nonce: AliceWalletMailbox.messagingKeyParams.nonce,
 		network: AliceWalletMailbox.messagingKeyParams.network,
 		protocol: AliceWalletMailbox.messagingKeyParams.protocol,
@@ -56,7 +56,7 @@ describe('userProfile', () => {
 
 	const protoMailbox2: user.Mailbox = user.Mailbox.create({
 		address: BobWalletMailbox.messagingKeyParams.address,
-		identityKey: encodePublicKey(BobWalletMailbox.identityKey),
+		identityKey: publicKeyToBytes(BobWalletMailbox.identityKey),
 		nonce: BobWalletMailbox.messagingKeyParams.nonce,
 		network: BobWalletMailbox.messagingKeyParams.network,
 		protocol: BobWalletMailbox.messagingKeyParams.protocol,
