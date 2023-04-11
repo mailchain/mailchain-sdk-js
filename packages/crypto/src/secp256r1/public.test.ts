@@ -56,7 +56,7 @@ describe('verifySignature()', () => {
 			pubKey: AliceSECP256R1PublicKey,
 			message: decodeUtf8('hello from mailchain'),
 			signature: decodeHex(
-				'e77fedf8e6c381a5578b6a18af80b5758453a5f9c34c5322fb4ff3a56db8b86155280610b5d061da74cc6b07bcfca7cbbe00a645fe4d79e2b1442ab2d0ac35a6',
+				'ba1618aca63b24376e6f538beee4f757523081306ed10f301ada1a5919a5b68d526b2ae2f1cd8fd6985c42dd0fe681dc1d7e2ea091bc0c2e524de6d65f2c7318',
 			),
 			expected: true,
 		},
@@ -65,7 +65,7 @@ describe('verifySignature()', () => {
 			pubKey: BobSECP256R1PublicKey,
 			message: decodeUtf8('hello from mailchain'),
 			signature: decodeHex(
-				'de5db37e848e34fc4a9999410969edb4ed20676a7209754968bbcf289ac2efc23fabad06e7fa69bbb01f5de0b9f6e19d95fd1f2ab5c03687ae6c83ab965e6787',
+				'f3c5e4a924b18264c166d74f3210a1fbc42dd4d93b0d1b0f6a96ef6584ae31905d698badee1399287f4c3f49bca4a690a19ef95ce620aecc862cc1e4f8d0cdf1',
 			),
 			expected: true,
 		},
@@ -101,7 +101,7 @@ describe('verifySignature()', () => {
 			pubKey: CarlosSECP256R1PublicKey,
 			message: decodeUtf8('hello from mailchain'),
 			signature: decodeHex(
-				'59cd7012db33304d04ee9f10f07aa32c3dd482268fd9e5dcb031ecaf17af532c2768b481f74653e425fc2ac3ff73a72782fc0dc4855578887e187b68027229d1',
+				'd6be4b13413fe3c1ca7562140a52ad14465f81d7a1ebc5eb74e3e5ef22126dfc25046c25ad5a09a67754161aed356a99a4b034e71aec36d714199c9e37485f56',
 			),
 			expected: true,
 		},
