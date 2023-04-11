@@ -23,10 +23,7 @@ export class SECP256K1PrivateKey implements PrivateKey {
 		return new this(rand(PrivateKeyLen));
 	}
 	async sign(message: Uint8Array): Promise<Uint8Array> {
-		// sign as an ethereum personal message
-		const { hashMessage } = await import('@ethersproject/hash');
-		const messageToVerify = Uint8Array.from(Buffer.from(hashMessage(message).replace('0x', ''), 'hex'));
-		const sigObj = ecdsaSign(messageToVerify, this.bytes);
+		const sigObj = ecdsaSign(message, this.bytes);
 
 		const ret = new Uint8Array(65);
 		ret.set(sigObj.signature, 0);

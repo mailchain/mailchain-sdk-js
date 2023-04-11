@@ -1,4 +1,5 @@
 import { decodeUtf8 } from '@mailchain/encoding';
+import { hashMessage } from '@ethersproject/hash';
 import {
 	AliceUncompressedSECP256K1PublicKeyBytes,
 	AliceCompressedSECP256K1PublicKeyBytes,
@@ -158,11 +159,12 @@ describe('verify()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
+		const messageHash = Uint8Array.from(Buffer.from(hashMessage(test.message).replace('0x', ''), 'hex'));
 		if (test.shouldThrow) {
 			expect.assertions(1);
-			return test.pubKey.verify(test.message, test.sig).catch((e) => expect(e).toBeDefined());
+			return test.pubKey.verify(messageHash, test.sig).catch((e) => expect(e).toBeDefined());
 		}
-		return test.pubKey.verify(test.message, test.sig).then((actual) => {
+		return test.pubKey.verify(messageHash, test.sig).then((actual) => {
 			expect(actual).toEqual(test.expected);
 		});
 	});
@@ -220,11 +222,12 @@ describe('FromSignature', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
+		const messageHash = Uint8Array.from(Buffer.from(hashMessage(test.message).replace('0x', ''), 'hex'));
 		if (test.shouldThrow) {
 			expect.assertions(1);
-			return SECP256K1PublicKey.fromSignature(test.message, test.signature).catch((e) => expect(e).toBeDefined());
+			return SECP256K1PublicKey.fromSignature(messageHash, test.signature).catch((e) => expect(e).toBeDefined());
 		}
-		return SECP256K1PublicKey.fromSignature(test.message, test.signature).then((actual) => {
+		return SECP256K1PublicKey.fromSignature(messageHash, test.signature).then((actual) => {
 			expect(actual).toEqual(test.expected);
 		});
 	});

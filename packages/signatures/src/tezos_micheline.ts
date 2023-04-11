@@ -8,7 +8,6 @@ import {
 } from '@mailchain/crypto';
 import { encodeHex, decodeHex, decodeUtf8 } from '@mailchain/encoding';
 import { blake2AsU8a } from '@polkadot/util-crypto';
-import { ecdsaSign, ecdsaVerify } from 'secp256k1';
 
 export async function signTezosMessage(key: PrivateKey, msg: string) {
 	const messagePayload = createTezosSignedMessagePayload(msg);
@@ -22,8 +21,8 @@ export async function signTezosRaw(key: PrivateKey, payload: Uint8Array) {
 		case KindSECP256R1:
 			return key.sign(bytesHash);
 		case KindSECP256K1:
-			const sigObj = ecdsaSign(bytesHash, key.bytes);
-			return sigObj.signature;
+			const sigObj = await key.sign(bytesHash);
+			return sigObj.slice(0, 64);
 		default:
 			throw new ErrorUnsupportedKey(key.curve);
 	}
@@ -35,19 +34,10 @@ export async function verifyTezosSignedMessage(key: PublicKey, msg: string, sign
 	switch (key.curve) {
 		case KindED25519:
 		case KindSECP256R1:
-			return key.verify(bytesHash, signature);
 		case KindSECP256K1:
-			return verifySpSignature(signature, bytesHash, key.bytes);
+			return key.verify(bytesHash, signature);
 		default:
 			throw new ErrorUnsupportedKey(key.curve);
-	}
-}
-
-function verifySpSignature(signature: Uint8Array, message: Uint8Array, publicKeyBytes: Uint8Array) {
-	try {
-		return ecdsaVerify(signature, message, publicKeyBytes);
-	} catch (e) {
-		return false;
 	}
 }
 

@@ -1,4 +1,5 @@
 import { decodeUtf8 } from '@mailchain/encoding';
+import { hashMessage } from '@ethersproject/hash';
 import {
 	BobSECP256K1PublicKey,
 	AliceSECP256K1PublicKey,
@@ -77,11 +78,12 @@ describe('sign()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
+		const messageHash = Uint8Array.from(Buffer.from(hashMessage(test.message).replace('0x', ''), 'hex'));
 		if (test.shouldThrow) {
 			expect.assertions(1);
-			return test.privKey.sign(test.message).catch((e) => expect(e).toBeDefined());
+			return test.privKey.sign(messageHash).catch((e) => expect(e).toBeDefined());
 		}
-		return test.privKey.sign(test.message).then((actual) => {
+		return test.privKey.sign(messageHash).then((actual) => {
 			expect(actual).toEqual(test.expected);
 		});
 	});

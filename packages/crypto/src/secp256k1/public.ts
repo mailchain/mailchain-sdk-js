@@ -41,9 +41,7 @@ export class SECP256K1PublicKey implements PublicKey {
 		}
 
 		const { recoverPublicKey } = await import('@ethersproject/signing-key');
-		const { hashMessage } = await import('@ethersproject/hash');
-		const dataBytes = Uint8Array.from(Buffer.from(hashMessage(Buffer.from(message)).replace('0x', ''), 'hex'));
-		const recoveredKeyBytes = recoverPublicKey(dataBytes, signature);
+		const recoveredKeyBytes = recoverPublicKey(message, signature);
 
 		// TODO: this always returns a public key even if the recovered key does not match
 		// the private key it was signed with. This should not be performed without knowing the address.
@@ -58,13 +56,7 @@ export class SECP256K1PublicKey implements PublicKey {
 		if (sig.length === 65) {
 			sig = sig.slice(0, -1);
 		}
-		const { hashMessage } = await import('@ethersproject/hash');
 
-		// Verify as personal ethereum message
-		const messageToVerify = Uint8Array.from(
-			Buffer.from(hashMessage(Buffer.from(message)).replace('0x', ''), 'hex'),
-		);
-
-		return ecdsaVerify(sig, messageToVerify, this.bytes);
+		return ecdsaVerify(sig, message, this.bytes);
 	}
 }
