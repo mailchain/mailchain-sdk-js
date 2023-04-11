@@ -1,5 +1,5 @@
 import { MessagingKeys, ResolveAddressResult } from '@mailchain/internal/messagingKeys';
-import { defaultConfiguration } from '@mailchain/internal/configuration';
+import { Configuration, defaultConfiguration } from '@mailchain/internal/configuration';
 
 /**
  * Resolve the address and returns proven messaging key for an address.
@@ -14,6 +14,9 @@ import { defaultConfiguration } from '@mailchain/internal/configuration';
  * if (error != null) // handle error
  * else console.log(resolvedAddress);
  */
-export async function resolveAddress(address: string): Promise<ResolveAddressResult> {
-	return MessagingKeys.create(defaultConfiguration).resolve(address);
+export async function resolveAddress(
+	address: string,
+	config: Configuration = defaultConfiguration,
+): Promise<ResolveAddressResult> {
+	return MessagingKeys.create(config).resolve(address);
 }

@@ -44,6 +44,9 @@
 	},
 	"typesVersions": {
 		"*": {
+			"configuration": [
+				"./types/configuration.d.ts"
+			],
 			"identityKeys": [
 				"./types/identityKeys/index.d.ts"
 			],
@@ -63,6 +66,11 @@
 			"import": "./browser/index.js",
 			"require": "./node/index.js",
 			"types": "./types/index.d.ts"
+		},
+		"./configuration": {
+			"types": "./types/configuration.d.ts",
+			"import": "./browser/configuration.js",
+			"require": "./node/configuration.js"
 		},
 		"./identityKeys": {
 			"types": "./types/identityKeys/index.d.ts",
