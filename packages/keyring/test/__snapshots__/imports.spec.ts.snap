@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check imports snapshot compare imports: imports 1`] = `
+[
+  "@mailchain/keyring/functions",
+  "@mailchain/keyring/keyring",
+]
+`;

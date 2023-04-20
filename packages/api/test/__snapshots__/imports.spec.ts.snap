@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check imports snapshot compare imports: imports 1`] = `
+[
+  "@mailchain/api/api",
+  "@mailchain/api/api/api",
+  "@mailchain/api/api/base",
+  "@mailchain/api/api/common",
+  "@mailchain/api/api/configuration",
+  "@mailchain/api/helpers/apiKeyToCryptoKey",
+  "@mailchain/api/helpers/cryptoKeyToApiKey",
+  "@mailchain/api/helpers/errors",
+]
+`;

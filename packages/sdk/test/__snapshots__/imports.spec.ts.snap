@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check imports snapshot compare explicit imports: imports_explicit 1`] = `
+[
+  "@mailchain/sdk/internal/",
+]
+`;
+
+exports[`check imports snapshot compare imports: imports 1`] = `
+[
+  "@mailchain/sdk",
+]
+`;

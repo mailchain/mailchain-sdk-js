@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`check imports snapshot compare imports: imports 1`] = `
+[
+  "@mailchain/signatures/consts",
+  "@mailchain/signatures/errors",
+  "@mailchain/signatures/eth_personal",
+  "@mailchain/signatures/keyreg/params",
+  "@mailchain/signatures/keyreg/templates",
+  "@mailchain/signatures/raw_ed25519",
+  "@mailchain/signatures/tezos_micheline",
+]
+`;
