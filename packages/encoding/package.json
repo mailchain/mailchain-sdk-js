@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/encoding",
-	"version": "0.18.5",
+	"version": "0.18.6",
 	"description": "Mailchain encoding tools",
 	"license": "Apache-2.0",
 	"author": {
