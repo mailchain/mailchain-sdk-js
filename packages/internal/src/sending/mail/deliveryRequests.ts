@@ -15,7 +15,8 @@ export type SentMailDeliveryRequests = SentDeliveryRequest[];
 export type SendMailDeliveryRequestsError = SomeMailDeliveryRequestsFailedError;
 
 export class SomeMailDeliveryRequestsFailedError extends Error {
-	readonly type = 'not_all_mail_delivery_requests_sent';
+	readonly type = 'send_mail_delivery_request_failures';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#send_mail_delivery_request_failures';
 	constructor(
 		public readonly successes: Array<{
 			params: SendManyDeliveryRequestsParams;

@@ -18,8 +18,8 @@ import { Configuration } from '../configuration';
 import { MailchainResult, partitionMailchainResults } from '../';
 import {
 	MessagingKeyContactError,
-	NameserviceAddressNotFoundError,
-	NameserviceAddressUnresolvableError,
+	IdentityNotFoundError,
+	AddressInvalidError,
 	UnexpectedMailchainError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
@@ -54,8 +54,8 @@ export type ResolveAddressError =
 	| ProtocolNotSupportedError
 	| MessagingKeyContactError
 	| MessagingKeyVerificationError
-	| NameserviceAddressNotFoundError
-	| NameserviceAddressUnresolvableError
+	| IdentityNotFoundError
+	| AddressInvalidError
 	| UnexpectedMailchainError;
 export type ResolveAddressResult = MailchainResult<ResolvedAddress, ResolveAddressError>;
 
@@ -64,7 +64,8 @@ export type ResolvedManyAddressesResult = MailchainResult<ResolvedManyAddresses>
 export type ResolveManyAddressesError = SomeAddressesUnresolvableError;
 
 export class SomeAddressesUnresolvableError extends Error {
-	readonly type = 'not_all_addresses_resolved';
+	readonly type = 'resolve_addresses_failures';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#resolve_addresses_failures';
 	constructor(
 		public readonly successes: Array<{ params: string; data: ResolvedAddress }>,
 		public readonly failures: Array<{ params: string; error: ResolveAddressError }>,
@@ -160,10 +161,7 @@ export class MessagingKeys {
 	): Promise<
 		MailchainResult<
 			GetAddressMessagingKeyResponseBody,
-			| ProtocolNotSupportedError
-			| UnexpectedMailchainError
-			| NameserviceAddressNotFoundError
-			| NameserviceAddressUnresolvableError
+			ProtocolNotSupportedError | UnexpectedMailchainError | IdentityNotFoundError | AddressInvalidError
 		>
 	> {
 		try {
@@ -180,11 +178,11 @@ export class MessagingKeys {
 				switch (e.response?.status) {
 					case 404:
 						return {
-							error: new NameserviceAddressNotFoundError(),
+							error: new IdentityNotFoundError(),
 						};
 					case 422:
 						return {
-							error: new NameserviceAddressUnresolvableError(),
+							error: new AddressInvalidError(),
 						};
 				}
 			}

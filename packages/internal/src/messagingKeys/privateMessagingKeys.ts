@@ -1,6 +1,6 @@
 import { PrivateKey } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
-import { MessagingKeyVerificationError } from '@mailchain/signatures';
+import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
 import isEqual from 'lodash/isEqual';
 import { MailchainResult } from '..';
 import { Configuration } from '../configuration';
@@ -11,7 +11,7 @@ import { MessagingKeyNotRegisteredError } from './errors';
 export type GetExportablePrivateMessagingKeyError =
 	| ResolveAddressError
 	| GetMessagingKeyLatestNonceError
-	| MessagingKeyVerificationError
+	| SenderMessagingKeyIncorrect
 	| MessagingKeyNotRegisteredError;
 
 export class PrivateMessagingKeys {
@@ -49,7 +49,7 @@ export class PrivateMessagingKeys {
 		);
 
 		if (!isEqual(privateMessagingKey.publicKey, resolvedAddress.messagingKey)) {
-			return { error: new MessagingKeyVerificationError() };
+			return { error: new SenderMessagingKeyIncorrect() };
 		}
 
 		return { data: privateMessagingKey };

@@ -10,7 +10,7 @@ import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors'
 import { UnexpectedMailchainError } from './errors';
 
 export type GetMessagingKeyLatestNonceResult = MailchainResult<number, GetMessagingKeyLatestNonceError>;
-export type GetMessagingKeyLatestNonceError = UnexpectedMailchainError | ProtocolNotSupportedError;
+export type GetMessagingKeyLatestNonceError = ProtocolNotSupportedError | UnexpectedMailchainError;
 
 export class AddressNonce {
 	constructor(

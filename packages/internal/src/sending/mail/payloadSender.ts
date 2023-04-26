@@ -5,7 +5,8 @@ import { PayloadSender, SentPayload } from '../payload/send';
 import { MailDistribution } from '../../transport/mail/distribution';
 
 export class SomePrepareDistributionError extends Error {
-	readonly type = 'not_all_distribution_prepared';
+	readonly type = 'prepare_distributions_failures';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#prepare_distributions_failures';
 	constructor(
 		public readonly successes: Array<{
 			params: PrepareDistributionParams;
