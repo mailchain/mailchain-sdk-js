@@ -4,9 +4,9 @@ import { ResolvedAddress } from '../../messagingKeys';
 import { MailDistribution } from '../../transport';
 import { SentDeliveryRequest } from '../deliveryRequests';
 import { MailPayloadSender, PrepareDistributionsError } from './payloadSender';
-import { MailDeliveryRequests, SomeMailDeliveryRequestsFailedError } from './deliveryRequests';
+import { MailDeliveryRequests, SendMailDeliveryRequestsFailuresError } from './deliveryRequests';
 
-export type DistributeMailError = PrepareDistributionsError | SomeMailDeliveryRequestsFailedError;
+export type DistributeMailError = PrepareDistributionsError | SendMailDeliveryRequestsFailuresError;
 
 export type DistributeMailParams = {
 	distributions: MailDistribution[];

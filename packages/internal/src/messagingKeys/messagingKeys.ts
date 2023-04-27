@@ -21,6 +21,7 @@ import {
 	IdentityNotFoundError,
 	AddressInvalidError,
 	UnexpectedMailchainError,
+	IdentityProviderUnsupportedError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -51,19 +52,20 @@ export type VendedResolvedAddress = BaseResolvedAddress & {
  */
 export type ResolvedAddress = RegisteredResolvedAddress | VendedResolvedAddress;
 export type ResolveAddressError =
-	| ProtocolNotSupportedError
+	| UnexpectedMailchainError
+	| IdentityNotFoundError
+	| IdentityProviderUnsupportedError
 	| MessagingKeyContactError
 	| MessagingKeyVerificationError
-	| IdentityNotFoundError
-	| AddressInvalidError
-	| UnexpectedMailchainError;
+	| ProtocolNotSupportedError
+	| AddressInvalidError;
 export type ResolveAddressResult = MailchainResult<ResolvedAddress, ResolveAddressError>;
 
 export type ResolvedManyAddresses = Map<string, ResolvedAddress>;
 export type ResolvedManyAddressesResult = MailchainResult<ResolvedManyAddresses>;
-export type ResolveManyAddressesError = SomeAddressesUnresolvableError;
+export type ResolveManyAddressesError = ResoleAddressesFailuresError;
 
-export class SomeAddressesUnresolvableError extends Error {
+export class ResoleAddressesFailuresError extends Error {
 	readonly type = 'resolve_addresses_failures';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#resolve_addresses_failures';
 	constructor(
@@ -128,7 +130,7 @@ export class MessagingKeys {
 		const { failures, successes } = partitionMailchainResults(resolvedAddresses);
 
 		if (failures.length > 0) {
-			return { error: new SomeAddressesUnresolvableError(successes, failures) };
+			return { error: new ResoleAddressesFailuresError(successes, failures) };
 		}
 
 		return {
@@ -161,7 +163,11 @@ export class MessagingKeys {
 	): Promise<
 		MailchainResult<
 			GetAddressMessagingKeyResponseBody,
-			ProtocolNotSupportedError | UnexpectedMailchainError | IdentityNotFoundError | AddressInvalidError
+			| AddressInvalidError
+			| IdentityNotFoundError
+			| IdentityProviderUnsupportedError
+			| ProtocolNotSupportedError
+			| UnexpectedMailchainError
 		>
 	> {
 		try {
@@ -175,14 +181,20 @@ export class MessagingKeys {
 			return { data };
 		} catch (e) {
 			if (isAxiosError(e)) {
-				switch (e.response?.status) {
-					case 404:
+				switch (e.response?.data?.code) {
+					case 'identity_provider_unsupported':
+						return {
+							error: new IdentityProviderUnsupportedError(),
+						};
+					case 'identity_not_found':
 						return {
 							error: new IdentityNotFoundError(),
 						};
-					case 422:
+					case 'address_invalid':
+					case 'identity_address_invalid':
+					case 'tld_unknown':
 						return {
-							error: new AddressInvalidError(),
+							error: new AddressInvalidError(new Error(e.response?.data?.message)),
 						};
 				}
 			}

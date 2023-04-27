@@ -4,7 +4,7 @@ import { Configuration, MailchainResult, partitionMailchainResults } from '../..
 import { PayloadSender, SentPayload } from '../payload/send';
 import { MailDistribution } from '../../transport/mail/distribution';
 
-export class SomePrepareDistributionError extends Error {
+export class PrepareDistributionsFailuresError extends Error {
 	readonly type = 'prepare_distributions_failures';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#prepare_distributions_failures';
 	constructor(
@@ -21,12 +21,12 @@ export class SomePrepareDistributionError extends Error {
 	}
 }
 
-export type PrepareDistributionsError = SomePrepareDistributionError;
+export type PrepareDistributionsError = PrepareDistributionsFailuresError;
 
 export class PayloadSendingError extends Error {
 	readonly type = 'payload_sending_error';
-	constructor(readonly distribution: MailDistribution, readonly cause: Error) {
-		super('Payload could not be sent.');
+	constructor(readonly distribution: MailDistribution, cause: Error) {
+		super('Payload could not be sent.', { cause });
 	}
 }
 
@@ -65,7 +65,7 @@ export class MailPayloadSender {
 
 		if (failures.length > 0) {
 			return {
-				error: new SomePrepareDistributionError(successes, failures),
+				error: new PrepareDistributionsFailuresError(successes, failures),
 			};
 		}
 

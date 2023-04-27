@@ -35,7 +35,9 @@ export class IdentityKeys {
 			}))
 			.catch((e) => {
 				if (Axios.isAxiosError(e)) {
-					if (e.response?.data?.message === 'address not found') {
+					if (e.response?.data.code === 'identity_not_found') {
+						return null;
+					} else if (e.response?.status === 404) {
 						return null;
 					}
 				}

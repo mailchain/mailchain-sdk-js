@@ -1,7 +1,7 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
 import { Configuration, MailchainResult } from '../../';
-import { MessagingKeys, ResolvedAddress, SomeAddressesUnresolvableError } from '../../messagingKeys';
+import { MessagingKeys, ResolvedAddress, ResoleAddressesFailuresError } from '../../messagingKeys';
 import { MailDistribution, MailData, Payload, MailSenderVerifier } from '../../transport';
 import { PreflightCheckError } from '../errors';
 import { createMailPayloads } from './payloads';
@@ -17,7 +17,7 @@ export type PreparedMail = {
 	resolvedAddresses: Map<string, ResolvedAddress>;
 };
 
-export type PrepareMailError = PreflightCheckError | SenderMessagingKeyIncorrect | SomeAddressesUnresolvableError;
+export type PrepareMailError = PreflightCheckError | SenderMessagingKeyIncorrect | ResoleAddressesFailuresError;
 
 export class MailPreparer {
 	constructor(

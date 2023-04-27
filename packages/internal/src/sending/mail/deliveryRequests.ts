@@ -12,9 +12,9 @@ import { ResolvedAddress } from '../../messagingKeys';
 import { PreparedDistribution } from './payloadSender';
 
 export type SentMailDeliveryRequests = SentDeliveryRequest[];
-export type SendMailDeliveryRequestsError = SomeMailDeliveryRequestsFailedError;
+export type SendMailDeliveryRequestsError = SendMailDeliveryRequestsFailuresError;
 
-export class SomeMailDeliveryRequestsFailedError extends Error {
+export class SendMailDeliveryRequestsFailuresError extends Error {
 	readonly type = 'send_mail_delivery_request_failures';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#send_mail_delivery_request_failures';
 	constructor(
@@ -74,7 +74,7 @@ export class MailDeliveryRequests {
 
 		const { successes: successfulDeliveries, failures: failed } = partitionMailchainResults(sendResults);
 		if (failed.length > 0) {
-			return { error: new SomeMailDeliveryRequestsFailedError(successfulDeliveries, failed) };
+			return { error: new SendMailDeliveryRequestsFailuresError(successfulDeliveries, failed) };
 		}
 
 		return {
