@@ -7,7 +7,7 @@ import {
 	KindSECP256R1,
 } from '@mailchain/crypto';
 import { encodeHex, decodeHex, decodeUtf8 } from '@mailchain/encoding';
-import { blake2AsU8a } from '@polkadot/util-crypto';
+import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
 
 export async function signTezosMessage(key: PrivateKey, msg: string) {
 	const messagePayload = createTezosSignedMessagePayload(msg);

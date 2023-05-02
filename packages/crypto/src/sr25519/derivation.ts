@@ -1,4 +1,5 @@
-import { cryptoWaitReady, sr25519DeriveHard } from '@polkadot/util-crypto';
+import { cryptoWaitReady } from '@polkadot/util-crypto/crypto';
+import { sr25519DeriveHard } from '@polkadot/util-crypto/sr25519';
 import { chainCodeFromDeriveIndex } from '../hd';
 import { asSR25519PrivateKey, SR25519PrivateKey } from './private';
 import { SR25519ExtendedPrivateKey } from './hd';

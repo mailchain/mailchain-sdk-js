@@ -1,17 +1,10 @@
-import {
-	BN,
-	bnToU8a,
-	compactAddLength,
-	hexToU8a,
-	isBigInt,
-	isBn,
-	isHex,
-	isNumber,
-	isString,
-	stringToU8a,
-} from '@polkadot/util';
+import { stringToU8a } from '@polkadot/util/string';
+import { hexToU8a } from '@polkadot/util/hex';
+import { compactAddLength } from '@polkadot/util/compact';
+import { BN, bnToU8a } from '@polkadot/util/bn';
+import { isBigInt, isBn, isHex, isNumber, isString } from '@polkadot/util/is';
 import { BN_LE_256_OPTS } from '@polkadot/util-crypto/bn';
-import { blake2AsU8a } from '@polkadot/util-crypto';
+import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
 import { PrivateKey } from '.';
 
 const CHAIN_CODE_LEN = 32;

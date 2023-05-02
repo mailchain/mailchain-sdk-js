@@ -1,6 +1,6 @@
 import { KindED25519, KindSECP256K1, KindSECP256R1, PublicKey } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
-import { blake2AsU8a } from '@polkadot/util-crypto';
+import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
 import { prefix } from './const';
 
 /**

@@ -1,5 +1,5 @@
 import { isAnyHex } from '@mailchain/encoding';
-import { isBase58 } from '@polkadot/util-crypto';
+import { isBase58 } from '@polkadot/util-crypto/base58';
 import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
 import { parseWalletAddress } from './parseWalletAddress';
 import { ETHEREUM, NEAR } from './protocols';

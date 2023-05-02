@@ -1,5 +1,6 @@
-import { sr25519Sign, sr25519PairFromSeed, cryptoWaitReady } from '@polkadot/util-crypto';
+import { sr25519Sign, sr25519PairFromSeed } from '@polkadot/util-crypto/sr25519';
 import { Keypair } from '@polkadot/util-crypto/types';
+import { cryptoWaitReady } from '@polkadot/util-crypto/crypto';
 import { RandomFunction, secureRandom } from '../rand';
 import { PrivateKey } from '../private';
 import { PublicKey } from '../public';

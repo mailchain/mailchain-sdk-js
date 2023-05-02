@@ -1,5 +1,5 @@
-import { convertSecretKeyToCurve25519, convertPublicKeyToCurve25519 } from '@polkadot/util-crypto';
 import { scalarMult } from 'tweetnacl';
+import { convertPublicKeyToCurve25519, convertSecretKeyToCurve25519 } from '@polkadot/util-crypto/ed25519';
 import { KeyExchange } from '../';
 import { RandomFunction, secureRandom } from '../../rand';
 import { PublicKey } from '../../public';

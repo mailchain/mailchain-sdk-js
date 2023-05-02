@@ -1,4 +1,5 @@
-import { cryptoWaitReady, sr25519Agreement } from '@polkadot/util-crypto';
+import { sr25519Agreement } from '@polkadot/util-crypto/sr25519';
+import { cryptoWaitReady } from '@polkadot/util-crypto/crypto';
 import { KeyExchange } from '../';
 import { RandomFunction, secureRandom } from '../../rand';
 import { PublicKey } from '../../public';

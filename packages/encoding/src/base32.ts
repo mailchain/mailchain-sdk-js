@@ -1,4 +1,4 @@
-import { base32Decode, base32Encode } from '@polkadot/util-crypto';
+import { base32Decode, base32Encode } from '@polkadot/util-crypto/base32';
 
 export function decodeBase32(input: string): Uint8Array {
 	return base32Decode(input);

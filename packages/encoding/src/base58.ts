@@ -1,4 +1,4 @@
-import { base58Decode, base58Encode } from '@polkadot/util-crypto';
+import { base58Decode, base58Encode } from '@polkadot/util-crypto/base58';
 
 export function decodeBase58(input: string): Uint8Array {
 	return base58Decode(input);

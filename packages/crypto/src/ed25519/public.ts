@@ -1,4 +1,4 @@
-import { ed25519Verify } from '@polkadot/util-crypto';
+import { ed25519Verify } from '@polkadot/util-crypto/ed25519';
 import { KindED25519 } from '../keys';
 import { PublicKey } from '../public';
 

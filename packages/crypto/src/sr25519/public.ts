@@ -1,4 +1,5 @@
-import { cryptoWaitReady, sr25519Verify } from '@polkadot/util-crypto';
+import { sr25519Verify } from '@polkadot/util-crypto/sr25519';
+import { cryptoWaitReady } from '@polkadot/util-crypto/crypto';
 import { PublicKey } from '../public';
 import { KindSR25519 } from '../keys';
 

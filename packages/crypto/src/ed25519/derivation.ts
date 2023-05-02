@@ -1,4 +1,4 @@
-import { ed25519DeriveHard } from '@polkadot/util-crypto';
+import { ed25519DeriveHard } from '@polkadot/util-crypto/ed25519';
 import { chainCodeFromDeriveIndex, ExtendedPrivateKey } from '../hd';
 import { asED25519PrivateKey, ED25519PrivateKey } from './private';
 import { ED25519ExtendedPrivateKey } from './hd';

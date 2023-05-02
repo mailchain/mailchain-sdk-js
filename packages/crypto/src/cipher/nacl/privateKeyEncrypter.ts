@@ -1,4 +1,4 @@
-import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto';
+import { convertSecretKeyToCurve25519 } from '@polkadot/util-crypto/ed25519';
 import { idFromPrivateKey } from '../../multikey/ids';
 import { EncryptedContent, Encrypter } from '../cipher';
 import { RandomFunction, secureRandom } from '../../rand';

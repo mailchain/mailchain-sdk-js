@@ -1,4 +1,4 @@
-import { ed25519Sign, ed25519PairFromSeed, ed25519PairFromSecret } from '@polkadot/util-crypto';
+import { ed25519Sign, ed25519PairFromSeed, ed25519PairFromSecret } from '@polkadot/util-crypto/ed25519';
 import { Keypair } from '@polkadot/util-crypto/types';
 import { KindED25519 } from '../keys';
 import { toSeed } from '../mnemonic/mnemonic';

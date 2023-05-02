@@ -1,5 +1,5 @@
 import { decodeUtf8 } from '@mailchain/encoding';
-import { blake2AsU8a } from '@polkadot/util-crypto';
+import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
 import {
 	BobSECP256R1PrivateKeyBytes,
 	CarlosSECP256R1PrivateKeyBytes,
