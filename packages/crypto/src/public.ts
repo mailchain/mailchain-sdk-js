@@ -9,3 +9,12 @@ export interface PublicKey {
 export function isPublicKeyEqual(a: PublicKey, b: PublicKey): boolean {
 	return isEqual(a.bytes, b.bytes) && a.curve === b.curve;
 }
+
+export function isPublicKey(x: any): x is PublicKey {
+	if (typeof x !== 'object') return false;
+	if (!(x.bytes instanceof Uint8Array)) return false;
+	if (!(x.verify instanceof Function)) return false;
+	if (typeof x.curve !== 'string') return false;
+
+	return true;
+}
