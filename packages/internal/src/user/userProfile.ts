@@ -41,7 +41,9 @@ import { Alias, UserMailbox } from './types';
 import { createMailboxAlias } from './createAlias';
 import { consolidateMailbox } from './consolidateMailbox';
 
-export type UserSettings = { [key: string]: Setting | undefined };
+export type UserSettings = {
+	[key: string]: Setting | undefined;
+};
 
 export class UserNotFoundError extends Error {
 	constructor() {
