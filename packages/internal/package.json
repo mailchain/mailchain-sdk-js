@@ -1,6 +1,6 @@
 {
 	"name": "@mailchain/internal",
-	"version": "0.18.6",
+	"version": "0.19.1",
 	"description": "Mailchain internal library",
 	"license": "Apache-2.0",
 	"author": {
@@ -17,13 +17,13 @@
 		"url": "https://github.com/mailchain/mailchain-sdk-js/issues"
 	},
 	"dependencies": {
-		"@mailchain/addressing": "0.18.6",
-		"@mailchain/api": "0.18.6",
-		"@mailchain/crypto": "0.18.6",
-		"@mailchain/encoding": "0.18.6",
-		"@mailchain/keyring": "0.18.6",
-		"@mailchain/message-composer": "0.18.6",
-		"@mailchain/signatures": "0.18.6",
+		"@mailchain/addressing": "0.19.1",
+		"@mailchain/api": "0.19.1",
+		"@mailchain/crypto": "0.19.1",
+		"@mailchain/encoding": "0.19.1",
+		"@mailchain/keyring": "0.19.1",
+		"@mailchain/message-composer": "0.19.1",
+		"@mailchain/signatures": "0.19.1",
 		"@noble/hashes": "^1.3.0",
 		"axios": "1.3.4",
 		"canonicalize": "^1.0.8",
