@@ -1,5 +1,6 @@
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
 import {
+	createNameServiceAddress,
 	createWalletAddress,
 	decodeAddressByProtocol,
 	encodeAddressByProtocol,

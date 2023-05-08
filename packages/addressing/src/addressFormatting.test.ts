@@ -1,8 +1,12 @@
-import { ALGORAND, ETHEREUM, MAILCHAIN, SUBSTRATE } from './protocols';
+import { ALGORAND, ETHEREUM, SUBSTRATE } from './protocols';
 import { formatAddress } from './addressFormatting';
 import { createNameServiceAddress, createWalletAddress, MailchainAddress } from '.';
 
-const testCases: { address: MailchainAddress; expectedMail: string; expectedHuman: string }[] = [
+const testCases: {
+	address: MailchainAddress;
+	expectedMail: string;
+	expectedHuman: string;
+}[] = [
 	{
 		address: createWalletAddress('0x492d61cD88255EbC8556c6393AFA3f3ac2B0505E', ETHEREUM, 'mailchain.local'),
 		expectedMail: '0x492d61cd88255ebc8556c6393afa3f3ac2b0505e@ethereum.mailchain.local',
