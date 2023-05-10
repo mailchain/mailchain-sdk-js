@@ -309,7 +309,7 @@ describe('generate', () => {
 		},
 		{
 			name: 'errors with invalid rando',
-			rand: (num?: number): Uint8Array => {
+			rand: (): Uint8Array => {
 				return new Uint8Array([0]);
 			},
 			expected: null,

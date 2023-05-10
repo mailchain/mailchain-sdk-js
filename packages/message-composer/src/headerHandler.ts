@@ -94,7 +94,7 @@ export async function exportStringHeader(header: StringHeader, ctx: MessageCompo
  *
  * Example: Wed, 17 Aug 2022 10:01:56 +0000
  */
-export async function exportDateHeader(header: DateHeader, ctx: MessageComposerContext): Promise<string> {
+export async function exportDateHeader(header: DateHeader, _ctx: MessageComposerContext): Promise<string> {
 	return formatDate(header.value, 'EEE, dd MMM yyyy HH:mm:ss xxxx', { locale: enUS });
 }
 
@@ -108,18 +108,18 @@ export async function exportDateHeader(header: DateHeader, ctx: MessageComposerC
  * "Bob Lastname" <bob@mailchain.com>
  * ```
  */
-export async function exportAddressHeader(header: AddressHeader, ctx: MessageComposerContext): Promise<string> {
+export async function exportAddressHeader(header: AddressHeader, _ctx: MessageComposerContext): Promise<string> {
 	// TODO: Check for other ASCII characters that need to be escaped
 	// TODO: Check for non ASCII characters (base64 encode)
 	// TODO: check for length (going optimistically for now, splitting on each recipient)
 	return header.value
 		.map((r) => {
-			return Boolean(r.name?.length) ? `"${r.name}" <${r.address}>` : `<${r.address}>`;
+			return r.name?.length ? `"${r.name}" <${r.address}>` : `<${r.address}>`;
 		})
 		.join(`,${CRLF}${HTAB}`);
 }
 
-export async function exportMessageIdHeader(header: MessageIdsHeader, ctx: MessageComposerContext): Promise<string> {
+export async function exportMessageIdHeader(header: MessageIdsHeader, _ctx: MessageComposerContext): Promise<string> {
 	return header.value.ids
 		.map((id) => (id.startsWith('<') && id.endsWith('>') ? id : `<${id}>`))
 		.join(`${CRLF}${HTAB}`);

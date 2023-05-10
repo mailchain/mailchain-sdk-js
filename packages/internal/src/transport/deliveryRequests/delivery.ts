@@ -15,7 +15,7 @@ export async function createDelivery(
 		envelope: await createEnvelope(recipientMessagingKey, messageRootEncryptionKey, messageURI, rand),
 	} as protocol.IDelivery;
 
-	var errMsg = protocol.Delivery.verify(payload);
+	const errMsg = protocol.Delivery.verify(payload);
 	if (errMsg) throw Error(errMsg);
 
 	return protocol.Delivery.create(payload);

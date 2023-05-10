@@ -73,7 +73,7 @@ describe('MailchainMessageComposer UTF8', () => {
 
 		writeFileSync(`${__dirname}/__tests__/mail_with_attachment-sender.eml`, res.forSender);
 		writeFileSync(`${__dirname}/__tests__/mail_with_attachment-visible-recipients.eml`, res.forVisibleRecipients);
-		res.forBlindedRecipients.forEach((value, index) => {
+		res.forBlindedRecipients.forEach((value) => {
 			writeFileSync(`${__dirname}/__tests__/mail_with_attachment-${value[0].address}.eml`, value[1]);
 		});
 

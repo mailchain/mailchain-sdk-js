@@ -14,7 +14,7 @@ export class UnknownPrivateKey implements PrivateKey {
 		this.publicKey = new UnknownPublicKey();
 	}
 
-	async sign(message: Uint8Array): Promise<Uint8Array> {
+	async sign(_message: Uint8Array): Promise<Uint8Array> {
 		return new Uint8Array();
 	}
 }

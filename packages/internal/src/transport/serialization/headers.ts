@@ -5,9 +5,9 @@ export interface SerializablePayloadHeaders {
 	ToBuffer(): Buffer;
 }
 
-export function parseHeaderElements(input: string, requiredKeys: string[]): Map<String, String> {
+export function parseHeaderElements(input: string, requiredKeys: string[]): Map<string, string> {
 	const invalidAttributes: string[] = [];
-	const attributes = new Map<String, String>();
+	const attributes = new Map<string, string>();
 	input.split(';').forEach((item) => {
 		const parts = item.split('=', 2);
 		if (parts.length !== 2) {

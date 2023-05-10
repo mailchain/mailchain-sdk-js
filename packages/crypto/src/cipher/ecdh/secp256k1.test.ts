@@ -44,7 +44,7 @@ describe('shared-secret', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = new SECP256K1KeyExchange((num?: number): Uint8Array => {
+		const target = new SECP256K1KeyExchange((): Uint8Array => {
 			return new Uint8Array([]);
 		});
 		if (test.shouldThrow) {

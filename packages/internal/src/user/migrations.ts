@@ -48,7 +48,7 @@ export function createV2IdentityKey(
 	};
 }
 
-export function createV3LabelMigration(mailchainAddressDomain: string): UserMailboxMigrationRule {
+export function createV3LabelMigration(_mailchainAddressDomain: string): UserMailboxMigrationRule {
 	return {
 		shouldApply: (data) => Promise.resolve(data.version === 2),
 		apply: (data) =>

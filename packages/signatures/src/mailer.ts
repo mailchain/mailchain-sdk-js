@@ -55,7 +55,7 @@ export async function createMailerProof(
 	};
 }
 
-export async function verifyMailerProof(author: PublicKey, mailerProof: MailerProof): Promise<Boolean> {
+export async function verifyMailerProof(author: PublicKey, mailerProof: MailerProof): Promise<boolean> {
 	return verifyRawEd25519(
 		author,
 		Buffer.from(createMailerProofSigningData(mailerProof.params, mailerProof.version)),

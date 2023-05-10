@@ -44,7 +44,7 @@ describe('shared-secret', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = new ED25519KeyExchange((num?: number): Uint8Array => {
+		const target = new ED25519KeyExchange((): Uint8Array => {
 			return new Uint8Array([]);
 		});
 		if (test.shouldThrow) {

@@ -81,7 +81,7 @@ describe('shared-secret', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const target = new SR25519KeyExchange((num?: number): Uint8Array => {
+		const target = new SR25519KeyExchange((): Uint8Array => {
 			return new Uint8Array([]);
 		});
 		if (test.shouldThrow) {
@@ -97,7 +97,7 @@ describe('shared-secret', () => {
 describe('shared-secret-wasm-compatibility', () => {
 	// test cases from https://github.com/polkadot-js/wasm/blob/master/packages/wasm-crypto/src/rs/sr25519.rs#L306
 	it('key-agreement', async () => {
-		const target = new SR25519KeyExchange((num?: number): Uint8Array => {
+		const target = new SR25519KeyExchange((): Uint8Array => {
 			return new Uint8Array([]);
 		});
 
@@ -117,7 +117,7 @@ describe('shared-secret-wasm-compatibility', () => {
 	});
 
 	it('key-agreement-random-keys', async () => {
-		const target = new SR25519KeyExchange((num?: number): Uint8Array => {
+		const target = new SR25519KeyExchange((): Uint8Array => {
 			return new Uint8Array([]);
 		});
 

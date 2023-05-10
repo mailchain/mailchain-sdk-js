@@ -3,7 +3,6 @@ import {
 	PrivateKey,
 	Encrypter,
 	Decrypter,
-	ED25519KeyExchange,
 	PrivateKeyDecrypter,
 	SignerWithPublicKey,
 	PrivateKeyEncrypter,

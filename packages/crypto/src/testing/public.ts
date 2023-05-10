@@ -8,7 +8,7 @@ export class UnknownPublicKey implements PublicKey {
 		this.bytes = new Uint8Array();
 	}
 
-	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
+	async verify(_message: Uint8Array, _sig: Uint8Array): Promise<boolean> {
 		return false;
 	}
 }

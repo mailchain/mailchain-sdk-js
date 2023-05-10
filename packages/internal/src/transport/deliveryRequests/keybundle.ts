@@ -18,7 +18,7 @@ export async function createECDHKeyBundle(
 		publicEphemeralKey: publicKeyToBytes(ephemeralKey.publicKey),
 	} as protocol.IECDHKeyBundle;
 
-	var errMsg = protocol.ECDHKeyBundle.verify(payload);
+	const errMsg = protocol.ECDHKeyBundle.verify(payload);
 	if (errMsg) {
 		throw Error(errMsg);
 	}

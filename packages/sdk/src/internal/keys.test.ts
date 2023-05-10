@@ -1,7 +1,7 @@
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { AliceSR25519PrivateKey, AliceSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
 import { AliceSECP256K1PrivateKey, AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSECP256R1PrivateKey, AliceSECP256R1PublicKey } from '@mailchain/crypto/secp256r1/test.const';
+import { AliceSECP256R1PublicKey } from '@mailchain/crypto/secp256r1/test.const';
 import {
 	privateMessagingKeyFromHex,
 	privateMessagingKeyToHex,

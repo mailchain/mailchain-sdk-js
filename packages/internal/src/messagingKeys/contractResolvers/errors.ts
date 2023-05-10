@@ -5,7 +5,7 @@ export class MessagingKeyNotFoundInContractError extends Error {
 }
 
 export class InvalidContractResponseError extends Error {
-	constructor(problem: string) {
-		super(`Messaging key contract returned invalid response.`);
+	constructor(public readonly problem: string) {
+		super(`Messaging key contract returned invalid response. ${problem}}`);
 	}
 }

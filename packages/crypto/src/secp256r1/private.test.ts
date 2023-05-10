@@ -16,7 +16,7 @@ import {
 } from './test.const';
 import { SECP256R1PrivateKey, SECP256R1PublicKey } from './';
 
-function random(num?: number) {
+function random() {
 	return new Uint8Array([
 		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
 		30, 31,
@@ -62,12 +62,7 @@ describe('sign()', () => {
 			name: 'BobSECP256R1 sign',
 			privKey: BobSECP256R1PrivateKeyBytes,
 			message: decodeUtf8('hello from mailchain'),
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array([
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-					27, 28, 29, 30, 31,
-				]);
-			},
+			rand: random,
 			expected: Uint8Array.from(
 				Buffer.from(
 					'5d6cfcb93b7c3698341ef963205604f7b7ad0f9a6f52ea84c02ef494c27eaba54309e81f44f45907de0a7711994a17b8d21e69d2d2c3a040eac6e0e203fa7fad',
@@ -80,12 +75,7 @@ describe('sign()', () => {
 			name: 'CarlosSECP256R1 sign',
 			privKey: CarlosSECP256R1PrivateKeyBytes,
 			message: decodeUtf8('hello from mailchain'),
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array([
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-					27, 28, 29, 30, 31,
-				]);
-			},
+			rand: random,
 			expected: Uint8Array.from(
 				Buffer.from(
 					'5dc9a3c61e34a77ce1ced6ef6114856eab46685824acbe3fdc5e0f502eb61ffb28d62a8cdc326374de6beb29da4d79f62f148af4d5f5fa24e81e82e812e05294',
@@ -98,12 +88,7 @@ describe('sign()', () => {
 			name: 'AliceSECP256R1 sign',
 			privKey: AliceSECP256R1PrivateKeyBytes,
 			message: decodeUtf8('hello from mailchain'),
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array([
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-					27, 28, 29, 30, 31,
-				]);
-			},
+			rand: random,
 			expected: Uint8Array.from(
 				Buffer.from(
 					'164bcbb84304919a34d47683e4699a3dbb61f5ab6b3761c71437707e5fe062c27b166185d1d220ff825342c9f2ac4ef1ce7b710c0e58fbf815f136f9381d9610',
@@ -116,12 +101,7 @@ describe('sign()', () => {
 			name: 'CarolSECP256R1 sign',
 			privKey: CarolSECP256R1PrivateKeyBytes,
 			message: decodeUtf8('hello from mailchain'),
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array([
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-					27, 28, 29, 30, 31,
-				]);
-			},
+			rand: random,
 			expected: Uint8Array.from(
 				Buffer.from(
 					'fd4706acf02006624442741d1e469dd674732a928b777c637f6fd4f930668b502883c3c20f26c1c38972aad3b3fe11a69eb48ab31d3aef70468f865e3bfad7dd',
@@ -190,7 +170,7 @@ describe('generate', () => {
 		},
 		{
 			name: 'err returned',
-			rand: (num?: number): Uint8Array => {
+			rand: () => {
 				return new Uint8Array([0]);
 			},
 			expected: null,

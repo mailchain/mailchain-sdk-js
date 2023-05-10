@@ -35,7 +35,7 @@ export async function createEnvelope(
 		ecdhKeyBundle: keyBundle.keyBundle,
 	} as protocol.IEnvelope;
 
-	var errMsg = protocol.Envelope.verify(payload);
+	const errMsg = protocol.Envelope.verify(payload);
 	if (errMsg) throw Error(errMsg);
 
 	return protocol.Envelope.create(payload);

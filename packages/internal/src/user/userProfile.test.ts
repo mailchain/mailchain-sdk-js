@@ -4,10 +4,7 @@ import { ED25519PublicKey, publicKeyToBytes, secureRandom } from '@mailchain/cry
 import { AxiosResponse } from 'axios';
 import { formatAddress } from '@mailchain/addressing';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
-import {
-	AliceSECP256K1PublicAddressStr,
-	BobSECP256K1PublicAddressStr,
-} from '@mailchain/addressing/protocols/ethereum/test.const';
+import { AliceSECP256K1PublicAddressStr } from '@mailchain/addressing/protocols/ethereum/test.const';
 import {
 	GetUserMailboxesResponseBody,
 	GetUsernameResponseBody,
@@ -48,22 +45,6 @@ describe('userProfile', () => {
 		aliases: [
 			{
 				address: `${AliceSECP256K1PublicAddressStr.toLowerCase()}@ethereum.mailchain.test`,
-				blockSending: false,
-				blockReceiving: false,
-			},
-		],
-	});
-
-	const protoMailbox2: user.Mailbox = user.Mailbox.create({
-		address: BobWalletMailbox.messagingKeyParams.address,
-		identityKey: publicKeyToBytes(BobWalletMailbox.identityKey),
-		nonce: BobWalletMailbox.messagingKeyParams.nonce,
-		network: BobWalletMailbox.messagingKeyParams.network,
-		protocol: BobWalletMailbox.messagingKeyParams.protocol,
-		label: BobWalletMailbox.label,
-		aliases: [
-			{
-				address: `${BobSECP256K1PublicAddressStr.toLowerCase()}@ethereum.mailchain.test`,
 				blockSending: false,
 				blockReceiving: false,
 			},

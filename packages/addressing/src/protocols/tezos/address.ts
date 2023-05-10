@@ -10,7 +10,7 @@ import { prefix } from './const';
  * @throw if the provided key is on unsupported curve
  */
 export function tezosAddressFromPublicKey(publicKey: PublicKey): Uint8Array {
-	var prefixArray: Uint8Array;
+	let prefixArray: Uint8Array;
 	switch (publicKey.curve) {
 		case KindSECP256K1:
 			prefixArray = prefix.tz2;

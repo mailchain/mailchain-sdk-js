@@ -94,6 +94,7 @@ export type ParseMimeTextResult = {
 };
 
 export async function parseMimeText(content: Buffer): Promise<ParseMimeTextResult> {
+	// @ts-ignore no type def for emailjs-mime-parser
 	const parse = (await import('emailjs-mime-parser')).default;
 	const text = content.toString('utf-8');
 	const headersMap = simpleMimeHeaderParser(text);

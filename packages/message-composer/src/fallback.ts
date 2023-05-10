@@ -26,10 +26,10 @@ export async function concludeHeaders(
 
 export async function fallbackMessageId(from: Address, ctx: MessageComposerContext): Promise<MessageIdsHeader> {
 	const senderDomain = from.address.split('@')[1];
-	const idValue = await ctx.encodeBase64(ctx.random(32));
+	const idValue = await ctx.encodeBase64(await ctx.random(32));
 	return createMessageIdHeader(HEADER_LABELS.MessageId, [`${idValue}@${senderDomain}`]);
 }
 
-export async function fallbackDate(ctx: MessageComposerContext): Promise<DateHeader> {
+export async function fallbackDate(_ctx: MessageComposerContext): Promise<DateHeader> {
 	return createHeader(HEADER_LABELS.Date, new Date());
 }

@@ -1,7 +1,7 @@
 import { ProofParams } from './params';
 
 export function simpleV1enUS(encodedAddress: string, encodedMessagingPublicKey: string, nonce: number): string {
-	var lines = Array<string>(11);
+	const lines = Array<string>(11);
 
 	lines[0] = 'Welcome to Mailchain!';
 	lines[1] = '';
@@ -19,7 +19,7 @@ export function simpleV1enUS(encodedAddress: string, encodedMessagingPublicKey: 
 }
 
 export function mailchainUsername(encodedAddress: string, encodedMessagingPublicKey: string, nonce: number): string {
-	var lines = Array<string>(4);
+	const lines = Array<string>(4);
 
 	lines[0] = `Address: ${encodedAddress}`;
 	lines[1] = `Messaging key: ${encodedMessagingPublicKey}`;
@@ -29,7 +29,7 @@ export function mailchainUsername(encodedAddress: string, encodedMessagingPublic
 	return lines.join('\n').trim();
 }
 
-const templateMessageFunctions = new Map<String, ParseTemplate>([
+const templateMessageFunctions = new Map<string, ParseTemplate>([
 	['simple-v1-en', simpleV1enUS],
 	['simple-v1-en_US', simpleV1enUS],
 	['mailchain-username-en', mailchainUsername],

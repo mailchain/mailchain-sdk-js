@@ -57,7 +57,7 @@ export async function buildContentParts(
 	const builtParts = await Promise.all(parts.map((p) => buildContentPart(p, ctx)));
 	if (builtParts.length === 1 && !forceMultipart) return builtParts[0];
 
-	const boundary = (await ctx.encodeBase64(ctx.random(9))).toUpperCase();
+	const boundary = (await ctx.encodeBase64(await ctx.random(9))).toUpperCase();
 	const boundaryLine = `--${boundary}`;
 
 	const builtPartsStr = builtParts.reduce((acc, curr, i) => {

@@ -74,7 +74,7 @@ export class SerializableTransportPayloadHeaders {
 	}
 
 	static FromBuffer(buffer: Buffer): SerializableTransportPayloadHeaders {
-		const { headers, invalidHeaders } = headersMapFromBuffers(buffer, [
+		const { headers, invalidHeaders: _invalidHeaders } = headersMapFromBuffers(buffer, [
 			HEADER_CONTENT_ENCODING,
 			HEADER_CONTENT_ENCRYPTION,
 			HEADER_CONTENT_LENGTH,

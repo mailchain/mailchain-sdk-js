@@ -1,7 +1,7 @@
 import { PublicKey, Signer } from '@mailchain/crypto';
 import { signRawEd25519, verifyRawEd25519 } from './raw_ed25519';
 
-const mailchainUsernameMessage = function (message) {
+const mailchainUsernameMessage = function (message: Uint8Array) {
 	const prefix = Buffer.from(`\x11Mailchain username ownership:\n${message.length}\n`, 'utf-8');
 	return Buffer.concat([prefix, message]);
 };

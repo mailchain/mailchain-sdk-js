@@ -259,7 +259,7 @@ describe('generate', () => {
 	const tests = [
 		{
 			name: 'generate',
-			rand: (num?: number): Uint8Array => {
+			rand: () => {
 				return new Uint8Array([
 					134, 222, 215, 10, 158, 142, 84, 118, 211, 113, 114, 16, 7, 32, 133, 180, 7, 209, 180, 246, 231, 54,
 					240, 129, 195, 62, 61, 154, 18, 37, 116, 8,
@@ -295,7 +295,7 @@ describe('generate', () => {
 		},
 		{
 			name: 'err',
-			rand: (num?: number): Uint8Array => {
+			rand: (): Uint8Array => {
 				return new Uint8Array([0]);
 			},
 			expected: null,
