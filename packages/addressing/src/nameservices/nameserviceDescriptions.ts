@@ -18,6 +18,10 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		domains: ['lens'],
 	},
 	{
+		name: 'spaceid',
+		domains: ['arb', 'bnb'],
+	},
+	{
 		name: 'tezosdomains',
 		domains: ['tez'],
 	},
