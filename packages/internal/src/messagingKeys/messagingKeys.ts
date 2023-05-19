@@ -37,6 +37,8 @@ type BaseResolvedAddress = {
 	protocolAddress: string;
 };
 
+export type AddressMessagingKeyStatus = 'vended' | 'registered';
+
 export type RegisteredResolvedAddress = BaseResolvedAddress & {
 	/** Indicates the messaging key has been registered by a user. */
 	type: 'registered';
@@ -200,6 +202,19 @@ export class MessagingKeys {
 			}
 			return {
 				error: new UnexpectedMailchainError(`Failed to resolve messaging key of address ${address}`, e),
+			};
+		}
+	}
+
+	async getAddressMessagingKeyStatus(
+		address: string,
+	): Promise<MailchainResult<AddressMessagingKeyStatus, IdentityProviderUnsupportedError>> {
+		try {
+			const { data } = await this.addressApi.getAddressMessagingKeyStatus(address);
+			return { data: data.status as AddressMessagingKeyStatus };
+		} catch (e) {
+			return {
+				error: new IdentityProviderUnsupportedError(),
 			};
 		}
 	}
