@@ -22,6 +22,7 @@ import {
 	AddressInvalidError,
 	UnexpectedMailchainError,
 	IdentityProviderUnsupportedError,
+	IdentityProviderAddressUnsupportedError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -57,6 +58,7 @@ export type ResolveAddressError =
 	| UnexpectedMailchainError
 	| IdentityNotFoundError
 	| IdentityProviderUnsupportedError
+	| IdentityProviderAddressUnsupportedError
 	| MessagingKeyContactError
 	| MessagingKeyVerificationError
 	| ProtocolNotSupportedError
@@ -168,6 +170,7 @@ export class MessagingKeys {
 			| AddressInvalidError
 			| IdentityNotFoundError
 			| IdentityProviderUnsupportedError
+			| IdentityProviderAddressUnsupportedError
 			| ProtocolNotSupportedError
 			| UnexpectedMailchainError
 		>
@@ -187,6 +190,10 @@ export class MessagingKeys {
 					case 'identity_provider_unsupported':
 						return {
 							error: new IdentityProviderUnsupportedError(),
+						};
+					case 'identity_provider_address_unsupported':
+						return {
+							error: new IdentityProviderAddressUnsupportedError(),
 						};
 					case 'identity_not_found':
 						return {

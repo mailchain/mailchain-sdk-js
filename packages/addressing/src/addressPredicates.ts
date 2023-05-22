@@ -4,6 +4,8 @@ import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './na
 import { parseWalletAddress } from './parseWalletAddress';
 import { ETHEREUM, NEAR } from './protocols';
 import { Prefix } from './protocols/tezos/const';
+import { FilPrefix } from './protocols/filecoin/const';
+import { convertFilDelegatedAddressToEthAddress } from './protocols/filecoin/delegatedAddress';
 
 export function isMailchainAccountAddress(address: NameServiceAddress): boolean {
 	const isMailchainUsername = address.username.match(/(^[a-zA-Z0-9][_\-a-zA-Z0-9]{0,18}[a-zA-Z0-9])$/) != null;
@@ -36,4 +38,15 @@ export function isTezosAddress(address: MailchainAddress): boolean {
 		[Prefix.TZ1, Prefix.TZ2, Prefix.TZ3].includes(address.username.slice(0, 3) as Prefix) &&
 		isBase58(address.username.slice(3))
 	);
+}
+
+export function isFilecoinAddress(address: MailchainAddress): boolean {
+	if (
+		address.username.length > 42 &&
+		address.username.length < 49 &&
+		[FilPrefix.F4ETHEREUM, FilPrefix.T4ETHEREUM].includes(address.username.slice(0, 4) as FilPrefix)
+	) {
+		return convertFilDelegatedAddressToEthAddress(address.username).error === undefined;
+	}
+	return false;
 }

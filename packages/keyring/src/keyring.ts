@@ -129,7 +129,7 @@ export class KeyRing {
 
 	/**
 	 * Gets messaging key that can be used for signing and decrypting for a specific protocol address.
-	 * @param address protocol address e.g. 0x1234.... for ethereum
+	 * @param address protocol address e.g. 0x1234.... for ethereum.
 	 * @param protocol a {@link ProtocolType}
 	 * @param nonce in most cases you will want to use the latest nonce.
 	 * @returns

@@ -1,4 +1,13 @@
-import { ETHEREUM, MAILCHAIN, NEAR, ProtocolNotSupportedError, ProtocolType, TEZOS } from '@mailchain/addressing';
+import {
+	ETHEREUM,
+	FILECOIN,
+	MAILCHAIN,
+	NEAR,
+	ProtocolNotSupportedError,
+	ProtocolType,
+	TEZOS,
+	isBlockchainProtocolEnabled,
+} from '@mailchain/addressing';
 import axios, { AxiosInstance } from 'axios';
 import { MessagingKeysApiFactory, MessagingKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
@@ -19,12 +28,14 @@ export class AddressNonce {
 	) {}
 
 	static create(configuration: Configuration, axiosInstance: AxiosInstance = axios.create()) {
+		const mailchainKeyRegistryResolver = MailchainKeyRegContractCallResolver.create(configuration, axiosInstance);
 		return new AddressNonce(
 			MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			new Map<ProtocolType, ContractCallLatestNonce>([
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
-				[ETHEREUM, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
-				[TEZOS, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
+				[ETHEREUM, mailchainKeyRegistryResolver],
+				[TEZOS, mailchainKeyRegistryResolver],
+				[FILECOIN, mailchainKeyRegistryResolver],
 			]),
 		);
 	}
@@ -49,7 +60,7 @@ export class AddressNonce {
 			return { error: new ProtocolNotSupportedError(protocol) };
 		}
 
-		if (protocol !== ETHEREUM && protocol !== NEAR && protocol !== TEZOS) {
+		if (!isBlockchainProtocolEnabled(protocol)) {
 			return { error: new ProtocolNotSupportedError(protocol) };
 		}
 

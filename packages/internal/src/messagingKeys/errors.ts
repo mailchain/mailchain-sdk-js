@@ -29,6 +29,14 @@ export class IdentityNotFoundError extends Error {
 	}
 }
 
+export class IdentityProviderAddressUnsupportedError extends Error {
+	readonly type = 'identity_provider_address_unsupported';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#identity_provider_address_unsupported';
+	constructor() {
+		super(`Identity is not supported by the provider. Check identity provider supported addresses.`);
+	}
+}
+
 export class AddressInvalidError extends Error {
 	readonly type = 'address_invalid';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#address_invalid';

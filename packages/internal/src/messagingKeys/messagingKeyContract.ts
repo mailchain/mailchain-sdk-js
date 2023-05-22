@@ -9,7 +9,7 @@ import { ETHEREUM, NEAR, TEZOS, ProtocolType } from '@mailchain/addressing';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
-import { MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
+import { FILECOIN, MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
 import { Configuration, MailchainResult } from '../';
 import { NearContractCallResolver } from './contractResolvers/near';
 import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
@@ -27,12 +27,14 @@ export class MessagingKeyContractCall {
 	) {}
 
 	static create(configuration: Configuration, axiosInstance: AxiosInstance = axios.create()) {
+		const mailchainKeyRegistryResolver = MailchainKeyRegContractCallResolver.create(configuration, axiosInstance);
 		return new MessagingKeyContractCall(
 			new Map<ProtocolType, ContractCallMessagingKeyResolver>([
+				[ETHEREUM, mailchainKeyRegistryResolver],
+				[FILECOIN, mailchainKeyRegistryResolver],
+				[MAILCHAIN, mailchainKeyRegistryResolver],
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
-				[ETHEREUM, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
-				[TEZOS, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
-				[MAILCHAIN, MailchainKeyRegContractCallResolver.create(configuration, axiosInstance)],
+				[TEZOS, mailchainKeyRegistryResolver],
 			]),
 			MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			MessagingKeyVerifier.create(configuration),
