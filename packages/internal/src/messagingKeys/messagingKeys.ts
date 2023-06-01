@@ -23,6 +23,7 @@ import {
 	UnexpectedMailchainError,
 	IdentityProviderUnsupportedError,
 	IdentityProviderAddressUnsupportedError,
+	IdentityExpiredError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -56,6 +57,7 @@ export type VendedResolvedAddress = BaseResolvedAddress & {
 export type ResolvedAddress = RegisteredResolvedAddress | VendedResolvedAddress;
 export type ResolveAddressError =
 	| UnexpectedMailchainError
+	| IdentityExpiredError
 	| IdentityNotFoundError
 	| IdentityProviderUnsupportedError
 	| IdentityProviderAddressUnsupportedError
@@ -168,6 +170,7 @@ export class MessagingKeys {
 		MailchainResult<
 			GetAddressMessagingKeyResponseBody,
 			| AddressInvalidError
+			| IdentityExpiredError
 			| IdentityNotFoundError
 			| IdentityProviderUnsupportedError
 			| IdentityProviderAddressUnsupportedError
@@ -190,6 +193,10 @@ export class MessagingKeys {
 					case 'identity_provider_unsupported':
 						return {
 							error: new IdentityProviderUnsupportedError(),
+						};
+					case 'identity_expired':
+						return {
+							error: new IdentityExpiredError(),
 						};
 					case 'identity_provider_address_unsupported':
 						return {

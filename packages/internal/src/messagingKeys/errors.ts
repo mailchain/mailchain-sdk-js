@@ -14,6 +14,14 @@ export class UnexpectedMailchainError extends Error {
 	}
 }
 
+export class IdentityExpiredError extends Error {
+	readonly type = 'identity_expired';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#identity_expired';
+	constructor() {
+		super(`Identity has expired. Check identity provider settings.`);
+	}
+}
+
 export class IdentityProviderUnsupportedError extends Error {
 	readonly type = 'identity_provider_unsupported';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#identity_provider_unsupported';
