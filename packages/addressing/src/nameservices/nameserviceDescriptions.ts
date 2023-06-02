@@ -25,4 +25,8 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		name: 'tezosdomains',
 		domains: ['tez'],
 	},
+	{
+		name: 'avvy',
+		domains: ['avax'],
+	},
 ];
