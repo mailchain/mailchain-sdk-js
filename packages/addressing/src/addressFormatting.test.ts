@@ -120,17 +120,17 @@ const testCases: {
 	{
 		address: createNameServiceAddress('alice.avax', 'avvy.mailchain.test'),
 		expectedMail: 'alice.avax@avvy.mailchain.test',
-		expectedHuman: 'alice.avax@avvy',
+		expectedHuman: 'alice.avax',
 	},
 	{
 		address: createNameServiceAddress('alice.bnb', 'spaceid.mailchain.test'),
 		expectedMail: 'alice.bnb@spaceid.mailchain.test',
-		expectedHuman: 'alice.bnb@spaceid',
+		expectedHuman: 'alice.bnb',
 	},
 	{
 		address: createNameServiceAddress('alice.arb', 'spaceid.mailchain.test'),
 		expectedMail: 'alice.arb@spaceid.mailchain.test',
-		expectedHuman: 'alice.arb@spaceid',
+		expectedHuman: 'alice.arb',
 	},
 ];
 
