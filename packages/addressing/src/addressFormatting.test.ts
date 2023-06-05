@@ -112,6 +112,26 @@ const testCases: {
 		expectedMail: 'alice-very-long-name-alice.testnet@near.mailchain.test',
 		expectedHuman: 'alice-very-long-name-alice.testnet@near',
 	},
+	{
+		address: createNameServiceAddress('alice.tez', 'tezosdomains.mailchain.test'),
+		expectedMail: 'alice.tez@tezosdomains.mailchain.test',
+		expectedHuman: 'alice.tez',
+	},
+	{
+		address: createNameServiceAddress('alice.avax', 'avvy.mailchain.test'),
+		expectedMail: 'alice.avax@avvy.mailchain.test',
+		expectedHuman: 'alice.avax@avvy',
+	},
+	{
+		address: createNameServiceAddress('alice.bnb', 'spaceid.mailchain.test'),
+		expectedMail: 'alice.bnb@spaceid.mailchain.test',
+		expectedHuman: 'alice.bnb@spaceid',
+	},
+	{
+		address: createNameServiceAddress('alice.arb', 'spaceid.mailchain.test'),
+		expectedMail: 'alice.arb@spaceid.mailchain.test',
+		expectedHuman: 'alice.arb@spaceid',
+	},
 ];
 
 describe('addressFormatting', () => {

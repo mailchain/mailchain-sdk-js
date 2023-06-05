@@ -45,10 +45,17 @@ export class Nameservices {
 	async nameResolvesToMailbox(nsName: string, mailboxIdentityKey: PublicKey): Promise<NameServiceAddress | null> {
 		for (const nsDesc of NAMESERVICE_DESCRIPTIONS) {
 			const nsAddress = createNameServiceAddress(nsName, nsDesc.name, this.mailchainAddressDomain);
-			const addressIdentityKey = await this.identityKeysService.getAddressIdentityKey(nsAddress);
+			try {
+				const addressIdentityKey = await this.identityKeysService.getAddressIdentityKey(nsAddress);
 
-			if (addressIdentityKey != null && isPublicKeyEqual(addressIdentityKey.identityKey, mailboxIdentityKey)) {
-				return nsAddress;
+				if (
+					addressIdentityKey != null &&
+					isPublicKeyEqual(addressIdentityKey.identityKey, mailboxIdentityKey)
+				) {
+					return nsAddress;
+				}
+			} catch (e) {
+				console.log(`failed to resolve address: ${e}`);
 			}
 		}
 

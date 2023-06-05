@@ -4,7 +4,10 @@ export type NameserviceDescription = {
 };
 
 export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
-	{ name: 'ens', domains: ['cb.id', 'eth'] },
+	{
+		name: 'ens',
+		domains: ['cb.id', 'eth'],
+	},
 	{
 		name: 'unstoppable',
 		domains: ['crypto', 'wallet', 'blockchain', 'x', '888', 'nft', 'dao'],
