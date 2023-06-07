@@ -19,11 +19,12 @@ import { MailchainResult, partitionMailchainResults } from '../';
 import {
 	MessagingKeyContactError,
 	IdentityNotFoundError,
-	AddressInvalidError,
+	IdentityProviderAddressInvalidError,
 	UnexpectedMailchainError,
 	IdentityProviderUnsupportedError,
 	IdentityProviderAddressUnsupportedError,
 	IdentityExpiredError,
+	BadlyFormattedAddressError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -57,6 +58,7 @@ export type VendedResolvedAddress = BaseResolvedAddress & {
 export type ResolvedAddress = RegisteredResolvedAddress | VendedResolvedAddress;
 export type ResolveAddressError =
 	| UnexpectedMailchainError
+	| BadlyFormattedAddressError
 	| IdentityExpiredError
 	| IdentityNotFoundError
 	| IdentityProviderUnsupportedError
@@ -64,7 +66,7 @@ export type ResolveAddressError =
 	| MessagingKeyContactError
 	| MessagingKeyVerificationError
 	| ProtocolNotSupportedError
-	| AddressInvalidError;
+	| IdentityProviderAddressInvalidError;
 export type ResolveAddressResult = MailchainResult<ResolvedAddress, ResolveAddressError>;
 
 export type ResolvedManyAddresses = Map<string, ResolvedAddress>;
@@ -169,7 +171,8 @@ export class MessagingKeys {
 	): Promise<
 		MailchainResult<
 			GetAddressMessagingKeyResponseBody,
-			| AddressInvalidError
+			| IdentityProviderAddressInvalidError
+			| BadlyFormattedAddressError
 			| IdentityExpiredError
 			| IdentityNotFoundError
 			| IdentityProviderUnsupportedError
@@ -206,16 +209,22 @@ export class MessagingKeys {
 						return {
 							error: new IdentityNotFoundError(),
 						};
-					case 'address_invalid':
-					case 'identity_address_invalid':
+					case 'address_format_invalid':
 					case 'tld_unknown':
 						return {
-							error: new AddressInvalidError(new Error(e.response?.data?.message)),
+							error: new BadlyFormattedAddressError(),
+						};
+					case 'identity_address_invalid':
+						return {
+							error: new IdentityProviderAddressInvalidError(),
 						};
 				}
 			}
 			return {
-				error: new UnexpectedMailchainError(`Failed to resolve messaging key of address ${address}`, e),
+				error: new UnexpectedMailchainError(
+					`Failed to resolve messaging key of address ${address}`,
+					e as Error,
+				),
 			};
 		}
 	}
