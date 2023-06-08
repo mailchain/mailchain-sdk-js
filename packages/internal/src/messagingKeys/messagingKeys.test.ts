@@ -49,7 +49,7 @@ describe('MessagingKeys', () => {
 			},
 		});
 
-		const actual = await messagingKeys.resolve('alice.near@near.mailchain.com');
+		const actual = await messagingKeys.resolve('alice.near@near.mailchain.test');
 
 		expect(actual).toEqual({
 			data: {

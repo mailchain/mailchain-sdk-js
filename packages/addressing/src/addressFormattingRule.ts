@@ -34,7 +34,7 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 
 	const usernameParts = address.username.split('.');
 	if (
-		usernameParts.length <= 2 &&
+		usernameParts.length == 1 &&
 		isNearImplicitAccount({
 			domain: address.domain,
 			username: usernameParts[0],
