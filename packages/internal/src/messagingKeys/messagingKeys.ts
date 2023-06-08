@@ -1,5 +1,13 @@
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { ALL_PROTOCOLS, encodeAddressByProtocol, ProtocolNotSupportedError, ProtocolType } from '@mailchain/addressing';
+import {
+	ALL_PROTOCOLS,
+	BadlyFormattedAddressError,
+	checkAddressForErrors,
+	encodeAddressByProtocol,
+	IdentityProviderAddressInvalidError,
+	ProtocolNotSupportedError,
+	ProtocolType,
+} from '@mailchain/addressing';
 import { publicKeyToBytes, PublicKey } from '@mailchain/crypto';
 import {
 	AddressesApiFactory,
@@ -19,12 +27,10 @@ import { MailchainResult, partitionMailchainResults } from '../';
 import {
 	MessagingKeyContactError,
 	IdentityNotFoundError,
-	IdentityProviderAddressInvalidError,
 	UnexpectedMailchainError,
 	IdentityProviderUnsupportedError,
 	IdentityProviderAddressUnsupportedError,
 	IdentityExpiredError,
-	BadlyFormattedAddressError,
 } from './errors';
 import { MessagingKeyProof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -89,6 +95,7 @@ export class MessagingKeys {
 		private readonly addressApi: AddressesApiInterface,
 		private readonly identityKeysApi: IdentityKeysApiInterface,
 		private readonly messagingKeyContractCall: MessagingKeyContractCall,
+		private readonly mailchainAddressDomain: string,
 	) {}
 
 	static create(configuration: Configuration) {
@@ -96,6 +103,7 @@ export class MessagingKeys {
 			AddressesApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			IdentityKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			MessagingKeyContractCall.create(configuration),
+			configuration.mailchainAddressDomain,
 		);
 	}
 
@@ -114,6 +122,10 @@ export class MessagingKeys {
 	 *
 	 */
 	async resolve(address: string): Promise<ResolveAddressResult> {
+		const validateAddressError = checkAddressForErrors(address, this.mailchainAddressDomain);
+		if (validateAddressError != null) {
+			return { error: validateAddressError };
+		}
 		const { data, error } = await this.getAddressMessagingKey(address);
 		if (error != null) {
 			return { error };

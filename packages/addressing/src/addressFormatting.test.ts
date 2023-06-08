@@ -1,4 +1,4 @@
-import { ALGORAND, ETHEREUM, SUBSTRATE } from './protocols';
+import { ALGORAND, ETHEREUM, NEAR, SUBSTRATE } from './protocols';
 import { formatAddress } from './addressFormatting';
 import { createNameServiceAddress, createWalletAddress, MailchainAddress } from '.';
 
@@ -25,6 +25,33 @@ const testCases: {
 		address: createWalletAddress('5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY', SUBSTRATE, 'mailchain.dev'),
 		expectedMail: '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY@substrate.mailchain.dev',
 		expectedHuman: '5Grw...utQY@substrate',
+	},
+	{
+		address: createWalletAddress(
+			'244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06',
+			NEAR,
+			'mailchain.test',
+		),
+		expectedMail: '244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06@near.mailchain.test',
+		expectedHuman: '244a6b...1e06@near',
+	},
+	{
+		address: createWalletAddress(
+			'244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06.testnet',
+			NEAR,
+			'mailchain.test',
+		),
+		expectedMail: '244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06.testnet@near.mailchain.test',
+		expectedHuman: '244a6b...1e06.testnet@near',
+	},
+	{
+		address: createWalletAddress(
+			'98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de',
+			NEAR,
+			'mailchain.test',
+		),
+		expectedMail: '98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de@near.mailchain.test',
+		expectedHuman: '98793c...d6de@near',
 	},
 	{
 		address: createNameServiceAddress('account', 'mailchain.xyz'),
@@ -60,22 +87,6 @@ const testCases: {
 		address: createNameServiceAddress('alice.bitcoin', 'unstoppable.ethereum.mailchain.test'),
 		expectedMail: 'alice.bitcoin@unstoppable.ethereum.mailchain.test',
 		expectedHuman: 'alice.bitcoin@unstoppable.ethereum',
-	},
-	{
-		address: createNameServiceAddress(
-			'244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06',
-			'near.mailchain.test',
-		),
-		expectedMail: '244a6b069451faf6f4296284dcb75ccb14ef686699f54a7d3f790a6d50471e06@near.mailchain.test',
-		expectedHuman: '244a6b...1e06@near',
-	},
-	{
-		address: createNameServiceAddress(
-			'98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de.testnet',
-			'near.mailchain.test',
-		),
-		expectedMail: '98793cd91a3f870fb126f66285808c7e094afcfc4eda8a970f6648cdf0dbd6de.testnet@near.mailchain.test',
-		expectedHuman: '98793c...d6de.testnet@near',
 	},
 	{
 		address: createNameServiceAddress('alice.mailchain.near', 'near.mailchain.test'),

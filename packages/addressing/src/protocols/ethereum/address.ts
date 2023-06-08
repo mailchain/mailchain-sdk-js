@@ -15,3 +15,7 @@ export async function addressFromPublicKey(publicKey: PublicKey): Promise<Uint8A
 
 	return decodeHexZeroX(computeAddress(publicKey.bytes));
 }
+
+export function validateEthereumAddress(address: string): boolean {
+	return /^0x[a-fA-F0-9]{40}/.test(address);
+}

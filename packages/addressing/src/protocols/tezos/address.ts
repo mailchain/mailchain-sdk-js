@@ -1,7 +1,8 @@
 import { KindED25519, KindSECP256K1, KindSECP256R1, PublicKey } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
 import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
-import { prefix } from './const';
+import { decodeBase58, isBase58 } from '@mailchain/encoding';
+import { Prefix, prefix } from './const';
 
 /**
  * Derive the tezos address corresponding to the {@link PublicKey}.
@@ -45,4 +46,27 @@ function composeAddress(key: Uint8Array, prefixArray: Uint8Array) {
 	result.set(h, 3);
 	result.set(checksum(result.slice(0, 23)), 23);
 	return result;
+}
+
+export function validateTezosAddress(address: string): boolean {
+	if (address.length !== 36) {
+		return false;
+	} else if (
+		address.slice(0, 3) !== Prefix.TZ1 &&
+		address.slice(0, 3) !== Prefix.TZ2 &&
+		address.slice(0, 3) !== Prefix.TZ3
+	) {
+		return false;
+	} else if (!isBase58(address)) {
+		return false;
+	}
+
+	const decoded = decodeBase58(address);
+
+	const addressChecksum = checksum(decoded.slice(0, 23));
+	if (decoded.slice(-4).toString() !== addressChecksum.toString()) {
+		return false;
+	}
+
+	return true;
 }

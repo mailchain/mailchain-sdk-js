@@ -44,9 +44,12 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 			[`${usernameParts[0].slice(0, 6)}...${usernameParts[0].slice(-4)}`, ...usernameParts.slice(1)].join('.'),
 			props.protocol,
 		);
+	} else if (usernameParts.length >= 2 && usernameParts[usernameParts.length - 1] !== 'near') {
+		// testnet or local named accounts
+		return formatMailLike(address.username, props.protocol);
 	}
-	if (usernameParts[usernameParts.length - 1] === NEAR) return address.username;
-	return formatMailLike(address.username, NEAR);
+
+	return address.username;
 };
 
 const humanTezosAddress: NameServiceAddressFormatter = (address) => {

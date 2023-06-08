@@ -2,6 +2,7 @@ export * from './consts';
 export * from './ensure';
 export * from './encoding';
 export * from './hex';
+export * from './base32';
 export * from './base58';
 export * from './base58Check';
 export * from './base64';

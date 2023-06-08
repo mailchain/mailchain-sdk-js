@@ -13,7 +13,5 @@ export const BobFilEthAddressStr = '0xe85651a3f364dde76800d51fcada6367e0268110';
 export const BobFilEthPrivateKeyStr = '2c6b29d5545e5804b7fb7e65404782e57dddea84cbcec9b2586add6403808965';
 export const BobFilEthPrivateKey = new SECP256K1PrivateKey(decodeHex(BobFilEthPrivateKeyStr));
 
-export enum FilPrefix {
-	F4ETHEREUM = 'f410',
-	T4ETHEREUM = 't410',
-}
+export const FILECOIN_PREFIX_F4_ETHEREUM = 'f410';
+export const FILECOIN_PREFIX_T4_ETHEREUM = 't410';
