@@ -22,7 +22,7 @@ describe('MessagingKeys', () => {
 			mockAddressesApiInterface,
 			mockIdentityKeysApiInterface,
 			mockContractCallResolvers,
-			'mailchain.com',
+			'mailchain.test',
 		);
 	});
 

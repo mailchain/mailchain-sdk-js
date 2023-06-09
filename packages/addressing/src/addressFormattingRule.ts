@@ -44,6 +44,19 @@ const humanNearAddress: NameServiceAddressFormatter = (address) => {
 			[`${usernameParts[0].slice(0, 6)}...${usernameParts[0].slice(-4)}`, ...usernameParts.slice(1)].join('.'),
 			props.protocol,
 		);
+	} else if (
+		usernameParts.length >= 2 &&
+		isNearImplicitAccount({
+			domain: address.domain,
+			username: usernameParts[0],
+		}) &&
+		usernameParts[usernameParts.length - 1] !== 'near'
+	) {
+		// testnet or local implicit accounts
+		return formatMailLike(
+			[`${usernameParts[0].slice(0, 6)}...${usernameParts[0].slice(-4)}`, ...usernameParts.slice(1)].join('.'),
+			props.protocol,
+		);
 	} else if (usernameParts.length >= 2 && usernameParts[usernameParts.length - 1] !== 'near') {
 		// testnet or local named accounts
 		return formatMailLike(address.username, props.protocol);
