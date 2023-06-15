@@ -10,7 +10,7 @@ const aliceMessagingKey = aliceKeyRing.accountMessagingKey().publicKey;
 
 const bobMessagingKey = bobKeyRing.accountMessagingKey().publicKey;
 
-jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params) => mockRandomFunction(...params) }));
+jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params: any[]) => mockRandomFunction(...params) }));
 
 const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
 	ED25519PrivateKey.fromSecretKey(

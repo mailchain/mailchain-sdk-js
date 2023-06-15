@@ -22,7 +22,7 @@ describe('MessageSync', () => {
 		mockMailboxOperations = mock();
 		aliceAccountMailReceiver = mock();
 		aliceWalletMailReceiver = mock();
-		const mockMailReceiverFactory = (_, decrypter: KeyRingDecrypter) => {
+		const mockMailReceiverFactory: (typeof MailReceiver)['create'] = (_, decrypter: KeyRingDecrypter) => {
 			if (decrypter.publicKey === keyRing.accountMessagingKey().publicKey) return aliceAccountMailReceiver;
 			return aliceWalletMailReceiver;
 		};

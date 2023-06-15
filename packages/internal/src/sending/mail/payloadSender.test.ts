@@ -27,7 +27,7 @@ mockCreateMailPayloads.mockResolvedValue({
 	distributions: dummyDistributions,
 });
 jest.mock('./payloads', () => ({
-	createMailPayloads: (...params) => mockCreateMailPayloads(...params),
+	createMailPayloads: (...params: any[]) => mockCreateMailPayloads(...params),
 }));
 
 describe('MailPreparer', () => {

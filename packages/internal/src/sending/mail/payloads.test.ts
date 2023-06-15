@@ -14,7 +14,7 @@ const mockMimeMessageResult = {
 
 const mockCreateMimeMessage = jest.fn();
 jest.mock('@mailchain/internal/formatters/generate', () => ({
-	createMimeMessage: (...params) => mockCreateMimeMessage(...params),
+	createMimeMessage: (...params: any[]) => mockCreateMimeMessage(...params),
 }));
 
 describe('createMailPayloads', () => {

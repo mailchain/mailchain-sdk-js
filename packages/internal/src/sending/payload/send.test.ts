@@ -39,7 +39,7 @@ const payload: Payload = {
 	]),
 };
 
-jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params) => mockRandomFunction(...params) }));
+jest.mock('@mailchain/crypto/rand', () => ({ secureRandom: (...params: any[]) => mockRandomFunction(...params) }));
 
 const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
 	ED25519PrivateKey.fromSecretKey(
