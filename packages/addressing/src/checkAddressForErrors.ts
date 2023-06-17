@@ -44,7 +44,7 @@ export function checkAddressForErrors(
 }
 
 function validateMailchainProtocolAddress(tldTrimmedAddress: string): IdentityProviderAddressInvalidError | undefined {
-	const mailchainAddressPattern = /^[a-zA-Z0-9-]{2,20}$/;
+	const mailchainAddressPattern = /^[a-zA-Z0-9-_]{2,20}$/;
 
 	if (!mailchainAddressPattern.test(tldTrimmedAddress)) {
 		// check mailchain protocol address

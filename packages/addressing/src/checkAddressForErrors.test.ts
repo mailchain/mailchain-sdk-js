@@ -25,6 +25,9 @@ describe('checkAddressForErrors', () => {
 
 	describe('mailchain protocol', () => {
 		it('should return undefined when address is valid', () => {
+			expect(checkAddressForErrors('alice_bob@mailchain.com')).toBeUndefined();
+		});
+		it('should return undefined when address is valid', () => {
 			expect(checkAddressForErrors('alice@mailchain.com')).toBeUndefined();
 		});
 		it('should return error when address is invalid - not allow character', () => {
