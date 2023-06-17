@@ -1,5 +1,4 @@
-import { PublicKey } from '@mailchain/crypto';
-import isEqual from 'lodash/isEqual';
+import { PublicKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { Configuration } from '../../configuration';
 import { MessagingKeys } from '../../messagingKeys';
 import { MailAddress } from './types';
@@ -22,6 +21,6 @@ export class MailSenderVerifier {
 			return false;
 		}
 
-		return isEqual(resolvedSenderMessagingKey.messagingKey, senderMessagingKey);
+		return isPublicKeyEqual(resolvedSenderMessagingKey.messagingKey, senderMessagingKey);
 	}
 }

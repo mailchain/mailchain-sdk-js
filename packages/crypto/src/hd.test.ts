@@ -41,6 +41,11 @@ describe('ChainCodeFromDeriveIndex()', () => {
 			expected: decodeHex('1473686f72740000000000000000000000000000000000000000000000000000'),
 		},
 		{
+			name: `hex-string`,
+			index: '0x1234abcd',
+			expected: decodeHex('1234abcd00000000000000000000000000000000000000000000000000000000'),
+		},
+		{
 			name: `short-string`,
 			index: 'short-string',
 			expected: decodeHex('3073686f72742d737472696e6700000000000000000000000000000000000000'),

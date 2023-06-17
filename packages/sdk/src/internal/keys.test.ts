@@ -1,5 +1,4 @@
 import { AliceED25519PrivateKey, AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
-import { AliceSR25519PrivateKey, AliceSR25519PublicKey } from '@mailchain/crypto/sr25519/test.const';
 import { AliceSECP256K1PrivateKey, AliceSECP256K1PublicKey } from '@mailchain/crypto/secp256k1/test.const';
 import { AliceSECP256R1PublicKey } from '@mailchain/crypto/secp256r1/test.const';
 import {
@@ -23,10 +22,6 @@ describe('publicMessagingKey()', () => {
 			name: 'secp256r1 alice',
 			arg: AliceSECP256R1PublicKey,
 		},
-		{
-			name: 'sr25519 alice',
-			arg: AliceSR25519PublicKey,
-		},
 	];
 	test.each(tests)('$name', async (test) => {
 		const hex = publicMessagingKeyToHex(test.arg);
@@ -48,10 +43,6 @@ describe('privateMessagingKey()', () => {
 		// 	name: 'secp256r1 alice',
 		// 	arg: AliceSECP256R1PrivateKey,
 		// }, not tested due to rand function
-		{
-			name: 'sr25519 alice',
-			arg: AliceSR25519PrivateKey,
-		},
 	];
 	test.each(tests)('$name', async (test) => {
 		const hex = privateMessagingKeyToHex(test.arg);

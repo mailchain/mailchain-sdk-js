@@ -1,5 +1,5 @@
 import { decodeHex, decodeUtf8 } from '@mailchain/encoding';
-import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
+import { blake2b } from '@noble/hashes/blake2b';
 import {
 	BobSECP256R1PrivateKey,
 	BobSECP256R1PublicKey,
@@ -32,7 +32,7 @@ describe('verify()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const bytesHash = blake2AsU8a(test.message, 256);
+		const bytesHash = blake2b(test.message, { dkLen: 256 / 8 });
 		const sig = await test.privKey.sign(bytesHash);
 		return test.privKey.publicKey.verify(bytesHash, sig).then((actual) => {
 			expect(actual).toEqual(test.expected);
@@ -116,7 +116,7 @@ describe('verifySignature()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const bytesHash = blake2AsU8a(test.message, 256);
+		const bytesHash = blake2b(test.message, { dkLen: 256 / 8 });
 		return test.pubKey.verify(bytesHash, test.signature).then((actual) => {
 			expect(actual).toEqual(test.expected);
 		});

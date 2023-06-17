@@ -1,6 +1,5 @@
 import { AliceED25519PrivateKey, BobED25519PrivateKey } from '../../ed25519/test.const';
 import { AliceSECP256K1PrivateKey, BobSECP256K1PrivateKey } from '../../secp256k1/test.const';
-import { AliceSR25519PrivateKey, BobSR25519PrivateKey } from '../../sr25519/test.const';
 import { PrivateKeyEncrypter } from './privateKeyEncrypter';
 
 describe('Encrypt', () => {
@@ -64,24 +63,6 @@ describe('Encrypt', () => {
 				),
 			),
 			shouldThrow: false,
-		},
-		{
-			name: 'sr25519-alice',
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array(Buffer.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ascii')).slice(0, num);
-			},
-			prvKey: AliceSR25519PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			shouldThrow: true,
-		},
-		{
-			name: 'sr25519-bob',
-			rand: (num?: number): Uint8Array => {
-				return new Uint8Array(Buffer.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ascii')).slice(0, num);
-			},
-			prvKey: BobSR25519PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-			shouldThrow: true,
 		},
 	];
 	test.each(tests)('$name', async (test) => {

@@ -1,5 +1,5 @@
 import { scalarMult } from 'tweetnacl';
-import { convertPublicKeyToCurve25519, convertSecretKeyToCurve25519 } from '@polkadot/util-crypto/ed25519';
+import ed2curve from 'ed2curve';
 import { KeyExchange } from '../';
 import { RandomFunction, secureRandom } from '../../rand';
 import { PublicKey } from '../../public';
@@ -29,10 +29,14 @@ export class ED25519KeyExchange implements KeyExchange {
 	}
 
 	static privateKeyToCurve25519(privateKey: ED25519PrivateKey): Uint8Array {
-		return convertSecretKeyToCurve25519(privateKey.bytes);
+		return ed2curve.convertSecretKey(privateKey.bytes);
 	}
 
 	static publicKeyToCurve25519(publicKey: ED25519PublicKey): Uint8Array {
-		return convertPublicKeyToCurve25519(publicKey.bytes);
+		const output = ed2curve.convertPublicKey(publicKey.bytes);
+		if (output === null) {
+			throw new Error('invalid public key');
+		}
+		return output;
 	}
 }

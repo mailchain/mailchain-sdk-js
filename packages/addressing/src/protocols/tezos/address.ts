@@ -1,6 +1,6 @@
 import { KindED25519, KindSECP256K1, KindSECP256R1, PublicKey } from '@mailchain/crypto';
 import { sha256 } from '@noble/hashes/sha256';
-import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
+import { blake2b } from '@noble/hashes/blake2b';
 import { decodeBase58, isBase58 } from '@mailchain/encoding';
 import { Prefix, prefix } from './const';
 
@@ -36,7 +36,7 @@ function checksum(input: Uint8Array) {
 }
 
 function hash(pkBytes: Uint8Array) {
-	return blake2AsU8a(pkBytes, 160 as 64);
+	return blake2b(pkBytes, { dkLen: 160 / 8 });
 }
 
 function composeAddress(key: Uint8Array, prefixArray: Uint8Array) {

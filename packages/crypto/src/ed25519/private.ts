@@ -1,5 +1,4 @@
-import { ed25519Sign, ed25519PairFromSeed, ed25519PairFromSecret } from '@polkadot/util-crypto/ed25519';
-import { Keypair } from '@polkadot/util-crypto/types';
+import nacl from 'tweetnacl';
 import { KindED25519 } from '../keys';
 import { toSeed } from '../mnemonic/mnemonic';
 import { PrivateKey } from '../private';
@@ -10,13 +9,18 @@ import { ED25519PublicKey } from './public';
 export const ED25519PrivateKeyLength = 64;
 export const ED25519SeedLength = 32;
 
+type KeyPair = {
+	publicKey: Uint8Array;
+	secretKey: Uint8Array;
+};
+
 export class ED25519PrivateKey implements PrivateKey {
 	readonly bytes: Uint8Array;
 	readonly publicKey: PublicKey;
 	readonly curve: string = KindED25519;
-	readonly keyPair: Keypair;
+	readonly keyPair: KeyPair;
 
-	constructor(keyPair: Keypair) {
+	constructor(keyPair: KeyPair) {
 		this.keyPair = keyPair;
 		this.bytes = this.keyPair.secretKey;
 		this.publicKey = new ED25519PublicKey(this.keyPair.publicKey);
@@ -26,14 +30,15 @@ export class ED25519PrivateKey implements PrivateKey {
 		if (seed.length !== ED25519SeedLength) {
 			throw Error('seed must be 32 bytes');
 		}
-		return new this(ed25519PairFromSeed(seed, true));
+
+		return new this(nacl.sign.keyPair.fromSeed(seed));
 	}
 
 	static fromSecretKey(secretKey: Uint8Array): ED25519PrivateKey {
 		if (secretKey.length !== ED25519PrivateKeyLength) {
 			throw Error('secret key must be 64 bytes');
 		}
-		return new this(ed25519PairFromSecret(secretKey));
+		return new this(nacl.sign.keyPair.fromSecretKey(secretKey));
 	}
 
 	static fromMnemonicPhrase(mnemonic: string, password = ''): ED25519PrivateKey {
@@ -45,7 +50,7 @@ export class ED25519PrivateKey implements PrivateKey {
 	}
 
 	async sign(message: Uint8Array): Promise<Uint8Array> {
-		return ed25519Sign(message, this.keyPair);
+		return nacl.sign.detached(message, this.keyPair.secretKey);
 	}
 }
 

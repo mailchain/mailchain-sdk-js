@@ -1,7 +1,6 @@
-import { PrivateKey } from '@mailchain/crypto';
+import { PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
 import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
-import isEqual from 'lodash/isEqual';
 import { MailchainResult } from '..';
 import { Configuration } from '../configuration';
 import { AddressNonce, GetMessagingKeyLatestNonceError } from './addressNonce';
@@ -48,7 +47,7 @@ export class PrivateMessagingKeys {
 			getMessagingKeyLatestNonce,
 		);
 
-		if (!isEqual(privateMessagingKey.publicKey, resolvedAddress.messagingKey)) {
+		if (!isPublicKeyEqual(privateMessagingKey.publicKey, resolvedAddress.messagingKey)) {
 			return { error: new SenderMessagingKeyIncorrect() };
 		}
 

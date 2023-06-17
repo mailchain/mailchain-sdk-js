@@ -1,5 +1,3 @@
-import isEqual from 'lodash/isEqual';
-
 export interface PublicKey {
 	readonly bytes: Uint8Array;
 	verify: (message: Uint8Array, sig: Uint8Array) => Promise<boolean>;
@@ -7,7 +5,11 @@ export interface PublicKey {
 }
 
 export function isPublicKeyEqual(a: PublicKey, b: PublicKey): boolean {
-	return isEqual(a.bytes, b.bytes) && a.curve === b.curve;
+	if (a.bytes.length !== a.bytes.length) {
+		return false;
+	}
+
+	return a.bytes.every((value, index) => value === b.bytes[index]);
 }
 
 export function isPublicKey(x: any): x is PublicKey {

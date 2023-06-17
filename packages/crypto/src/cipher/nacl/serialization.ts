@@ -3,7 +3,6 @@ import { PublicKey } from '../../public';
 import { EncryptedContent, NACLECDH, NACLSK } from '../cipher';
 import { SECP256K1PublicKey } from '../../secp256k1/public';
 import { ED25519PublicKey, ED25519PublicKeyLen } from '../../ed25519/public';
-import { SR25519PublicKey, SR25519PublicKeyLen } from '../../sr25519/public';
 import { idFromPublicKey } from '../../multikey/ids';
 
 export function serializePublicKeyEncryptedContent(sealedBox: EncryptedContent, pubKey: PublicKey): EncryptedContent {
@@ -51,12 +50,6 @@ export function deserializePublicKeyEncryptedContent(input: Uint8Array): {
 			pubKeyEnd = start + ED25519PublicKeyLen;
 			return {
 				pubKey: new ED25519PublicKey(input.slice(start, pubKeyEnd)),
-				encryptedContent: input.slice(pubKeyEnd),
-			};
-		case IdSR25519:
-			pubKeyEnd = start + SR25519PublicKeyLen;
-			return {
-				pubKey: new SR25519PublicKey(input.slice(start, pubKeyEnd)),
 				encryptedContent: input.slice(pubKeyEnd),
 			};
 		default:

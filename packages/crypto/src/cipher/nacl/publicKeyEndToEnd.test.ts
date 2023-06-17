@@ -4,39 +4,11 @@ import {
 	BobED25519PrivateKey,
 	AliceED25519PrivateKey,
 } from '../../ed25519/test.const';
-import {
-	BobSECP256K1PublicKey,
-	AliceSECP256K1PublicKey,
-	BobSECP256K1PrivateKey,
-	AliceSECP256K1PrivateKey,
-} from '../../secp256k1/test.const';
-import {
-	BobSR25519PublicKey,
-	AliceSR25519PublicKey,
-	BobSR25519PrivateKey,
-	AliceSR25519PrivateKey,
-} from '../../sr25519/test.const';
 import { ED25519KeyExchange } from '../ecdh/ed25519';
-import { SR25519KeyExchange } from '../ecdh/sr25519';
-import { SECP256K1KeyExchange } from '../ecdh/secp256k1';
 import { PublicKeyDecrypter, PublicKeyEncrypter } from '.';
 
 describe('encrypt-then-decrypt', () => {
 	const tests = [
-		{
-			name: 'secp25519-to-bob',
-			keyEx: new SECP256K1KeyExchange(),
-			recipientPublicKey: BobSECP256K1PublicKey,
-			recipientPrivateKey: BobSECP256K1PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-		},
-		{
-			name: 'secp25519-to-alice',
-			keyEx: new SECP256K1KeyExchange(),
-			recipientPublicKey: AliceSECP256K1PublicKey,
-			recipientPrivateKey: AliceSECP256K1PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-		},
 		{
 			name: 'ed25519-to-bob',
 			keyEx: new ED25519KeyExchange(),
@@ -49,20 +21,6 @@ describe('encrypt-then-decrypt', () => {
 			keyEx: new ED25519KeyExchange(),
 			recipientPublicKey: AliceED25519PublicKey,
 			recipientPrivateKey: AliceED25519PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-		},
-		{
-			name: 'sr25519-to-bob',
-			keyEx: new SR25519KeyExchange(),
-			recipientPublicKey: BobSR25519PublicKey,
-			recipientPrivateKey: BobSR25519PrivateKey,
-			message: new Uint8Array(Buffer.from('message', 'ascii')),
-		},
-		{
-			name: 'sr25519-to-alice',
-			keyEx: new SR25519KeyExchange(),
-			recipientPublicKey: AliceSR25519PublicKey,
-			recipientPrivateKey: AliceSR25519PrivateKey,
 			message: new Uint8Array(Buffer.from('message', 'ascii')),
 		},
 	];

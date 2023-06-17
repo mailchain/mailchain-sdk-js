@@ -36,6 +36,10 @@ export function isHex(input: string): boolean {
 	return new RegExp('^[a-fA-F0-9]+$').test(input);
 }
 
+export function isHexZeroX(input: string): boolean {
+	return new RegExp('^0x[a-fA-F0-9]+$').test(input);
+}
+
 export function isAnyHex(input: string): boolean {
 	if (input.startsWith('0x')) {
 		input = input.substring(2);

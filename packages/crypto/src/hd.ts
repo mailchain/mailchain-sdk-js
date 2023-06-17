@@ -1,12 +1,7 @@
-import { stringToU8a } from '@polkadot/util/string';
-import { hexToU8a } from '@polkadot/util/hex';
-import { compactAddLength } from '@polkadot/util/compact';
-import { BN, bnToU8a } from '@polkadot/util/bn';
-import { isBigInt, isBn, isHex, isNumber, isString } from '@polkadot/util/is';
-import { BN_LE_256_OPTS } from '@polkadot/util-crypto/bn';
-import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
+import { blake2b } from '@noble/hashes/blake2b';
+import { decodeHexZeroX, decodeUtf8, isHexZeroX } from '@mailchain/encoding';
+import BN from 'bn.js';
 import { PrivateKey } from '.';
-
 const CHAIN_CODE_LEN = 32;
 
 export interface ExtendedPrivateKey {
@@ -16,18 +11,18 @@ export interface ExtendedPrivateKey {
 
 export type HardenedDerivationFunction = (
 	parentKey: ExtendedPrivateKey,
-	index: string | number | bigint | Uint8Array | BN,
+	index: string | number | Uint8Array | BN,
 ) => Promise<ExtendedPrivateKey>;
 
-export function chainCodeFromDeriveIndex(value: string | number | bigint | Uint8Array | BN): Uint8Array {
-	if (isNumber(value) || isBn(value) || isBigInt(value)) {
-		return chainCodeFromDeriveIndex(bnToU8a(value, BN_LE_256_OPTS));
-	} else if (isHex(value)) {
-		return chainCodeFromDeriveIndex(hexToU8a(value));
+export function chainCodeFromDeriveIndex(value: string | number | Uint8Array | BN): Uint8Array {
+	if (isNumber(value) || BN.isBN(value)) {
+		return chainCodeFromDeriveIndex(Uint8Array.from(new BN(value).toArray('le', 256 / 8)));
+	} else if (isString(value) && isHexZeroX(value)) {
+		return chainCodeFromDeriveIndex(decodeHexZeroX(value));
 	} else if (isString(value)) {
-		return chainCodeFromDeriveIndex(compactAddLength(stringToU8a(value)));
+		return chainCodeFromDeriveIndex(Uint8Array.from([value.length << 2, ...decodeUtf8(value)]));
 	} else if (value.length > CHAIN_CODE_LEN) {
-		return chainCodeFromDeriveIndex(blake2AsU8a(value));
+		return chainCodeFromDeriveIndex(blake2b(value, { dkLen: 256 / 8 }));
 	}
 
 	const chainCode = new Uint8Array(32);
@@ -35,4 +30,12 @@ export function chainCodeFromDeriveIndex(value: string | number | bigint | Uint8
 	chainCode.set(value, 0);
 
 	return chainCode;
+}
+
+function isNumber(value: unknown): value is number {
+	return typeof value === 'number';
+}
+
+function isString(value: unknown): value is string {
+	return typeof value === 'string' || value instanceof String;
 }

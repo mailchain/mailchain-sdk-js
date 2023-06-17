@@ -7,7 +7,7 @@ import {
 	KindSECP256R1,
 } from '@mailchain/crypto';
 import { encodeHex, decodeHex, decodeUtf8 } from '@mailchain/encoding';
-import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
+import { blake2b } from '@noble/hashes/blake2b';
 
 export async function signTezosMessage(key: PrivateKey, msg: string) {
 	const messagePayload = createTezosSignedMessagePayload(msg);
@@ -15,7 +15,7 @@ export async function signTezosMessage(key: PrivateKey, msg: string) {
 }
 
 export async function signTezosRaw(key: PrivateKey, payload: Uint8Array) {
-	const bytesHash = blake2AsU8a(payload, 256);
+	const bytesHash = blake2b(payload, { dkLen: 256 / 8 });
 	switch (key.curve) {
 		case KindED25519:
 		case KindSECP256R1:
@@ -30,7 +30,8 @@ export async function signTezosRaw(key: PrivateKey, payload: Uint8Array) {
 
 export async function verifyTezosSignedMessage(key: PublicKey, msg: string, signature: Uint8Array) {
 	const messagePayload = createTezosSignedMessagePayload(msg);
-	const bytesHash = blake2AsU8a(messagePayload, 256);
+	const bytesHash = blake2b(messagePayload, { dkLen: 256 / 8 });
+
 	switch (key.curve) {
 		case KindED25519:
 		case KindSECP256R1:

@@ -5,8 +5,6 @@ import {
 	ED25519PublicKey,
 	SECP256K1PublicKey,
 	SECP256K1PrivateKey,
-	SR25519PrivateKey,
-	SR25519PublicKey,
 } from '@mailchain/crypto';
 import { decode } from '@mailchain/encoding';
 import { SECP256R1PrivateKey, SECP256R1PublicKey } from '@mailchain/crypto/secp256r1';
@@ -25,8 +23,6 @@ export function convertPublic(key: ApiPublicKey): PublicKey {
 			return new ED25519PublicKey(decode(key.encoding, key.value));
 		case PublicKeyCurveEnum.Secp256k1:
 			return new SECP256K1PublicKey(decode(key.encoding, key.value));
-		case PrivateKeyCurveEnum.Sr25519:
-			return new SR25519PublicKey(decode(key.encoding, key.value));
 		case PublicKeyCurveEnum.Secp256r1:
 			return new SECP256R1PublicKey(decode(key.encoding, key.value));
 		default:
@@ -41,8 +37,6 @@ export function convertPrivate(key: ApiPrivateKey): PrivateKey {
 			return ED25519PrivateKey.fromSecretKey(decode(key.encoding, key.value));
 		case PrivateKeyCurveEnum.Secp256k1:
 			return new SECP256K1PrivateKey(decode(key.encoding, key.value));
-		case PrivateKeyCurveEnum.Sr25519:
-			return SR25519PrivateKey.fromBytes(decode(key.encoding, key.value));
 		case PrivateKeyCurveEnum.Secp256r1:
 			return new SECP256R1PrivateKey(decode(key.encoding, key.value));
 		default:

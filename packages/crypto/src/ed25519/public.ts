@@ -1,4 +1,4 @@
-import { ed25519Verify } from '@polkadot/util-crypto/ed25519';
+import nacl from 'tweetnacl';
 import { KindED25519 } from '../keys';
 import { PublicKey } from '../public';
 
@@ -16,7 +16,7 @@ export class ED25519PublicKey implements PublicKey {
 	}
 
 	async verify(message: Uint8Array, sig: Uint8Array): Promise<boolean> {
-		return ed25519Verify(message, sig, this.bytes);
+		return nacl.sign.detached.verify(message, sig, this.bytes);
 	}
 }
 

@@ -1,22 +1,31 @@
-import { mnemonicGenerate, mnemonicValidate, mnemonicToLegacySeed } from '@polkadot/util-crypto/mnemonic';
-import { entropyToMnemonic, mnemonicToEntropy } from '@polkadot/util-crypto/mnemonic/bip39';
+import {
+	entropyToMnemonic,
+	mnemonicToEntropy,
+	generateMnemonic,
+	validateMnemonic,
+	mnemonicToSeedSync,
+} from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 
-export function generate(words: 12 | 15 | 18 | 21 | 24 = 24): string {
-	return mnemonicGenerate(words, true);
+export function generate(words: 12 | 24 = 24): string {
+	return generateMnemonic(wordlist, words === 12 ? 128 : 256);
 }
 
 export function toEntropy(mnemonic: string): Uint8Array {
-	return mnemonicToEntropy(mnemonic);
+	return mnemonicToEntropy(mnemonic, wordlist);
 }
 
 export function fromEntropy(entropy: Uint8Array): string {
-	return entropyToMnemonic(entropy);
+	return entropyToMnemonic(entropy, wordlist);
 }
 
 export function validate(mnemonic: string): boolean {
-	return mnemonicValidate(mnemonic, true);
+	return validateMnemonic(mnemonic, wordlist);
 }
 
 export function toSeed(mnemonic: string, password?: string, byteLength?: 32 | 64 | undefined): Uint8Array {
-	return mnemonicToLegacySeed(mnemonic, password, true, byteLength);
+	if (!validate(mnemonic)) {
+		throw new Error('Invalid mnemonic');
+	}
+	return mnemonicToSeedSync(mnemonic, password).slice(0, byteLength === undefined ? 32 : byteLength);
 }

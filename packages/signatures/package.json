@@ -21,7 +21,7 @@
 		"@mailchain/addressing": "0.20.0",
 		"@mailchain/crypto": "0.20.0",
 		"@mailchain/encoding": "0.20.0",
-		"@polkadot/util-crypto": "10.1.11",
+		"@noble/hashes": "^1.3.0",
 		"canonicalize": "^1.0.8",
 		"lodash": "^4.17.21"
 	},

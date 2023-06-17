@@ -4,7 +4,6 @@ import {
 	AliceED25519PublicKey,
 } from '@mailchain/crypto/ed25519/test.const';
 import { AliceSECP256K1PublicKey, AliceSECP256K1PrivateKey } from '@mailchain/crypto/secp256k1/test.const';
-import { AliceSR25519PublicKey, AliceSR25519PrivateKey } from '@mailchain/crypto/sr25519/test.const';
 import { encode } from '@mailchain/encoding';
 import {
 	PrivateKey as ApiPrivateKey,
@@ -35,15 +34,6 @@ const publicKeyTestCases = [
 			value: encode('hex/0x-prefix', AliceSECP256K1PublicKey.bytes),
 		} as ApiPublicKey,
 		cryptoPublicKey: AliceSECP256K1PublicKey,
-	},
-	{
-		name: 'Convert Sr25519 Public key',
-		apiPublicKey: {
-			curve: PublicKeyCurveEnum.Sr25519,
-			encoding: PublicKeyEncodingEnum._0xPrefix,
-			value: encode('hex/0x-prefix', AliceSR25519PublicKey.bytes),
-		} as ApiPublicKey,
-		cryptoPublicKey: AliceSR25519PublicKey,
 	},
 ] as const;
 
@@ -79,15 +69,6 @@ const privateKeyTestCases = [
 			value: encode('hex/0x-prefix', AliceSECP256K1PrivateKey.bytes),
 		} as ApiPublicKey,
 		cryptoPrivateKey: AliceSECP256K1PrivateKey,
-	},
-	{
-		name: 'Convert Sr25519 Private key',
-		apiPrivateKey: {
-			curve: PrivateKeyCurveEnum.Sr25519,
-			encoding: PrivateKeyEncodingEnum._0xPrefix,
-			value: encode('hex/0x-prefix', AliceSR25519PrivateKey.bytes),
-		} as ApiPublicKey,
-		cryptoPrivateKey: AliceSR25519PrivateKey,
 	},
 ] as const;
 

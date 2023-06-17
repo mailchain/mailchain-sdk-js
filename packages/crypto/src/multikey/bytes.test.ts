@@ -6,28 +6,16 @@ import {
 	AliceUncompressedSECP256K1PublicKeyBytes,
 } from '../secp256k1/test.const';
 import {
-	AliceSR25519PublicKey,
-	AliceSR25519PrivateKey,
-	AliceSR25519PrivateKeyBytes,
-	AliceSR25519PublicKeyBytes,
-} from '../sr25519/test.const';
-import {
 	AliceED25519PublicKey,
 	AliceED25519PrivateKey,
 	AliceED25519PrivateKeyBytes,
 	AliceED25519PublicKeyBytes,
 } from '../ed25519/test.const';
-import { IdED25519, IdSR25519, IdSECP256K1 } from '../keys';
+import { IdED25519, IdSECP256K1 } from '../keys';
 import { privateKeyFromBytes, publicKeyFromBytes, privateKeyToBytes, publicKeyToBytes } from './bytes';
 
 describe('publicKeyToBytes()', () => {
 	const tests = [
-		{
-			name: 'sr25519 alice',
-			arg: AliceSR25519PublicKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKeyBytes])),
-			shouldThrow: false,
-		},
 		{
 			name: 'ed25519 alice',
 			arg: AliceED25519PublicKey,
@@ -56,12 +44,6 @@ describe('publicKeyToBytes()', () => {
 
 describe('publicKeyFromBytes()', () => {
 	const tests = [
-		{
-			name: 'sr25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PublicKeyBytes])),
-			expected: AliceSR25519PublicKey,
-			shouldThrow: false,
-		},
 		{
 			name: 'ed25519 alice',
 			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKeyBytes])),
@@ -97,12 +79,6 @@ describe('publicKeyFromBytes()', () => {
 describe('privateKeyToBytes()', () => {
 	const tests = [
 		{
-			name: 'sr25519 alice',
-			arg: AliceSR25519PrivateKey,
-			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKeyBytes])),
-			shouldThrow: false,
-		},
-		{
 			name: 'ed25519 alice',
 			arg: AliceED25519PrivateKey,
 			expected: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKeyBytes])),
@@ -128,12 +104,6 @@ describe('privateKeyToBytes()', () => {
 
 describe('privateKeyFromBytes()', () => {
 	const tests = [
-		{
-			name: 'sr25519 alice',
-			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSR25519]), AliceSR25519PrivateKeyBytes])),
-			expected: AliceSR25519PrivateKey,
-			shouldThrow: false,
-		},
 		{
 			name: 'ed25519 alice',
 			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PrivateKeyBytes])),

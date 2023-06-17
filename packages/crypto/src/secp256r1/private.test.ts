@@ -1,5 +1,5 @@
 import { decodeUtf8 } from '@mailchain/encoding';
-import { blake2AsU8a } from '@polkadot/util-crypto/blake2';
+import { blake2b } from '@noble/hashes/blake2b';
 import {
 	BobSECP256R1PrivateKeyBytes,
 	CarlosSECP256R1PrivateKeyBytes,
@@ -112,7 +112,7 @@ describe('sign()', () => {
 		},
 	];
 	test.each(tests)('$name', async (test) => {
-		const bytesHash = blake2AsU8a(test.message, 256);
+		const bytesHash = blake2b(test.message, { dkLen: 256 / 8 });
 		if (test.shouldThrow) {
 			expect.assertions(1);
 			return new SECP256R1PrivateKey(test.privKey, test.rand)
