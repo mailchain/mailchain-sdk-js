@@ -31,7 +31,10 @@ export class PrivateMessagingKeys {
 		}
 
 		const { data: getMessagingKeyLatestNonce, error: getMessagingKeyLatestNonceError } =
-			await this.addressNonce.getMessagingKeyLatestNonce(address, resolvedAddress.protocol);
+			await this.addressNonce.getMessagingKeyLatestNonce(
+				resolvedAddress.protocolAddress,
+				resolvedAddress.protocol,
+			);
 
 		if (getMessagingKeyLatestNonceError != null) {
 			return { error: getMessagingKeyLatestNonceError };
