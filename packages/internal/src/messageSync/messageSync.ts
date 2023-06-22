@@ -59,35 +59,41 @@ export class MessageSync {
 	async syncWithMessagingKey(mailbox: UserMailbox, messagingKey: KeyRingDecrypter): Promise<SyncResult> {
 		const receiver = this.receiverFactory(this.sdkConfig, messagingKey, this.axiosInstance);
 
-		const messageResults = await receiver.getUndelivered();
+		const undeliveredMessages = await receiver.getUndelivered();
+
 		const messages: MessagePreview[] = [];
-		for (const messageResult of messageResults) {
-			if (messageResult.status !== 'success') {
-				console.warn('failed to get undelivered message', messageResult.cause);
+		for (const undeliveredMessage of undeliveredMessages) {
+			if (undeliveredMessage.status !== 'success') {
+				console.warn('failed to get undelivered message', undeliveredMessage.cause);
 				continue;
 			}
 
 			const savedMessages = await this.mailboxOperations
-				.saveReceivedMessage({ receivedTransportPayload: messageResult.payload, userMailbox: mailbox })
+				.saveReceivedMessage({ receivedTransportPayload: undeliveredMessage.payload, userMailbox: mailbox })
 				.catch((e) => {
-					console.warn(`Failed saving received message with hash ${messageResult.deliveryRequestHash}`, e);
+					console.warn(
+						`Failed saving received message with hash ${undeliveredMessage.deliveryRequestHash}`,
+						e,
+					);
 					return undefined;
 				});
 
 			if (savedMessages && savedMessages.length > 0) {
 				messages.push(...savedMessages);
 				await receiver
-					.confirmDelivery(messageResult.deliveryRequestHash)
+					.confirmDelivery(undeliveredMessage.deliveryRequestHash)
 					.then(() => {
 						console.debug(
 							`Successfully confirmed delivery message hash ${encodeHex(
-								messageResult.deliveryRequestHash,
+								undeliveredMessage.deliveryRequestHash,
 							)}`,
 						);
 					})
 					.catch((e) =>
 						console.warn(
-							`Failed saving received message with hash ${encodeHex(messageResult.deliveryRequestHash)}`,
+							`Failed saving received message with hash ${encodeHex(
+								undeliveredMessage.deliveryRequestHash,
+							)}`,
 							e,
 						),
 					);

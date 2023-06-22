@@ -1,7 +1,7 @@
 import { KeyRingDecrypter } from '@mailchain/keyring';
 import axios, { AxiosInstance } from 'axios';
 import { Payload } from '../../transport';
-import { PayloadReceiver } from '../payload';
+import { PayloadReceiver, UndeliveredPayloadOk } from '../payload';
 import { Configuration } from '../../configuration';
 import { ReadonlyMailerPayload } from '../../transport/mailer/payload';
 import { MailerContentResolver } from '../mailer';
@@ -74,32 +74,36 @@ export class MailReceiver {
 		const undeliveredPayloads = await this.payloadReceiver.getUndelivered();
 
 		return Promise.all(
-			undeliveredPayloads.map(async (result) => {
-				switch (result.status) {
+			undeliveredPayloads.map<Promise<ReceivedMail>>(async (undeliveredPayload) => {
+				switch (undeliveredPayload.status) {
 					case 'success':
-						return {
-							status: 'success',
-							payload: await this.processReceivedPayload(result.payload),
-							deliveryRequestHash: result.deliveryRequestHash,
-						};
+						return this.processReceivedPayload(undeliveredPayload);
 					case 'error-payload':
-						return {
-							status: 'failure',
-							cause: result.cause,
-						};
 					case 'error-delivery-request':
 						return {
 							status: 'failure',
-							cause: result.cause,
+							cause: undeliveredPayload.cause,
 						};
 					default:
 						return {
 							status: 'failure',
-							cause: new Error('unknown status'),
+							cause: new Error('failed processing received payload, unknown status'),
 						};
 				}
 			}),
 		);
+	}
+
+	private async processReceivedPayload(undeliveredPayload: UndeliveredPayloadOk): Promise<ReceivedMail> {
+		try {
+			return {
+				status: 'success',
+				payload: await this.processReceivedPayloadData(undeliveredPayload.payload),
+				deliveryRequestHash: undeliveredPayload.deliveryRequestHash,
+			};
+		} catch (e) {
+			return { status: 'failure', cause: new Error('failed processing received payload', { cause: e }) };
+		}
 	}
 
 	/**
@@ -107,7 +111,7 @@ export class MailReceiver {
 	 * @param payload the decrypted payload received from the network.
 	 * @returns
 	 */
-	private async processReceivedPayload(payload: Payload): Promise<ReadonlyMailPayload> {
+	private async processReceivedPayloadData(payload: Payload): Promise<ReadonlyMailPayload> {
 		switch (payload.Headers.ContentType) {
 			case 'message/x.mailchain':
 				return payload;

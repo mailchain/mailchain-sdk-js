@@ -40,15 +40,7 @@ describe('Receiving payload tests', () => {
 
 		const payload = await createMailPayload(BobED25519PrivateKey, message.original);
 
-		const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
-			ED25519PrivateKey.fromSecretKey(
-				Uint8Array.from([
-					78, 137, 46, 117, 36, 79, 240, 211, 46, 165, 198, 84, 140, 255, 38, 95, 235, 121, 115, 216, 195,
-					196, 123, 185, 229, 233, 198, 194, 228, 232, 45, 166, 100, 165, 182, 109, 29, 160, 199, 39, 195, 10,
-					213, 69, 101, 181, 112, 205, 121, 83, 92, 64, 76, 73, 241, 81, 215, 81, 88, 177, 64, 131, 145, 79,
-				]),
-			),
-		);
+		const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate());
 
 		const serializedContent = await serializeAndEncryptPayload(payload, payloadRootEncryptionKey);
 

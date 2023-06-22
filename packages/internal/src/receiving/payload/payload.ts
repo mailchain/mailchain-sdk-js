@@ -75,7 +75,7 @@ export class PayloadReceiver {
 							cause: result.cause,
 							deliveryRequestHash: result.deliveryRequestHash,
 							status: 'error-delivery-request',
-						} as UndeliveredPayloadError;
+						};
 				}
 			}),
 		);
