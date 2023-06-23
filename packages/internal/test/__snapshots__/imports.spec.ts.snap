@@ -55,6 +55,7 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/internal/receiving/transport/payload/verifier",
   "@mailchain/internal/receiving/transport/serialization",
   "@mailchain/internal/sending/configuration",
+  "@mailchain/internal/sending/deliveryRequests",
   "@mailchain/internal/sending/errors",
   "@mailchain/internal/sending/formatters/generate",
   "@mailchain/internal/sending/index",
