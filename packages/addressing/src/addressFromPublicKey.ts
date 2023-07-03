@@ -1,8 +1,7 @@
 import { PublicKey } from '@mailchain/crypto';
-import { ETHEREUM, FILECOIN, ProtocolType, TEZOS } from './protocols';
+import { ETHEREUM, ProtocolType, TEZOS } from './protocols';
 import { addressFromPublicKey as ethereumAddressFromPublicKey } from './protocols/ethereum/address';
 import { tezosAddressFromPublicKey } from './protocols/tezos/address';
-import { convertEthAddressToFilDelegated, MAINNET_PREFIX } from './protocols/filecoin/delegatedAddress';
 
 /**
  * Derive the address corresponding to the {@link PublicKey}.
@@ -18,9 +17,6 @@ export async function addressFromPublicKey(publicKey: PublicKey, protocol: Proto
 			return ethereumAddressFromPublicKey(publicKey);
 		case TEZOS:
 			return tezosAddressFromPublicKey(publicKey);
-		case FILECOIN:
-			const ethAddress = await ethereumAddressFromPublicKey(publicKey);
-			return convertEthAddressToFilDelegated(ethAddress, MAINNET_PREFIX);
 		default:
 			throw new Error(`address from PublicKey for {${protocol}} not unsupported`);
 	}

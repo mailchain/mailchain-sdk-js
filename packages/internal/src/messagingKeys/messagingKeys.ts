@@ -132,7 +132,6 @@ export class MessagingKeys {
 		}
 
 		return this.messagingKeyContractCall.resolve(
-			data.protocol as ProtocolType,
 			data.contractCall,
 			data.identityKey ? convertPublic(data.identityKey) : undefined,
 		);
@@ -196,7 +195,7 @@ export class MessagingKeys {
 		try {
 			const { data } = await this.addressApi.getAddressMessagingKey(address);
 
-			const protocol = data.protocol as ProtocolType;
+			const protocol = data.contractCall.protocol as ProtocolType;
 			if (!ALL_PROTOCOLS.includes(protocol)) {
 				return { error: new ProtocolNotSupportedError(protocol) };
 			}

@@ -9,7 +9,7 @@ import { ETHEREUM, NEAR, TEZOS, ProtocolType } from '@mailchain/addressing';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
-import { FILECOIN, MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
+import { MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
 import { Configuration, MailchainResult } from '../';
 import { NearContractCallResolver } from './contractResolvers/near';
 import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
@@ -31,7 +31,6 @@ export class MessagingKeyContractCall {
 		return new MessagingKeyContractCall(
 			new Map<ProtocolType, ContractCallMessagingKeyResolver>([
 				[ETHEREUM, mailchainKeyRegistryResolver],
-				[FILECOIN, mailchainKeyRegistryResolver],
 				[MAILCHAIN, mailchainKeyRegistryResolver],
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[TEZOS, mailchainKeyRegistryResolver],
@@ -42,10 +41,10 @@ export class MessagingKeyContractCall {
 	}
 
 	async resolve(
-		protocol: ProtocolType,
 		contractCall: ContractCall,
 		identityKey?: PublicKey,
 	): Promise<MailchainResult<ResolvedAddress, ResolveAddressError>> {
+		const protocol = contractCall.protocol as ProtocolType;
 		const resolver = this.resolvers.get(protocol);
 		if (!resolver) {
 			return { error: new ProtocolNotSupportedError(protocol) };
@@ -56,7 +55,7 @@ export class MessagingKeyContractCall {
 			if (error instanceof MessagingKeyNotFoundInContractError) {
 				const vendedKeyResponse = await this.messagingKeysApi.getVendedPublicMessagingKey(
 					contractCall.address,
-					contractCall.protocol as any,
+					protocol as any,
 				);
 				const verified = await this.messagingKeyVerifier.verifyProvidedKeyProof(
 					vendedKeyResponse.data.proof,

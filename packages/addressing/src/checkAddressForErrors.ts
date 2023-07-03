@@ -1,5 +1,5 @@
 import { BadlyFormattedAddressError, IdentityProviderAddressInvalidError } from './errors';
-import { ETHEREUM, FILECOIN, NEAR, TEZOS } from './protocols';
+import { ETHEREUM, NEAR, TEZOS } from './protocols';
 import { validateEthereumAddress } from './protocols/ethereum/address';
 import { validateNearAccountId } from './protocols/near/address';
 import { validateTezosAddress } from './protocols/tezos/address';
@@ -74,7 +74,7 @@ function validateIdentityProviderAddress(
 				return new IdentityProviderAddressInvalidError();
 			}
 			break;
-		case FILECOIN:
+		case 'filecoin':
 			if (!validateFilecoinAddress(address)) {
 				return new IdentityProviderAddressInvalidError();
 			}

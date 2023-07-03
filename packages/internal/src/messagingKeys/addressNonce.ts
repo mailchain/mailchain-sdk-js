@@ -1,6 +1,5 @@
 import {
 	ETHEREUM,
-	FILECOIN,
 	MAILCHAIN,
 	NEAR,
 	ProtocolNotSupportedError,
@@ -35,7 +34,6 @@ export class AddressNonce {
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[ETHEREUM, mailchainKeyRegistryResolver],
 				[TEZOS, mailchainKeyRegistryResolver],
-				[FILECOIN, mailchainKeyRegistryResolver],
 			]),
 		);
 	}

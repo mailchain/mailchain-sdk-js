@@ -31,6 +31,7 @@ describe('MessagingKeys', () => {
 			data: {
 				protocol: 'near',
 				contractCall: {
+					protocol: 'near',
 					contractAddress: 'alice.near',
 					method: 'getMessagingKey',
 					body: '[]',

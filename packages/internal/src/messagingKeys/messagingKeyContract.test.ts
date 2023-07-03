@@ -37,10 +37,10 @@ describe('MessagingKeyContractCall', () => {
 		resolvers.set(NEAR, nearResolver);
 
 		const actual = await messagingKeyContractCall.resolve(
-			NEAR,
 			{
 				body: 'body',
 				method: 'POST',
+				protocol: NEAR,
 			} as ContractCall,
 			identityKey.publicKey,
 		);
@@ -73,10 +73,10 @@ describe('MessagingKeyContractCall', () => {
 		resolvers.set(NEAR, nearResolver);
 
 		const actual = await messagingKeyContractCall.resolve(
-			NEAR,
 			{
 				body: 'body',
 				method: 'POST',
+				protocol: NEAR,
 			} as ContractCall,
 			identityKey.publicKey,
 		);
@@ -95,14 +95,14 @@ describe('MessagingKeyContractCall', () => {
 		resolvers.set(NEAR, nearResolver);
 
 		expect(
-			await messagingKeyContractCall.resolve(ETHEREUM, {
+			await messagingKeyContractCall.resolve({
 				body: 'body',
 				method: 'POST',
 				identityKey: convertPublic(identityKey.publicKey),
 				endpoint: 'http://endpoint',
 				address: 'address',
 				path: '/',
-				protocol: 'near',
+				protocol: ETHEREUM,
 			} as ContractCall),
 		).toEqual({ error: new ProtocolNotSupportedError(ETHEREUM) });
 	});

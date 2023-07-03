@@ -17,17 +17,15 @@ export const NEAR = 'near' as const;
 
 export const TEZOS = 'tezos' as const;
 
-export const FILECOIN = 'filecoin' as const;
-
 /**
  * Mailchain protocol name.
  */
 export const MAILCHAIN = 'mailchain' as const;
 
-export const ALL_PROTOCOLS = [ALGORAND, ETHEREUM, SUBSTRATE, NEAR, MAILCHAIN, TEZOS, FILECOIN] as const;
+export const ALL_PROTOCOLS = [ALGORAND, ETHEREUM, SUBSTRATE, NEAR, MAILCHAIN, TEZOS] as const;
 export type ProtocolType = (typeof ALL_PROTOCOLS)[number];
 
-const ENABLED_PROTOCOLS = [ETHEREUM, NEAR, TEZOS, FILECOIN] as const;
+const ENABLED_PROTOCOLS = [ETHEREUM, NEAR, TEZOS] as const;
 export type EnabledBlockchainProtocol = (typeof ENABLED_PROTOCOLS)[number];
 export function isBlockchainProtocolEnabled(protocol: string): protocol is EnabledBlockchainProtocol {
 	return ENABLED_PROTOCOLS.includes(protocol as EnabledBlockchainProtocol);

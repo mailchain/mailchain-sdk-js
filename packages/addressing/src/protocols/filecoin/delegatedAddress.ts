@@ -2,6 +2,8 @@ import { decodeUtf8 } from '@mailchain/encoding';
 import { decodeBase32, encodeBase32 } from '@mailchain/encoding/base32';
 import { blake2b } from '@noble/hashes/blake2b';
 import isEqual from 'lodash/isEqual';
+import { PublicKey } from '@mailchain/crypto';
+import { addressFromPublicKey as ethereumAddressFromPublicKey } from '../ethereum/address';
 import { FilecoinAddressType } from './types';
 
 const MIN_FIL_ADDRESS_STR_LENGTH = 6;
@@ -69,6 +71,14 @@ export function convertFilDelegatedAddressToEthAddress(fileCoinAddress: string):
 	}
 
 	return { data: ethAddress };
+}
+
+/**
+ * Compute the Filecoin F4 Ethereum delegated address from the provided PublicKey.
+ */
+export async function filDelegatedAddressFromPublicKey(publicKey: PublicKey): Promise<Uint8Array> {
+	const ethAddress = await ethereumAddressFromPublicKey(publicKey);
+	return convertEthAddressToFilDelegated(ethAddress, MAINNET_PREFIX);
 }
 
 export function convertEthAddressToFilDelegated(

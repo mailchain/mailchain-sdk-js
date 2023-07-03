@@ -1,6 +1,6 @@
 import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
 import { parseWalletAddress } from './parseWalletAddress';
-import { ETHEREUM, FILECOIN, NEAR, TEZOS } from './protocols';
+import { ETHEREUM, NEAR, TEZOS } from './protocols';
 import { validateTezosAddress } from './protocols/tezos/address';
 import { validateFilecoinAddress } from './protocols/filecoin/address';
 import { validateNearImplicitAccount } from './protocols/near/address';
@@ -35,8 +35,8 @@ export function isTezosAddress(address: MailchainAddress): boolean {
 }
 
 export function isFilecoinAddress(address: MailchainAddress): boolean {
-	const props = parseWalletAddress(address);
+	const domainParts = address.domain.split('.');
 
-	if (props?.protocol !== FILECOIN) return false;
+	if (domainParts[0] !== 'filecoin') return false;
 	return validateFilecoinAddress(address.username);
 }
