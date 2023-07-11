@@ -4,7 +4,17 @@ export interface PublicKey {
 	curve: string;
 }
 
+/**
+ * Compares two {@link PublicKey} objects for equality.
+ * @param a The first {@link PublicKey} to compare.
+ * @param b The second {@link PublicKey} to compare.
+ * @returns True if both {@link PublicKey} are equal, false otherwise.
+ */
 export function isPublicKeyEqual(a: PublicKey, b: PublicKey): boolean {
+	if (a.curve !== b.curve) {
+		return false;
+	}
+
 	if (a.bytes.length !== a.bytes.length) {
 		return false;
 	}
