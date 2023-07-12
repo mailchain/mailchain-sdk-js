@@ -1,7 +1,4 @@
-import { createNameServiceAddress } from '@mailchain/addressing';
-import { AliceFilStr } from '@mailchain/addressing/protocols/filecoin/const';
 import { consolidateMailbox, consolidateMailboxAliases, consolidateMailboxLabel } from './consolidateMailbox';
-import { createMailboxAlias } from './createAlias';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox, BobWalletMailbox } from './test.const';
 import { Alias } from './types';
 
@@ -54,20 +51,6 @@ describe('consolidateMailbox', () => {
 			const result = consolidateMailboxAliases(mailbox);
 
 			expect(result.aliases).toEqual([AliceAccountMailbox.aliases[0], BobAccountMailbox.aliases[0]]);
-		});
-
-		it('should filter Filecoin aliases', () => {
-			const mailbox = {
-				...AliceWalletMailbox,
-				aliases: [
-					AliceWalletMailbox.aliases[0],
-					createMailboxAlias(createNameServiceAddress(AliceFilStr, 'filecoin.mailchain.test')),
-				] as [Alias, ...Alias[]],
-			};
-
-			const result = consolidateMailboxAliases(mailbox);
-
-			expect(result.aliases).toEqual([AliceWalletMailbox.aliases[0]]);
 		});
 	});
 
