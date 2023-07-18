@@ -16,7 +16,7 @@ import {
 	PublicKey,
 	SignerWithPublicKey,
 } from '@mailchain/crypto';
-import { AxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import {
 	Setting,
 	UserApiFactory,
@@ -42,7 +42,9 @@ import { createMailboxAlias } from './createAlias';
 import { consolidateMailbox } from './consolidateMailbox';
 
 export type UserSettings = {
-	[key: string]: Setting | undefined;
+	[key: string]: {
+		[key: string]: Setting | undefined;
+	};
 };
 
 export class UserNotFoundError extends Error {
@@ -50,6 +52,10 @@ export class UserNotFoundError extends Error {
 		super(`user not found for provided key`);
 	}
 }
+
+export const GENERIC_SETTINGS_GROUP = 'generic' as const;
+
+export type SettingsGroup = typeof GENERIC_SETTINGS_GROUP;
 
 const CURRENT_MAILBOX_VERSION = 6 as const;
 
@@ -60,8 +66,10 @@ export interface UserProfile {
 	addMailbox(mailbox: NewUserMailbox): Promise<UserMailbox>;
 	updateMailbox(mailboxId: string, mailbox: NewUserMailbox): Promise<UserMailbox>;
 	removeMailbox(mailboxId: string): Promise<void>;
-	getSettings(): Promise<UserSettings>;
-	setSetting(key: string, value: string): Promise<void>;
+	getSetting(key: string): Promise<Setting | undefined>;
+	getSettings(group?: SettingsGroup): Promise<Map<string, Setting>>;
+	setSetting(key: string, value: string, opts?: { group?: SettingsGroup }): Promise<void>;
+	deleteSetting(key: string): Promise<void>;
 	getUsername(): Promise<{ username: string; address: string }>;
 }
 
@@ -117,13 +125,37 @@ export class MailchainUserProfile implements UserProfile {
 			});
 	}
 
-	async setSetting(key: string, value: string) {
-		await this.userApi.putUserSetting(key, { value });
+	async setSetting(key: string, value: string, opts?: { group?: SettingsGroup }) {
+		await this.userApi.putUserSetting(key, { value, group: opts?.group });
 	}
 
-	async getSettings(): Promise<UserSettings> {
-		const { data } = await this.userApi.getUserSettings();
-		return data.settings ?? {};
+	async getSettings(group?: SettingsGroup) {
+		try {
+			const { data } = await this.userApi.getUserSettings(group);
+			return new Map<string, Setting>(data.settings.map((s) => [s.name, s]));
+		} catch (e) {
+			if (isAxiosError(e) && e.response?.status === 422) {
+				// Invalid group
+				return new Map<string, Setting>();
+			}
+			throw e;
+		}
+	}
+
+	async getSetting(key: string) {
+		try {
+			const { data } = await this.userApi.getUserSetting(key);
+			return data;
+		} catch (e) {
+			if (isAxiosError(e) && (e.response?.status === 404 || e.response?.status === 422)) {
+				return undefined;
+			}
+			throw e;
+		}
+	}
+
+	async deleteSetting(key: string) {
+		await this.userApi.deleteUserSetting(key);
 	}
 
 	async mailboxes(): Promise<[UserMailbox, ...UserMailbox[]]> {
