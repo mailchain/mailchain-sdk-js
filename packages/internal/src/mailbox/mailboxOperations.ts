@@ -58,6 +58,8 @@ export interface MailboxOperations {
 	getOutboxMessages(): Promise<MessagePreview[]>;
 	/** Get messages from the Archived folder (with ARCHIVED label) */
 	getArchivedMessages(): Promise<MessagePreview[]>;
+	/** Get messages from the Spam folder (with SPAM label). Warn: This feature is still in development, is is not stable for usage. */
+	getSpamMessages_unstable(): Promise<MessagePreview[]>;
 	searchMessages(): Promise<MessagePreview[]>;
 
 	/** Get the full contents of the single message for the provided ID (same as the {@link MessagePreview.id}) */
@@ -79,6 +81,8 @@ export interface MailboxOperations {
 	modifyIsReadMessage(messageId: string, isRead: boolean): Promise<void>;
 	modifyTrashMessage(messageId: string, trash: boolean): Promise<void>;
 	modifyStarredMessage(messageId: string, isStarred: boolean): Promise<void>;
+	/**  Warn: This feature is still in development, is is not stable for usage. */
+	modifySpamMessage_unstable(messageId: string, isSpam: boolean): Promise<void>;
 	modifyUserLabel(messageId: string, userLabel: UserMessageLabel, include: boolean): Promise<void>;
 }
 
@@ -159,6 +163,11 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	async getArchivedMessages(): Promise<MessagePreview[]> {
 		const messages = await this.inboxApi.getMessagesInArchivedView().then((res) => res.data.messages);
+		return this.handleMessagePreviews(messages);
+	}
+
+	async getSpamMessages_unstable(): Promise<MessagePreview[]> {
+		const messages: ApiMessagePreview[] = []; // await this.inboxApi.getMessagesInSpamView().then((res) => res.data.messages);
 		return this.handleMessagePreviews(messages);
 	}
 
@@ -360,6 +369,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	async modifyStarredMessage(messageId: string, isStarred: boolean): Promise<void> {
 		await this.modifySystemLabel(messageId, 'starred', isStarred);
+	}
+
+	async modifySpamMessage_unstable(messageId: string, isSpam: boolean): Promise<void> {
+		await this.modifySystemLabel(messageId, 'spam', isSpam);
 	}
 
 	private async modifySystemLabel(
