@@ -18,6 +18,13 @@ import { MailchainUserProfile, UserProfile } from '@mailchain/internal/user';
 import { MailboxOperations, MailchainMailboxOperations } from '@mailchain/internal/mailbox';
 import { UserMailbox } from '@mailchain/internal/user/types';
 import { defaultConfiguration } from '@mailchain/internal/configuration';
+import {
+	MailboxRuleEngine,
+	MailchainRuleRepository,
+	MailchainUserBlocklistRule,
+} from '@mailchain/internal/mailboxRuleEngine';
+import { defaultConditionHandlers } from '@mailchain/internal/mailboxRuleEngine/conditionsHandler';
+import { defaultActionHandlers } from '@mailchain/internal/mailboxRuleEngine/actionsHandler';
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
@@ -26,10 +33,21 @@ export class Mailchain {
 		this._userProfile = MailchainUserProfile.create(
 			config,
 			keyRing.accountIdentityKey(),
-			keyRing.userProfileCrypto(),
+			keyRing.userMailboxCrypto(),
+			keyRing.userSettingsCrypto(),
 		);
 
-		this._mailboxOperations = MailchainMailboxOperations.create(config, keyRing);
+		const mailchainUserBlocklist = MailchainUserBlocklistRule.create(this._userProfile);
+		const mailchainRuleRepository = MailchainRuleRepository.create(
+			() => Promise.resolve([mailchainUserBlocklist]),
+			this._userProfile,
+		);
+		const mailboxRuleEngine = MailboxRuleEngine.create(mailchainRuleRepository.asRulesSource());
+
+		this._mailboxOperations = MailchainMailboxOperations.create(config, keyRing, mailboxRuleEngine);
+
+		mailboxRuleEngine.addConditionHandler(...defaultConditionHandlers(config));
+		mailboxRuleEngine.addActionHandler(...defaultActionHandlers(this._mailboxOperations));
 	}
 
 	static fromAccountSeed(seed: Uint8Array | string, config: Configuration = defaultConfiguration) {

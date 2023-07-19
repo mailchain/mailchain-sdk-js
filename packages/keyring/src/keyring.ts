@@ -16,9 +16,10 @@ import {
 	DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 	DERIVATION_PATH_IDENTITY_KEY_ROOT,
 	DERIVATION_PATH_INBOX_ROOT,
-	DERIVATION_PATH_USER_PROFILE,
 	DERIVATION_PATH_MESSAGING_KEY_ROOT,
 	DERIVATION_PATH_DATE_OFFSET,
+	DERIVATION_PATH_USER_PROFILE,
+	DERIVATION_PATH_USER_PROFILE_SETTINGS,
 } from './constants';
 import { ecdhKeyRingDecrypter, InboxKey, KeyRingDecrypter } from './functions';
 
@@ -27,7 +28,9 @@ export type PrivateMessagingKey = KeyRingDecrypter;
 export class KeyRing {
 	private readonly _accountIdentityKey: ED25519ExtendedPrivateKey;
 	private readonly _rootEncryptionKey: ED25519ExtendedPrivateKey;
-	private readonly _userProfileEncryptionKey: ED25519ExtendedPrivateKey;
+	private readonly _rootUserProfileEncryptionKey: ED25519ExtendedPrivateKey;
+	private readonly _userMailboxEncryptionKey: ED25519ExtendedPrivateKey;
+	private readonly _userSettingsEncryptionKey: ED25519ExtendedPrivateKey;
 	private readonly _rootInboxKey: ED25519ExtendedPrivateKey;
 	// used to derive messaging keys for all protocol addresses
 	private readonly _protocolAddressRootMessagingKey: ED25519ExtendedPrivateKey;
@@ -69,10 +72,20 @@ export class KeyRing {
 			ED25519ExtendedPrivateKey.fromPrivateKey(accountKey),
 			DERIVATION_PATH_ENCRYPTION_KEY_ROOT,
 		);
-		this._userProfileEncryptionKey = deriveHardenedKey(
+
+		this._rootUserProfileEncryptionKey = deriveHardenedKey(
 			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootEncryptionKey.privateKey),
 			DERIVATION_PATH_USER_PROFILE,
 		);
+		this._userSettingsEncryptionKey = deriveHardenedKey(
+			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootUserProfileEncryptionKey.privateKey),
+			DERIVATION_PATH_USER_PROFILE_SETTINGS,
+		);
+
+		// For legacy purposes `userMailboxEncryptionKey` uses the "UserProfile" (instead of UserProfile.Mailbox) as path to avoid having to do migration.
+		// More info: https://github.com/mailchain/monorepo/pull/1857#discussion_r1268021100
+		this._userMailboxEncryptionKey = this._rootUserProfileEncryptionKey;
+
 		this._rootInboxKey = deriveHardenedKey(
 			ED25519ExtendedPrivateKey.fromPrivateKey(this._rootEncryptionKey.privateKey),
 			DERIVATION_PATH_INBOX_ROOT,
@@ -119,10 +132,24 @@ export class KeyRing {
 		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
 	}
 
-	userProfileCrypto(): Encrypter & Decrypter {
-		const inboxKey = this._userProfileEncryptionKey.privateKey;
-		const decrypter = PrivateKeyDecrypter.fromPrivateKey(inboxKey);
-		const encrypter = PrivateKeyEncrypter.fromPrivateKey(inboxKey);
+	/**
+	 * Crypto operations for encrypting and decrypting the persisted data of the user mailboxes.
+	 */
+	userMailboxCrypto(): Encrypter & Decrypter {
+		const mailboxKey = this._userMailboxEncryptionKey.privateKey;
+		const decrypter = PrivateKeyDecrypter.fromPrivateKey(mailboxKey);
+		const encrypter = PrivateKeyEncrypter.fromPrivateKey(mailboxKey);
+
+		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
+	}
+
+	/**
+	 * Crypto operations for encrypting and decrypting the persisted data of the user settings.
+	 */
+	userSettingsCrypto(): Encrypter & Decrypter {
+		const mailboxKey = this._userSettingsEncryptionKey.privateKey;
+		const decrypter = PrivateKeyDecrypter.fromPrivateKey(mailboxKey);
+		const encrypter = PrivateKeyEncrypter.fromPrivateKey(mailboxKey);
 
 		return { encrypt: (input) => encrypter.encrypt(input), decrypt: (input) => decrypter.decrypt(input) };
 	}

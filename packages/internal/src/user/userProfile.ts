@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
+import { decodeBase64, decodeUtf8, encodeBase64, encodeUtf8 } from '@mailchain/encoding';
 import {
 	createWalletAddress,
 	decodeAddressByProtocol,
@@ -18,6 +18,7 @@ import {
 } from '@mailchain/crypto';
 import { AxiosError, isAxiosError } from 'axios';
 import {
+	PutUserSettingRequestBodyGroupEnum,
 	Setting,
 	UserApiFactory,
 	UserApiInterface,
@@ -41,21 +42,15 @@ import { Alias, UserMailbox } from './types';
 import { createMailboxAlias } from './createAlias';
 import { consolidateMailbox } from './consolidateMailbox';
 
-export type UserSettings = {
-	[key: string]: {
-		[key: string]: Setting | undefined;
-	};
-};
-
 export class UserNotFoundError extends Error {
 	constructor() {
 		super(`user not found for provided key`);
 	}
 }
 
-export const GENERIC_SETTINGS_GROUP = 'generic' as const;
+export const GENERIC_SETTINGS_GROUP = PutUserSettingRequestBodyGroupEnum.Generic;
 
-export type SettingsGroup = typeof GENERIC_SETTINGS_GROUP;
+export type SettingsGroup = PutUserSettingRequestBodyGroupEnum;
 
 const CURRENT_MAILBOX_VERSION = 6 as const;
 
@@ -66,9 +61,9 @@ export interface UserProfile {
 	addMailbox(mailbox: NewUserMailbox): Promise<UserMailbox>;
 	updateMailbox(mailboxId: string, mailbox: NewUserMailbox): Promise<UserMailbox>;
 	removeMailbox(mailboxId: string): Promise<void>;
-	getSetting(key: string): Promise<Setting | undefined>;
 	getSettings(group?: SettingsGroup): Promise<Map<string, Setting>>;
-	setSetting(key: string, value: string, opts?: { group?: SettingsGroup }): Promise<void>;
+	setSetting(key: string, value: string, opts?: { group?: SettingsGroup; secure?: boolean }): Promise<void>;
+	getSetting(key: string): Promise<Setting | undefined>;
 	deleteSetting(key: string): Promise<void>;
 	getUsername(): Promise<{ username: string; address: string }>;
 }
@@ -79,6 +74,7 @@ export class MailchainUserProfile implements UserProfile {
 		private readonly userApi: UserApiInterface,
 		private readonly accountIdentityKey: () => Promise<PublicKey>,
 		private readonly mailboxCrypto: Encrypter & Decrypter,
+		private readonly settingsCrypto: Encrypter & Decrypter,
 		private readonly migration: UserMailboxMigrationRule,
 	) {}
 
@@ -86,6 +82,7 @@ export class MailchainUserProfile implements UserProfile {
 		config: Configuration,
 		accountIdentityKey: SignerWithPublicKey,
 		mailboxCrypto: Encrypter & Decrypter,
+		settingsCrypto: Encrypter & Decrypter,
 	): MailchainUserProfile {
 		const axiosConfig = createAxiosConfiguration(config.apiPath);
 		const identityKeys = IdentityKeys.create(config);
@@ -103,6 +100,7 @@ export class MailchainUserProfile implements UserProfile {
 			userApi,
 			() => Promise.resolve(accountIdentityKey.publicKey),
 			mailboxCrypto,
+			settingsCrypto,
 			migrations,
 		);
 	}
@@ -125,14 +123,35 @@ export class MailchainUserProfile implements UserProfile {
 			});
 	}
 
-	async setSetting(key: string, value: string, opts?: { group?: SettingsGroup }) {
-		await this.userApi.putUserSetting(key, { value, group: opts?.group });
+	async setSetting(key: string, value: string, opts?: { group?: SettingsGroup; secure?: boolean }): Promise<void> {
+		const valueToStore = opts?.secure ? encodeBase64(await this.settingsCrypto.encrypt(decodeUtf8(value))) : value;
+		await this.userApi.putUserSetting(key, {
+			value: valueToStore,
+			kind: opts?.secure ? 'encrypted' : 'string',
+			group: opts?.group,
+		});
+	}
+
+	async getSetting(key: string) {
+		try {
+			const { data } = await this.userApi.getUserSetting(key);
+			return this.handleSettingsItem(data);
+		} catch (e) {
+			if (isAxiosError(e) && (e.response?.status === 404 || e.response?.status === 422)) {
+				return undefined;
+			}
+			throw e;
+		}
 	}
 
 	async getSettings(group?: SettingsGroup) {
 		try {
 			const { data } = await this.userApi.getUserSettings(group);
-			return new Map<string, Setting>(data.settings.map((s) => [s.name, s]));
+			const result = new Map<string, Setting>();
+			for (const setting of data.settings) {
+				result.set(setting.name, await this.handleSettingsItem(setting));
+			}
+			return result;
 		} catch (e) {
 			if (isAxiosError(e) && e.response?.status === 422) {
 				// Invalid group
@@ -142,16 +161,14 @@ export class MailchainUserProfile implements UserProfile {
 		}
 	}
 
-	async getSetting(key: string) {
-		try {
-			const { data } = await this.userApi.getUserSetting(key);
-			return data;
-		} catch (e) {
-			if (isAxiosError(e) && (e.response?.status === 404 || e.response?.status === 422)) {
-				return undefined;
-			}
-			throw e;
+	private async handleSettingsItem(item: Setting) {
+		if (item.kind === 'encrypted' && item.value) {
+			return {
+				...item,
+				value: encodeUtf8(await this.settingsCrypto.decrypt(decodeBase64(item.value))),
+			};
 		}
+		return item;
 	}
 
 	async deleteSetting(key: string) {

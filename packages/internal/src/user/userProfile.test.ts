@@ -1,4 +1,4 @@
-import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
+import { decodeBase64, decodeUtf8, encodeBase64 } from '@mailchain/encoding';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ED25519PublicKey, publicKeyToBytes, secureRandom } from '@mailchain/crypto';
 import { AxiosResponse } from 'axios';
@@ -9,6 +9,7 @@ import {
 	GetUserMailboxesResponseBody,
 	GetUsernameResponseBody,
 	PostUserMailboxResponseBody,
+	Setting,
 	UserApiInterface,
 } from '@mailchain/api';
 import { user } from '../protobuf/user/user';
@@ -73,14 +74,16 @@ describe('userProfile', () => {
 			'mailchain.test',
 			mockUserApi,
 			fetchIdentityKey,
-			aliceKeyRing.userProfileCrypto(),
+			aliceKeyRing.userMailboxCrypto(),
+			aliceKeyRing.userSettingsCrypto(),
 			nopMigration(),
 		);
 		userProfileWithMigration = new MailchainUserProfile(
 			'mailchain.test',
 			mockUserApi,
 			fetchIdentityKey,
-			aliceKeyRing.userProfileCrypto(),
+			aliceKeyRing.userMailboxCrypto(),
+			aliceKeyRing.userSettingsCrypto(),
 			dummyMigration,
 		);
 	});
@@ -121,7 +124,7 @@ describe('userProfile', () => {
 		const [mailboxId, postedData] = mockUserApi.putUserMailbox.mock.calls[0];
 		expect(mailboxId).toEqual(AliceWalletMailbox.id);
 		const protoMailbox = user.Mailbox.decode(
-			await aliceKeyRing.userProfileCrypto().decrypt(decodeBase64(postedData.encryptedMailboxInformation)),
+			await aliceKeyRing.userMailboxCrypto().decrypt(decodeBase64(postedData.encryptedMailboxInformation)),
 		);
 		expect(protoMailbox).toEqual(protoMailbox1);
 		expect(resMailbox).toEqual(AliceWalletMailbox);
@@ -139,7 +142,7 @@ describe('userProfile', () => {
 
 	it('should run migration on mailbox and store the update', async () => {
 		const encryptedMailboxInformation = encodeBase64(
-			await aliceKeyRing.userProfileCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),
+			await aliceKeyRing.userMailboxCrypto().encrypt(user.Mailbox.encode(protoMailbox1).finish()),
 		);
 		mockUserApi.getUserMailboxes.mockResolvedValue({
 			data: { mailboxes: [{ encryptedMailboxInformation, version: 1, mailboxId: AliceWalletMailbox.id }] },
@@ -151,5 +154,54 @@ describe('userProfile', () => {
 		expect(mockUserApi.putUserMailbox.mock.calls[0][0]).toEqual(AliceWalletMailbox.id);
 		expect(mockUserApi.putUserMailbox.mock.calls[0][1].version).toEqual(2);
 		expect(mockUserApi.putUserMailbox.mock.calls[0][1].encryptedMailboxInformation).toBeDefined();
+	});
+
+	it('should set string setting', async () => {
+		await userProfile.setSetting('key', 'value');
+
+		expect(mockUserApi.putUserSetting).toHaveBeenCalledWith('key', { value: 'value', kind: 'string' });
+	});
+
+	it('should set encrypted setting', async () => {
+		await userProfile.setSetting('key', 'value', { secure: true });
+
+		expect(mockUserApi.putUserSetting).toHaveBeenCalledWith(
+			'key',
+			expect.objectContaining({ value: expect.any(String), kind: 'encrypted' }),
+		);
+		const encryptedValue = mockUserApi.putUserSetting.mock.calls[0][1].value as string;
+		expect(await aliceKeyRing.userSettingsCrypto().decrypt(decodeBase64(encryptedValue))).toEqual(
+			decodeUtf8('value'),
+		);
+	});
+
+	it('should get string setting', async () => {
+		mockUserApi.getUserSetting.calledWith('key').mockResolvedValue({
+			data: { name: 'key', group: 'generic', isSet: true, value: 'value', kind: 'string' } as Setting,
+		} as AxiosResponse<Setting>);
+
+		const value = await userProfile.getSetting('key');
+
+		expect(value).toEqual({ name: 'key', group: 'generic', isSet: true, value: 'value', kind: 'string' });
+	});
+
+	it('should get encrypted setting', async () => {
+		mockUserApi.getUserSetting.calledWith('key').mockResolvedValue({
+			data: {
+				name: 'key',
+				group: 'generic',
+				isSet: true,
+				value: encodeBase64(await aliceKeyRing.userSettingsCrypto().encrypt(decodeUtf8('value'))),
+				kind: 'encrypted',
+			} as Setting,
+		} as AxiosResponse<Setting>);
+
+		const value = await userProfile.getSetting('key');
+
+		expect(value).toEqual({ name: 'key', group: 'generic', isSet: true, value: 'value', kind: 'encrypted' });
+	});
+
+	it.failing('should get settings by group', async () => {
+		await userProfile.getSettings('generic');
 	});
 });

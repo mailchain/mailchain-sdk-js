@@ -41,13 +41,24 @@ describe('keyring', () => {
 		expect(await kr.accountIdentityKey().sign(new Uint8Array([1, 3, 3, 7]))).toMatchSnapshot('accountIdentityKey');
 	});
 
-	it('should encrypt and decrypt for user profile data', async () => {
+	it('should encrypt and decrypt for user mailbox data', async () => {
 		const kr = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
-		const userProfileCrypto = kr.userProfileCrypto();
+		const userMailboxCrypto = kr.userMailboxCrypto();
 		const input = new Uint8Array([1, 3, 3, 7]);
 
-		const encrypted = await userProfileCrypto.encrypt(input);
-		const decrypted = await userProfileCrypto.decrypt(encrypted);
+		const encrypted = await userMailboxCrypto.encrypt(input);
+		const decrypted = await userMailboxCrypto.decrypt(encrypted);
+
+		expect(decrypted).toEqual(input);
+	});
+
+	it('should encrypt and decrypt for user settings data', async () => {
+		const kr = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
+		const userSettingsCrypto = kr.userSettingsCrypto();
+		const input = new Uint8Array([1, 3, 3, 7]);
+
+		const encrypted = await userSettingsCrypto.encrypt(input);
+		const decrypted = await userSettingsCrypto.decrypt(encrypted);
 
 		expect(decrypted).toEqual(input);
 	});

@@ -16,6 +16,7 @@ import * as protoInbox from '../protobuf/inbox/inbox';
 import { parseMimeText } from '../formatters/parse';
 import { Configuration } from '..';
 import { UserMailbox } from '../user/types';
+import { MailboxRuleEngine } from '../mailboxRuleEngine/mailboxRuleEngine';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
@@ -81,6 +82,7 @@ export interface MailboxOperations {
 	modifyIsReadMessage(messageId: string, isRead: boolean): Promise<void>;
 	modifyTrashMessage(messageId: string, trash: boolean): Promise<void>;
 	modifyStarredMessage(messageId: string, isStarred: boolean): Promise<void>;
+	modifySystemLabel(messageId: string, systemLabel: SystemMessageLabel, include: boolean): Promise<void>;
 	/**  Warn: This feature is still in development, is is not stable for usage. */
 	modifySpamMessage_unstable(messageId: string, isSpam: boolean): Promise<void>;
 	modifyUserLabel(messageId: string, userLabel: UserMessageLabel, include: boolean): Promise<void>;
@@ -97,9 +99,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		private readonly userMailboxHasher: UserMailboxHasher,
 		private readonly messageDateOffset: number,
 		private readonly migration: MessagePreviewMigrationRule,
+		private readonly ruleEngine: MailboxRuleEngine,
 	) {}
 
-	static create(sdkConfig: Configuration, keyRing: KeyRing): MailboxOperations {
+	static create(sdkConfig: Configuration, keyRing: KeyRing, mailboxRuleEngine: MailboxRuleEngine): MailboxOperations {
 		const axiosConfig = createAxiosConfiguration(sdkConfig.apiPath);
 		const axiosClient = getAxiosWithSigner(keyRing.accountMessagingKey());
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
@@ -113,7 +116,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const messageHasher = createMailchainMessageIdCreator(keyRing);
 		const userMailboxHasher = createMailchainUserMailboxHasher(keyRing);
 
-		return new MailchainMailboxOperations(
+		const mailboxOperations = new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
 			messageMessageCrypto,
@@ -123,7 +126,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			userMailboxHasher,
 			keyRing.inboxMessageDateOffset(),
 			getAllMessagePreviewMigrations(sdkConfig),
+			mailboxRuleEngine,
 		);
+
+		return mailboxOperations;
 	}
 
 	async getMessage(messageId: string): Promise<MessagePreview> {
@@ -281,6 +287,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 				mailbox: userMailbox.identityKey,
 			});
 			const savedMessage = await this.saveMessage(messageId, payload, mailData, userMailbox, owner, 'inbox');
+			// TODO: Run the message through the mailbox rules engine
 			savedMessages.push(savedMessage);
 		}
 
@@ -301,10 +308,26 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	): Promise<MessagePreview> {
 		const ownerAddress = formatAddress(owner, 'mail');
 
-		const messagePreview = createMessagePreview(userMailbox, owner, content);
-		const encodedMessagePreview = protoInbox.preview.MessagePreview.encode(messagePreview).finish();
+		const protoMessagePreview = createProtoMessagePreview(userMailbox, owner, content);
+		const encodedProtoMessagePreview = protoInbox.preview.MessagePreview.encode(protoMessagePreview).finish();
+		const encryptedProtoMessagePreview = await this.messagePreviewCrypto.encrypt(encodedProtoMessagePreview);
 
-		const encryptedMessagePreview = await this.messagePreviewCrypto.encrypt(encodedMessagePreview);
+		const messagePreview: MessagePreview = {
+			mailbox: userMailbox.identityKey,
+			messageId,
+			from: protoMessagePreview.from,
+			to: protoMessagePreview.to,
+			cc: protoMessagePreview.cc,
+			bcc: protoMessagePreview.bcc,
+			subject: protoMessagePreview.subject,
+			owner: protoMessagePreview.owner,
+			snippet: protoMessagePreview.snippet,
+			isRead: folder === 'outbox',
+			systemLabels: folder === 'outbox' ? ['outbox'] : ['unread', 'inbox'],
+			hasAttachment: false,
+			timestamp: new Date(protoMessagePreview.timestamp * 1000),
+		};
+
 		const encryptedMessage = await this.messageCrypto.encrypt(payload);
 
 		const { recipients: to, carbonCopyRecipients: cc, blindCarbonCopyRecipients: bcc } = content;
@@ -320,7 +343,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 				folder === 'outbox'
 					? PutEncryptedMessageRequestBodyFolderEnum.Outbox
 					: PutEncryptedMessageRequestBodyFolderEnum.Inbox,
-			date: messagePreview.timestamp - this.messageDateOffset,
+			date: messagePreview.timestamp.getTime() / 1000 - this.messageDateOffset,
 			mailbox: Array.from(await this.userMailboxHasher(userMailbox)),
 			// Note: 'hashedOwner' is only 'username' hash because there is no need for 'identity-key' because that is covered by 'mailbox'
 			hashedOwner: Array.from(getAddressHash(addressHashes, ownerAddress, 'username')),
@@ -329,25 +352,11 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			hashedTo: getMailAddressesHashes(addressHashes, to).map((h) => Array.from(h)),
 			hashedCc: getMailAddressesHashes(addressHashes, cc).map((h) => Array.from(h)),
 			hashedBcc: getMailAddressesHashes(addressHashes, bcc).map((h) => Array.from(h)),
-			encryptedPreview: encodeBase64(encryptedMessagePreview),
+			encryptedPreview: encodeBase64(encryptedProtoMessagePreview),
 			messageBodyResourceId: resourceId,
 		});
 
-		return {
-			mailbox: userMailbox.identityKey,
-			messageId,
-			from: messagePreview.from,
-			to: messagePreview.to,
-			cc: messagePreview.cc,
-			bcc: messagePreview.bcc,
-			subject: messagePreview.subject,
-			owner: messagePreview.owner,
-			snippet: messagePreview.snippet,
-			isRead: folder === 'outbox',
-			systemLabels: folder === 'outbox' ? ['outbox'] : ['unread', 'inbox'],
-			hasAttachment: false,
-			timestamp: new Date(messagePreview.timestamp * 1000),
-		};
+		return messagePreview;
 	}
 
 	async markOutboxMessageAsSent(messageId: string): Promise<void> {
@@ -375,11 +384,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		await this.modifySystemLabel(messageId, 'spam', isSpam);
 	}
 
-	private async modifySystemLabel(
-		messageId: string,
-		systemLabel: SystemMessageLabel,
-		include: boolean,
-	): Promise<void> {
+	async modifySystemLabel(messageId: string, systemLabel: SystemMessageLabel, include: boolean): Promise<void> {
 		await this.modifyUserLabel(messageId, systemLabel, include);
 	}
 
@@ -392,7 +397,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	}
 }
 
-function createMessagePreview(
+function createProtoMessagePreview(
 	userMailbox: UserMailbox,
 	owner: MailchainAddress,
 	content: MailData,

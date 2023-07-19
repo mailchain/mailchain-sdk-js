@@ -18,6 +18,7 @@ import * as protoInbox from '../protobuf/inbox/inbox';
 import { createMimeMessage } from '../formatters/generate';
 import { dummyMailData } from '../test.const';
 import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
+import { MailboxRuleEngine } from '../mailboxRuleEngine';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
 import { createMailchainMessageCrypto } from './messageCrypto';
 import { AddressesHasher } from './addressHasher';
@@ -30,6 +31,7 @@ describe('mailbox', () => {
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 	const messagePreviewCrypto = keyRing.inboxKey();
 	const messageCrypto = createMailchainMessageCrypto(keyRing);
+	const mockRuleEngine = mock<MailboxRuleEngine>();
 
 	const mockAddressHasher: AddressesHasher = (addresses) =>
 		Promise.resolve(
@@ -84,6 +86,7 @@ describe('mailbox', () => {
 			mockUserMailboxHasher,
 			dateOffset,
 			dummyMigration,
+			mockRuleEngine,
 		);
 	});
 
