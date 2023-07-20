@@ -26,6 +26,7 @@ import { createMailchainMessageIdCreator } from './messageId';
 import { UserMailboxHasher } from './userMailboxHasher';
 import { AddressMatch, MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { MessagePreviewMigrationRule } from './migrations';
+import { SystemMessageLabel } from './types';
 
 describe('mailbox', () => {
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
@@ -73,7 +74,17 @@ describe('mailbox', () => {
 
 	const dateOffset = 999;
 	beforeEach(() => {
-		jest.resetAllMocks();
+		jest.clearAllMocks();
+
+		mockRuleEngine.apply.mockImplementation((params) => {
+			return Promise.resolve({
+				...params,
+				message: {
+					...params.message,
+					systemLabels: [...params.message.systemLabels, 'rule-engine' as SystemMessageLabel],
+				},
+			});
+		});
 
 		mockOwnerMatcher.withMessageIdentityKeys.mockReturnValue(mockOwnerMatcher);
 		mailboxOperations = new MailchainMailboxOperations(
@@ -273,6 +284,7 @@ describe('mailbox', () => {
 
 		expect(messages).toHaveLength(matchedOwners.length);
 		expect(inboxApi.putEncryptedMessage).toHaveBeenCalledTimes(matchedOwners.length);
+		expect(mockRuleEngine.apply).toHaveBeenCalledTimes(matchedOwners.length);
 
 		for (let index = 0; index < matchedOwners.length; index++) {
 			const { address: matchedOwner } = matchedOwners[index];

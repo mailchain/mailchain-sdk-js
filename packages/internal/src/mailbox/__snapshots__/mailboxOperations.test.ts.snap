@@ -662,6 +662,7 @@ exports[`mailbox should encrypt and post received message: message id 0x92d8f102
   "systemLabels": [
     "unread",
     "inbox",
+    "rule-engine",
   ],
   "timestamp": 2022-06-14T00:00:00.000Z,
   "to": [
@@ -730,6 +731,7 @@ exports[`mailbox should encrypt and post received message: message id bob@mailch
   "systemLabels": [
     "unread",
     "inbox",
+    "rule-engine",
   ],
   "timestamp": 2022-06-14T00:00:00.000Z,
   "to": [

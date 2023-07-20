@@ -91,18 +91,30 @@ export interface MailboxOperations {
 export class MailchainMailboxOperations implements MailboxOperations {
 	constructor(
 		private readonly inboxApi: InboxApiInterface,
+		/** Cryptography service for encrypting the message preview content when the message is being saved. It is decrypting the same content when the message preview is being read. */
 		private readonly messagePreviewCrypto: InboxKey,
+		/** Cryptography service for encrypting the full message content when the message is being saved. It is decrypting the same content when the message is being read. */
 		private readonly messageCrypto: MessageCrypto,
+		/** Service for matching the user mailboxes to the message recipients. The case could be that single message send to a single identity belongs to multiple mailbox aliases. */
 		private readonly messageMailboxOwnerMatcher: MessageMailboxOwnerMatcher,
+		/** Hasher for the addresses of the participants in a given message. Used for hashing each of the participants so at later stage the user is able to use the hashed address to search for messages without reveling the real address that is being searched for. */
 		private readonly addressHasher: AddressesHasher,
+		/** Create the message ID for when send and received messages are saved. It is used to create a unique ID for a given message parameters. Using same parameters will yield the same message ID. */
 		private readonly messageIdCreator: MessageIdCreator,
+		/** Hasher for the user mailbox for when send and received messages are saved. It obfuscates the real user mailbox (identity key) in order to increase user privacy. */
 		private readonly userMailboxHasher: UserMailboxHasher,
+		/** Random time offset that will be added to the message timestamps in order to obfuscate the time when the message was sent/received in order to increase user privacy. */
 		private readonly messageDateOffset: number,
 		private readonly migration: MessagePreviewMigrationRule,
-		private readonly ruleEngine: MailboxRuleEngine,
+		/** The {@link MailboxRuleEngine} is used to apply rules to received messages (ex. message filtering) when they are saved. If `null`, no rules will be applied and this step is skipped. */
+		private readonly ruleEngine: MailboxRuleEngine | null,
 	) {}
 
-	static create(sdkConfig: Configuration, keyRing: KeyRing, mailboxRuleEngine: MailboxRuleEngine): MailboxOperations {
+	static create(
+		sdkConfig: Configuration,
+		keyRing: KeyRing,
+		mailboxRuleEngine: MailboxRuleEngine | null,
+	): MailboxOperations {
 		const axiosConfig = createAxiosConfiguration(sdkConfig.apiPath);
 		const axiosClient = getAxiosWithSigner(keyRing.accountMessagingKey());
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
@@ -287,8 +299,12 @@ export class MailchainMailboxOperations implements MailboxOperations {
 				mailbox: userMailbox.identityKey,
 			});
 			const savedMessage = await this.saveMessage(messageId, payload, mailData, userMailbox, owner, 'inbox');
-			// TODO: Run the message through the mailbox rules engine
-			savedMessages.push(savedMessage);
+			if (this.ruleEngine != null) {
+				const ruleEngineOutput = await this.ruleEngine.apply({ message: savedMessage });
+				savedMessages.push(ruleEngineOutput.message);
+			} else {
+				savedMessages.push(savedMessage);
+			}
 		}
 
 		if (savedMessages.length === 0) {
