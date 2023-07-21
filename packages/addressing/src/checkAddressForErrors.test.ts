@@ -35,6 +35,24 @@ describe('checkAddressForErrors', () => {
 		});
 	});
 
+	describe('ethereum - token address', () => {
+		it('should return undefined for token', () => {
+			expect(
+				checkAddressForErrors('4254.0xdd69da9a83cedc730bc4d3c56e96d29acc05ecde@ethereum.mailchain.com'),
+			).toBeUndefined();
+		});
+		it('should return undefined when address is valid', () => {
+			expect(
+				checkAddressForErrors('.0xdd69da9a83cedc730bc4d3c56e96d29acc05ecde@ethereum.mailchain.com'),
+			).toBeUndefined();
+		});
+		it('should return error when address is invalid - non number', () => {
+			expect(
+				checkAddressForErrors('4a.0xdd69da9a83cedc730bc4d3c56e96d29acc05ecde@ethereum.mailchain.com'),
+			).toEqual(new IdentityProviderAddressInvalidError());
+		});
+	});
+
 	describe('ethereum', () => {
 		it('should return undefined when address is valid', () => {
 			expect(

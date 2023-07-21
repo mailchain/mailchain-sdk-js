@@ -19,3 +19,7 @@ export async function addressFromPublicKey(publicKey: PublicKey): Promise<Uint8A
 export function validateEthereumAddress(address: string): boolean {
 	return /^0x[a-fA-F0-9]{40}/.test(address);
 }
+
+export function validateEthereumTokenOwnerAddress(address: string): boolean {
+	return /^[0-9]*.0x[a-fA-F0-9]{40}/.test(address);
+}
