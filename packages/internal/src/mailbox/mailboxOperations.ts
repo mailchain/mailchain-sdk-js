@@ -185,7 +185,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 	}
 
 	async getSpamMessages_unstable(): Promise<MessagePreview[]> {
-		const messages: ApiMessagePreview[] = []; // await this.inboxApi.getMessagesInSpamView().then((res) => res.data.messages);
+		const messages = await this.inboxApi.getMessagesInSpamView().then((res) => res.data.messages);
 		return this.handleMessagePreviews(messages);
 	}
 
