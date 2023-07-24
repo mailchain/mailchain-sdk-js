@@ -26,7 +26,7 @@ export class IdentityProviderUnsupportedError extends Error {
 	readonly type = 'identity_provider_unsupported';
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#identity_provider_unsupported';
 	constructor() {
-		super(`Identity provider is not support. Check list of supported providers.`);
+		super(`Identity provider is not supported. Check list of supported providers.`);
 	}
 }
 export class IdentityNotFoundError extends Error {
