@@ -17,9 +17,10 @@ export class MailchainUserBlocklistRule implements MailboxRule<unknown, unknown>
 		return new MailchainUserBlocklistRule(userProfile);
 	}
 
-	async isEnabled(): Promise<boolean> {
-		const item = await this.userProfile.getSetting(`${this.id}-enabled`);
-		return item?.isSet ? item.value === 'true' : true;
+	isEnabled(): Promise<boolean> {
+		// Note: Future implementations might want to allow users to disable this rule. For now, it's always enabled.
+		// Idea: return this.userProfile.getSetting(`${this.id}-enabled`).then((enabled) => enabled.value === 'true');
+		return Promise.resolve(true);
 	}
 
 	async condition(): Promise<MailboxRuleCondition<unknown>> {
@@ -29,11 +30,6 @@ export class MailchainUserBlocklistRule implements MailboxRule<unknown, unknown>
 
 	async actions(): Promise<MailboxRuleAction<unknown>[]> {
 		return Promise.resolve([actionAddSystemLabel('spam')]);
-	}
-
-	public async setEnabled(enabled: boolean): Promise<boolean> {
-		await this.userProfile.setSetting(`${this.id}-enabled`, enabled.toString());
-		return Promise.resolve(enabled);
 	}
 
 	public async addBlocklistEntry(

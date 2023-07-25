@@ -10,14 +10,6 @@ describe('mailchainUserBlocklist', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockUserProfile.getSetting.calledWith(`${MailchainUserBlocklistRule.id}-enabled`).mockResolvedValue({
-			name: `${MailchainUserBlocklistRule.id}-enabled`,
-			group: 'generic',
-			isSet: true,
-			value: 'true',
-			kind: 'string',
-		});
-
 		mockUserProfile.getSetting.calledWith(`${MailchainUserBlocklistRule.id}-data`).mockResolvedValue({
 			name: `${MailchainUserBlocklistRule.id}-data`,
 			group: 'generic',
@@ -62,20 +54,6 @@ describe('mailchainUserBlocklist', () => {
 		const enabled = await mailchainUserBlocklist.isEnabled();
 
 		expect(enabled).toEqual(true);
-	});
-
-	it('should disable rule', async () => {
-		const enabled = await mailchainUserBlocklist.setEnabled(false);
-
-		expect(enabled).toEqual(false);
-		expect(mockUserProfile.setSetting).toHaveBeenCalledWith(`${MailchainUserBlocklistRule.id}-enabled`, 'false');
-	});
-
-	it('should enable rule', async () => {
-		const enabled = await mailchainUserBlocklist.setEnabled(true);
-
-		expect(enabled).toEqual(true);
-		expect(mockUserProfile.setSetting).toHaveBeenCalledWith(`${MailchainUserBlocklistRule.id}-enabled`, 'true');
 	});
 
 	it('should have add spam label action', async () => {
