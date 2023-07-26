@@ -3,7 +3,9 @@
 exports[`check imports snapshot compare imports: imports 1`] = `
 [
   "@mailchain/addressing/addressCasing",
+  "@mailchain/addressing/addressFormatting",
   "@mailchain/addressing/addressFormattingRule",
+  "@mailchain/addressing/addressPredicates",
   "@mailchain/addressing/encoding",
   "@mailchain/addressing/errors",
   "@mailchain/addressing/formatMailLike",

@@ -1,5 +1,6 @@
 import { EncodingTypes, EncodingType, decode, encode } from '@mailchain/encoding';
 import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE, TEZOS } from './protocols';
+import { casingByProtocol } from './addressCasing';
 
 /**
  * Convert address from Uint8Array, selects the relevant encoding method and encodes it as string.
@@ -9,7 +10,7 @@ export function encodeAddressByProtocol(
 	protocol: ProtocolType,
 ): { encoded: string; encoding: EncodingType } {
 	const encoding = encodingByProtocol(protocol);
-	const encoded = encode(encoding, address);
+	const encoded = casingByProtocol(encode(encoding, address), protocol);
 
 	return { encoded, encoding };
 }
@@ -22,7 +23,7 @@ export function decodeAddressByProtocol(
 	protocol: ProtocolType,
 ): { decoded: Uint8Array; encoding: string } {
 	const encoding = encodingByProtocol(protocol);
-	const decoded = decode(encoding, address);
+	const decoded = decode(encoding, casingByProtocol(address, protocol));
 
 	return { decoded, encoding };
 }
@@ -30,7 +31,6 @@ export function decodeAddressByProtocol(
 /**
  * EncodingByProtocol returns the relevant encoding method the protocol commonly uses.
  */
-//
 export function encodingByProtocol(protocol: ProtocolType): EncodingType {
 	switch (protocol) {
 		case ALGORAND:

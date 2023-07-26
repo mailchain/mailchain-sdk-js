@@ -35,13 +35,9 @@ export function createNameServiceAddress(username: string, ...domainParts: [stri
 }
 
 export function parseNameServiceAddress(address: string): NameServiceAddress {
-	const [username, domain] = address.split('@');
-	if (username && domain) return createNameServiceAddress(username, domain);
-	throw new Error(`invalid address format of [${address}]`);
-}
-
-export function isSameNameServiceAddress(a: NameServiceAddress, b: NameServiceAddress): boolean {
-	return a.username === b.username && a.domain === b.domain;
+	const addressParts = address.split('@');
+	if (addressParts.length !== 2) throw new Error(`invalid address format of [${address}]`);
+	return createNameServiceAddress(addressParts[0], addressParts[1]);
 }
 
 export function isNameServiceAddress(a: any): a is NameServiceAddress {

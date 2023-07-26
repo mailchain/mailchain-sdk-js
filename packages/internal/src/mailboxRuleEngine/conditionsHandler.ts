@@ -1,4 +1,5 @@
 import { isPublicKeyEqual } from '@mailchain/crypto';
+import { isSameAddress } from '@mailchain/addressing';
 import { IdentityKeys } from '../identityKeys';
 import { Configuration } from '../configuration';
 import {
@@ -57,7 +58,7 @@ export const conditionIsFromAddressHandler: ConditionHandler = {
 	id: 'conditionIsFromAddressHandler',
 	execute: async (params, condition) => {
 		if (!isConditionIsFromAddress(condition)) return false;
-		return params.message.from === condition.value;
+		return isSameAddress(params.message.from, condition.value);
 	},
 };
 

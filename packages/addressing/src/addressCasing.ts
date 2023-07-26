@@ -8,7 +8,7 @@ export function casingByProtocol(value: string, protocol: ProtocolType): string 
 			return value.toLowerCase(); // case insensitive
 		case SUBSTRATE:
 		case TEZOS:
-			return value; // substrate encoding is case sensitive
+			return value; // substrate&tezos encoding is case sensitive
 		case ALGORAND:
 			return value.toLowerCase(); // case insensitive
 		case NEAR:
