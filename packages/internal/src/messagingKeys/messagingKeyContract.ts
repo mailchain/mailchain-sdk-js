@@ -51,31 +51,11 @@ export class MessagingKeyContractCall {
 		}
 
 		const { data, error } = await resolver.resolve(contractCall);
-		if (error != null) {
-			if (error instanceof MessagingKeyNotFoundInContractError) {
-				const vendedKeyResponse = await this.messagingKeysApi.getVendedPublicMessagingKey(
-					contractCall.address,
-					protocol as any,
-				);
-				const verified = await this.messagingKeyVerifier.verifyProvidedKeyProof(
-					vendedKeyResponse.data.proof,
-					convertPublic(vendedKeyResponse.data.messagingKey),
-				);
-				if (!verified) {
-					return { error: new MessagingKeyVerificationError() };
-				}
-				return {
-					data: {
-						messagingKey: convertPublic(vendedKeyResponse.data.messagingKey),
-						identityKey,
-						protocol,
-						type: 'vended',
-						protocolAddress: contractCall.address,
-					},
-				};
-			} else if (error instanceof InvalidContractResponseError) {
-				return { error: new MessagingKeyContactError(error) };
-			}
+		if (error instanceof MessagingKeyNotFoundInContractError) {
+			return this.getVerifiedVendedPublicMessagingKey(contractCall.address, protocol, identityKey);
+		} else if (error instanceof InvalidContractResponseError) {
+			return { error: new MessagingKeyContactError(error) };
+		} else if (error) {
 			return {
 				error: new MessagingKeyContactError(error),
 			};
@@ -84,6 +64,30 @@ export class MessagingKeyContractCall {
 		const { messagingKey } = data;
 		return {
 			data: { type: 'registered', messagingKey, identityKey, protocol, protocolAddress: contractCall.address },
+		};
+	}
+
+	private async getVerifiedVendedPublicMessagingKey(
+		address: string,
+		protocol: ProtocolType,
+		identityKey?: PublicKey,
+	): Promise<MailchainResult<ResolvedAddress, MessagingKeyVerificationError>> {
+		const vendedKeyResponse = await this.messagingKeysApi.getVendedPublicMessagingKey(address, protocol as any);
+		const verified = await this.messagingKeyVerifier.verifyProvidedKeyProof(
+			vendedKeyResponse.data.proof,
+			convertPublic(vendedKeyResponse.data.messagingKey),
+		);
+		if (!verified) {
+			return { error: new MessagingKeyVerificationError() };
+		}
+		return {
+			data: {
+				messagingKey: convertPublic(vendedKeyResponse.data.messagingKey),
+				identityKey,
+				protocol,
+				type: 'vended',
+				protocolAddress: address,
+			},
 		};
 	}
 }

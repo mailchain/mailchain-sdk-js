@@ -39,6 +39,7 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/internal/messagingKeys/contractResolvers/resolver",
   "@mailchain/internal/messagingKeys/errors",
   "@mailchain/internal/messagingKeys/index",
+  "@mailchain/internal/messagingKeys/mailchainResult",
   "@mailchain/internal/messagingKeys/messagingKeyContract",
   "@mailchain/internal/messagingKeys/messagingKeys",
   "@mailchain/internal/messagingKeys/proof",

@@ -2,8 +2,10 @@ import { ContractCall, GetIdentityKeyNonceResponseBody, GetMsgKeyResponseBody } 
 import axios, { AxiosInstance } from 'axios';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
+import { MailchainResult } from '../../mailchainResult';
 import { Configuration } from '../../configuration';
 import { MessagingKeyVerifier } from '../verify';
+import { UnexpectedMailchainError } from '../errors';
 import { ContractCallLatestNonce, ContractCallMessagingKeyResolver, ContractCallResolveResult } from './resolver';
 import { MessagingKeyNotFoundInContractError } from './errors';
 
@@ -23,7 +25,13 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 			return { error: new MessagingKeyNotFoundInContractError() };
 		}
 
-		const rpcResponse = await this.callGetMessagingKeyContract(contract);
+		const { data: rpcResponse, error: getMessagingKeyContractError } = await this.callGetMessagingKeyContract(
+			contract,
+		);
+
+		if (getMessagingKeyContractError) {
+			return { error: getMessagingKeyContractError };
+		}
 
 		const messagingKey = convertPublic(rpcResponse.messagingKey);
 		const verified = await this.messagingKeyVerifier.verifyRegisteredKeyProof(rpcResponse.proof, messagingKey);
@@ -61,18 +69,24 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 		}
 	}
 
-	private async callGetMessagingKeyContract(contract: ContractCall): Promise<GetMsgKeyResponseBody> {
-		const response = await this.axiosInstance.request<GetMsgKeyResponseBody>({
-			method: contract.method,
-			url: this.rpcEndpoint + contract.path,
-		});
-
-		if (response.status !== 200) {
-			throw new Error(
-				`Failed to get messaging key from near, status: ${response.status}, response: ${response.data}`,
-			);
+	private async callGetMessagingKeyContract(
+		contract: ContractCall,
+	): Promise<MailchainResult<GetMsgKeyResponseBody, MessagingKeyNotFoundInContractError | UnexpectedMailchainError>> {
+		try {
+			const response = await this.axiosInstance.request<GetMsgKeyResponseBody>({
+				method: contract.method,
+				url: this.rpcEndpoint + contract.path,
+			});
+			return { data: response.data };
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+				return {
+					error: new MessagingKeyNotFoundInContractError(),
+				};
+			}
+			return {
+				error: new UnexpectedMailchainError('failed to call messaging key contract', error as Error),
+			};
 		}
-
-		return response.data;
 	}
 }
