@@ -10,6 +10,7 @@ import {
 	createAxiosConfiguration,
 	getAxiosWithSigner,
 } from '@mailchain/api';
+import striptags from 'striptags';
 import { IdentityKeys } from '../identityKeys';
 import { MailData, Payload } from '../transport';
 import * as protoInbox from '../protobuf/inbox/inbox';
@@ -427,8 +428,13 @@ function createProtoMessagePreview(
 		bcc: content.blindCarbonCopyRecipients.map((it) => it.address),
 		from: content.from.address,
 		subject: content.subject,
-		snippet: content.plainTextMessage.substring(0, snippetLength - 1).trim(),
+		snippet: createMessagePreviewSnippet(content, snippetLength),
 		hasAttachment: false, // TODO: replace with value from content.attachment when available,
 		timestamp: Math.round(content.date.getTime() / 1000),
 	});
+}
+
+function createMessagePreviewSnippet(content: MailData, snippetLength = 100): string {
+	const plainTextMessage = striptags(content.plainTextMessage);
+	return plainTextMessage.substring(0, snippetLength - 1).trim();
 }

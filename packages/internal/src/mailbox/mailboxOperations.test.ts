@@ -322,6 +322,36 @@ describe('mailbox', () => {
 		}
 	});
 
+	it('should remove html tags from message snippet', async () => {
+		mockOwnerMatcher.findMatches.mockResolvedValue([
+			{ matchBy: 'message-header', address: parseNameServiceAddress(dummyMailData.recipients[0].address) },
+		]);
+		const uri = 'messageBodyUri';
+		const resourceId = 'resourceId';
+		inboxApi.postEncryptedMessageBody.mockResolvedValue({
+			data: { uri, resourceId },
+		} as AxiosResponse<PostPayloadResponseBody>);
+		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
+
+		const payloadWithHtmlPlainText: Payload = {
+			...payload,
+			Content: Buffer.from(
+				(await createMimeMessage({ ...dummyMailData, plainTextMessage: dummyMailData.message }, new Map()))
+					.original,
+			),
+		};
+		const messages = await mailboxOperations.saveReceivedMessage({
+			receivedTransportPayload: payloadWithHtmlPlainText,
+			userMailbox: AliceWalletMailbox,
+		});
+
+		expect(messages).toHaveLength(1);
+		const message = messages[0];
+		expect(message.snippet).toMatchInlineSnapshot(
+			`"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Aliquam tincidunt mauris eu risus.Vestibul"`,
+		);
+	});
+
 	const labelsTests = [
 		['modifyArchiveMessage', 'archive', true],
 		['modifyIsReadMessage', 'unread', false],
