@@ -47,9 +47,8 @@ export class MailchainRuleRepository {
 		};
 	}
 
-	async deleteUserRule(_id: string): Promise<void> {
-		// TODO: implement
-		throw new Error('Delete UserRule not implemented');
+	async deleteUserRule(id: string): Promise<void> {
+		return this.userProfile.deleteSetting(id);
 	}
 
 	/**

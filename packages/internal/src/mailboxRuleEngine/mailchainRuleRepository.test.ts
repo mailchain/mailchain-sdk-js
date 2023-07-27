@@ -115,4 +115,10 @@ describe('mailchainRuleRepository', () => {
 			expect.objectContaining({ ...newRuleParams, id: expect.any(String) }),
 		);
 	});
+
+	it('should delete user rule', async () => {
+		await ruleRepository.deleteUserRule('user-rule');
+
+		expect(mockUserProfile.deleteSetting).toHaveBeenCalledWith('user-rule');
+	});
 });
