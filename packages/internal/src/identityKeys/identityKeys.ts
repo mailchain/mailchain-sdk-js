@@ -22,13 +22,14 @@ export class IdentityKeys {
 		return new IdentityKeys(AddressesApiFactory(axiosConfig), IdentityKeysApiFactory(axiosConfig));
 	}
 
-	async getAddressIdentityKey(address: MailchainAddress) {
-		return this.resolve(formatAddress(address, 'mail'));
+	async getAddressIdentityKey(address: MailchainAddress, at?: Date) {
+		return this.resolve(formatAddress(address, 'mail'), at);
 	}
 
-	async resolve(address: string): Promise<{ identityKey: PublicKey; protocol: ProtocolType } | null> {
+	async resolve(address: string, at?: Date): Promise<{ identityKey: PublicKey; protocol: ProtocolType } | null> {
+		const atDate: number | undefined = at ? Math.round(at.getTime() / 1000) : undefined;
 		return this.addressesApi
-			.getAddressIdentityKey(address)
+			.getAddressIdentityKey(address, atDate)
 			.then(({ data }) => ({
 				identityKey: publicKeyFromBytes(decodeHexZeroX(data.identityKey)),
 				protocol: data.protocol as ProtocolType,

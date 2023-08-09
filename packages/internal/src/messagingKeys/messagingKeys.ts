@@ -111,6 +111,7 @@ export class MessagingKeys {
 	 * Resolve the messaging key for the given address.
 	 *
 	 * @param address Address to resolve.
+	 * @param at Date to resolve the address at. When no date is provided, the address resolves using the latest block.
 	 *
 	 * @returns A {@link ResolvedAddress resolved address} which may be a registered or vended.
 	 *
@@ -121,12 +122,12 @@ export class MessagingKeys {
 	 * console.log(resolvedAddress);
 	 *
 	 */
-	async resolve(address: string): Promise<ResolveAddressResult> {
+	async resolve(address: string, at?: Date): Promise<ResolveAddressResult> {
 		const validateAddressError = checkAddressForErrors(address, this.mailchainAddressDomain);
 		if (validateAddressError != null) {
 			return { error: validateAddressError };
 		}
-		const { data, error } = await this.getAddressMessagingKey(address);
+		const { data, error } = await this.getAddressMessagingKey(address, at);
 		if (error != null) {
 			return { error };
 		}
@@ -137,11 +138,14 @@ export class MessagingKeys {
 		);
 	}
 
-	async resolveMany(addresses: string[]): Promise<MailchainResult<ResolvedManyAddresses, ResolveManyAddressesError>> {
+	async resolveMany(
+		addresses: string[],
+		at?: Date,
+	): Promise<MailchainResult<ResolvedManyAddresses, ResolveManyAddressesError>> {
 		const deduplicatedAddresses = [...new Set(addresses)];
 		const resolvedAddresses = await Promise.all(
 			deduplicatedAddresses.map(async (address) => {
-				const resolvedAddress = await this.resolve(address);
+				const resolvedAddress = await this.resolve(address, at);
 				return { params: address, result: resolvedAddress };
 			}),
 		);
@@ -179,6 +183,7 @@ export class MessagingKeys {
 
 	private async getAddressMessagingKey(
 		address: string,
+		at?: Date,
 	): Promise<
 		MailchainResult<
 			GetAddressMessagingKeyResponseBody,
@@ -193,7 +198,8 @@ export class MessagingKeys {
 		>
 	> {
 		try {
-			const { data } = await this.addressApi.getAddressMessagingKey(address);
+			const atDate: number | undefined = at ? Math.round(at.getTime() / 1000) : undefined;
+			const { data } = await this.addressApi.getAddressMessagingKey(address, atDate);
 
 			const protocol = data.contractCall.protocol as ProtocolType;
 			if (!ALL_PROTOCOLS.includes(protocol)) {
@@ -242,9 +248,11 @@ export class MessagingKeys {
 
 	async getAddressMessagingKeyStatus(
 		address: string,
+		at?: Date,
 	): Promise<MailchainResult<AddressMessagingKeyStatus, IdentityProviderUnsupportedError>> {
 		try {
-			const { data } = await this.addressApi.getAddressMessagingKeyStatus(address);
+			const atDate: number | undefined = at ? Math.round(at.getTime() / 1000) : undefined;
+			const { data } = await this.addressApi.getAddressMessagingKeyStatus(address, atDate);
 			return { data: data.status as AddressMessagingKeyStatus };
 		} catch (e) {
 			return {

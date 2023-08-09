@@ -13,10 +13,15 @@ export class MailSenderVerifier {
 	 *
 	 * @param fromAddress address that sent the mail. `From:` header in the mail.
 	 * @param senderMessagingKey public key of the sender.
+	 * @param at Date to resolve the sender messaging key. When no date is provided, the address resolves using the latest block.
 	 * @returns
 	 */
-	async verifySenderOwnsFromAddress(fromAddress: MailAddress, senderMessagingKey: PublicKey): Promise<boolean> {
-		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress.address);
+	async verifySenderOwnsFromAddress(
+		fromAddress: MailAddress,
+		senderMessagingKey: PublicKey,
+		at?: Date,
+	): Promise<boolean> {
+		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress.address, at);
 		if (error != null) {
 			return false;
 		}

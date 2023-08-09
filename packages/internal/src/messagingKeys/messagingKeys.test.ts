@@ -1,7 +1,13 @@
-import { AddressesApiInterface, IdentityKeysApiInterface } from '@mailchain/api';
-import { convertPublic } from '@mailchain/api/helpers/cryptoKeyToApiKey';
+import {
+	AddressesApiInterface,
+	CryptoKeyConvert,
+	GetAddressMessagingKeyResponseBody,
+	IdentityKeysApiInterface,
+} from '@mailchain/api';
 import { ED25519PrivateKey } from '@mailchain/crypto';
-import { mock, MockProxy } from 'jest-mock-extended';
+import { mock } from 'jest-mock-extended';
+import { AxiosResponse } from 'axios';
+import { AliceED25519PublicKey } from '@mailchain/crypto/ed25519/test.const';
 import { MessagingKeyContractCall } from './messagingKeyContract';
 import { MessagingKeys } from './messagingKeys';
 
@@ -9,14 +15,13 @@ describe('MessagingKeys', () => {
 	const messagingKey = ED25519PrivateKey.generate();
 	const identityKey = ED25519PrivateKey.generate();
 
-	const mockAddressesApiInterface: MockProxy<AddressesApiInterface> = mock();
-	const mockIdentityKeysApiInterface: MockProxy<IdentityKeysApiInterface> = mock();
-	const mockContractCallResolvers: MockProxy<MessagingKeyContractCall> = mock();
+	const mockAddressesApiInterface = mock<AddressesApiInterface>();
+	const mockIdentityKeysApiInterface = mock<IdentityKeysApiInterface>();
+	const mockContractCallResolvers = mock<MessagingKeyContractCall>();
 	let messagingKeys: MessagingKeys;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		jest.resetAllMocks();
 
 		messagingKeys = new MessagingKeys(
 			mockAddressesApiInterface,
@@ -29,17 +34,12 @@ describe('MessagingKeys', () => {
 	it('from contract', async () => {
 		mockAddressesApiInterface.getAddressMessagingKey.mockResolvedValue({
 			data: {
-				protocol: 'near',
 				contractCall: {
 					protocol: 'near',
-					contractAddress: 'alice.near',
-					method: 'getMessagingKey',
-					body: '[]',
-					identityKey: convertPublic(identityKey.publicKey),
 				},
+				identityKey: CryptoKeyConvert.public(AliceED25519PublicKey),
 			},
-		} as any);
-
+		} as AxiosResponse<GetAddressMessagingKeyResponseBody>);
 		mockContractCallResolvers.resolve.mockResolvedValue({
 			data: {
 				protocol: 'near',
@@ -50,7 +50,10 @@ describe('MessagingKeys', () => {
 			},
 		});
 
-		const actual = await messagingKeys.resolve('alice.near@near.mailchain.test');
+		const actual = await messagingKeys.resolve(
+			'alice.near@near.mailchain.test',
+			new Date('2022-05-19T08:00:00.000Z'),
+		);
 
 		expect(actual).toEqual({
 			data: {
@@ -61,5 +64,10 @@ describe('MessagingKeys', () => {
 				protocolAddress: 'alice.near',
 			},
 		});
+		expect(mockAddressesApiInterface.getAddressMessagingKey).toHaveBeenCalledWith(
+			'alice.near@near.mailchain.test',
+			1652947200,
+		);
+		expect(mockContractCallResolvers.resolve).toHaveBeenCalledWith({ protocol: 'near' }, AliceED25519PublicKey);
 	});
 });
