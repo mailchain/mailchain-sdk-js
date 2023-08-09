@@ -55,9 +55,9 @@ export const dummyMailData: MailData = {
 		{ name: 'maria', address: 'maria@mailchain.test' },
 	],
 	message:
-		'<ul><li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li><li>Aliquam tincidunt mauris eu risus.</li><li>Vestibulum auctor dapibus neque.</li></ul>',
+		'<ul>\n\t<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>\n\t<li>Aliquam tincidunt mauris eu risus.</li>\n\t<li>Vestibulum auctor dapibus neque.</li>\n</ul>',
 	plainTextMessage:
-		'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Neque vitae tempus quam pellentesque nec nam. Quam nulla porttitor massa id. Nisl rhoncus mattis rhoncus urna. Tortor posuere ac ut consequat semper viverra nam. Facilisis mauris sit amet massa. Et molestie ac feugiat sed lectus vestibulum. Id cursus metus aliquam eleifend mi in nulla posuere sollicitudin. A diam sollicitudin tempor id. Mauris ultrices eros in cursus turpis massa. Elementum facilisis leo vel fringilla est ullamcorper. Aliquam sem et tortor consequat id porta.	',
+		'\t- Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\n\t- Aliquam tincidunt mauris eu risus.\n\t- Vestibulum auctor dapibus neque.',
 };
 
 export const dummyMailDataResolvedAddresses: Map<string, ResolvedAddress> = new Map([

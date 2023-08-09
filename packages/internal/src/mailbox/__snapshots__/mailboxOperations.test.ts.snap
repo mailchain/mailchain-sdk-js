@@ -1,6 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`mailbox should decrypt full message body: fullMessageBody 1`] = `"<ul><li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li><li>Aliquam tincidunt mauris eu risus.</li><li>Vestibulum auctor dapibus neque.</li></ul>"`;
+exports[`mailbox should decrypt full message body: fullMessageBody 1`] = `
+"<ul>
+	<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
+	<li>Aliquam tincidunt mauris eu risus.</li>
+	<li>Vestibulum auctor dapibus neque.</li>
+</ul>"
+`;
 
 exports[`mailbox should encrypt and post received message: hashedFrom 1`] = `
 [
@@ -657,7 +663,7 @@ exports[`mailbox should encrypt and post received message: message id 0x92d8f102
   },
   "messageId": "6ddf55461c21f3fa1a0b33ee2debfd406311ba4777528194e830f4fd63ef52f7",
   "owner": "0x92d8f10248c6a3953cc3692a894655ad05d61efb@ethereum.mailchain.test",
-  "snippet": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
+  "snippet": "- Lorem ipsum dolor sit amet, consectetuer adipiscing elit. - Aliquam tincidunt mauris eu risus. -",
   "subject": "💌 Dummy MailData subject 😉",
   "systemLabels": [
     "unread",
@@ -726,7 +732,7 @@ exports[`mailbox should encrypt and post received message: message id bob@mailch
   },
   "messageId": "793dd5d44e166bc50051c959b7668beabfd374fc1ab15ba5601a8fdc566806ac",
   "owner": "bob@mailchain.test",
-  "snippet": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
+  "snippet": "- Lorem ipsum dolor sit amet, consectetuer adipiscing elit. - Aliquam tincidunt mauris eu risus. -",
   "subject": "💌 Dummy MailData subject 😉",
   "systemLabels": [
     "unread",

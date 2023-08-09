@@ -241,7 +241,7 @@ describe('mailbox', () => {
 			from: dummyMailData.from.address,
 			hasAttachment: false,
 			snippet:
-				'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
+				'- Lorem ipsum dolor sit amet, consectetuer adipiscing elit. - Aliquam tincidunt mauris eu risus. -',
 			subject: dummyMailData.subject,
 			timestamp: payload.Headers.Created.getTime() / 1000,
 			to: dummyMailData.recipients.map((r) => r.address),
@@ -301,7 +301,7 @@ describe('mailbox', () => {
 				mailbox: publicKeyToBytes(AliceWalletMailbox.identityKey),
 				hasAttachment: false,
 				snippet:
-					'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
+					'- Lorem ipsum dolor sit amet, consectetuer adipiscing elit. - Aliquam tincidunt mauris eu risus. -',
 				subject: dummyMailData.subject,
 				timestamp: payload.Headers.Created.getTime() / 1000,
 				to: dummyMailData.recipients.map((r) => r.address),
@@ -348,7 +348,7 @@ describe('mailbox', () => {
 		expect(messages).toHaveLength(1);
 		const message = messages[0];
 		expect(message.snippet).toMatchInlineSnapshot(
-			`"Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Aliquam tincidunt mauris eu risus.Vestibul"`,
+			`"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam tincidunt mauris eu risus. Vesti"`,
 		);
 	});
 

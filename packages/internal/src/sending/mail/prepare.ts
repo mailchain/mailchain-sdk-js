@@ -36,7 +36,7 @@ export class MailPreparer {
 		}
 
 		if (message.plainTextMessage.length === 0) {
-			return { error: new PreflightCheckError('Content text must not be empty.') };
+			return { error: new PreflightCheckError('Content plaintext must not be empty.') };
 		}
 
 		if (message.message.length === 0) {

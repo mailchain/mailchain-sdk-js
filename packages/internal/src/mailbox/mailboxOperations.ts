@@ -435,6 +435,6 @@ function createProtoMessagePreview(
 }
 
 function createMessagePreviewSnippet(content: MailData, snippetLength = 100): string {
-	const plainTextMessage = striptags(content.plainTextMessage);
+	const plainTextMessage = striptags(content.plainTextMessage).replace(/\s+/g, ' ');
 	return plainTextMessage.substring(0, snippetLength - 1).trim();
 }
