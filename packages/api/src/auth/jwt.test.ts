@@ -3,37 +3,93 @@ import MockAdapter from 'axios-mock-adapter';
 import { encodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { getAxiosWithSigner, getToken } from './jwt';
+import { getAxiosWithSigner, createSignedToken, verifySignedToken, createTokenPayload } from './jwt';
 
-const payload = {
-	m: 'GET',
-	url: '/users?id=1234',
-	len: 0,
-	aud: 'example.com',
-};
+describe('createTokenPayload', () => {
+	it('get', () => {
+		const payload = createTokenPayload(new URL('https://example.com/users?id=1234'), 'GET', null);
+		expect(payload).toEqual({
+			m: 'GET',
+			url: '/users',
+			q: 'id=1234',
+			len: 0,
+			aud: 'example.com',
+		});
+	});
+	it('post-object', () => {
+		const postBody = { scripts: { test: 'test value' } };
+		const len = Buffer.byteLength(JSON.stringify(postBody));
+		const payload = createTokenPayload(new URL('https://example.com/users'), 'POST', postBody);
+		expect(payload).toEqual({
+			m: 'POST',
+			url: '/users',
+			len,
+			aud: 'example.com',
+		});
+	});
+	it('post-uint8array', () => {
+		const payload = createTokenPayload(new URL('https://example.com/users'), 'POST', Uint8Array.from([1, 2]));
+		expect(payload).toEqual({
+			m: 'POST',
+			url: '/users',
+			len: 2,
+			aud: 'example.com',
+		});
+	});
+});
 
-const expectedTokenForAlice =
-	'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXJzP2lkPTEyMzQiLCJsZW4iOjAsImF1ZCI6ImV4YW1wbGUuY29tIiwiZXhwIjoxNTc3ODM2ODAwfQ.CHnGh7f9K6cnmKqgZ2CsXqNEZvcRElIBGDo3qfJGuxKtC1pxgN9yx06twVe9vXeKkRwiCb5rDiSA7CyL9ub3Bw';
-
-describe('JWT tokens()', () => {
-	afterAll(() => jest.resetAllMocks());
-
+describe('createSignedToken', () => {
 	const MS_IN_DATE = 1577836800;
-	Date.now = jest.fn(() => MS_IN_DATE);
+	it('createSignedToken - get query string', async () => {
+		const payload = {
+			m: 'GET',
+			url: '/users?id=1234',
+			len: 0,
+			aud: 'example.com',
+		};
+		const jwtTokenForAlice = await createSignedToken(AliceED25519PrivateKey, payload, MS_IN_DATE);
+
+		expect(jwtTokenForAlice).toEqual(
+			'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXJzP2lkPTEyMzQiLCJsZW4iOjAsImF1ZCI6ImV4YW1wbGUuY29tIiwiZXhwIjoxNTc3ODM2ODAwfQ.mKNaYiips6nSRx4UlsXJGKGC_0XeMC8agUo2SuxDMGylUUWoLUQ_ZqRHz7DWWTaIwDU0iCt2OdCvGWW_dv3XDg',
+		);
+	});
+	it('createSignedToken - get', async () => {
+		const payload = {
+			m: 'GET',
+			url: '/users/settings',
+			len: 0,
+			aud: 'mailchain.com',
+		};
+		const jwtTokenForAlice = await createSignedToken(AliceED25519PrivateKey, payload, MS_IN_DATE);
+
+		expect(jwtTokenForAlice).toEqual(
+			'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXJzL3NldHRpbmdzIiwibGVuIjowLCJhdWQiOiJtYWlsY2hhaW4uY29tIiwiZXhwIjoxNTc3ODM2ODAwfQ.kddbP_WWDwMEkXevFHCDbJhVTLVkbF33XNy8yRA5-9MJIQWUj97oJ2FuLz7vTHVJRCjnn0Ywvd8AL-t-zbGvDA',
+		);
+	});
+});
+
+describe('verifySignedToken', () => {
+	it('verifySignedToken', async () => {
+		const jwtTokenForAlice =
+			'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJtIjoiR0VUIiwidXJsIjoiL3VzZXJzP2lkPTEyMzQiLCJsZW4iOjAsImF1ZCI6ImV4YW1wbGUuY29tIiwiZXhwIjoxNTc3ODM2ODAwfQ.mKNaYiips6nSRx4UlsXJGKGC_0XeMC8agUo2SuxDMGylUUWoLUQ_ZqRHz7DWWTaIwDU0iCt2OdCvGWW_dv3XDg';
+		const verified = await verifySignedToken(jwtTokenForAlice, AliceED25519PrivateKey.publicKey);
+
+		expect(verified).toEqual(true);
+	});
+});
+
+describe('getAxiosWithSigner', () => {
+	const MS_IN_DATE = 1577836800;
 	const time = Math.floor(MS_IN_DATE * 0.001 + 60 * 5);
 
-	it('verify signing', async () => {
-		expect.assertions(1);
-		const jwtTokenForAlice = await getToken(
-			new KeyRing(AliceED25519PrivateKey).accountIdentityKey(),
-			payload,
-			MS_IN_DATE,
-		);
-
-		expect(jwtTokenForAlice).toEqual(expectedTokenForAlice);
+	afterAll(() => {
+		jest.resetAllMocks();
+		jest.clearAllTimers();
 	});
-
-	it('verify axios request GET', async () => {
+	beforeAll(() => {
+		jest.useFakeTimers().setSystemTime(new Date(MS_IN_DATE));
+	});
+	it('axios request GET', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
@@ -46,7 +102,8 @@ describe('JWT tokens()', () => {
 			aud: 'mailchain.com',
 		};
 
-		const token = await getToken(kr.accountIdentityKey(), payloadGet, time);
+		const token = await createSignedToken(kr.accountIdentityKey(), payloadGet, time);
+
 		mock.onGet(`https://mailchain.com/users/settings`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
@@ -58,7 +115,7 @@ describe('JWT tokens()', () => {
 			});
 	});
 
-	it('verify axios request GET query string', async () => {
+	it('axios request GET query string', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
@@ -72,7 +129,7 @@ describe('JWT tokens()', () => {
 			q: 'visible=false&test=1',
 		};
 
-		const token = await getToken(kr.accountIdentityKey(), payloadGet, time);
+		const token = await createSignedToken(kr.accountIdentityKey(), payloadGet, time);
 		mock.onGet(`https://mailchain.com/users/settings?visible=false&test=1`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
@@ -84,7 +141,7 @@ describe('JWT tokens()', () => {
 			});
 	});
 
-	it('verify axios request POST', async () => {
+	it('axios request POST', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 		const kr = new KeyRing(AliceED25519PrivateKey);
@@ -99,7 +156,7 @@ describe('JWT tokens()', () => {
 			aud: 'mailchain.com',
 		};
 
-		const token = await getToken(kr.accountIdentityKey(), payloadPost, time);
+		const token = await createSignedToken(kr.accountIdentityKey(), payloadPost, time);
 		mock.onPost(`https://${payloadPost.aud}${payloadPost.url}`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
@@ -111,7 +168,7 @@ describe('JWT tokens()', () => {
 			});
 	});
 
-	it('verify axios request signed with message key', async () => {
+	it('axios request signed with message key', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
@@ -127,7 +184,7 @@ describe('JWT tokens()', () => {
 			aud: 'mailchain.com',
 		};
 
-		const token = await getToken(kr.accountMessagingKey(), payloadPut, time);
+		const token = await createSignedToken(kr.accountMessagingKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountMessagingKey())
@@ -141,7 +198,7 @@ describe('JWT tokens()', () => {
 			});
 	});
 
-	it('verify axios request PUT', async () => {
+	it('axios request PUT', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
@@ -157,7 +214,7 @@ describe('JWT tokens()', () => {
 			aud: 'mailchain.com',
 		};
 
-		const token = await getToken(kr.accountIdentityKey(), payloadPut, time);
+		const token = await createSignedToken(kr.accountIdentityKey(), payloadPut, time);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
@@ -169,7 +226,7 @@ describe('JWT tokens()', () => {
 			});
 	});
 
-	it('verify axios request PATCH', async () => {
+	it('axios request PATCH', async () => {
 		expect.assertions(1);
 		const mock = new MockAdapter(axios);
 
@@ -185,7 +242,7 @@ describe('JWT tokens()', () => {
 			aud: 'mailchain.com',
 		};
 
-		const token = await getToken(kr.accountIdentityKey(), payloadPatch, time);
+		const token = await createSignedToken(kr.accountIdentityKey(), payloadPatch, time);
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
