@@ -31,7 +31,7 @@
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
 		"long": "^5.2.1",
-		"protobufjs": "7.1.1",
+		"protobufjs": "^7.2.4",
 		"striptags": "^3.2.0"
 	},
 	"devDependencies": {
