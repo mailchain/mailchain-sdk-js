@@ -27,6 +27,21 @@ export type Message = {
 	body: string;
 };
 
+export type MailboxOverview = {
+	mailboxes: MailboxItem[];
+};
+
+export type MailboxItem = {
+	mailbox: string;
+	labels: LabelOverview[];
+};
+
+export type LabelOverview = {
+	label: string;
+	total: number;
+	unread: number;
+};
+
 /** Copy from services/inbox/internal/datastore/labels.go */
 export const SYSTEM_MESSAGE_LABELS = [
 	'archive',

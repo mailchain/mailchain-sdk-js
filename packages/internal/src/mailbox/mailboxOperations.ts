@@ -21,7 +21,7 @@ import { MailboxRuleEngine } from '../mailboxRuleEngine/mailboxRuleEngine';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
 import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
-import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message } from './types';
+import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message, MailboxOverview, MailboxItem } from './types';
 import { createMailchainUserMailboxHasher, UserMailboxHasher } from './userMailboxHasher';
 import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
@@ -62,7 +62,8 @@ export interface MailboxOperations {
 	getArchivedMessages(): Promise<MessagePreview[]>;
 	/** Get messages from the Spam folder (with SPAM label). Warn: This feature is still in development, is is not stable for usage. */
 	getSpamMessages_unstable(): Promise<MessagePreview[]>;
-	searchMessages(): Promise<MessagePreview[]>;
+	/**  Get overview of mailboxes*/
+	getMailboxOverview(mailboxes?: string[]): Promise<MailboxOverview>;
 
 	/** Get the full contents of the single message for the provided ID (same as the {@link MessagePreview.id}) */
 	getFullMessage(messageId: string): Promise<Message>;
@@ -190,9 +191,23 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		return this.handleMessagePreviews(messages);
 	}
 
-	async searchMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesSearch().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
+	async getMailboxOverview(mailboxes?: string[]): Promise<MailboxOverview> {
+		const overview = await this.inboxApi.getMailboxOverview(mailboxes);
+		const result: MailboxOverview = {
+			mailboxes: [],
+		};
+
+		for (const m of overview.data.mailboxes) {
+			const mailbox: MailboxItem = { mailbox: m.mailbox, labels: [] };
+
+			for (const l of m.labels) {
+				mailbox.labels.push({ label: l.label, total: l.total, unread: l.unread });
+			}
+
+			result.mailboxes.push(mailbox);
+		}
+
+		return result;
 	}
 
 	private async handleMessagePreviews(messages: ApiMessagePreview[]): Promise<MessagePreview[]> {

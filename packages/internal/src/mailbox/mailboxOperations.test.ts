@@ -150,7 +150,6 @@ describe('mailbox', () => {
 		['getTrashMessages', 'getMessagesInTrashView'],
 		['getUnreadMessages', 'getMessagesInUnreadView'],
 		['getSentMessages', 'getMessagesInSentView'],
-		['searchMessages', 'getMessagesSearch'],
 	] as const;
 
 	test.each(messageViewsTests)(
