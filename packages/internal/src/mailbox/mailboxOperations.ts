@@ -1,32 +1,46 @@
-import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
-import { KeyRing, InboxKey } from '@mailchain/keyring';
-import { formatAddress, MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
-import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
+import { MailchainAddress, formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import {
-	InboxApiInterface,
-	PutEncryptedMessageRequestBodyFolderEnum,
 	Message as ApiMessagePreview,
 	InboxApiFactory,
+	InboxApiInterface,
+	PutEncryptedMessageRequestBodyFolderEnum,
 	createAxiosConfiguration,
 	getAxiosWithSigner,
 } from '@mailchain/api';
+import { isPublicKeyEqual, publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
+import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { InboxKey, KeyRing } from '@mailchain/keyring';
 import striptags from 'striptags';
-import { IdentityKeys } from '../identityKeys';
-import { MailData, Payload } from '../transport';
-import * as protoInbox from '../protobuf/inbox/inbox';
-import { parseMimeText } from '../formatters/parse';
 import { Configuration } from '..';
-import { UserMailbox } from '../user/types';
+import { parseMimeText } from '../formatters/parse';
+import { IdentityKeys } from '../identityKeys';
 import { MailboxRuleEngine } from '../mailboxRuleEngine/mailboxRuleEngine';
+import * as protoInbox from '../protobuf/inbox/inbox';
+import { MailData, Payload } from '../transport';
+import { encodeMailbox } from '../user';
+import { UserMailbox } from '../user/types';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
-import { createMailchainMessageIdCreator, MessageIdCreator } from './messageId';
-import { createMailchainMessageCrypto, MessageCrypto } from './messageCrypto';
-import { MessagePreview, UserMessageLabel, SystemMessageLabel, Message, MailboxOverview, MailboxItem } from './types';
-import { createMailchainUserMailboxHasher, UserMailboxHasher } from './userMailboxHasher';
-import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
-import { getAllMessagePreviewMigrations, MessagePreviewMigrationRule } from './migrations';
+import { MessageCrypto, createMailchainMessageCrypto } from './messageCrypto';
+import { MessageIdCreator, createMailchainMessageIdCreator } from './messageId';
+import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
+import { MessagePreviewMigrationRule, getAllMessagePreviewMigrations } from './migrations';
 import { MailPayload, convertPayload } from './payload/payload';
+import {
+	FolderMessagesOverview,
+	Message,
+	MessagePreview,
+	MessagesOverview,
+	SystemMessageLabel,
+	UserMessageLabel,
+} from './types';
+import { UserMailboxHasher, createMailchainUserMailboxHasher } from './userMailboxHasher';
+
+type GetMessagesViewParams = {
+	offset: number;
+	limit: number;
+	userMailbox: UserMailbox | null;
+};
 
 type SaveSentMessageParam = {
 	/** The {@link UserMailbox} that is sending this message */
@@ -47,26 +61,27 @@ export interface MailboxOperations {
 
 	// GETTING MESSAGES
 	/** Get messages from the Inbox folder (with INBOX label) */
-	getInboxMessages(): Promise<MessagePreview[]>;
+	getInboxMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Starred folder (with STARRED label) */
-	getStarredMessages(): Promise<MessagePreview[]>;
+	getStarredMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Trash folder (with TRASH label) */
-	getTrashMessages(): Promise<MessagePreview[]>;
+	getTrashMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Unread folder (without READ label) */
-	getUnreadMessages(): Promise<MessagePreview[]>;
+	getUnreadMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Send folder (with SEND label) */
-	getSentMessages(): Promise<MessagePreview[]>;
+	getSentMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Outbox folder */
-	getOutboxMessages(): Promise<MessagePreview[]>;
+	getOutboxMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Archived folder (with ARCHIVED label) */
-	getArchivedMessages(): Promise<MessagePreview[]>;
+	getArchivedMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/** Get messages from the Spam folder (with SPAM label). Warn: This feature is still in development, is is not stable for usage. */
-	getSpamMessages_unstable(): Promise<MessagePreview[]>;
+	getSpamMessages_unstable(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/**  Get overview of mailboxes*/
-	getMailboxOverview(mailboxes?: string[]): Promise<MailboxOverview>;
 
 	/** Get the full contents of the single message for the provided ID (same as the {@link MessagePreview.id}) */
 	getFullMessage(messageId: string): Promise<Message>;
+
+	getMessagesOverview(mailboxes: UserMailbox[]): Promise<MessagesOverview>;
 
 	// SAVING MESSAGES
 	/**
@@ -151,63 +166,64 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		return this.handleMessagePreview(message);
 	}
 
-	async getInboxMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInInboxView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getStarredMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInStarredView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getTrashMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInTrashView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getUnreadMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInUnreadView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getSentMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInSentView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getOutboxMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInOutboxView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getArchivedMessages(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInArchivedView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getSpamMessages_unstable(): Promise<MessagePreview[]> {
-		const messages = await this.inboxApi.getMessagesInSpamView().then((res) => res.data.messages);
-		return this.handleMessagePreviews(messages);
-	}
-
-	async getMailboxOverview(mailboxes?: string[]): Promise<MailboxOverview> {
-		const overview = await this.inboxApi.getMailboxOverview(mailboxes);
-		const result: MailboxOverview = {
-			mailboxes: [],
+	filterByParams(params: GetMessagesViewParams) {
+		return (messages: MessagePreview[]) => {
+			return params.userMailbox
+				? messages.filter((m) => isPublicKeyEqual(m.mailbox, params.userMailbox!.identityKey))
+				: messages;
 		};
+	}
 
-		for (const m of overview.data.mailboxes) {
-			const mailbox: MailboxItem = { mailbox: m.mailbox, labels: [] };
+	async getInboxMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInInboxView, params);
+	}
 
-			for (const l of m.labels) {
-				mailbox.labels.push({ label: l.label, total: l.total, unread: l.unread });
-			}
+	async getStarredMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInStarredView, params);
+	}
 
-			result.mailboxes.push(mailbox);
-		}
+	async getTrashMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInTrashView, params);
+	}
 
-		return result;
+	async getUnreadMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInUnreadView, params);
+	}
+
+	async getSentMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInSentView, params);
+	}
+
+	async getOutboxMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInOutboxView, params);
+	}
+
+	async getArchivedMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInArchivedView, params);
+	}
+
+	async getSpamMessages_unstable(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
+		return this.getMessagesInView(this.inboxApi.getMessagesInSpamView, params);
+	}
+
+	private async getMessagesInView(
+		viewMethod: InboxApiInterface['getMessagesInInboxView'],
+		params?: GetMessagesViewParams,
+	) {
+		const resolvedParams: GetMessagesViewParams = Object.assign(params ?? {}, {
+			offset: 0,
+			limit: 9999,
+			userMailbox: null,
+		});
+		const _hashedMailbox = resolvedParams.userMailbox
+			? encodeHexZeroX(await this.userMailboxHasher(resolvedParams.userMailbox))
+			: undefined;
+		const _from = undefined,
+			_to = undefined;
+		const {
+			data: { messages },
+		} = await viewMethod(/**from, to, params.offset, params.limit, hashedMailbox */);
+		return this.handleMessagePreviews(messages).then(this.filterByParams(resolvedParams));
 	}
 
 	private async handleMessagePreviews(messages: ApiMessagePreview[]): Promise<MessagePreview[]> {
@@ -287,6 +303,55 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			cc,
 			bcc,
 		};
+	}
+
+	async getMessagesOverview(mailboxes: UserMailbox[]): Promise<MessagesOverview> {
+		const hashedMailboxes = new Map<string, UserMailbox>(
+			await Promise.all(
+				mailboxes.map((mailbox) =>
+					this.userMailboxHasher(mailbox).then(
+						(mailboxHash) => [encodeHexZeroX(mailboxHash), mailbox] as [string, UserMailbox],
+					),
+				),
+			),
+		);
+
+		const folders = new Map<string, FolderMessagesOverview>();
+		const messagesOverview: MessagesOverview = { total: 0, unread: 0, folders };
+		const { data: apiMessagesOverview } = await this.inboxApi.getMailboxOverview([...hashedMailboxes.keys()]);
+		apiMessagesOverview.mailboxes.forEach((apiMailboxOverview) => {
+			const mailbox = hashedMailboxes.get(apiMailboxOverview.mailbox);
+			if (mailbox == null) {
+				console.warn(
+					`getMailboxOverview returned mailbox (${apiMailboxOverview.mailbox}) that was not requested mailboxes`,
+				);
+				return;
+			}
+
+			apiMailboxOverview.labels.forEach((apiLabelOverview) => {
+				const folderOverview: FolderMessagesOverview = folders.get(apiLabelOverview.label) ?? {
+					total: 0,
+					unread: 0,
+					mailboxes: new Map(),
+				};
+
+				folderOverview.total += apiLabelOverview.total;
+				folderOverview.unread += apiLabelOverview.unread;
+				if (!['starred'].includes(apiLabelOverview.label)) {
+					// Don't count 'starred' messages in the overall total/unread count as they are already in the inbox/archive/etc.
+					messagesOverview.total += apiLabelOverview.total;
+					messagesOverview.unread += apiLabelOverview.unread;
+				}
+				folderOverview.mailboxes.set(encodeMailbox(mailbox), {
+					total: apiLabelOverview.total,
+					unread: apiLabelOverview.unread,
+				});
+
+				folders.set(apiLabelOverview.label, folderOverview);
+			});
+		});
+
+		return messagesOverview;
 	}
 
 	async saveSentMessage(params: SaveSentMessageParam): Promise<MessagePreview> {

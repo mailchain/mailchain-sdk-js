@@ -1,12 +1,13 @@
 import { KeyRing } from '@mailchain/keyring';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { publicKeyToBytes, KindNaClSecretKey } from '@mailchain/crypto';
-import { decodeBase64, encodeBase64, encodeHex, EncodingTypes } from '@mailchain/encoding';
+import { decodeBase64, encodeBase64, encodeHex, encodeHexZeroX, EncodingTypes } from '@mailchain/encoding';
 import { mock } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { sha256 } from '@noble/hashes/sha256';
 import {
+	GetMailboxOverviewResponseBody,
 	GetMessageResponseBody,
 	GetMessagesInViewResponseBody,
 	InboxApi,
@@ -17,7 +18,7 @@ import { Payload } from '../transport';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { createMimeMessage } from '../formatters/generate';
 import { dummyMailData } from '../test.const';
-import { AliceAccountMailbox, AliceWalletMailbox } from '../user/test.const';
+import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
 import { MailboxRuleEngine } from '../mailboxRuleEngine';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
 import { createMailchainMessageCrypto } from './messageCrypto';
@@ -45,7 +46,7 @@ describe('mailbox', () => {
 			}, new Map()),
 		);
 	const mockUserMailboxHasher: UserMailboxHasher = (mailbox) => Promise.resolve(sha256(mailbox.identityKey.bytes));
-	const inboxApi = mock<InboxApi>();
+	const mockInboxApi = mock<InboxApi>();
 	const mockOwnerMatcher = mock<MessageMailboxOwnerMatcher>();
 	let payload: Payload;
 
@@ -88,7 +89,7 @@ describe('mailbox', () => {
 
 		mockOwnerMatcher.withMessageIdentityKeys.mockReturnValue(mockOwnerMatcher);
 		mailboxOperations = new MailchainMailboxOperations(
-			inboxApi,
+			mockInboxApi,
 			messagePreviewCrypto,
 			messageCrypto,
 			mockOwnerMatcher,
@@ -120,7 +121,7 @@ describe('mailbox', () => {
 		const msg1EncryptedPreview = await messagePreviewCrypto.encrypt(
 			protoInbox.preview.MessagePreview.encode(msg1Preview).finish(),
 		);
-		inboxApi.getMessage.mockResolvedValue({
+		mockInboxApi.getMessage.mockResolvedValue({
 			data: {
 				message: {
 					messageId: encodeHex(Uint8Array.from([1])),
@@ -132,7 +133,7 @@ describe('mailbox', () => {
 
 		const message = await mailboxOperations.getMessage('messageId');
 
-		expect(inboxApi.getMessage.mock.calls[0][0]).toEqual('messageId');
+		expect(mockInboxApi.getMessage.mock.calls[0][0]).toEqual('messageId');
 		expect(message).toEqual({
 			...msg1Preview,
 			mailbox: AliceAccountMailbox.identityKey,
@@ -150,6 +151,7 @@ describe('mailbox', () => {
 		['getTrashMessages', 'getMessagesInTrashView'],
 		['getUnreadMessages', 'getMessagesInUnreadView'],
 		['getSentMessages', 'getMessagesInSentView'],
+		['getSpamMessages_unstable', 'getMessagesInSpamView'],
 	] as const;
 
 	test.each(messageViewsTests)(
@@ -162,7 +164,7 @@ describe('mailbox', () => {
 			const msg2EncryptedPreview = await messagePreviewCrypto.encrypt(
 				protoInbox.preview.MessagePreview.encode(msg2Preview).finish(),
 			);
-			inboxApi[apiMethod].mockResolvedValue({
+			mockInboxApi[apiMethod].mockResolvedValue({
 				data: {
 					messages: [
 						{
@@ -180,10 +182,14 @@ describe('mailbox', () => {
 			} as AxiosResponse<GetMessagesInViewResponseBody>);
 
 			// When
-			const messages = await mailboxOperations[mailboxMethod]();
+			const messages = await mailboxOperations[mailboxMethod]({
+				offset: 10,
+				limit: 20,
+				userMailbox: AliceAccountMailbox,
+			});
 
 			// Then
-			expect(inboxApi[apiMethod].mock.calls).toHaveLength(1);
+			expect(mockInboxApi[apiMethod]).toHaveBeenCalledTimes(1);
 			expect(messages).toEqual(
 				[msg1Preview, msg2Preview].map((msg, index) => ({
 					...msg,
@@ -200,7 +206,7 @@ describe('mailbox', () => {
 
 	it('should decrypt full message body', async () => {
 		const encryptedPayload = await messageCrypto.encrypt(payload);
-		inboxApi.getEncryptedMessageBody.mockResolvedValue({ data: encryptedPayload } as AxiosResponse<object>);
+		mockInboxApi.getEncryptedMessageBody.mockResolvedValue({ data: encryptedPayload } as AxiosResponse<object>);
 
 		const message = await mailboxOperations.getFullMessage('messageId');
 
@@ -216,10 +222,10 @@ describe('mailbox', () => {
 	it('should encrypt and post sent message', async () => {
 		const uri = 'messageBodyUri';
 		const resourceId = 'resourceId';
-		inboxApi.postEncryptedMessageBody.mockResolvedValue({
+		mockInboxApi.postEncryptedMessageBody.mockResolvedValue({
 			data: { uri, resourceId },
 		} as AxiosResponse<PostPayloadResponseBody>);
-		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
+		mockInboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
 		const message = await mailboxOperations.saveSentMessage({
 			userMailbox: AliceAccountMailbox,
@@ -228,8 +234,8 @@ describe('mailbox', () => {
 		});
 
 		expect(message.messageId).toMatchSnapshot('sent message id');
-		expect(inboxApi.putEncryptedMessage.mock.calls[0][0]).toEqual(message.messageId);
-		const requestBody = inboxApi.putEncryptedMessage.mock.calls[0][1];
+		expect(mockInboxApi.putEncryptedMessage.mock.calls[0][0]).toEqual(message.messageId);
+		const requestBody = mockInboxApi.putEncryptedMessage.mock.calls[0][1];
 		const decryptedPreview = protoInbox.preview.MessagePreview.decode(
 			await messagePreviewCrypto.decrypt(decodeBase64(requestBody.encryptedPreview)),
 		);
@@ -255,9 +261,9 @@ describe('mailbox', () => {
 		expect(requestBody.hashedFrom).toMatchSnapshot('hashedFrom');
 		expect(requestBody.hashedTo).toMatchSnapshot('hashedTo');
 		expect(requestBody.mailbox).toEqual(Array.from(sha256(AliceAccountMailbox.identityKey.bytes)));
-		expect(await messageCrypto.decrypt(inboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array)).toEqual(
-			payload,
-		);
+		expect(
+			await messageCrypto.decrypt(mockInboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array),
+		).toEqual(payload);
 	});
 
 	it('should encrypt and post received message', async () => {
@@ -271,10 +277,10 @@ describe('mailbox', () => {
 		mockOwnerMatcher.findMatches.mockResolvedValue(matchedOwners);
 		const uri = 'messageBodyUri';
 		const resourceId = 'resourceId';
-		inboxApi.postEncryptedMessageBody.mockResolvedValue({
+		mockInboxApi.postEncryptedMessageBody.mockResolvedValue({
 			data: { uri, resourceId },
 		} as AxiosResponse<PostPayloadResponseBody>);
-		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
+		mockInboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
 		const messages = await mailboxOperations.saveReceivedMessage({
 			receivedTransportPayload: payload,
@@ -282,14 +288,14 @@ describe('mailbox', () => {
 		});
 
 		expect(messages).toHaveLength(matchedOwners.length);
-		expect(inboxApi.putEncryptedMessage).toHaveBeenCalledTimes(matchedOwners.length);
+		expect(mockInboxApi.putEncryptedMessage).toHaveBeenCalledTimes(matchedOwners.length);
 		expect(mockRuleEngine.apply).toHaveBeenCalledTimes(matchedOwners.length);
 
 		for (let index = 0; index < matchedOwners.length; index++) {
 			const { address: matchedOwner } = matchedOwners[index];
 			expect(messages[index]).toMatchSnapshot(`message id ${formatAddress(matchedOwner, 'mail')}`);
-			expect(inboxApi.putEncryptedMessage.mock.calls[index][0]).toEqual(messages[index].messageId);
-			const requestBody = inboxApi.putEncryptedMessage.mock.calls[index][1];
+			expect(mockInboxApi.putEncryptedMessage.mock.calls[index][0]).toEqual(messages[index].messageId);
+			const requestBody = mockInboxApi.putEncryptedMessage.mock.calls[index][1];
 			const decryptedPreview = protoInbox.preview.MessagePreview.decode(
 				await messagePreviewCrypto.decrypt(decodeBase64(requestBody.encryptedPreview)),
 			);
@@ -316,7 +322,7 @@ describe('mailbox', () => {
 			expect(requestBody.hashedFrom).toMatchSnapshot('hashedFrom');
 			expect(requestBody.hashedTo).toMatchSnapshot('hashedTo');
 			expect(
-				await messageCrypto.decrypt(inboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array),
+				await messageCrypto.decrypt(mockInboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array),
 			).toEqual(payload);
 		}
 	});
@@ -327,10 +333,10 @@ describe('mailbox', () => {
 		]);
 		const uri = 'messageBodyUri';
 		const resourceId = 'resourceId';
-		inboxApi.postEncryptedMessageBody.mockResolvedValue({
+		mockInboxApi.postEncryptedMessageBody.mockResolvedValue({
 			data: { uri, resourceId },
 		} as AxiosResponse<PostPayloadResponseBody>);
-		inboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
+		mockInboxApi.putEncryptedMessage.mockResolvedValue({ data: undefined } as AxiosResponse<void>);
 
 		const payloadWithHtmlPlainText: Payload = {
 			...payload,
@@ -367,7 +373,7 @@ describe('mailbox', () => {
 				await mailboxOperations[method]('messageId', shouldPut);
 			}
 
-			const apiCall = inboxApi.putMessageLabel.mock.calls[0];
+			const apiCall = mockInboxApi.putMessageLabel.mock.calls[0];
 			expect(apiCall[0]).toEqual('messageId');
 			expect(apiCall[1]).toEqual(label);
 		});
@@ -379,9 +385,47 @@ describe('mailbox', () => {
 				await mailboxOperations[method]('messageId', !shouldPut);
 			}
 
-			const apiCall = inboxApi.deleteMessageLabel.mock.calls[0];
+			const apiCall = mockInboxApi.deleteMessageLabel.mock.calls[0];
 			expect(apiCall[0]).toEqual('messageId');
 			expect(apiCall[1]).toEqual(label);
 		});
+	});
+
+	it('should compute messages overview', async () => {
+		mockInboxApi.getMailboxOverview.mockResolvedValue({
+			data: {
+				mailboxes: [
+					{
+						labels: [
+							{ label: 'inbox', total: 2, unread: 1 },
+							{ label: 'starred', total: 3, unread: 2 },
+							{ label: 'archived', total: 4, unread: 3 },
+						],
+						mailbox: encodeHexZeroX(await mockUserMailboxHasher(AliceAccountMailbox)),
+					},
+					{
+						labels: [
+							{ label: 'inbox', total: 3, unread: 0 },
+							{ label: 'starred', total: 4, unread: 1 },
+							{ label: 'sent', total: 5, unread: 0 },
+						],
+						mailbox: encodeHexZeroX(await mockUserMailboxHasher(AliceWalletMailbox)),
+					},
+				],
+			},
+		} as AxiosResponse<GetMailboxOverviewResponseBody>);
+
+		const overview = await mailboxOperations.getMessagesOverview([
+			AliceAccountMailbox,
+			AliceWalletMailbox,
+			BobAccountMailbox,
+		]);
+
+		expect(overview).toMatchSnapshot();
+		expect(mockInboxApi.getMailboxOverview).toHaveBeenCalledWith([
+			'0xe80f39fd4a3d65d4a6494125ee0ecf279024c8fdd4e670e225485c777349d5a9',
+			'0xc35dd5d86b8f0170db2b082cef3bca93db9ed95c6c785d4a67cced08b773bcea',
+			'0xd2c8b50395acebb32709406a1102c4aa25f2fefc57d0ed64f58239d1be1da701',
+		]);
 	});
 });

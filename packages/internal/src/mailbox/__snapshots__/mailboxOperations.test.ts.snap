@@ -1,5 +1,62 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`mailbox should compute messages overview 1`] = `
+{
+  "folders": Map {
+    "inbox" => {
+      "mailboxes": Map {
+        "e237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b" => {
+          "total": 2,
+          "unread": 1,
+        },
+        "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006" => {
+          "total": 3,
+          "unread": 0,
+        },
+      },
+      "total": 5,
+      "unread": 1,
+    },
+    "starred" => {
+      "mailboxes": Map {
+        "e237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b" => {
+          "total": 3,
+          "unread": 2,
+        },
+        "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006" => {
+          "total": 4,
+          "unread": 1,
+        },
+      },
+      "total": 7,
+      "unread": 3,
+    },
+    "archived" => {
+      "mailboxes": Map {
+        "e237a5d03f0fb08681a9bfb5e30dcee7a744e5a57acc43d7be979b00a6c6b24d1b" => {
+          "total": 4,
+          "unread": 3,
+        },
+      },
+      "total": 4,
+      "unread": 3,
+    },
+    "sent" => {
+      "mailboxes": Map {
+        "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006" => {
+          "total": 5,
+          "unread": 0,
+        },
+      },
+      "total": 5,
+      "unread": 0,
+    },
+  },
+  "total": 14,
+  "unread": 4,
+}
+`;
+
 exports[`mailbox should decrypt full message body: fullMessageBody 1`] = `
 "<ul>
 	<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>
