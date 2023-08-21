@@ -24,10 +24,10 @@ import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { isAxiosError } from 'axios';
 import { Configuration } from '../configuration';
 import { MailchainResult, partitionMailchainResults } from '../';
+import { UnexpectedMailchainError } from '../errors';
 import {
 	MessagingKeyContactError,
 	IdentityNotFoundError,
-	UnexpectedMailchainError,
 	IdentityProviderUnsupportedError,
 	IdentityProviderAddressUnsupportedError,
 	IdentityExpiredError,

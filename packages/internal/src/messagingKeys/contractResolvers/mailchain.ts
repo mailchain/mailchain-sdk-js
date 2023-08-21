@@ -5,7 +5,7 @@ import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { MailchainResult } from '../../mailchainResult';
 import { Configuration } from '../../configuration';
 import { MessagingKeyVerifier } from '../verify';
-import { UnexpectedMailchainError } from '../errors';
+import { UnexpectedMailchainError } from '../../errors';
 import { ContractCallLatestNonce, ContractCallMessagingKeyResolver, ContractCallResolveResult } from './resolver';
 import { MessagingKeyNotFoundInContractError } from './errors';
 

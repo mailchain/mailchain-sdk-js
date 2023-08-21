@@ -3,6 +3,7 @@
 exports[`check imports snapshot compare imports: imports 1`] = `
 [
   "@mailchain/internal/configuration",
+  "@mailchain/internal/errors",
   "@mailchain/internal/formatters/consts",
   "@mailchain/internal/formatters/parse",
   "@mailchain/internal/formatters/simpleMimeHeaderParser",
@@ -75,7 +76,6 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/internal/sending/mail/prepare",
   "@mailchain/internal/sending/mail/sendMailParams",
   "@mailchain/internal/sending/messagingKeys",
-  "@mailchain/internal/sending/messagingKeys/errors",
   "@mailchain/internal/sending/payload/send",
   "@mailchain/internal/sending/protobuf/protocol/protocol",
   "@mailchain/internal/sending/transport",

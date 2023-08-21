@@ -11,11 +11,11 @@ import axios, { AxiosInstance } from 'axios';
 import { MessagingKeysApiFactory, MessagingKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
 import { MailchainResult } from '../mailchainResult';
+import { UnexpectedMailchainError } from '../errors';
 import { ContractCallLatestNonce } from './contractResolvers/resolver';
 import { NearContractCallResolver } from './contractResolvers/near';
 import { MailchainKeyRegContractCallResolver } from './contractResolvers/mailchain';
 import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
-import { UnexpectedMailchainError } from './errors';
 
 export type GetMessagingKeyLatestNonceResult = MailchainResult<number, GetMessagingKeyLatestNonceError>;
 export type GetMessagingKeyLatestNonceError = ProtocolNotSupportedError | UnexpectedMailchainError;

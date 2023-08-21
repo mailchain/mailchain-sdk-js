@@ -1,7 +1,7 @@
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey, SignerWithPublicKey } from '@mailchain/crypto';
 import { Configuration, TransportApiInterface, TransportApiFactory, getAxiosWithSigner } from '@mailchain/api';
 import { MailchainResult } from '../..';
-import { UnexpectedMailchainError } from '../../messagingKeys/errors';
+import { UnexpectedMailchainError } from '../../errors';
 import { Payload, serializeAndEncryptPayload } from '../../transport';
 
 export type SentPayload = {
