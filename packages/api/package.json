@@ -19,7 +19,9 @@
 	"dependencies": {
 		"@mailchain/crypto": "0.24.0",
 		"@mailchain/encoding": "0.24.0",
+		"@noble/hashes": "^1.3.0",
 		"axios": "1.3.4",
+		"canonicalize": "^1.0.8",
 		"lodash": "^4.17.21"
 	},
 	"devDependencies": {
