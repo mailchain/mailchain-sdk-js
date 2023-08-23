@@ -7,8 +7,8 @@ import {
 	createAxiosConfiguration,
 	getAxiosWithSigner,
 } from '@mailchain/api';
-import { isPublicKeyEqual, publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
-import { decodeBase64, encodeBase64, encodeHexZeroX } from '@mailchain/encoding';
+import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
+import { decodeBase64, encodeBase64, encodeHex } from '@mailchain/encoding';
 import { InboxKey, KeyRing } from '@mailchain/keyring';
 import striptags from 'striptags';
 import { Configuration } from '..';
@@ -36,10 +36,10 @@ import {
 } from './types';
 import { UserMailboxHasher, createMailchainUserMailboxHasher } from './userMailboxHasher';
 
-type GetMessagesViewParams = {
+export type GetMessagesViewParams = {
 	offset: number;
 	limit: number;
-	userMailbox: UserMailbox | null;
+	userMailboxes: UserMailbox[] | 'all';
 };
 
 type SaveSentMessageParam = {
@@ -166,14 +166,6 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		return this.handleMessagePreview(message);
 	}
 
-	filterByParams(params: GetMessagesViewParams) {
-		return (messages: MessagePreview[]) => {
-			return params.userMailbox
-				? messages.filter((m) => isPublicKeyEqual(m.mailbox, params.userMailbox!.identityKey))
-				: messages;
-		};
-	}
-
 	async getInboxMessages(params?: GetMessagesViewParams): Promise<MessagePreview[]> {
 		return this.getMessagesInView(this.inboxApi.getMessagesInInboxView, params);
 	}
@@ -210,20 +202,16 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		viewMethod: InboxApiInterface['getMessagesInInboxView'],
 		params?: GetMessagesViewParams,
 	) {
-		const resolvedParams: GetMessagesViewParams = Object.assign(params ?? {}, {
-			offset: 0,
-			limit: 9999,
-			userMailbox: null,
-		});
-		const _hashedMailbox = resolvedParams.userMailbox
-			? encodeHexZeroX(await this.userMailboxHasher(resolvedParams.userMailbox))
+		const hashedMailbox = Array.isArray(params?.userMailboxes)
+			? (await Promise.all(params!.userMailboxes.map((m) => this.userMailboxHasher(m)))).map(encodeHex)
 			: undefined;
-		const _from = undefined,
-			_to = undefined;
+		const labels = undefined,
+			from = undefined,
+			to = undefined;
 		const {
 			data: { messages },
-		} = await viewMethod(/**from, to, params.offset, params.limit, hashedMailbox */);
-		return this.handleMessagePreviews(messages).then(this.filterByParams(resolvedParams));
+		} = await viewMethod(labels, from, to, params?.offset, params?.limit, hashedMailbox);
+		return this.handleMessagePreviews(messages);
 	}
 
 	private async handleMessagePreviews(messages: ApiMessagePreview[]): Promise<MessagePreview[]> {
@@ -310,7 +298,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			await Promise.all(
 				mailboxes.map((mailbox) =>
 					this.userMailboxHasher(mailbox).then(
-						(mailboxHash) => [encodeHexZeroX(mailboxHash), mailbox] as [string, UserMailbox],
+						(mailboxHash) => [encodeHex(mailboxHash), mailbox] as [string, UserMailbox],
 					),
 				),
 			),

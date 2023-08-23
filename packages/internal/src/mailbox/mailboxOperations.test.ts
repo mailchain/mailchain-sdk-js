@@ -1,11 +1,4 @@
-import { KeyRing } from '@mailchain/keyring';
-import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
-import { publicKeyToBytes, KindNaClSecretKey } from '@mailchain/crypto';
-import { decodeBase64, encodeBase64, encodeHex, encodeHexZeroX, EncodingTypes } from '@mailchain/encoding';
-import { mock } from 'jest-mock-extended';
-import { AxiosResponse } from 'axios';
 import { formatAddress, parseNameServiceAddress } from '@mailchain/addressing';
-import { sha256 } from '@noble/hashes/sha256';
 import {
 	GetMailboxOverviewResponseBody,
 	GetMessageResponseBody,
@@ -14,20 +7,27 @@ import {
 	PostPayloadResponseBody,
 	PutEncryptedMessageRequestBodyFolderEnum,
 } from '@mailchain/api';
-import { Payload } from '../transport';
-import * as protoInbox from '../protobuf/inbox/inbox';
+import { KindNaClSecretKey, publicKeyToBytes } from '@mailchain/crypto';
+import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
+import { EncodingTypes, decodeBase64, encodeBase64, encodeHex } from '@mailchain/encoding';
+import { KeyRing } from '@mailchain/keyring';
+import { sha256 } from '@noble/hashes/sha256';
+import { AxiosResponse } from 'axios';
+import { mock } from 'jest-mock-extended';
 import { createMimeMessage } from '../formatters/generate';
-import { dummyMailData } from '../test.const';
-import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
 import { MailboxRuleEngine } from '../mailboxRuleEngine';
+import * as protoInbox from '../protobuf/inbox/inbox';
+import { dummyMailData } from '../test.const';
+import { Payload } from '../transport';
+import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
+import { AddressesHasher } from './addressHasher';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
 import { createMailchainMessageCrypto } from './messageCrypto';
-import { AddressesHasher } from './addressHasher';
 import { createMailchainMessageIdCreator } from './messageId';
-import { UserMailboxHasher } from './userMailboxHasher';
 import { AddressMatch, MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { MessagePreviewMigrationRule } from './migrations';
 import { SystemMessageLabel } from './types';
+import { UserMailboxHasher } from './userMailboxHasher';
 
 describe('mailbox', () => {
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
@@ -185,11 +185,14 @@ describe('mailbox', () => {
 			const messages = await mailboxOperations[mailboxMethod]({
 				offset: 10,
 				limit: 20,
-				userMailbox: AliceAccountMailbox,
+				userMailboxes: [AliceAccountMailbox],
 			});
 
 			// Then
 			expect(mockInboxApi[apiMethod]).toHaveBeenCalledTimes(1);
+			expect(mockInboxApi[apiMethod]).toHaveBeenCalledWith(undefined, undefined, undefined, 10, 20, [
+				'e80f39fd4a3d65d4a6494125ee0ecf279024c8fdd4e670e225485c777349d5a9',
+			]);
 			expect(messages).toEqual(
 				[msg1Preview, msg2Preview].map((msg, index) => ({
 					...msg,
@@ -401,7 +404,7 @@ describe('mailbox', () => {
 							{ label: 'starred', total: 3, unread: 2 },
 							{ label: 'archived', total: 4, unread: 3 },
 						],
-						mailbox: encodeHexZeroX(await mockUserMailboxHasher(AliceAccountMailbox)),
+						mailbox: encodeHex(await mockUserMailboxHasher(AliceAccountMailbox)),
 					},
 					{
 						labels: [
@@ -409,7 +412,7 @@ describe('mailbox', () => {
 							{ label: 'starred', total: 4, unread: 1 },
 							{ label: 'sent', total: 5, unread: 0 },
 						],
-						mailbox: encodeHexZeroX(await mockUserMailboxHasher(AliceWalletMailbox)),
+						mailbox: encodeHex(await mockUserMailboxHasher(AliceWalletMailbox)),
 					},
 				],
 			},
@@ -421,11 +424,13 @@ describe('mailbox', () => {
 			BobAccountMailbox,
 		]);
 
+		console.log(overview, 'overview');
+
 		expect(overview).toMatchSnapshot();
 		expect(mockInboxApi.getMailboxOverview).toHaveBeenCalledWith([
-			'0xe80f39fd4a3d65d4a6494125ee0ecf279024c8fdd4e670e225485c777349d5a9',
-			'0xc35dd5d86b8f0170db2b082cef3bca93db9ed95c6c785d4a67cced08b773bcea',
-			'0xd2c8b50395acebb32709406a1102c4aa25f2fefc57d0ed64f58239d1be1da701',
+			'e80f39fd4a3d65d4a6494125ee0ecf279024c8fdd4e670e225485c777349d5a9',
+			'c35dd5d86b8f0170db2b082cef3bca93db9ed95c6c785d4a67cced08b773bcea',
+			'd2c8b50395acebb32709406a1102c4aa25f2fefc57d0ed64f58239d1be1da701',
 		]);
 	});
 });
