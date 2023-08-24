@@ -3,13 +3,13 @@ import MockAdapter from 'axios-mock-adapter';
 import { encodeBase64UrlSafe } from '@mailchain/encoding';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { KeyRing } from '@mailchain/keyring';
-import { signJWT } from './jwt';
+import { signJWT } from '../jwt';
 import { getAxiosWithSigner } from './axios';
 import { createTokenPayload } from './token';
 
 describe('getAxiosWithSigner', () => {
 	const MS_IN_DATE = 1577836800;
-	const time = Math.floor(MS_IN_DATE * 0.001 + 60 * 5);
+	const exp = Math.floor(MS_IN_DATE * 0.001 + 60 * 5);
 
 	afterAll(() => {
 		jest.resetAllMocks();
@@ -28,9 +28,10 @@ describe('getAxiosWithSigner', () => {
 			m: 'GET',
 			url: '/users/settings',
 			aud: 'mailchain.com',
+			exp,
 		};
 
-		const token = await signJWT(kr.accountIdentityKey(), payloadGet, time);
+		const token = await signJWT(kr.accountIdentityKey(), payloadGet);
 
 		mock.onGet(`https://mailchain.com/users/settings`).reply((conf) => [200, conf.headers]);
 
@@ -54,9 +55,10 @@ describe('getAxiosWithSigner', () => {
 			url: '/users/settings',
 			aud: 'mailchain.com',
 			q: 'visible=false&test=1',
+			exp,
 		};
 
-		const token = await signJWT(kr.accountIdentityKey(), payloadGet, time);
+		const token = await signJWT(kr.accountIdentityKey(), payloadGet);
 		mock.onGet(`https://mailchain.com/users/settings?visible=false&test=1`).reply((conf) => [200, conf.headers]);
 
 		return getAxiosWithSigner(kr.accountIdentityKey())
@@ -76,8 +78,7 @@ describe('getAxiosWithSigner', () => {
 
 		const token = await signJWT(
 			AliceED25519PrivateKey,
-			createTokenPayload(new URL('https://mailchain.com/user/settings'), 'post', postBody),
-			time,
+			createTokenPayload(new URL('https://mailchain.com/user/settings'), 'post', postBody, exp),
 		);
 		mock.onPost('https://mailchain.com/user/settings').reply((conf) => [200, conf.headers]);
 
@@ -108,8 +109,7 @@ describe('getAxiosWithSigner', () => {
 
 		const token = await signJWT(
 			kr.accountMessagingKey(),
-			createTokenPayload(new URL('https://mailchain.com/transport/delivery-requests'), 'put', putBody),
-			time,
+			createTokenPayload(new URL('https://mailchain.com/transport/delivery-requests'), 'put', putBody, exp),
 		);
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
 
@@ -142,8 +142,7 @@ describe('getAxiosWithSigner', () => {
 
 		const token = await signJWT(
 			kr.accountIdentityKey(),
-			createTokenPayload(new URL('https://mailchain.com/user'), 'put', putBody),
-			time,
+			createTokenPayload(new URL('https://mailchain.com/user'), 'put', putBody, exp),
 		);
 
 		mock.onPut(`https://${payloadPut.aud}${payloadPut.url}`).reply((conf) => [200, conf.headers]);
@@ -175,8 +174,7 @@ describe('getAxiosWithSigner', () => {
 
 		const token = await signJWT(
 			kr.accountIdentityKey(),
-			createTokenPayload(new URL('https://mailchain.com/user'), 'patch', patchBody),
-			time,
+			createTokenPayload(new URL('https://mailchain.com/user'), 'patch', patchBody, exp),
 		);
 
 		mock.onPatch(`https://${payloadPatch.aud}${payloadPatch.url}`).reply((conf) => [200, conf.headers]);

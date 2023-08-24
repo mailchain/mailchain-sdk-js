@@ -7,10 +7,10 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/api/api/base",
   "@mailchain/api/api/common",
   "@mailchain/api/api/configuration",
+  "@mailchain/api/axios/token",
   "@mailchain/api/helpers/apiKeyToCryptoKey",
   "@mailchain/api/helpers/cryptoKeyToApiKey",
   "@mailchain/api/helpers/errors",
-  "@mailchain/api/jwt/jwt",
-  "@mailchain/api/jwt/token",
+  "@mailchain/api/jwt",
 ]
 `;

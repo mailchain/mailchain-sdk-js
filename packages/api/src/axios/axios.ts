@@ -1,7 +1,7 @@
-import { encodeBase64UrlSafe } from '@mailchain/encoding';
-import axios, { AxiosInstance } from 'axios';
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import { signJWT } from './jwt';
+import axios, { AxiosInstance } from 'axios';
+import { encodeBase64UrlSafe } from '@mailchain/encoding';
+import { signJWT } from '../jwt';
 import { createTokenPayload } from './token';
 
 export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstance => {
@@ -13,8 +13,9 @@ export const getAxiosWithSigner = (requestKey: SignerWithPublicKey): AxiosInstan
 				new URL(request?.url ?? ''),
 				request.method?.toUpperCase() ?? '',
 				request.data,
+				expires,
 			);
-			const token = await signJWT(requestKey, tokenPayload, expires);
+			const token = await signJWT(requestKey, tokenPayload);
 			request.headers.Authorization = `vapid t=${token}, k=${encodeBase64UrlSafe(requestKey.publicKey.bytes)}`;
 		}
 		return request;

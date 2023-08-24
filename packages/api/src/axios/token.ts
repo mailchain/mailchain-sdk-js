@@ -31,11 +31,12 @@ function asBuffer(data: unknown): Buffer | undefined {
 	}
 	return Buffer.from(decodeUtf8(JSON.stringify(data)));
 }
-export function createTokenPayload(url: URL, method: string, data: unknown): TokenPayload {
+export function createTokenPayload(url: URL, method: string, data: unknown, expires: number): TokenPayload {
 	const basePayload = {
 		m: method.toUpperCase(),
 		url: url.pathname,
 		aud: url.host,
+		exp: expires,
 	} as TokenPayload;
 
 	// there is a difference when hashing when the q field is missing vs undefined
