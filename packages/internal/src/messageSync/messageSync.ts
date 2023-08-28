@@ -72,7 +72,7 @@ export class MessageSync {
 				.saveReceivedMessage({ receivedTransportPayload: undeliveredMessage.payload, userMailbox: mailbox })
 				.catch((e) => {
 					console.warn(
-						`Failed saving received message with hash ${undeliveredMessage.deliveryRequestHash}`,
+						`Failed saving received message with hash ${encodeHex(undeliveredMessage.deliveryRequestHash)}`,
 						e,
 					);
 					return undefined;
