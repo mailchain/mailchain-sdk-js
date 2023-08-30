@@ -4,18 +4,18 @@ import { Configuration, MailchainResult, partitionMailchainResults } from '../..
 import {
 	DeliveryRequests,
 	SentManyDeliveryRequests,
-	SentDeliveryRequest,
+	SentPayloadDistributionRequest,
 	SomeDeliveryRequestsFailedError,
 	SendManyDeliveryRequestsParams,
-} from '../deliveryRequests/deliveryRequests';
+} from '../deliveryRequests';
 import { ResolvedAddress } from '../../messagingKeys';
-import { PreparedDistribution } from './payloadSender';
+import { DistributionRequest } from './distributor';
 
-export type SentMailDeliveryRequests = SentDeliveryRequest[];
-export type SendMailDeliveryRequestsError = SendMailDeliveryRequestsFailuresError;
+export type SentPayloadDistributionRequests = SentPayloadDistributionRequest[];
+export type SendPayloadDistributionRequestsError = SendPayloadDistributionRequestsFailuresError;
 
-export class SendMailDeliveryRequestsFailuresError extends Error {
-	readonly type = 'send_mail_delivery_request_failures';
+export class SendPayloadDistributionRequestsFailuresError extends Error {
+	readonly type = 'send_mail_delivery_request_failures'; // TODO:
 	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#send_mail_delivery_request_failures';
 	constructor(
 		public readonly successes: Array<{
@@ -33,35 +33,35 @@ export class SendMailDeliveryRequestsFailuresError extends Error {
 	}
 }
 
-export type SendMailDeliveryRequestsParams = {
-	distributions: PreparedDistribution[];
+export type SendPayloadDistributionRequestsParams = {
+	distributionRequests: DistributionRequest[];
 	resolvedAddresses: Map<string, ResolvedAddress>;
 };
-export class MailDeliveryRequests {
+
+export class PayloadDeliveryRequests {
 	constructor(private readonly deliveryRequests: DeliveryRequests) {}
 
 	static create(configuration: Configuration, sender: SignerWithPublicKey) {
-		return new MailDeliveryRequests(DeliveryRequests.create(configuration, sender));
+		return new PayloadDeliveryRequests(DeliveryRequests.create(configuration, sender));
 	}
 
 	/**
 	 * Send the prepared payloads to each recipient.
 	 * A single payload maybe be sent to multiple recipients in the case of multiple recipients.
-	 * Separate payloads are sent to each recipient in the case of bcc recipients.
 	 */
-	async sendMailDeliveryRequests(
-		params: SendMailDeliveryRequestsParams,
-	): Promise<MailchainResult<SentMailDeliveryRequests, SendMailDeliveryRequestsError>> {
-		const { distributions, resolvedAddresses } = params;
+	async sendPayloadDistributionRequests(
+		params: SendPayloadDistributionRequestsParams,
+	): Promise<MailchainResult<SentPayloadDistributionRequests, SendPayloadDistributionRequestsError>> {
+		const { distributionRequests, resolvedAddresses } = params;
 		// for each distribution, send the payload to the recipients
 		const sendResults = await Promise.all(
-			distributions.map(async (preparedDistribution) => {
-				const recipients = preparedDistribution.distribution.recipients.map(
-					({ address }) => resolvedAddresses.get(address)!.messagingKey,
+			distributionRequests.map(async (distributionRequest) => {
+				const recipients = distributionRequest.distribution.recipients.map(
+					(address) => resolvedAddresses.get(address)!.messagingKey,
 				);
 				const sendManyDeliveryRequestsParams = {
 					recipients,
-					...preparedDistribution.preparedPayload,
+					...distributionRequest.storedPayload,
 				};
 				const result = await this.deliveryRequests.sendManyDeliveryRequests(sendManyDeliveryRequestsParams);
 
@@ -74,7 +74,7 @@ export class MailDeliveryRequests {
 
 		const { successes: successfulDeliveries, failures: failed } = partitionMailchainResults(sendResults);
 		if (failed.length > 0) {
-			return { error: new SendMailDeliveryRequestsFailuresError(successfulDeliveries, failed) };
+			return { error: new SendPayloadDistributionRequestsFailuresError(successfulDeliveries, failed) };
 		}
 
 		return {

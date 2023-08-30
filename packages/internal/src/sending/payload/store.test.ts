@@ -7,7 +7,7 @@ import { TransportApiInterface } from '@mailchain/api';
 import { Payload } from '../../transport';
 import { decryptPayload, deserialize } from '../../transport/serialization';
 import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
-import { PayloadSender } from './send';
+import { PayloadStorer } from './store';
 
 const payload: Payload = {
 	Headers: {
@@ -52,12 +52,12 @@ const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(
 );
 
 describe('PayloadSender', () => {
-	let sender: PayloadSender;
+	let sender: PayloadStorer;
 	let mockTransportApi: MockProxy<TransportApiInterface>;
 
 	beforeAll(() => {
 		mockTransportApi = mock();
-		sender = new PayloadSender(mockTransportApi);
+		sender = new PayloadStorer(mockTransportApi);
 	});
 
 	test('[private] createAndStorePayload successfully posts encrypted payload', async () => {
@@ -67,7 +67,7 @@ describe('PayloadSender', () => {
 			},
 		} as AxiosResponse);
 
-		const { data: result, error } = await sender.sendPayload(payload);
+		const { data: result, error } = await sender.storePayload(payload);
 		expect(error).toBeUndefined();
 
 		expect(result).toEqual({

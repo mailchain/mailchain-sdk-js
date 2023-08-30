@@ -52,8 +52,8 @@ describe('createMailPayloads', () => {
 		expect(distributions[0].payload).toMatchSnapshot('visible');
 		expect(distributions[0].payload.Content.toString()).toEqual(mockMimeMessageResult.visibleRecipients);
 		expect(distributions[0].recipients).toEqual([
-			...dummyMailData.recipients,
-			...dummyMailData.carbonCopyRecipients,
+			...dummyMailData.recipients.map((x) => x.address),
+			...dummyMailData.carbonCopyRecipients.map((x) => x.address),
 		]);
 	});
 
@@ -68,7 +68,7 @@ describe('createMailPayloads', () => {
 		distributions.slice(1).forEach((bccParams, index) => {
 			expect(bccParams.payload).toMatchSnapshot(`blinded ${dummyMailData.blindCarbonCopyRecipients[index].name}`);
 			expect(bccParams.payload.Content.toString()).toEqual(mockMimeMessageResult.blindRecipients[index].content);
-			expect(bccParams.recipients[0]).toEqual(dummyMailData.blindCarbonCopyRecipients[index]);
+			expect(bccParams.recipients[0]).toEqual(dummyMailData.blindCarbonCopyRecipients[index].address);
 		});
 	});
 });

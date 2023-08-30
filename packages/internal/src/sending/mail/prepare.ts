@@ -2,7 +2,7 @@ import { SignerWithPublicKey } from '@mailchain/crypto';
 import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
 import { Configuration, MailchainResult } from '../../';
 import { MessagingKeys, ResolvedAddress, ResoleAddressesFailuresError } from '../../messagingKeys';
-import { MailDistribution, MailData, Payload, MailSenderVerifier } from '../../transport';
+import { Distribution, MailData, Payload, SenderVerifier } from '../../transport';
 import { PreflightCheckError } from '../errors';
 import { createMailPayloads } from './payloads';
 
@@ -12,7 +12,7 @@ export type PrepareMailParams = {
 };
 
 export type PreparedMail = {
-	distributions: MailDistribution[];
+	distributions: Distribution[];
 	message: Payload;
 	resolvedAddresses: Map<string, ResolvedAddress>;
 };
@@ -20,13 +20,10 @@ export type PreparedMail = {
 export type PrepareMailError = PreflightCheckError | SenderMessagingKeyIncorrect | ResoleAddressesFailuresError;
 
 export class MailPreparer {
-	constructor(
-		private readonly messagingKeys: MessagingKeys,
-		private readonly mailSenderVerifier: MailSenderVerifier,
-	) {}
+	constructor(private readonly messagingKeys: MessagingKeys, private readonly senderVerifier: SenderVerifier) {}
 
 	static create(configuration: Configuration) {
-		return new MailPreparer(MessagingKeys.create(configuration), MailSenderVerifier.create(configuration));
+		return new MailPreparer(MessagingKeys.create(configuration), SenderVerifier.create(configuration));
 	}
 
 	async prepareMail(params: PrepareMailParams): Promise<MailchainResult<PreparedMail, PrepareMailError>> {
@@ -52,8 +49,8 @@ export class MailPreparer {
 			return { error: new PreflightCheckError('No recipients found.') };
 		}
 
-		const isSenderMatching = await this.mailSenderVerifier.verifySenderOwnsFromAddress(
-			message.from,
+		const isSenderMatching = await this.senderVerifier.verifySenderOwnsFromAddress(
+			message.from.address,
 			senderMessagingKey.publicKey,
 		);
 		if (!isSenderMatching) {
@@ -73,6 +70,7 @@ export class MailPreparer {
 			return { error };
 		}
 
+		// Separate payloads are sent to each recipient in the case of bcc recipients.
 		const messagePayloads = await createMailPayloads(params.senderMessagingKey, resolvedAddresses, message);
 
 		return {

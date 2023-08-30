@@ -14,7 +14,7 @@ export class SomeDeliveryRequestsFailedError extends Error {
 	constructor(
 		public readonly successes: Array<{
 			params: SendDeliveryRequestParams;
-			data: SentDeliveryRequest;
+			data: SentPayloadDistributionRequest;
 		}>,
 		public readonly failures: Array<{
 			params: SendDeliveryRequestParams;
@@ -27,7 +27,7 @@ export class SomeDeliveryRequestsFailedError extends Error {
 	}
 }
 export type SendManyDeliveryRequestError = SomeDeliveryRequestsFailedError;
-export type SentManyDeliveryRequests = SentDeliveryRequest[];
+export type SentManyDeliveryRequests = SentPayloadDistributionRequest[];
 
 export type SendManyDeliveryRequestsParams = {
 	recipients: PublicKey[];
@@ -41,13 +41,13 @@ type SendDeliveryRequestParams = {
 	payloadRootEncryptionKey: ED25519ExtendedPrivateKey;
 };
 
-export type SentDeliveryRequest = {
+export type SentPayloadDistributionRequest = {
 	deliveryRequestId: string;
 	recipientMessageKey: PublicKey;
 };
 export type SendDeliveryRequestError = SendDeliveryRequestTransportError;
 export class SendDeliveryRequestTransportError extends Error {
-	constructor(cause: any, readonly params: SendDeliveryRequestParams) {
+	constructor(cause: Error, readonly params: SendDeliveryRequestParams) {
 		super('failed sending delivery request', { cause });
 	}
 }
@@ -103,7 +103,7 @@ export class DeliveryRequests {
 	 */
 	async sendDeliveryRequest(
 		params: SendDeliveryRequestParams,
-	): Promise<MailchainResult<SentDeliveryRequest, SendDeliveryRequestError>> {
+	): Promise<MailchainResult<SentPayloadDistributionRequest, SendDeliveryRequestError>> {
 		const { recipientMessageKey, payloadRootEncryptionKey, payloadUri } = params;
 		const deliveryCreated = await createDelivery(recipientMessageKey, payloadRootEncryptionKey, payloadUri);
 
@@ -118,7 +118,7 @@ export class DeliveryRequests {
 			return { data: { deliveryRequestId, recipientMessageKey } };
 		} catch (e) {
 			return {
-				error: new SendDeliveryRequestTransportError(e, params),
+				error: new SendDeliveryRequestTransportError(e as Error, params),
 			};
 		}
 	}

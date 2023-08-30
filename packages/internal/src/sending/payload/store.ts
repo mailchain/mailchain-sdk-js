@@ -1,10 +1,14 @@
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey, SignerWithPublicKey } from '@mailchain/crypto';
-import { Configuration, TransportApiInterface, TransportApiFactory, getAxiosWithSigner } from '@mailchain/api';
-import { MailchainResult } from '../..';
-import { UnexpectedMailchainError } from '../../errors';
+import {
+	TransportApiInterface,
+	TransportApiFactory,
+	getAxiosWithSigner,
+	createAxiosConfiguration,
+} from '@mailchain/api';
+import { Configuration, MailchainResult } from '../..';
 import { Payload, serializeAndEncryptPayload } from '../../transport';
 
-export type SentPayload = {
+export type StoredPayload = {
 	payloadUri: string;
 	payloadRootEncryptionKey: ED25519ExtendedPrivateKey;
 };
@@ -13,18 +17,30 @@ export type PreparePayloadParams = {
 	payload: Payload;
 };
 
-export class PayloadSender {
+export class StorePayloadError extends Error {
+	constructor(cause: Error) {
+		super('Payload could not be stored.', { cause });
+	}
+}
+
+export class PayloadStorer {
 	constructor(private readonly transportApi: TransportApiInterface) {}
 
 	static create(configuration: Configuration, accountKeySigner: SignerWithPublicKey) {
-		return new PayloadSender(TransportApiFactory(configuration, undefined, getAxiosWithSigner(accountKeySigner)));
+		return new PayloadStorer(
+			TransportApiFactory(
+				createAxiosConfiguration(configuration.apiPath),
+				undefined,
+				getAxiosWithSigner(accountKeySigner),
+			),
+		);
 	}
 
 	/**
 	 * Encrypt the payload with ephemeral key and deliver it to the storage nodes.
 	 * @returns the URL to get the message from the and ephemeral key used for the encryption of it
 	 */
-	async sendPayload(payload: Payload): Promise<MailchainResult<SentPayload, UnexpectedMailchainError>> {
+	async storePayload(payload: Payload): Promise<MailchainResult<StoredPayload, StorePayloadError>> {
 		try {
 			// create root encryption key that will be used to encrypt message content.
 			const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate());
@@ -41,7 +57,7 @@ export class PayloadSender {
 			};
 		} catch (error) {
 			return {
-				error: new UnexpectedMailchainError('failed to send payload', error as Error),
+				error: new StorePayloadError(error as Error),
 			};
 		}
 	}

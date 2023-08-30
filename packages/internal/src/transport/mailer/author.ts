@@ -1,14 +1,15 @@
 import { PublicKey } from '@mailchain/crypto';
 import { MailerProof, verifyMailerProof } from '@mailchain/signatures';
 import { Configuration } from '../../configuration';
-import { MailAddress, MailSenderVerifier } from '../mail';
+import { MailAddress } from '../mail';
+import { SenderVerifier } from '../verifier';
 import { MailerContent } from './content';
 
 export class MailerAuthorVerifier {
-	constructor(private readonly sender: MailSenderVerifier) {}
+	constructor(private readonly sender: SenderVerifier) {}
 
 	static create(configuration: Configuration) {
-		return new MailerAuthorVerifier(MailSenderVerifier.create(configuration));
+		return new MailerAuthorVerifier(SenderVerifier.create(configuration));
 	}
 
 	async verifyMailerAuthor(mailerContent: MailerContent) {
@@ -46,7 +47,7 @@ export class MailerAuthorVerifier {
 		authorMessagingKey: PublicKey,
 	): Promise<boolean> {
 		// Use the authors messaging key too see if the `from` address is valid.
-		return await this.sender.verifySenderOwnsFromAddress(fromAddress, authorMessagingKey);
+		return await this.sender.verifySenderOwnsFromAddress(fromAddress.address, authorMessagingKey);
 	}
 
 	private async verifyMailerProof(authorMessagingKey: PublicKey, mailerProof: MailerProof) {

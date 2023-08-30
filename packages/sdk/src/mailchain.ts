@@ -1,15 +1,7 @@
 import { KeyRing } from '@mailchain/keyring';
 import { ED25519PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { EncodingTypes, ensureDecoded } from '@mailchain/encoding';
-import {
-	DistributeMailError,
-	MailDistributor,
-	MailPreparer,
-	PrepareMailError,
-	SentMailDeliveryRequests,
-	Address,
-	SendMailParams,
-} from '@mailchain/internal/sending/mail';
+import { MailPreparer, PrepareMailError, Address, SendMailParams } from '@mailchain/internal/sending/mail';
 import { MessagingKeys } from '@mailchain/internal/messagingKeys';
 import { MailData, Payload } from '@mailchain/internal/transport';
 import { Configuration, MailchainResult } from '@mailchain/internal';
@@ -18,6 +10,7 @@ import { MailchainUserProfile, UserProfile } from '@mailchain/internal/user';
 import { MailboxOperations, MailchainMailboxOperations } from '@mailchain/internal/mailbox';
 import { UserMailbox } from '@mailchain/internal/user/types';
 import { defaultConfiguration } from '@mailchain/internal/configuration';
+import { DistributePayloadError, DistributedPayload, PayloadDistributor } from '@mailchain/internal/sending';
 
 export class Mailchain {
 	private readonly _userProfile: UserProfile;
@@ -142,9 +135,9 @@ export class Mailchain {
 			options.saveToSentFolder,
 		);
 
-		const distributor = MailDistributor.create(this.config, senderMessagingKey);
+		const distributor = PayloadDistributor.create(this.config, senderMessagingKey);
 
-		const { data: distributedMail, error: distributedMailError } = await distributor.distributeMail({
+		const { data: distributedMail, error: distributedMailError } = await distributor.distributePayload({
 			distributions: preparedMail.distributions,
 			resolvedAddresses: preparedMail.resolvedAddresses,
 		});
@@ -237,7 +230,7 @@ export class Mailchain {
 	}
 }
 
-export type SendMailError = PrepareMailError | DistributeMailError;
+export type SendMailError = PrepareMailError | DistributePayloadError;
 
 export type SentMail = {
 	/**
@@ -246,7 +239,7 @@ export type SentMail = {
 	 * Saving to the outbox/sent folder is enabled by default and controlled by {@link SendMailOptions}.
 	 */
 	savedMessageId: string | undefined;
-	sentMailDeliveryRequests: SentMailDeliveryRequests;
+	sentMailDeliveryRequests: DistributedPayload;
 };
 
 /**

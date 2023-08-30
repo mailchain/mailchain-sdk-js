@@ -1,12 +1,12 @@
 import { Configuration } from '../../configuration';
 import { parseMimeText } from '../../formatters/parse';
-import { parseMailerContentFromJSON, MailSenderVerifier, Payload } from '../../transport';
+import { parseMailerContentFromJSON, SenderVerifier, Payload } from '../../transport';
 
 export class MailerAuthorVerifier {
-	constructor(private readonly mailSenderVerifier: MailSenderVerifier) {}
+	constructor(private readonly senderVerifier: SenderVerifier) {}
 
 	static create(configuration: Configuration) {
-		return new MailerAuthorVerifier(MailSenderVerifier.create(configuration));
+		return new MailerAuthorVerifier(SenderVerifier.create(configuration));
 	}
 
 	/**
@@ -22,8 +22,8 @@ export class MailerAuthorVerifier {
 			throw new Error('author address does not match from address');
 		}
 
-		return await this.mailSenderVerifier.verifySenderOwnsFromAddress(
-			parsedContent.mailData.from,
+		return await this.senderVerifier.verifySenderOwnsFromAddress(
+			parsedContent.mailData.from.address,
 			mailerContent.authorMessagingKey,
 		);
 	}

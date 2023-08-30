@@ -1,13 +1,12 @@
 import { PublicKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { Configuration } from '../../configuration';
 import { MessagingKeys } from '../../messagingKeys';
-import { MailAddress } from './types';
 
-export class MailSenderVerifier {
+export class SenderVerifier {
 	constructor(private readonly messagingKeys: MessagingKeys) {}
 
 	static create(configuration: Configuration) {
-		return new MailSenderVerifier(MessagingKeys.create(configuration));
+		return new SenderVerifier(MessagingKeys.create(configuration));
 	}
 	/**
 	 *
@@ -16,12 +15,8 @@ export class MailSenderVerifier {
 	 * @param at Date to resolve the sender messaging key. When no date is provided, the address resolves using the latest block.
 	 * @returns
 	 */
-	async verifySenderOwnsFromAddress(
-		fromAddress: MailAddress,
-		senderMessagingKey: PublicKey,
-		at?: Date,
-	): Promise<boolean> {
-		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress.address, at);
+	async verifySenderOwnsFromAddress(fromAddress: string, senderMessagingKey: PublicKey, at?: Date): Promise<boolean> {
+		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress, at);
 		if (error != null) {
 			return false;
 		}

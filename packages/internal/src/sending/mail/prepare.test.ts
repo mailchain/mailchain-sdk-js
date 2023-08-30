@@ -3,7 +3,7 @@ import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { ProtocolNotSupportedError } from '@mailchain/addressing';
 import { MessagingKeys } from '../../messagingKeys';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
-import { Payload, MailSenderVerifier } from '../../transport';
+import { Payload, SenderVerifier } from '../../transport';
 import { MailPreparer } from './prepare';
 
 const dummyPayload = { Content: Buffer.from('Payload') } as Payload;
@@ -32,7 +32,7 @@ jest.mock('./payloads', () => ({
 
 describe('MailPreparer', () => {
 	let mockMessagingKeys: MockProxy<MessagingKeys>;
-	let mockMailSenderVerifier: MockProxy<MailSenderVerifier>;
+	let mockSenderVerifier: MockProxy<SenderVerifier>;
 	let mailPreparer: MailPreparer;
 
 	beforeAll(() => {
@@ -48,15 +48,15 @@ describe('MailPreparer', () => {
 				: { error: new ProtocolNotSupportedError(`invalid mock call with address [${address}]`) };
 		});
 
-		mockMailSenderVerifier = mock();
-		mailPreparer = new MailPreparer(mockMessagingKeys, mockMailSenderVerifier);
+		mockSenderVerifier = mock();
+		mailPreparer = new MailPreparer(mockMessagingKeys, mockSenderVerifier);
 	});
 
 	it('should prepare distributions for sending', async () => {
 		mockMessagingKeys.resolveMany.mockResolvedValue({
 			data: dummyMailDataResolvedAddresses,
 		});
-		mockMailSenderVerifier.verifySenderOwnsFromAddress.mockResolvedValue(true);
+		mockSenderVerifier.verifySenderOwnsFromAddress.mockResolvedValue(true);
 
 		const { data, error } = await mailPreparer.prepareMail({
 			message: dummyMailData,

@@ -1,6 +1,6 @@
 import { KindNaClSecretKey, SignerWithPublicKey } from '@mailchain/crypto';
 import { EncodingTypes } from '@mailchain/encoding';
-import { MailDistribution, MailData, Payload } from '../../transport';
+import { Distribution, MailData, Payload } from '../../transport';
 import { ResolvedAddress } from '../../messagingKeys';
 import { createMimeMessage } from '../../formatters/generate';
 
@@ -10,7 +10,7 @@ export async function createMailPayloads(
 	mailData: MailData,
 ): Promise<{
 	original: Payload;
-	distributions: MailDistribution[];
+	distributions: Distribution[];
 }> {
 	const message = await createMimeMessage(mailData, resolvedAddresses);
 
@@ -18,7 +18,7 @@ export async function createMailPayloads(
 	const visibleRecipientsPayload = await createMailPayload(senderMessagingKey, message.visibleRecipients);
 	const blindRecipients = await Promise.all(
 		message.blindRecipients.map(async ({ recipient, content }) => ({
-			recipients: [recipient],
+			recipients: [recipient.address],
 			payload: await createMailPayload(senderMessagingKey, content),
 		})),
 	);
@@ -27,7 +27,10 @@ export async function createMailPayloads(
 		original,
 		distributions: [
 			{
-				recipients: [...mailData.recipients, ...mailData.carbonCopyRecipients],
+				recipients: [
+					...mailData.recipients.map((x) => x.address),
+					...mailData.carbonCopyRecipients.map((x) => x.address),
+				],
 				payload: visibleRecipientsPayload,
 			},
 			...blindRecipients,
