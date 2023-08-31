@@ -6,7 +6,11 @@ import {
 } from './addressPredicates';
 import { decodeAddressByProtocol } from './encoding';
 import { formatMailLike } from './formatMailLike';
-import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
+import {
+	NameServiceAddress as MailchainAddress,
+	NameServiceAddress,
+	createNameServiceAddress,
+} from './nameServiceAddress';
 import { matchesNameservice } from './nameservices/matchesNameservice';
 import { NAMESERVICE_DESCRIPTIONS } from './nameservices/nameserviceDescriptions';
 import { parseWalletAddress } from './parseWalletAddress';
@@ -70,6 +74,11 @@ const humanTezosAddress: NameServiceAddressFormatter = (address) => {
 	return formatMailLike(`${address.username.slice(0, 7)}...${address.username.slice(-4)}`, TEZOS);
 };
 
+const humanEthereumAddress: NameServiceAddressFormatter = (address) => {
+	if (!isEthereumAddress(address)) return undefined;
+	return formatMailLike(`${address.username.slice(0, 6)}...${address.username.slice(-4)}`, ETHEREUM);
+};
+
 /**
  * `0xdDfFC3003797e44FCd103eE7A4aE78Ed02853A55@ethereum.mailchain.com` into `0xdDfFC...3A55@ethereum`
  */
@@ -77,10 +86,6 @@ const humanWalletAddress: NameServiceAddressFormatter = (address) => {
 	const domainParts = address.domain.split('.');
 	if (domainParts.length <= 2) return undefined;
 
-	if (isEthereumAddress(address)) {
-		return formatMailLike(`${address.username.slice(0, 6)}...${address.username.slice(-4)}`, ETHEREUM);
-	}
-	// TODO: since other addresses except ethereum not support, very basic support for them
 	const props = parseWalletAddress(address);
 	if (props == null) return undefined;
 
@@ -107,6 +112,35 @@ const humanNsAddress: NameServiceAddressFormatter = (address) => {
 	return undefined;
 };
 
+const humanTokenAddress: NameServiceAddressFormatter = (address: NameServiceAddress) => {
+	const usernameParts = address.username.split('.');
+	if (usernameParts.length !== 2) return undefined;
+	const [tokenId, walletUsername] = usernameParts;
+	if (/^\d+$/.test(tokenId) === false) return undefined;
+
+	const walletAddress = createNameServiceAddress(walletUsername, address.domain);
+	const walletProps = parseWalletAddress(walletAddress);
+	if (walletProps == null) return undefined;
+
+	let walletAddressStr: string | undefined = undefined;
+	switch (walletProps.protocol) {
+		case ETHEREUM:
+			walletAddressStr = humanEthereumAddress(walletAddress);
+			break;
+		case NEAR:
+			walletAddressStr = humanNearAddress(walletAddress);
+			break;
+		case TEZOS:
+			walletAddressStr = humanTezosAddress(walletAddress);
+			break;
+		default:
+			return undefined;
+	}
+
+	if (walletAddressStr == null) return undefined;
+	return `${tokenId}.${walletAddressStr}`;
+};
+
 /** If the other formatting rules fail, apply this generic one */
 const humanCatchAll: NameServiceAddressFormatter = (address) => {
 	const domainParts = address.domain.split('.');
@@ -123,7 +157,9 @@ export const humanNameServiceFormatters = [
 	humanMailchainAccount,
 	humanNearAddress,
 	humanTezosAddress,
-	humanWalletAddress,
+	humanEthereumAddress,
+	humanTokenAddress,
 	humanNsAddress,
+	humanWalletAddress,
 	humanCatchAll,
 ] as const;

@@ -1,4 +1,4 @@
-import { NameServiceAddress, parseNameServiceAddress } from './nameServiceAddress';
+import { NameServiceAddress, createNameServiceAddress, parseNameServiceAddress } from './nameServiceAddress';
 import { formatAddress } from './addressFormatting';
 import { isMailchainAccountAddress } from './addressPredicates';
 import { decodeAddressByProtocol } from './encoding';
@@ -16,6 +16,7 @@ export function isSameAddress(a: string | NameServiceAddress, b: string | NameSe
 		domainAddressIsEqual,
 		walletAddressIsEqual,
 		mailchainAddressIsEqual,
+		tokenAddressIsEqual,
 		catchAllAddressIsEqual,
 	];
 
@@ -41,6 +42,27 @@ const domainAddressIsEqual: AddressIsEqualFn = (a: NameServiceAddress, b: NameSe
 	return undefined;
 };
 
+const tokenAddressIsEqual: AddressIsEqualFn = (a: NameServiceAddress, b: NameServiceAddress) => {
+	const aWalletAddress = parseWalletAddress(a);
+	const bWalletAddress = parseWalletAddress(b);
+
+	if (!aWalletAddress && bWalletAddress) return false;
+	if (aWalletAddress && !bWalletAddress) return false;
+	if (!aWalletAddress || !bWalletAddress) return undefined;
+	if (aWalletAddress.protocol !== bWalletAddress.protocol) return false;
+
+	const aUsernameParts = a.username.split('.');
+	const bUsernameParts = b.username.split('.');
+	if (aUsernameParts.length !== bUsernameParts.length) return false;
+	if (aUsernameParts.length !== 2 || bUsernameParts.length !== 2) return undefined;
+
+	if (aUsernameParts[0] !== bUsernameParts[0]) return false;
+	return walletAddressIsEqual(
+		createNameServiceAddress(aUsernameParts[1], a.domain),
+		createNameServiceAddress(bUsernameParts[1], b.domain),
+	);
+};
+
 /**
  * Compare two addresses for their wallet protocol equality.
  */
@@ -53,10 +75,14 @@ const walletAddressIsEqual: AddressIsEqualFn = (a: NameServiceAddress, b: NameSe
 	if (!aWalletAddress || !bWalletAddress) return undefined;
 	if (aWalletAddress.protocol !== bWalletAddress.protocol) return false;
 
-	const aDecoded = decodeAddressByProtocol(a.username, aWalletAddress.protocol).decoded;
-	const bDecoded = decodeAddressByProtocol(b.username, bWalletAddress.protocol).decoded;
+	try {
+		const aDecoded = decodeAddressByProtocol(a.username, aWalletAddress.protocol).decoded;
+		const bDecoded = decodeAddressByProtocol(b.username, bWalletAddress.protocol).decoded;
 
-	return aDecoded.length === bDecoded.length && aDecoded.every((v, i) => v === bDecoded[i]);
+		return aDecoded.length === bDecoded.length && aDecoded.every((v, i) => v === bDecoded[i]);
+	} catch (e) {
+		return undefined;
+	}
 };
 
 /**

@@ -1,4 +1,8 @@
-import { NameServiceAddress as MailchainAddress, NameServiceAddress } from './nameServiceAddress';
+import {
+	NameServiceAddress as MailchainAddress,
+	NameServiceAddress,
+	createNameServiceAddress,
+} from './nameServiceAddress';
 import { parseWalletAddress } from './parseWalletAddress';
 import { ETHEREUM, NEAR, TEZOS } from './protocols';
 import { validateTezosAddress } from './protocols/tezos/address';
@@ -39,4 +43,23 @@ export function isFilecoinAddress(address: MailchainAddress): boolean {
 
 	if (domainParts[0] !== 'filecoin') return false;
 	return validateFilecoinAddress(address.username);
+}
+
+export function isTokenAddress(address: MailchainAddress): boolean {
+	const usernameParts = address.username.split('.');
+	if (usernameParts.length !== 2) return false;
+	const [tokenId, walletUsername] = usernameParts;
+
+	if (/^\d+$/.test(tokenId) === false) return false;
+
+	const walletAddress = createNameServiceAddress(walletUsername, address.domain);
+	const walletProps = parseWalletAddress(walletAddress);
+	if (!walletProps) return false;
+
+	switch (walletProps.protocol) {
+		case ETHEREUM:
+			return validateEthereumAddress(walletUsername);
+		default:
+			return false;
+	}
 }

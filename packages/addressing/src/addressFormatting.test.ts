@@ -143,6 +143,12 @@ const testCases: {
 		expectedMail: 'alice.arb@spaceid.mailchain.test',
 		expectedHuman: 'alice.arb',
 	},
+	// Token addresses
+	{
+		address: createWalletAddress('1337.0x492d61cD88255EbC8556c6393AFA3f3ac2B0505E', ETHEREUM, 'mailchain.local'),
+		expectedMail: '1337.0x492d61cd88255ebc8556c6393afa3f3ac2b0505e@ethereum.mailchain.local',
+		expectedHuman: '1337.0x492d...505e@ethereum',
+	},
 ];
 
 describe('addressFormatting', () => {

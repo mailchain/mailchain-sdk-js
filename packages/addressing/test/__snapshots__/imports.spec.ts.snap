@@ -14,7 +14,6 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/addressing/nameservices/nameserviceDescriptions",
   "@mailchain/addressing/parseWalletAddress",
   "@mailchain/addressing/protocols",
-  "@mailchain/addressing/protocols/consts",
   "@mailchain/addressing/protocols/ethereum/address",
   "@mailchain/addressing/protocols/filecoin/address",
   "@mailchain/addressing/protocols/filecoin/const",

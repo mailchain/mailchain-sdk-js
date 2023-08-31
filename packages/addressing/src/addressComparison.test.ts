@@ -45,6 +45,11 @@ const positiveCases: {
 		a: 'alice.eth@mailchain.test',
 		b: 'AlIcE.eTH@MaIlChAin.TeSt',
 	},
+	// Token Address
+	{
+		a: '1234.0x251F7846728c3a271c930AFD6c4353a43c3Cfe56@ethereum.mailchain.test',
+		b: '1234.0x251f7846728c3a271c930afd6c4353a43c3cfe56@EtHeReUm.MaIlChaIn.tEsT',
+	},
 ];
 
 test.each(positiveCases)('should return true when comparing $a and $b', ({ a, b }) => {
@@ -116,6 +121,11 @@ const negativeCases: {
 	{
 		a: 'alice.eth@mailchain.test',
 		b: 'allice.eth@mailchain.test',
+	},
+	// Token Address
+	{
+		a: '1235.0x251F7846728c3a271c930AFD6c4353a43c3Cfe56@ethereum.mailchain.test',
+		b: '1234.0x251F7846728c3a271c930AFD6c4353a43c3Cfe56@ethereum.mailchain.test',
 	},
 ];
 
