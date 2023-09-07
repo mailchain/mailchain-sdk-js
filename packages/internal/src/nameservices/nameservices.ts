@@ -1,17 +1,24 @@
 import { publicKeyToBytes, isPublicKeyEqual, PublicKey } from '@mailchain/crypto';
 import { encodeHexZeroX } from '@mailchain/encoding';
-import { createNameServiceAddress, ETHEREUM, NameServiceAddress, TEZOS } from '@mailchain/addressing';
+import {
+	checkAddressForErrors,
+	createNameServiceAddress,
+	formatAddress,
+	isTokenAddress,
+	NameServiceAddress,
+	parseNameServiceAddress,
+} from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
 import { IdentityKeys } from '../identityKeys';
-
-export const PROTOCOLS_SUPPORTING_NAMESERVICE = [ETHEREUM, TEZOS] as const;
+import { UserMailbox } from '../user';
 
 export type ResolvedName = {
-	name: string;
-	resolver: string;
+	kind: 'name' | 'token';
 	address: NameServiceAddress;
+	resolver?: string;
+	metadata?: object;
 };
 
 export class Nameservices {
@@ -28,18 +35,17 @@ export class Nameservices {
 		return new Nameservices(identityKeysApi, identityKeysService, config.mailchainAddressDomain);
 	}
 
-	async reverseResolveNames(identityKey: PublicKey): Promise<ResolvedName[]> {
-		return this.identityKeysApi.getIdentityKeyResolvableNames(encodeHexZeroX(publicKeyToBytes(identityKey))).then(
-			({ data }) =>
-				data.resolvableNames?.map((resolved) => ({
-					...resolved,
-					address: createNameServiceAddress(resolved.name, resolved.resolver, this.mailchainAddressDomain),
-				})) ?? [],
-			(e) => {
-				console.error(e);
-				return [];
-			},
-		);
+	async reverseResolveNames(identityKey: PublicKey, kind?: ResolvedName['kind'][]): Promise<ResolvedName[]> {
+		return this.identityKeysApi
+			.getIdentityKeyResolvableNames(encodeHexZeroX(publicKeyToBytes(identityKey)), kind)
+			.then(({ data }) => {
+				return (data.resolvableNames ?? []).map((resolved) => ({
+					kind: resolved.kind as ResolvedName['kind'],
+					address: parseNameServiceAddress(resolved.fullAddress),
+					resolver: resolved.resolver,
+					metadata: resolved.metadata ?? undefined,
+				}));
+			});
 	}
 
 	async nameResolvesToMailbox(nsName: string, mailboxIdentityKey: PublicKey): Promise<NameServiceAddress | null> {
@@ -55,10 +61,52 @@ export class Nameservices {
 					return nsAddress;
 				}
 			} catch (e) {
-				console.log(`failed to resolve address: ${e}`);
+				console.log(`failed to resolve address: ${formatAddress(nsAddress, 'mail')}`, e);
 			}
 		}
 
+		return null;
+	}
+
+	async tokenResolvesToMailbox(
+		tokenId: string,
+		contractAddress: string,
+		mailbox: UserMailbox,
+	): Promise<NameServiceAddress | null> {
+		const { protocol } = mailbox.messagingKeyParams;
+
+		const contractNsAddress = createNameServiceAddress(contractAddress, protocol, this.mailchainAddressDomain);
+
+		const contractAddressError = checkAddressForErrors(
+			formatAddress(contractNsAddress, 'mail'),
+			this.mailchainAddressDomain,
+		);
+
+		if (contractAddressError != null) {
+			throw new Error(`Invalid contract address ${contractAddress} for protocol ${protocol}`);
+		}
+
+		const tokenNsAddress = createNameServiceAddress(
+			`${tokenId}.${contractAddress}`,
+			protocol,
+			this.mailchainAddressDomain,
+		);
+		if (!isTokenAddress(tokenNsAddress)) {
+			throw new Error(`Invalid address ${formatAddress(tokenNsAddress, 'mail')}`);
+		}
+
+		try {
+			const tokenAddressIdentityKey = await this.identityKeysService.getAddressIdentityKey(tokenNsAddress);
+
+			if (
+				tokenAddressIdentityKey != null &&
+				isPublicKeyEqual(tokenAddressIdentityKey.identityKey, mailbox.identityKey)
+			) {
+				return tokenNsAddress;
+			}
+		} catch (e) {
+			console.log(`failed to resolve address: ${formatAddress(tokenNsAddress, 'mail')}`, e);
+		}
 		return null;
 	}
 }

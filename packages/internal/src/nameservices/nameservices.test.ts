@@ -22,8 +22,8 @@ describe('Nameservices', () => {
 
 	it('should reverse resolve names by identity key', async () => {
 		const names = [
-			{ name: 'alice.eth', resolver: 'ens' },
-			{ name: 'alice.near', resolver: 'near' },
+			{ kind: 'name', name: 'alice.eth', resolver: 'ens', fullAddress: 'alice.eth@ens.mailchain.test' },
+			{ kind: 'name', name: 'alice.near', resolver: 'near', fullAddress: 'alice.near@near.mailchain.test' },
 		];
 		identityKeysApi.getIdentityKeyResolvableNames.mockResolvedValue({
 			data: {
@@ -31,18 +31,26 @@ describe('Nameservices', () => {
 			},
 		} as AxiosResponse<GetIdentityKeyResolvableNamesResponseBody>);
 
-		const result = await nameservices.reverseResolveNames(AliceSECP256K1PublicKey);
+		const result = await nameservices.reverseResolveNames(AliceSECP256K1PublicKey, ['name']);
 
 		expect(identityKeysApi.getIdentityKeyResolvableNames).toHaveBeenCalledWith(
 			encodeHexZeroX(publicKeyToBytes(AliceSECP256K1PublicKey)),
+			['name'],
 		);
-		expect(result).toEqual(
-			names.map(({ name, resolver }) => ({
-				name,
-				resolver,
-				address: createNameServiceAddress(name, resolver, 'mailchain.test'),
-			})),
-		);
+		expect(result).toEqual([
+			{
+				kind: 'name',
+				address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
+				resolver: 'ens',
+				metadata: undefined,
+			},
+			{
+				kind: 'name',
+				address: createNameServiceAddress('alice.near', 'near', 'mailchain.test'),
+				resolver: 'near',
+				metadata: undefined,
+			},
+		]);
 	});
 
 	it('should match alice.eth to AliceWallet mailbox', async () => {
