@@ -53,4 +53,9 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		name: 'avvy',
 		domains: ['avax'],
 	},
+	{
+		name: 'idriss',
+		domains: ['x', 'twitter'],
+		supportsSubdomains: false,
+	},
 ];
