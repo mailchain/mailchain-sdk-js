@@ -21,16 +21,19 @@ export type NameserviceDescription = {
 	 * Defaults to `true`.
 	 */
 	readonly supportsSubdomains?: boolean;
+	readonly supportsMetadata?: boolean;
 };
 
 export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 	{
 		name: 'ens',
 		domains: ['cb.id', 'eth'],
+		supportsMetadata: true,
 	},
 	{
 		name: 'unstoppable',
 		domains: ['crypto', 'wallet', 'blockchain', 'x', '888', 'nft', 'dao'],
+		supportsMetadata: true,
 	},
 	{
 		name: 'freename',
