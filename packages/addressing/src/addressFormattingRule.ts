@@ -105,7 +105,10 @@ const humanNsAddress: NameServiceAddressFormatter = (address) => {
 	for (const desc of NAMESERVICE_DESCRIPTIONS) {
 		const matchingNsDomain = matchesNameservice(address, desc);
 		if (matchingNsDomain) {
-			return address.username;
+			const nsDomainCollision = NAMESERVICE_DESCRIPTIONS.some(
+				(nsd) => desc.name !== nsd.name && nsd.domains.includes(matchingNsDomain),
+			);
+			return nsDomainCollision ? `${address.username}@${desc.name}` : address.username;
 		}
 	}
 

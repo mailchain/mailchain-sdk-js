@@ -149,6 +149,17 @@ const testCases: {
 		expectedMail: '1337.0x492d61cd88255ebc8556c6393afa3f3ac2b0505e@ethereum.mailchain.local',
 		expectedHuman: '1337.0x492d...505e@ethereum',
 	},
+	// NS address domain collision
+	{
+		address: createNameServiceAddress('alice.x', 'unstoppable.mailchain.test'),
+		expectedMail: 'alice.x@unstoppable.mailchain.test',
+		expectedHuman: 'alice.x@unstoppable',
+	},
+	{
+		address: createNameServiceAddress('alice.x', 'idriss.mailchain.test'),
+		expectedMail: 'alice.x@idriss.mailchain.test',
+		expectedHuman: 'alice.x@idriss',
+	},
 ];
 
 describe('addressFormatting', () => {
