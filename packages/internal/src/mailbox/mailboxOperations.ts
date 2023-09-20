@@ -254,6 +254,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const { messagePreview } = message;
 
 		return {
+			kind: apiMessage.kind,
 			mailbox: publicKeyFromBytes(messagePreview.mailbox),
 			messageId: apiMessage.messageId,
 			owner: messagePreview.owner,
@@ -398,6 +399,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const encryptedProtoMessagePreview = await this.messagePreviewCrypto.encrypt(encodedProtoMessagePreview);
 
 		const messagePreview: MessagePreview = {
+			kind: 'mail',
 			mailbox: userMailbox.identityKey,
 			messageId,
 			from: protoMessagePreview.from,
@@ -423,6 +425,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const { resourceId } = await this.inboxApi.postEncryptedMessageBody(encryptedMessage).then((res) => res.data);
 
 		await this.inboxApi.putEncryptedMessage(messageId, {
+			kind: messagePreview.kind,
 			version: 3,
 			folder:
 				folder === 'outbox'

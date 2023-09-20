@@ -680,6 +680,7 @@ exports[`mailbox should encrypt and post received message: message id 0x92d8f102
   "from": "alice@mailchain.test",
   "hasAttachment": false,
   "isRead": false,
+  "kind": "mail",
   "mailbox": SECP256K1PublicKey {
     "bytes": Uint8Array [
       2,
@@ -749,6 +750,7 @@ exports[`mailbox should encrypt and post received message: message id bob@mailch
   "from": "alice@mailchain.test",
   "hasAttachment": false,
   "isRead": false,
+  "kind": "mail",
   "mailbox": SECP256K1PublicKey {
     "bytes": Uint8Array [
       2,

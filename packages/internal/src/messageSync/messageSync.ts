@@ -7,13 +7,13 @@ import { Configuration } from '..';
 import { MailboxOperations, MessagePreview } from '../mailbox';
 import { UserMailbox } from '../user/types';
 
-type SyncResultOk = {
+export type SyncResultOk = {
 	status: 'success';
 	mailbox: UserMailbox;
 	messages: MessagePreview[];
 };
 
-type SyncResultFailed = {
+export type SyncResultFailed = {
 	status: 'fail';
 	mailbox: UserMailbox;
 	cause: Error;

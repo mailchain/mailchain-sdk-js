@@ -124,6 +124,7 @@ describe('mailbox', () => {
 		mockInboxApi.getMessage.mockResolvedValue({
 			data: {
 				message: {
+					kind: 'mail',
 					messageId: encodeHex(Uint8Array.from([1])),
 					encryptedPreview: encodeBase64(msg1EncryptedPreview),
 					systemLabels: ['inbox', 'unread'],
@@ -136,6 +137,7 @@ describe('mailbox', () => {
 		expect(mockInboxApi.getMessage.mock.calls[0][0]).toEqual('messageId');
 		expect(message).toEqual({
 			...msg1Preview,
+			kind: 'mail',
 			mailbox: AliceAccountMailbox.identityKey,
 			messageId: encodeHex(Uint8Array.from([1])),
 			isRead: false,
@@ -168,11 +170,13 @@ describe('mailbox', () => {
 				data: {
 					messages: [
 						{
+							kind: 'mail',
 							messageId: encodeHex(Uint8Array.from([1])),
 							encryptedPreview: encodeBase64(msg1EncryptedPreview),
 							systemLabels: ['starred'],
 						},
 						{
+							kind: 'mail',
 							messageId: encodeHex(Uint8Array.from([2])),
 							encryptedPreview: encodeBase64(msg2EncryptedPreview),
 							systemLabels: ['starred'],
@@ -196,6 +200,7 @@ describe('mailbox', () => {
 			expect(messages).toEqual(
 				[msg1Preview, msg2Preview].map((msg, index) => ({
 					...msg,
+					kind: 'mail',
 					mailbox: AliceAccountMailbox.identityKey,
 					messageId: encodeHex(Uint8Array.from([index + 1])),
 					isRead: true,
@@ -256,6 +261,7 @@ describe('mailbox', () => {
 			cc: dummyMailData.carbonCopyRecipients.map((r) => r.address),
 			bcc: dummyMailData.blindCarbonCopyRecipients.map((r) => r.address),
 		});
+		expect(requestBody.kind).toEqual('mail');
 		expect(requestBody.version).toEqual(3);
 		expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);
 		expect(requestBody.folder).toEqual(PutEncryptedMessageRequestBodyFolderEnum.Outbox);
@@ -316,6 +322,7 @@ describe('mailbox', () => {
 				cc: dummyMailData.carbonCopyRecipients.map((r) => r.address),
 				bcc: dummyMailData.blindCarbonCopyRecipients.map((r) => r.address),
 			});
+			expect(requestBody.kind).toEqual('mail');
 			expect(requestBody.version).toEqual(3);
 			expect(requestBody.mailbox).toEqual(Array.from(sha256(AliceWalletMailbox.identityKey.bytes)));
 			expect(requestBody.date + dateOffset).toEqual(payload.Headers.Created.getTime() / 1000);

@@ -17,7 +17,10 @@ export type MailboxMessagesOverview = {
 	unread: number;
 };
 
+export type MessageKind = 'mail' | 'vc-request';
+
 export type MessagePreview = {
+	kind: MessageKind;
 	mailbox: PublicKey;
 	messageId: string;
 	from: string;
