@@ -51,6 +51,12 @@ describe('publicKeyFromBytes()', () => {
 			shouldThrow: false,
 		},
 		{
+			name: 'ed25519 alice Buffer',
+			arg: Buffer.concat([new Uint8Array([IdED25519]), AliceED25519PublicKeyBytes]),
+			expected: AliceED25519PublicKey,
+			shouldThrow: false,
+		},
+		{
 			name: 'secp256k1 alice compressed',
 			arg: new Uint8Array(Buffer.concat([new Uint8Array([IdSECP256K1]), AliceCompressedSECP256K1PublicKeyBytes])),
 			expected: AliceSECP256K1PublicKey,

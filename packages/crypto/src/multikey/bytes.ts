@@ -11,11 +11,12 @@ export function publicKeyToBytes(key: PublicKey): Uint8Array {
 	return out;
 }
 
-export function publicKeyFromBytes(bytes: Uint8Array): PublicKey {
+export function publicKeyFromBytes(bytes: Uint8Array | Buffer): PublicKey {
 	if (bytes.length < 32 + 1) {
 		throw Error('public key is too short to contain ID byte');
 	}
-	return publicKeyFromId(bytes[0], bytes.slice(1));
+	// create a new Uint8Array object as it bytes might be a buffer
+	return publicKeyFromId(bytes[0], new Uint8Array(bytes.slice(1)));
 }
 
 export function privateKeyToBytes(key: PrivateKey): Uint8Array {
