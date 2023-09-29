@@ -218,12 +218,7 @@ describe('mailbox', () => {
 
 		const message = await mailboxOperations.getFullMessage('messageId');
 
-		expect(message.from).toEqual(dummyMailData.from.address);
 		expect(message.replyTo).toEqual(dummyMailData.replyTo?.address);
-		expect(message.to).toEqual(dummyMailData.recipients.map((r) => r.address));
-		expect(message.cc).toEqual(dummyMailData.carbonCopyRecipients.map((r) => r.address));
-		expect(message.bcc).toEqual(dummyMailData.blindCarbonCopyRecipients.map((r) => r.address));
-		expect(message.timestamp).toEqual(payload.Headers.Created);
 		expect(message.body).toMatchSnapshot('fullMessageBody');
 	});
 
@@ -430,8 +425,6 @@ describe('mailbox', () => {
 			AliceWalletMailbox,
 			BobAccountMailbox,
 		]);
-
-		console.log(overview, 'overview');
 
 		expect(overview).toMatchSnapshot();
 		expect(mockInboxApi.getMailboxOverview).toHaveBeenCalledWith([

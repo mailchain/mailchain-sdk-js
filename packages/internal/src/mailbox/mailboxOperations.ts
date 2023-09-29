@@ -278,19 +278,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
 		const { mailData } = await parseMimeText(messageData.Content);
-		const to = mailData.recipients.map((r) => r.address);
-		const cc = mailData.carbonCopyRecipients.map((r) => r.address);
-		const bcc = mailData.blindCarbonCopyRecipients.map((r) => r.address);
 
 		return {
-			from: mailData.from.address,
-			to,
 			replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
-			subject: mailData.subject,
-			timestamp: mailData.date,
 			body: mailData.message,
-			cc,
-			bcc,
 		};
 	}
 
