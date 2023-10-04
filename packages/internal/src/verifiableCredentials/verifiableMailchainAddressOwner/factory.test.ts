@@ -12,10 +12,11 @@ describe('VerifiableMailchainAddressOwnerCreator', () => {
 		const target = new VerifiableMailchainAddressOwnerCreator(
 			AliceED25519PrivateKey,
 			mockMailchainAddressOwnershipIssuer,
+			'mailchain.test',
 		);
 		const result = await target.createVerifiableMailchainAddressOwner({
-			from: 'app@mailchain.com',
-			to: 'alice@mailchain.com',
+			from: 'app@mailchain.test',
+			to: 'alice@mailchain.test',
 			actions: ['Authenticate', 'Join Meeting'],
 			resources: ['*'],
 			signedCredentialExpiresAfter: 600,
@@ -29,8 +30,8 @@ describe('VerifiableMailchainAddressOwnerCreator', () => {
 
 		expect(result).toEqual({ data: 'mockedVerifiablePresentation' });
 		expect(mockMailchainAddressOwnershipIssuer.createVerifiableMailchainAddressOwnership).toHaveBeenCalledWith({
-			address: 'alice@mailchain.com',
-			requester: 'app@mailchain.com',
+			address: 'alice@mailchain.test',
+			requester: 'app@mailchain.test',
 			actions: ['Authenticate', 'Join Meeting'],
 			resources: ['*'],
 			signer: AliceED25519PrivateKey,

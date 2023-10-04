@@ -2,17 +2,10 @@ import { W3C_CREDENTIALS_CONTEXT } from './context';
 import { createPresentationPayload } from './presentation';
 
 describe('createPresentationPayload', () => {
-	afterAll(() => {
-		jest.resetAllMocks();
-		jest.clearAllTimers();
-	});
-	beforeAll(() => {
-		jest.useFakeTimers().setSystemTime(new Date(2020, 1, 1));
-	});
-
 	it('create', () => {
 		const actual = createPresentationPayload({
 			holder: 'did:mailchain:holder',
+			issuanceDate: new Date(2020, 1, 1),
 			verifiableCredential: {
 				'@context': [W3C_CREDENTIALS_CONTEXT],
 				credentialSubject: {

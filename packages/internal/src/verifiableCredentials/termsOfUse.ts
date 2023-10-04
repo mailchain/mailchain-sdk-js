@@ -7,11 +7,11 @@ export type TermsOfUse = {
 	/**
 	 *	assigner formatted as a {@link DecentralizedIdentifier}, is who is defining the terms of use. Often assigner is the issuer of the credential, however it may be another identity.
 	 */
-	assigner: DecentralizedIdentifier<string>;
+	assigner: DecentralizedIdentifier;
 	/**
 	 * assigner formatted as a {@link DecentralizedIdentifier}, is who the terms of use is intended for.
 	 */
-	assignee: DecentralizedIdentifier<string>;
+	assignee: DecentralizedIdentifier;
 	actions: string[];
 	resources: string[];
 };

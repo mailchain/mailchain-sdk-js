@@ -13,7 +13,7 @@ type CreateVerifiableCredentialParams = {
 	type: CredentialPayloadType;
 	credentialSubjects: CredentialSubject[];
 	issuanceDate: Date;
-	issuerId: DecentralizedIdentifier<string>;
+	issuerId: DecentralizedIdentifier;
 	termsOfUse: TermsOfUse[];
 	proof: Proof;
 };

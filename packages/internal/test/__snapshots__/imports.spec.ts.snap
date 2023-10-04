@@ -100,6 +100,7 @@ exports[`check imports snapshot compare imports: imports 1`] = `
   "@mailchain/internal/user/createAlias",
   "@mailchain/internal/user/types",
   "@mailchain/internal/user/userProfile",
+  "@mailchain/internal/verifiableCredentials/configuration",
   "@mailchain/internal/verifiableCredentials/context",
   "@mailchain/internal/verifiableCredentials/did",
   "@mailchain/internal/verifiableCredentials/errors/validation",

@@ -2,6 +2,7 @@ import { VerifiableCredential, createVerifiablePresentationJwt } from 'did-jwt-v
 import { SignerWithPublicKey, publicKeyToBytes } from '@mailchain/crypto';
 import { Proof } from 'did-jwt-vc/lib/types';
 import { encodeHex } from '@mailchain/encoding';
+import { defaultConfiguration } from '../../configuration';
 import {
 	AddressNotRegisteredError,
 	MessagingKeys,
@@ -83,14 +84,15 @@ function createIssuerProof(resolvedAddress: RegisteredResolvedAddress): Proof {
 
 function createCredentialPayloadMailchainAddressOwner(
 	resolvedAddress: RegisteredResolvedAddress,
-	requester: DecentralizedIdentifier<string>,
+	requester: DecentralizedIdentifier,
+	issuanceDate: Date,
 	actions: string[],
 	resources: string[],
 ): VerifiableCredential {
 	return createVerifiableCredential({
 		type: 'MailchainMessagingKeyCredential',
 		credentialSubjects: [createOwnerOfMessagingKeySubject(resolvedAddress.mailchainAddress)],
-		issuanceDate: new Date(),
+		issuanceDate,
 		issuerId: mailchainBlockchainAddressDecentralizedIdentifier(
 			resolvedAddress.protocol,
 			resolvedAddress.protocolAddress,
@@ -115,7 +117,7 @@ export class MailchainAddressOwnershipIssuer {
 		private readonly mailchainMessagingKeyIssuer: MailchainMessagingKeyIssuer,
 	) {}
 
-	static create(configuration: Configuration) {
+	static create(configuration: Configuration = defaultConfiguration) {
 		return new MailchainAddressOwnershipIssuer(
 			MessagingKeys.create(configuration),
 			new MailchainMessagingKeyIssuer(),
@@ -140,18 +142,21 @@ export class MailchainAddressOwnershipIssuer {
 		}
 
 		const { expiresIn, expiresAt, nonce } = options;
+		const issuanceDate = new Date();
 
 		const presentationPayload = createPresentationPayload({
 			id,
+			issuanceDate,
 			verifiableCredential: createCredentialPayloadMailchainAddressOwner(
 				resolvedAddress,
 				mailchainAddressDecentralizedIdentifier(requester),
+				issuanceDate,
 				actions,
 				resources,
 			),
 			holder: mailchainAddressDecentralizedIdentifier(resolvedAddress.mailchainAddress),
 			verifier: mailchainAddressDecentralizedIdentifier(requester),
-			expiresAt,
+			expirationDate: resolveExpirationDate(issuanceDate, expiresAt, expiresIn),
 		});
 
 		const { data: issuer, error: createMailchainMessagingKeyIssuerError } =
@@ -171,9 +176,25 @@ export class MailchainAddressOwnershipIssuer {
 			challenge: nonce,
 			domain: mailchainAddressDecentralizedIdentifier(requester),
 			canonicalize: true,
-			expiresIn,
 		});
 
 		return { data: verifiablePresentation };
 	}
+}
+
+/**
+ * Resolve the credential expiration date with the resolution being to date with the earliest expiration date.
+ */
+export function resolveExpirationDate(
+	issuanceDate: Date,
+	expiresAt: Date | undefined,
+	expiresIn: number | undefined,
+): Date | undefined {
+	if (expiresAt == null && expiresIn == null) return undefined;
+	if (expiresIn == null) return expiresAt;
+
+	const expiresInTimestamp = issuanceDate.getTime() + expiresIn * 1000;
+	if (expiresAt == null) return new Date(expiresInTimestamp);
+
+	return new Date(Math.min(expiresInTimestamp, expiresAt.getTime()));
 }

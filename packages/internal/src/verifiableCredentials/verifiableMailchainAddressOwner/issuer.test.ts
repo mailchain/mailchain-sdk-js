@@ -15,7 +15,7 @@ import { AliceSECP256K1PublicKey, BobSECP256K1PublicKey } from '@mailchain/crypt
 import { decodeBase64, encodeUtf8 } from '@mailchain/encoding';
 import { MessagingKeys } from '../../messagingKeys';
 import { MailchainMessagingKeyIssuer, createIssuerFromSigner } from '../issuer';
-import { MailchainAddressOwnershipIssuer } from './issuer';
+import { MailchainAddressOwnershipIssuer, resolveExpirationDate } from './issuer';
 
 const mockMessagingKeys = mock<MessagingKeys>();
 mockMessagingKeys.resolve.calledWith(`${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`).mockResolvedValue({
@@ -127,5 +127,37 @@ describe('issuer', () => {
 		expect(result.error).toBeUndefined();
 		expect(result.data).toMatchSnapshot();
 		expect(encodeUtf8(decodeBase64(result.data!.split('.')[1]))).toMatchSnapshot();
+	});
+});
+
+describe('resolveExpirationDate', () => {
+	it('should return expiresAt', () => {
+		const actual = resolveExpirationDate(new Date(2000, 1, 1), new Date(2000, 1, 2), undefined);
+
+		expect(actual).toEqual(new Date(2000, 1, 2));
+	});
+
+	it('should return expiresIn', () => {
+		const actual = resolveExpirationDate(new Date(2000, 1, 1), undefined, 2 * 24 * 60 * 60 /** 2 day */);
+
+		expect(actual).toEqual(new Date(2000, 1, 3));
+	});
+
+	it('should return expiresAt as it is sooner', () => {
+		const actual = resolveExpirationDate(new Date(2000, 1, 1), new Date(2000, 1, 2), 2 * 24 * 60 * 60 /** 2 day */);
+
+		expect(actual).toEqual(new Date(2000, 1, 2));
+	});
+
+	it('should return expiresIn as it is sooner', () => {
+		const actual = resolveExpirationDate(new Date(2000, 1, 1), new Date(2000, 1, 3), 1 * 24 * 60 * 60 /** 1 day */);
+
+		expect(actual).toEqual(new Date(2000, 1, 2));
+	});
+
+	it('should return undefined if both are undefined', () => {
+		const actual = resolveExpirationDate(new Date(2000, 1, 1), undefined, undefined);
+
+		expect(actual).toBeUndefined();
 	});
 });

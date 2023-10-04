@@ -1,4 +1,5 @@
 import { VerifiedPresentation, verifyPresentation } from 'did-jwt-vc';
+import { defaultConfiguration } from '../../configuration';
 import { ValidationError } from '../../errors/validation';
 import { MailchainDIDMessagingKeyResolver } from '../resolver';
 import { mailchainAddressDecentralizedIdentifier } from '../did';
@@ -26,7 +27,7 @@ export type VerifyMailchainAddressOwnershipError = VerificationError | Validatio
 export class MailchainAddressOwnershipVerifier {
 	constructor(private readonly mailchainDidResolver: MailchainDIDMessagingKeyResolver) {}
 
-	static create(configuration: Configuration) {
+	static create(configuration: Configuration = defaultConfiguration) {
 		return new MailchainAddressOwnershipVerifier(MailchainDIDMessagingKeyResolver.create(configuration));
 	}
 

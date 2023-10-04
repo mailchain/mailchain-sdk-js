@@ -1,5 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import { ValidateAddressError, checkAddressForErrors } from '@mailchain/addressing';
+import { defaultConfiguration } from '../../configuration';
 import { ValidationError } from '../../errors/validation';
 import { VerifiablePresentationRequest } from '../request';
 import { Configuration, MailchainResult } from '../..';
@@ -16,12 +17,14 @@ export class VerifiableMailchainAddressOwnerCreator {
 	constructor(
 		private readonly signer: SignerWithPublicKey,
 		private readonly mailchainAddressOwnershipIssuer: MailchainAddressOwnershipIssuer,
+		private readonly mailchainAddressDomain: string,
 	) {}
 
-	static create(signer: SignerWithPublicKey, configuration: Configuration) {
+	static create(signer: SignerWithPublicKey, configuration: Configuration = defaultConfiguration) {
 		return new VerifiableMailchainAddressOwnerCreator(
 			signer,
 			MailchainAddressOwnershipIssuer.create(configuration),
+			configuration.mailchainAddressDomain,
 		);
 	}
 
@@ -33,7 +36,7 @@ export class VerifiableMailchainAddressOwnerCreator {
 	async createVerifiableMailchainAddressOwner(
 		request: VerifiablePresentationRequest,
 	): Promise<MailchainResult<VerifiablePresentationJWT, CreateVerifiableMailchainAddressOwnerFromRequestError>> {
-		const validationError = validateVerifiablePresentationRequest(request);
+		const validationError = validateVerifiablePresentationRequest(request, this.mailchainAddressDomain);
 		if (validationError) {
 			return {
 				error: validationError,
@@ -61,6 +64,7 @@ export type ValidateVerifiablePresentationRequestError = ValidationError | Valid
 
 export function validateVerifiablePresentationRequest(
 	request: VerifiablePresentationRequest,
+	mailchainAddressDomain: string,
 ): ValidateVerifiablePresentationRequestError | undefined {
 	const {
 		from: requestFrom,
@@ -103,12 +107,12 @@ export function validateVerifiablePresentationRequest(
 		return new ValidationError('resources is empty');
 	}
 
-	const fromAddressError = checkAddressForErrors(requestFrom);
+	const fromAddressError = checkAddressForErrors(requestFrom, mailchainAddressDomain);
 	if (fromAddressError) {
 		return fromAddressError;
 	}
 
-	const toAddressError = checkAddressForErrors(requestTo);
+	const toAddressError = checkAddressForErrors(requestTo, mailchainAddressDomain);
 	if (toAddressError) {
 		return toAddressError;
 	}

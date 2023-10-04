@@ -5,12 +5,13 @@ import { W3C_CREDENTIALS_CONTEXT } from './context';
 type CreatePresentationPayloadParams = {
 	id?: string;
 	verifiableCredential: VerifiableCredential;
-	verifier: DecentralizedIdentifier<string>;
+	verifier: DecentralizedIdentifier;
+	issuanceDate: Date;
 	/**
 	 * The date and time that the credential will expire.
 	 */
-	expiresAt?: Date;
-	holder: MailchainDecentralizedIdentifier<string>;
+	expirationDate?: Date;
+	holder: MailchainDecentralizedIdentifier;
 };
 
 /**
@@ -19,7 +20,7 @@ type CreatePresentationPayloadParams = {
  * @returns
  */
 export function createPresentationPayload(params: CreatePresentationPayloadParams): PresentationPayload {
-	const { verifiableCredential, verifier, expiresAt, holder, id } = params;
+	const { verifiableCredential, verifier, issuanceDate, expirationDate, holder, id } = params;
 
 	return {
 		'@context': [W3C_CREDENTIALS_CONTEXT],
@@ -28,7 +29,7 @@ export function createPresentationPayload(params: CreatePresentationPayloadParam
 		holder,
 		verifiableCredential: [verifiableCredential],
 		verifier,
-		issuanceDate: new Date().toUTCString(),
-		expirationDate: expiresAt ? expiresAt.toUTCString() : undefined,
+		issuanceDate: issuanceDate.toUTCString(),
+		expirationDate: expirationDate ? expirationDate.toUTCString() : undefined,
 	};
 }

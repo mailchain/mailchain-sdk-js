@@ -1,15 +1,19 @@
 import { encodeHex } from '@mailchain/encoding';
 import { DIDResolutionOptions, DIDResolutionResult, Resolvable } from 'did-resolver';
 import { MessagingKeys, ResolvedAddress } from '../messagingKeys';
-import { Configuration } from '../configuration';
+import { Configuration, defaultConfiguration } from '../configuration';
+import { isMailchainAddressDecentralizedIdentifier, mailchainAddressFromDecentralizedIdentifier } from './did';
 
 export class MailchainDIDMessagingKeyResolver implements Resolvable {
 	constructor(private readonly messagingKeys: MessagingKeys) {}
-	static create(configuration: Configuration) {
+	static create(configuration: Configuration = defaultConfiguration) {
 		return new MailchainDIDMessagingKeyResolver(MessagingKeys.create(configuration));
 	}
 	async resolve(didUrl: string, _options?: DIDResolutionOptions): Promise<DIDResolutionResult> {
-		const address = didUrl.replace('did:mailchain:', '');
+		if (!isMailchainAddressDecentralizedIdentifier(didUrl))
+			throw new Error(`Not a Mailchain Address DID: ${didUrl}`);
+		const address = mailchainAddressFromDecentralizedIdentifier(didUrl);
+
 		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolve(address);
 		if (resolveAddressError) {
 			throw resolveAddressError;
