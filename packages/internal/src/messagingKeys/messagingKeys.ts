@@ -32,16 +32,15 @@ import {
 	IdentityProviderAddressUnsupportedError,
 	IdentityExpiredError,
 } from './errors';
-import { MessagingKeyProof } from './proof';
+import { MailchainRegistryMessagingKeyProof, Proof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
 
 type BaseResolvedAddress = {
+	mailchainAddress: string;
 	/** Messaging key to be used when communicate with the resolved address. See {@link PublicKey} */
 	messagingKey: PublicKey;
 	/** Protocol of resolved address. Protocol is determined when resolving the address. */
 	protocol: ProtocolType;
-	/** Identity key of resolved address. Identity key might be undefined in the case of `vended` messaging key. */
-	identityKey?: PublicKey;
 	/** Protocol address that has been resolved in the case of name services. */
 	protocolAddress: string;
 };
@@ -51,11 +50,16 @@ export type AddressMessagingKeyStatus = 'vended' | 'registered';
 export type RegisteredResolvedAddress = BaseResolvedAddress & {
 	/** Indicates the messaging key has been registered by a user. */
 	type: 'registered';
+	/** Identity key of resolved address. */
+	identityKey: PublicKey;
+	proof: Proof;
 };
 
 export type VendedResolvedAddress = BaseResolvedAddress & {
 	/** Indicates the messaging key has been vended by Mailchain. */
 	type: 'vended';
+	/** Identity key of resolved address. Identity key might be undefined in the case of `vended` messaging key. */
+	identityKey?: PublicKey;
 };
 
 /**
@@ -127,15 +131,24 @@ export class MessagingKeys {
 		if (validateAddressError != null) {
 			return { error: validateAddressError };
 		}
-		const { data, error } = await this.getAddressMessagingKey(address, at);
-		if (error != null) {
-			return { error };
+		const { data: addressMessagingKeyResponse, error: addressMessagingKeyError } =
+			await this.getAddressMessagingKey(address, at);
+		if (addressMessagingKeyError != null) {
+			return { error: addressMessagingKeyError };
 		}
 
-		return this.messagingKeyContractCall.resolve(
-			data.contractCall,
-			data.identityKey ? convertPublic(data.identityKey) : undefined,
+		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeyContractCall.resolve(
+			addressMessagingKeyResponse.contractCall,
+			addressMessagingKeyResponse.identityKey
+				? convertPublic(addressMessagingKeyResponse.identityKey)
+				: undefined,
 		);
+
+		if (resolveAddressError) {
+			return { error: resolveAddressError };
+		}
+
+		return { data: { ...resolvedAddress, mailchainAddress: address } };
 	}
 
 	async resolveMany(
@@ -161,7 +174,7 @@ export class MessagingKeys {
 		};
 	}
 
-	async update(proof: MessagingKeyProof): Promise<void> {
+	async update(proof: Omit<MailchainRegistryMessagingKeyProof, 'source'>): Promise<void> {
 		const encodedIdentityKey = encodeHexZeroX(publicKeyToBytes(proof.identityKey));
 		const encodedAddress = encodeAddressByProtocol(proof.address, proof.protocol);
 
@@ -238,10 +251,9 @@ export class MessagingKeys {
 				}
 			}
 			return {
-				error: new UnexpectedMailchainError(
-					`Failed to resolve messaging key of address ${address}`,
-					e as Error,
-				),
+				error: new UnexpectedMailchainError(`Failed to resolve messaging key of address ${address}`, {
+					cause: e as Error,
+				}),
 			};
 		}
 	}

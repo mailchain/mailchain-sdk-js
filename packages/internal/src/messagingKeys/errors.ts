@@ -37,10 +37,10 @@ export class IdentityProviderAddressUnsupportedError extends Error {
 	}
 }
 
-export class MessagingKeyNotRegisteredError extends Error {
-	readonly type = 'messaging_key_unregistered';
-	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#messaging_key_unregistered';
+export class AddressNotRegisteredError extends Error {
+	readonly type = 'address_unregistered';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#address_unregistered';
 	constructor() {
-		super('Messaging key is not registered. Register address, then try again.');
+		super('Address is not registered. Register address, then try again.');
 	}
 }

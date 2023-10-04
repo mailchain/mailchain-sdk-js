@@ -71,11 +71,11 @@ export class DeliveryRequests {
 
 		const results = await Promise.all(
 			recipients.map(async (recipientMessageKey) => {
-				const sendDeliveryRequestParams = {
+				const sendDeliveryRequestParams: SendDeliveryRequestParams = {
 					recipientMessageKey,
 					payloadUri,
 					payloadRootEncryptionKey,
-				} as SendDeliveryRequestParams;
+				};
 				const result = await this.sendDeliveryRequest(sendDeliveryRequestParams);
 				return { result, params: sendDeliveryRequestParams };
 			}),

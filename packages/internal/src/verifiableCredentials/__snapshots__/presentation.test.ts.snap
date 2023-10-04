@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createPresentationPayload create 1`] = `
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+  ],
+  "expirationDate": undefined,
+  "holder": "did:mailchain:holder",
+  "id": undefined,
+  "issuanceDate": "Sat, 01 Feb 2020 00:00:00 GMT",
+  "type": [
+    "VerifiablePresentation",
+  ],
+  "verifiableCredential": [
+    {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+      ],
+      "credentialSubject": {
+        "id": "credentialSubjectId",
+      },
+      "issuanceDate": "2000-02-01T00:00:00.000Z",
+      "issuer": {
+        "id": "did:mailchain:issuer",
+      },
+      "proof": {
+        "id": "proof",
+      },
+      "type": [
+        "type",
+      ],
+    },
+  ],
+  "verifier": "did:mailchain:verifier",
+}
+`;

@@ -1,5 +1,5 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
+import { ProvidedMessagingKeyIncorrectError } from '@mailchain/signatures';
 import { Configuration, MailchainResult } from '../../';
 import { MessagingKeys, ResolvedAddress, ResoleAddressesFailuresError } from '../../messagingKeys';
 import { Distribution, MailData, Payload, SenderVerifier } from '../../transport';
@@ -17,7 +17,7 @@ export type PreparedMail = {
 	resolvedAddresses: Map<string, ResolvedAddress>;
 };
 
-export type PrepareMailError = PreflightCheckError | SenderMessagingKeyIncorrect | ResoleAddressesFailuresError;
+export type PrepareMailError = PreflightCheckError | ProvidedMessagingKeyIncorrectError | ResoleAddressesFailuresError;
 
 export class MailPreparer {
 	constructor(private readonly messagingKeys: MessagingKeys, private readonly senderVerifier: SenderVerifier) {}
@@ -54,7 +54,7 @@ export class MailPreparer {
 			senderMessagingKey.publicKey,
 		);
 		if (!isSenderMatching) {
-			return { error: new SenderMessagingKeyIncorrect() };
+			return { error: new ProvidedMessagingKeyIncorrectError('sender') };
 		}
 
 		// add at after checking if all recipients are empty

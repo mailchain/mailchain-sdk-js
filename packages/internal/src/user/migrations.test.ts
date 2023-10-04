@@ -148,18 +148,18 @@ describe('UserProfile migrations', () => {
 		it('should add found nameservice names as aliases to the mailbox', async () => {
 			nameservices.reverseResolveNames.mockResolvedValue([
 				{
-					name: 'alice.eth',
+					kind: 'name',
 					resolver: 'ens',
 					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
 				},
 				{
-					name: 'alice.crypto',
+					kind: 'name',
 					resolver: 'unstoppable',
 					address: createNameServiceAddress('alice.crypto', 'unstoppable', 'mailchain.test'),
 				},
 				{
 					// duplicate
-					name: 'alice.eth',
+					kind: 'name',
 					resolver: 'ens',
 					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
 				},
@@ -173,12 +173,12 @@ describe('UserProfile migrations', () => {
 		it('should not add duplicate nameservice names as aliases that already exist', async () => {
 			nameservices.reverseResolveNames.mockResolvedValue([
 				{
-					name: 'alice.eth',
+					kind: 'name',
 					resolver: 'ens',
 					address: createNameServiceAddress('alice.eth', 'ens', 'mailchain.test'),
 				},
 				{
-					name: 'alice.crypto',
+					kind: 'name',
 					resolver: 'unstoppable',
 					address: createNameServiceAddress('alice.crypto', 'unstoppable', 'mailchain.test'),
 				},

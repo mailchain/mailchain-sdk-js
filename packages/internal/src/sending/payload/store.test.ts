@@ -4,9 +4,9 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { AxiosResponse } from 'axios';
 import { aliceKeyRing } from '@mailchain/keyring/test.const';
 import { TransportApiInterface } from '@mailchain/api';
+import { SerializablePayloadHeadersImpl } from '../../transport/payload';
 import { Payload } from '../../transport';
 import { decryptPayload, deserialize } from '../../transport/serialization';
-import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
 import { PayloadStorer } from './store';
 
 const payload: Payload = {
@@ -82,7 +82,7 @@ describe('PayloadSender', () => {
 		);
 
 		expect({
-			Headers: SerializableTransportPayloadHeaders.FromBuffer(headers).headers,
+			Headers: new SerializablePayloadHeadersImpl().deserialize(headers),
 			Content: content,
 		}).toEqual(payload);
 	});

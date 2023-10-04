@@ -1,17 +1,17 @@
 import { PrivateKey, isPublicKeyEqual } from '@mailchain/crypto';
 import { KeyRing } from '@mailchain/keyring';
-import { SenderMessagingKeyIncorrect } from '@mailchain/signatures';
+import { ProvidedMessagingKeyIncorrectError } from '@mailchain/signatures';
 import { MailchainResult } from '..';
 import { Configuration } from '../configuration';
 import { AddressNonce, GetMessagingKeyLatestNonceError } from './addressNonce';
 import { MessagingKeys, ResolveAddressError } from './messagingKeys';
-import { MessagingKeyNotRegisteredError } from './errors';
+import { AddressNotRegisteredError } from './errors';
 
 export type GetExportablePrivateMessagingKeyError =
 	| ResolveAddressError
 	| GetMessagingKeyLatestNonceError
-	| SenderMessagingKeyIncorrect
-	| MessagingKeyNotRegisteredError;
+	| ProvidedMessagingKeyIncorrectError
+	| AddressNotRegisteredError;
 
 export class PrivateMessagingKeys {
 	constructor(private readonly messagingKeys: MessagingKeys, private readonly addressNonce: AddressNonce) {}
@@ -41,7 +41,7 @@ export class PrivateMessagingKeys {
 		}
 
 		if (resolvedAddress.type === 'vended') {
-			return { error: new MessagingKeyNotRegisteredError() };
+			return { error: new AddressNotRegisteredError() };
 		}
 
 		const privateMessagingKey = keyRing.addressExportableMessagingKey(
@@ -51,7 +51,7 @@ export class PrivateMessagingKeys {
 		);
 
 		if (!isPublicKeyEqual(privateMessagingKey.publicKey, resolvedAddress.messagingKey)) {
-			return { error: new SenderMessagingKeyIncorrect() };
+			return { error: new ProvidedMessagingKeyIncorrectError('address') };
 		}
 
 		return { data: privateMessagingKey };

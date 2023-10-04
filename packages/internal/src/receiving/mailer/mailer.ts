@@ -1,8 +1,14 @@
 import { verifyMailerProof } from '@mailchain/signatures';
 import axios, { AxiosInstance } from 'axios';
-import { decodeBase64, encodeUtf8 } from '@mailchain/encoding';
-import { MailerContent, MailerData, parseMailerContentFromJSON, Payload } from '../../transport';
-import { ReadonlyMailerPayload } from '../../transport/mailer/payload';
+import { decodeBase64, decodeUtf8, encodeUtf8 } from '@mailchain/encoding';
+import {
+	isMailerPayload,
+	MailerContent,
+	MailerData,
+	parseMailerContentFromJSON,
+	Payload,
+	ResolvedMailerPayload,
+} from '../../transport';
 import { Configuration } from '../../configuration';
 import { createMimeMessage } from '../../formatters/generate';
 import { MailerAuthorVerifier } from './author';
@@ -14,8 +20,8 @@ export class MailerContentResolver {
 		return new MailerContentResolver(axiosInstance, MailerAuthorVerifier.create(configuration));
 	}
 
-	async get(payload: Payload): Promise<ReadonlyMailerPayload> {
-		if (payload.Headers.ContentType !== 'message/x.mailchain-mailer') {
+	async get(payload: Payload): Promise<ResolvedMailerPayload> {
+		if (!isMailerPayload(payload)) {
 			throw new Error('invalid content type');
 		}
 
@@ -44,15 +50,16 @@ export class MailerContentResolver {
 
 		const processedContent = await processContent(mailerContent, parsedMailerData);
 
-		const mailerPayload = {
+		const utf8EncodedContent = decodeUtf8(processedContent);
+		const mailerPayload: ResolvedMailerPayload = {
 			...payload,
-			Content: Buffer.from(processedContent, 'utf8'),
-			MailerContent: mailerContent,
-		} as ReadonlyMailerPayload;
+			Headers: { ...payload.Headers, MailerContent: mailerContent },
+			Content: Buffer.from(utf8EncodedContent),
+		};
 
 		const senderOwnsFromAddress = await this.sender.verifyAuthorOwnsFromAddress(
 			payload,
-			Buffer.from(processedContent),
+			Buffer.from(utf8EncodedContent),
 		);
 
 		// done here to check that the from address isn't manipulated during rendering

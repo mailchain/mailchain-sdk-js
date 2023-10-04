@@ -8,6 +8,7 @@ import { MessagingKeyContractCall } from './messagingKeyContract';
 import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
 import { MessagingKeyVerifier } from './verify';
 import { MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
+import { Proof } from './proof';
 
 let messagingKeyContractCall: MessagingKeyContractCall;
 describe('MessagingKeyContractCall', () => {
@@ -31,6 +32,7 @@ describe('MessagingKeyContractCall', () => {
 			data: {
 				protocol: NEAR,
 				messagingKey: messagingKey.publicKey,
+				proof: {} as Proof,
 			},
 		});
 
@@ -41,6 +43,7 @@ describe('MessagingKeyContractCall', () => {
 				body: 'body',
 				method: 'POST',
 				protocol: NEAR,
+				address: 'protocolAddress',
 			} as ContractCall,
 			identityKey.publicKey,
 		);
@@ -51,6 +54,8 @@ describe('MessagingKeyContractCall', () => {
 				messagingKey: messagingKey.publicKey,
 				protocol: 'near',
 				type: 'registered',
+				protocolAddress: 'protocolAddress',
+				proof: {} as Proof,
 			},
 		});
 	});
@@ -77,6 +82,7 @@ describe('MessagingKeyContractCall', () => {
 				body: 'body',
 				method: 'POST',
 				protocol: NEAR,
+				address: 'protocolAddress',
 			} as ContractCall,
 			identityKey.publicKey,
 		);
@@ -87,6 +93,7 @@ describe('MessagingKeyContractCall', () => {
 				messagingKey: messagingKey.publicKey,
 				protocol: 'near',
 				type: 'vended',
+				protocolAddress: 'protocolAddress',
 			},
 		});
 	});
@@ -103,6 +110,7 @@ describe('MessagingKeyContractCall', () => {
 				address: 'address',
 				path: '/',
 				protocol: ETHEREUM,
+				proof: {} as Proof,
 			} as ContractCall),
 		).toEqual({ error: new ProtocolNotSupportedError(ETHEREUM) });
 	});

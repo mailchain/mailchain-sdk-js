@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MailchainDIDMessagingKeyResolver should resolve: result 1`] = `
+{
+  "didDocument": {
+    "authentication": [
+      {
+        "controller": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+        "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com/messaging-key",
+        "publicKeyHex": "723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+        "type": "ED25519SignatureVerification",
+      },
+    ],
+    "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+    "verificationMethod": [],
+  },
+  "didDocumentMetadata": {
+    "canonicalId": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+  },
+  "didResolutionMetadata": {
+    "contentType": "application/did+ld+json",
+  },
+}
+`;

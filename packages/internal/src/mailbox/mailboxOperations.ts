@@ -25,7 +25,6 @@ import { MessageCrypto, createMailchainMessageCrypto } from './messageCrypto';
 import { MessageIdCreator, createMailchainMessageIdCreator } from './messageId';
 import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { MessagePreviewMigrationRule, getAllMessagePreviewMigrations } from './migrations';
-import { MailPayload, convertPayload } from './payload/payload';
 import {
 	FolderMessagesOverview,
 	Message,
@@ -344,7 +343,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		userMailbox,
 		receivedTransportPayload,
 	}: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]> {
-		const payload = convertPayload(receivedTransportPayload);
+		const payload = receivedTransportPayload;
 		const { mailData, addressIdentityKeys } = await parseMimeText(payload.Content);
 		const owners = await this.messageMailboxOwnerMatcher
 			.withMessageIdentityKeys(addressIdentityKeys)
@@ -377,7 +376,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 
 	private async saveMessage(
 		messageId: string,
-		payload: MailPayload,
+		payload: Payload,
 		content: MailData,
 		userMailbox: UserMailbox,
 		owner: MailchainAddress,

@@ -76,7 +76,7 @@ export class AddressNonce {
 				};
 			}
 			return {
-				error: new UnexpectedMailchainError('Failed to get latest nonce.', error as Error),
+				error: new UnexpectedMailchainError('Failed to get latest nonce.', { cause: error as Error }),
 			};
 		}
 	}

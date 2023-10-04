@@ -47,6 +47,7 @@ describe('MessagingKeys', () => {
 				identityKey: identityKey.publicKey,
 				type: 'registered',
 				protocolAddress: 'alice.near',
+				proof: expect.any(Object),
 			},
 		});
 
@@ -57,11 +58,13 @@ describe('MessagingKeys', () => {
 
 		expect(actual).toEqual({
 			data: {
+				mailchainAddress: 'alice.near@near.mailchain.test',
 				identityKey: identityKey.publicKey,
 				messagingKey: messagingKey.publicKey,
 				protocol: 'near',
 				type: 'registered',
 				protocolAddress: 'alice.near',
+				proof: expect.any(Object),
 			},
 		});
 		expect(mockAddressesApiInterface.getAddressMessagingKey).toHaveBeenCalledWith(

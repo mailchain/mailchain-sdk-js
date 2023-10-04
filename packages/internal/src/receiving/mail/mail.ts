@@ -3,11 +3,9 @@ import axios, { AxiosInstance } from 'axios';
 import { Payload } from '../../transport';
 import { PayloadReceiver, UndeliveredPayloadOk } from '../payload';
 import { Configuration } from '../../configuration';
-import { ReadonlyMailerPayload } from '../../transport/mailer/payload';
 import { MailerContentResolver } from '../mailer';
 import { DeliveryRequests } from '../deliveryRequests';
 
-export type ReadonlyMailPayload = ReadonlyMailerPayload | Payload;
 export type ReceivedMail = ReceivedMailOk | ReceivedMailError;
 
 /**
@@ -18,7 +16,7 @@ export type ReceivedMailOk = {
 	/**
 	 * Payload of the mail.
 	 */
-	payload: ReadonlyMailPayload;
+	payload: Payload;
 	/**
 	 * Hash of delivery request.
 	 */
@@ -111,7 +109,7 @@ export class MailReceiver {
 	 * @param payload the decrypted payload received from the network.
 	 * @returns
 	 */
-	private async processReceivedPayloadData(payload: Payload): Promise<ReadonlyMailPayload> {
+	private async processReceivedPayloadData(payload: Payload): Promise<Payload> {
 		switch (payload.Headers.ContentType) {
 			case 'message/x.mailchain':
 				return payload;

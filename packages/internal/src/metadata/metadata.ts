@@ -105,7 +105,9 @@ export class MetaData {
 				}
 			}
 			return {
-				error: new UnexpectedMailchainError(`Failed to get metadata for address ${address}`, e as Error),
+				error: new UnexpectedMailchainError(`Failed to get metadata for address ${address}`, {
+					cause: e as Error,
+				}),
 			};
 		}
 	}

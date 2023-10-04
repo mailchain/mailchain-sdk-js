@@ -2,11 +2,11 @@ import { AxiosInstance } from 'axios';
 import { ED25519ExtendedPrivateKey, ED25519PrivateKey } from '@mailchain/crypto';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { BobED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
+import { createPayload } from '../../sending/payload';
 import { PayloadReceiver, ReceivedPayload } from '../payload';
 import { DeliveryRequests } from '../deliveryRequests';
 import { PayloadOriginVerifier } from '../../transport/payload/verifier';
 import { createMimeMessage } from '../../formatters/generate';
-import { createMailPayload } from '../../sending/mail/payloads';
 import { serializeAndEncryptPayload } from '../../transport';
 
 const mockAxios: MockProxy<AxiosInstance> = mock();
@@ -38,7 +38,11 @@ describe('Receiving payload tests', () => {
 	it('alice receives messages', async () => {
 		const message = await createMimeMessage(mailData, new Map());
 
-		const payload = await createMailPayload(BobED25519PrivateKey, message.original);
+		const payload = await createPayload(
+			BobED25519PrivateKey,
+			Buffer.from(message.original),
+			'application/vnd.mailchain.verified-credential-request',
+		);
 
 		const payloadRootEncryptionKey = ED25519ExtendedPrivateKey.fromPrivateKey(ED25519PrivateKey.generate());
 

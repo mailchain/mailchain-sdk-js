@@ -2,11 +2,13 @@ import { ProtocolType } from '@mailchain/addressing';
 import { ContractCall } from '@mailchain/api';
 import { PublicKey } from '@mailchain/crypto';
 import { MailchainResult } from '../../';
+import { Proof } from '../proof';
 import { InvalidContractResponseError, MessagingKeyNotFoundInContractError } from './errors';
 
 export type ContractMessagingKey = {
 	messagingKey: PublicKey;
 	protocol: ProtocolType;
+	proof: Proof;
 };
 export type ContractMessagingKeyError = MessagingKeyNotFoundInContractError | InvalidContractResponseError;
 export type ContractCallResolveResult = MailchainResult<

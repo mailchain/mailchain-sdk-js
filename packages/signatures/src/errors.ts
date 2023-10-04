@@ -17,11 +17,11 @@ export class MessagingKeyVerificationError extends Error {
 	}
 }
 
-export class SenderMessagingKeyIncorrect extends Error {
-	readonly type = 'sender_messaging_key_incorrect';
-	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#sender_messaging_key_incorrect';
-	constructor() {
-		super('Messaging key is not owner by the sender. Use the latest messaging key owned by sender address.');
+export class ProvidedMessagingKeyIncorrectError extends Error {
+	readonly type = 'provided_messaging_key_incorrect';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#provided_messaging_key_incorrect';
+	constructor(type: 'sender' | 'signer' | 'address') {
+		super(`Provided messaging key does not match. Use the latest messaging key owned by ${type}.`);
 	}
 }
 
@@ -33,6 +33,6 @@ export class AddressMustBeProtocolAddressError extends Error {
 
 export class PublicKeyNotFoundError extends Error {
 	constructor() {
-		super('mailchain public key not found');
+		super('Mailchain public key not found');
 	}
 }

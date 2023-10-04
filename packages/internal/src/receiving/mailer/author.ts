@@ -1,6 +1,6 @@
 import { Configuration } from '../../configuration';
 import { parseMimeText } from '../../formatters/parse';
-import { parseMailerContentFromJSON, SenderVerifier, Payload } from '../../transport';
+import { parseMailerContentFromJSON, SenderVerifier, MailerPayload } from '../../transport';
 
 export class MailerAuthorVerifier {
 	constructor(private readonly senderVerifier: SenderVerifier) {}
@@ -14,7 +14,7 @@ export class MailerAuthorVerifier {
 	 * @param payload - The mailer payload
 	 * @returns
 	 */
-	async verifyAuthorOwnsFromAddress(payload: Payload, rfcMail: Buffer): Promise<boolean> {
+	async verifyAuthorOwnsFromAddress(payload: MailerPayload, rfcMail: Buffer): Promise<boolean> {
 		const mailerContent = parseMailerContentFromJSON(payload.Content.toString());
 		const parsedContent = await parseMimeText(rfcMail);
 

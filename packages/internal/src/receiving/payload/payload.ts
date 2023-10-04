@@ -2,12 +2,12 @@ import { ED25519ExtendedPrivateKey } from '@mailchain/crypto';
 import { decodeBase64 } from '@mailchain/encoding';
 import axios, { AxiosInstance } from 'axios';
 import { KeyRingDecrypter } from '@mailchain/keyring';
+import { SerializablePayloadHeadersImpl } from '../../transport/payload';
 import { Payload } from '../../transport';
 import { DeliveryRequests } from '../deliveryRequests';
 import { Configuration } from '../../configuration';
 import { PayloadOriginVerifier } from '../../transport/payload/verifier';
 import { deserialize, decryptPayload } from '../../transport/serialization';
-import { SerializableTransportPayloadHeaders } from '../../transport/payload/headers';
 
 export type ReceivedPayload = ReceivedPayloadOk | ReceivedPayloadError;
 
@@ -94,7 +94,7 @@ export class PayloadReceiver {
 			const { headers, content } = await decryptPayload(encryptedPayload, payloadRootEncryptionKey);
 
 			const payload = {
-				Headers: SerializableTransportPayloadHeaders.FromBuffer(headers).headers,
+				Headers: new SerializablePayloadHeadersImpl().deserialize(headers),
 				Content: content,
 			};
 

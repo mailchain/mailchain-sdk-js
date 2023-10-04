@@ -2,10 +2,12 @@ import { ContractCall, GetIdentityKeyNonceResponseBody, GetMsgKeyResponseBody } 
 import axios, { AxiosInstance } from 'axios';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
+import { ProtocolType } from '@mailchain/addressing';
 import { MailchainResult } from '../../mailchainResult';
 import { Configuration } from '../../configuration';
 import { MessagingKeyVerifier } from '../verify';
 import { UnexpectedMailchainError } from '../../errors';
+import { messagingKeyProofFromApi } from '../proof';
 import { ContractCallLatestNonce, ContractCallMessagingKeyResolver, ContractCallResolveResult } from './resolver';
 import { MessagingKeyNotFoundInContractError } from './errors';
 
@@ -42,7 +44,8 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 		return {
 			data: {
 				messagingKey,
-				protocol: contract.protocol as any,
+				protocol: contract.protocol as ProtocolType,
+				proof: messagingKeyProofFromApi(rpcResponse),
 			},
 		};
 	}
@@ -85,7 +88,7 @@ export class MailchainKeyRegContractCallResolver implements ContractCallMessagin
 				};
 			}
 			return {
-				error: new UnexpectedMailchainError('failed to call messaging key contract', error as Error),
+				error: new UnexpectedMailchainError('failed to call messaging key contract', { cause: error as Error }),
 			};
 		}
 	}

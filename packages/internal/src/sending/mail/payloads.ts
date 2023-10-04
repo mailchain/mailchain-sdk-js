@@ -1,8 +1,8 @@
-import { KindNaClSecretKey, SignerWithPublicKey } from '@mailchain/crypto';
-import { EncodingTypes } from '@mailchain/encoding';
+import { SignerWithPublicKey } from '@mailchain/crypto';
 import { Distribution, MailData, Payload } from '../../transport';
 import { ResolvedAddress } from '../../messagingKeys';
 import { createMimeMessage } from '../../formatters/generate';
+import { createPayload } from '../payload';
 
 export async function createMailPayloads(
 	senderMessagingKey: SignerWithPublicKey,
@@ -14,12 +14,16 @@ export async function createMailPayloads(
 }> {
 	const message = await createMimeMessage(mailData, resolvedAddresses);
 
-	const original = await createMailPayload(senderMessagingKey, message.original);
-	const visibleRecipientsPayload = await createMailPayload(senderMessagingKey, message.visibleRecipients);
+	const original = await createPayload(senderMessagingKey, Buffer.from(message.original), 'message/x.mailchain');
+	const visibleRecipientsPayload = await createPayload(
+		senderMessagingKey,
+		Buffer.from(message.visibleRecipients),
+		'message/x.mailchain',
+	);
 	const blindRecipients = await Promise.all(
 		message.blindRecipients.map(async ({ recipient, content }) => ({
 			recipients: [recipient.address],
-			payload: await createMailPayload(senderMessagingKey, content),
+			payload: await createPayload(senderMessagingKey, Buffer.from(content), 'message/x.mailchain'),
 		})),
 	);
 
@@ -35,24 +39,5 @@ export async function createMailPayloads(
 			},
 			...blindRecipients,
 		],
-	};
-}
-
-export async function createMailPayload(
-	senderMessagingKey: SignerWithPublicKey,
-	contentPayload: string,
-): Promise<Payload> {
-	const contentBuffer = Buffer.from(contentPayload);
-	return {
-		Headers: {
-			Origin: senderMessagingKey.publicKey,
-			ContentSignature: await senderMessagingKey.sign(contentBuffer),
-			Created: new Date(),
-			ContentLength: contentBuffer.length,
-			ContentType: 'message/x.mailchain',
-			ContentEncoding: EncodingTypes.Base64,
-			ContentEncryption: KindNaClSecretKey,
-		},
-		Content: contentBuffer,
 	};
 }

@@ -57,6 +57,10 @@ export class NearContractCallResolver implements ContractCallMessagingKeyResolve
 			data: {
 				messagingKey: parsedResult.data.messagingKey,
 				protocol: NEAR,
+				proof: {
+					source: 'ContractCall',
+					call: contract,
+				},
 			},
 		};
 	}

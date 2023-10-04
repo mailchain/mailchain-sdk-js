@@ -15,8 +15,8 @@ export type SentPayloadDistributionRequests = SentPayloadDistributionRequest[];
 export type SendPayloadDistributionRequestsError = SendPayloadDistributionRequestsFailuresError;
 
 export class SendPayloadDistributionRequestsFailuresError extends Error {
-	readonly type = 'send_mail_delivery_request_failures'; // TODO:
-	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#send_mail_delivery_request_failures';
+	readonly type = 'send_payload_distribution_request_failures';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#send_payload_distribution_request_failures';
 	constructor(
 		public readonly successes: Array<{
 			params: SendManyDeliveryRequestsParams;

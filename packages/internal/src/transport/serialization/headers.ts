@@ -1,8 +1,10 @@
 import { kindFromPublicKey, publicKeyFromKind, PublicKey } from '@mailchain/crypto';
 import { decodeBase64, encodeBase64 } from '@mailchain/encoding';
+import { PayloadHeaders } from '../payload/headers';
 
-export interface SerializablePayloadHeaders {
-	ToBuffer(): Buffer;
+export interface PayloadHeadersSerializer {
+	serialize(headers: PayloadHeaders): Buffer;
+	deserialize(serializedHeaders: Buffer): PayloadHeaders;
 }
 
 export function parseHeaderElements(input: string, requiredKeys: string[]): Map<string, string> {

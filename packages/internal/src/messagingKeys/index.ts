@@ -1,5 +1,6 @@
 export * from './addressNonce';
+export * from './errors';
 export * from './messagingKeys';
-export * from './proof';
 export * from './messagingKeys';
 export * from './privateMessagingKeys';
+export * from './proof';

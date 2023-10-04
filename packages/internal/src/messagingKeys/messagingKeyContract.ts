@@ -11,13 +11,18 @@ import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
 import { MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
 import { Configuration, MailchainResult } from '../';
+import { UnexpectedMailchainError } from '../errors';
 import { NearContractCallResolver } from './contractResolvers/near';
 import { ContractCallMessagingKeyResolver } from './contractResolvers/resolver';
 import { MessagingKeyVerifier } from './verify';
 import { MailchainKeyRegContractCallResolver } from './contractResolvers/mailchain';
 import { InvalidContractResponseError, MessagingKeyNotFoundInContractError } from './contractResolvers/errors';
-import { ResolvedAddress, ResolveAddressError } from './messagingKeys';
+import { ResolveAddressError, RegisteredResolvedAddress, VendedResolvedAddress } from './messagingKeys';
 import { MessagingKeyContactError } from './errors';
+
+export type ContractCallResolvedAddress =
+	| Omit<RegisteredResolvedAddress, 'mailchainAddress'>
+	| Omit<VendedResolvedAddress, 'mailchainAddress'>;
 
 export class MessagingKeyContractCall {
 	constructor(
@@ -43,7 +48,7 @@ export class MessagingKeyContractCall {
 	async resolve(
 		contractCall: ContractCall,
 		identityKey?: PublicKey,
-	): Promise<MailchainResult<ResolvedAddress, ResolveAddressError>> {
+	): Promise<MailchainResult<ContractCallResolvedAddress, ResolveAddressError>> {
 		const protocol = contractCall.protocol as ProtocolType;
 		const resolver = this.resolvers.get(protocol);
 		if (!resolver) {
@@ -61,9 +66,22 @@ export class MessagingKeyContractCall {
 			};
 		}
 
-		const { messagingKey } = data;
+		if (!identityKey) {
+			return {
+				error: new UnexpectedMailchainError('identityKey is required'),
+			};
+		}
+
+		const { messagingKey, proof } = data;
 		return {
-			data: { type: 'registered', messagingKey, identityKey, protocol, protocolAddress: contractCall.address },
+			data: {
+				type: 'registered',
+				messagingKey,
+				identityKey,
+				protocol,
+				protocolAddress: contractCall.address,
+				proof,
+			},
 		};
 	}
 
@@ -71,7 +89,7 @@ export class MessagingKeyContractCall {
 		address: string,
 		protocol: ProtocolType,
 		identityKey?: PublicKey,
-	): Promise<MailchainResult<ResolvedAddress, MessagingKeyVerificationError>> {
+	): Promise<MailchainResult<ContractCallResolvedAddress, MessagingKeyVerificationError>> {
 		const vendedKeyResponse = await this.messagingKeysApi.getVendedPublicMessagingKey(address, protocol as any);
 		const verified = await this.messagingKeyVerifier.verifyProvidedKeyProof(
 			vendedKeyResponse.data.proof,

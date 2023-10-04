@@ -1,0 +1,369 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`verify mailchain address alice nonce not checked: presentation 1`] = `"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJuYmYiOjE1ODA2MDE2MDAsIm5vbmNlIjoiMTIzNCIsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwiY3JlZGVudGlhbFN1YmplY3QiOlt7Im93bmVyT2YiOnsiYWRkcmVzcyI6IjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNkBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwidHlwZSI6Ik1haWxjaGFpbk1lc3NhZ2luZ0tleSJ9fV0sImlzc3VhbmNlRGF0ZSI6IjIwMjAtMDItMDJUMDA6MDA6MDAuMDAwWiIsImlzc3VlciI6eyJpZCI6ImRpZDptYWlsY2hhaW46ZXRoZXJldW06MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2In0sInByb29mIjp7ImFkZHJlc3NIZXgiOiJkNWFiNGNlMzYwNWNkNTkwZGI2MDliNmI1Yzg5MDFmZGIyZWY3ZmU2IiwiaWRlbnRpdHlLZXlIZXgiOiJlMTAyNjlkOTA4NTEwZTM1NWJlYjFkNWJmMmRmODEyOWU1YjY0MDFlMTk2OTg5MWU4MDE2YTBiMjMwMDczOWJiYjAwNiIsImxvY2FsZSI6ImxvY2FsZSIsIm1lc3NhZ2VWYXJpYW50IjoidjEiLCJtZXNzYWdpbmdLZXlIZXgiOiJlMjcyM2NhYTIzYTViNTExYWY1YWQ3YjdlZjYwNzZlNDE0YWI3ZTc1YTlkYzkxMGVhNjBlNDE3YTJiNzcwYTU2NzEiLCJuZXR3b3JrIjoiIiwibm9uY2UiOjEsInByb3RvY29sIjoiZXRoZXJldW0iLCJzaWduYXR1cmVIZXgiOiIwMTAyMDMwNCIsInNpZ25hdHVyZU1ldGhvZCI6ImV0aGVyZXVtX3BlcnNvbmFsX21lc3NhZ2UiLCJzb3VyY2UiOiJNYWlsY2hhaW5SZWdpc3RyeSIsInR5cGUiOiJNYWlsY2hhaW4tRWQyNTUxOVNpZ25hdHVyZTIwMjAifSwidGVybXNPZlVzZSI6W3siYWN0aW9ucyI6WyJBdXRoZW50aWNhdGUiLCJKb2luIE1lZXRpbmciXSwiYXNzaWduZWUiOiJkaWQ6bWFpbGNoYWluOmFwcC1leGFtcGxlJTQwbWFpbGNoYWluLmNvbSIsImFzc2lnbmVyIjoiZGlkOm1haWxjaGFpbjoweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTYlNDBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwiZWZmZWN0IjoiQWxsb3ciLCJyZXNvdXJjZXMiOlsiKiJdLCJ0eXBlIjoiSG9sZGVyUG9saWN5In1dLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiTWFpbGNoYWluTWVzc2FnaW5nS2V5Q3JlZGVudGlhbCJdfV19fQ.o7gpQmN0WAE1yeSNR5xT0YnXfuC5E5tvfFVGipHV8FwRdkvAzKG5OOWRc8jRCsn5QT4Qu9bl55OGkuxjmNoHCQ"`;
+
+exports[`verify mailchain address alice nonce not checked: result 1`] = `
+{
+  "data": {
+    "didResolutionResult": {
+      "didDocument": {
+        "authentication": [
+          {
+            "controller": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+            "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com/messaging-key",
+            "publicKeyHex": "723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+            "type": "ED25519SignatureVerification",
+          },
+        ],
+        "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+        "verificationMethod": [],
+      },
+      "didDocumentMetadata": {
+        "canonicalId": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      },
+      "didResolutionMetadata": {
+        "contentType": "application/did+ld+json",
+      },
+    },
+    "issuer": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+    "jwt": "eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJuYmYiOjE1ODA2MDE2MDAsIm5vbmNlIjoiMTIzNCIsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwiY3JlZGVudGlhbFN1YmplY3QiOlt7Im93bmVyT2YiOnsiYWRkcmVzcyI6IjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNkBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwidHlwZSI6Ik1haWxjaGFpbk1lc3NhZ2luZ0tleSJ9fV0sImlzc3VhbmNlRGF0ZSI6IjIwMjAtMDItMDJUMDA6MDA6MDAuMDAwWiIsImlzc3VlciI6eyJpZCI6ImRpZDptYWlsY2hhaW46ZXRoZXJldW06MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2In0sInByb29mIjp7ImFkZHJlc3NIZXgiOiJkNWFiNGNlMzYwNWNkNTkwZGI2MDliNmI1Yzg5MDFmZGIyZWY3ZmU2IiwiaWRlbnRpdHlLZXlIZXgiOiJlMTAyNjlkOTA4NTEwZTM1NWJlYjFkNWJmMmRmODEyOWU1YjY0MDFlMTk2OTg5MWU4MDE2YTBiMjMwMDczOWJiYjAwNiIsImxvY2FsZSI6ImxvY2FsZSIsIm1lc3NhZ2VWYXJpYW50IjoidjEiLCJtZXNzYWdpbmdLZXlIZXgiOiJlMjcyM2NhYTIzYTViNTExYWY1YWQ3YjdlZjYwNzZlNDE0YWI3ZTc1YTlkYzkxMGVhNjBlNDE3YTJiNzcwYTU2NzEiLCJuZXR3b3JrIjoiIiwibm9uY2UiOjEsInByb3RvY29sIjoiZXRoZXJldW0iLCJzaWduYXR1cmVIZXgiOiIwMTAyMDMwNCIsInNpZ25hdHVyZU1ldGhvZCI6ImV0aGVyZXVtX3BlcnNvbmFsX21lc3NhZ2UiLCJzb3VyY2UiOiJNYWlsY2hhaW5SZWdpc3RyeSIsInR5cGUiOiJNYWlsY2hhaW4tRWQyNTUxOVNpZ25hdHVyZTIwMjAifSwidGVybXNPZlVzZSI6W3siYWN0aW9ucyI6WyJBdXRoZW50aWNhdGUiLCJKb2luIE1lZXRpbmciXSwiYXNzaWduZWUiOiJkaWQ6bWFpbGNoYWluOmFwcC1leGFtcGxlJTQwbWFpbGNoYWluLmNvbSIsImFzc2lnbmVyIjoiZGlkOm1haWxjaGFpbjoweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTYlNDBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwiZWZmZWN0IjoiQWxsb3ciLCJyZXNvdXJjZXMiOlsiKiJdLCJ0eXBlIjoiSG9sZGVyUG9saWN5In1dLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiTWFpbGNoYWluTWVzc2FnaW5nS2V5Q3JlZGVudGlhbCJdfV19fQ.o7gpQmN0WAE1yeSNR5xT0YnXfuC5E5tvfFVGipHV8FwRdkvAzKG5OOWRc8jRCsn5QT4Qu9bl55OGkuxjmNoHCQ",
+    "payload": {
+      "aud": [
+        "did:mailchain:app-example%40mailchain.com",
+      ],
+      "exp": 1580602200,
+      "iss": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "nbf": 1580601600,
+      "nonce": "1234",
+      "vp": {
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+        ],
+        "type": [
+          "VerifiablePresentation",
+        ],
+        "verifiableCredential": [
+          {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+            ],
+            "credentialSubject": [
+              {
+                "ownerOf": {
+                  "address": "0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+                  "type": "MailchainMessagingKey",
+                },
+              },
+            ],
+            "issuanceDate": "2020-02-02T00:00:00.000Z",
+            "issuer": {
+              "id": "did:mailchain:ethereum:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6",
+            },
+            "proof": {
+              "addressHex": "d5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6",
+              "identityKeyHex": "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006",
+              "locale": "locale",
+              "messageVariant": "v1",
+              "messagingKeyHex": "e2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+              "network": "",
+              "nonce": 1,
+              "protocol": "ethereum",
+              "signatureHex": "01020304",
+              "signatureMethod": "ethereum_personal_message",
+              "source": "MailchainRegistry",
+              "type": "Mailchain-Ed25519Signature2020",
+            },
+            "termsOfUse": [
+              {
+                "actions": [
+                  "Authenticate",
+                  "Join Meeting",
+                ],
+                "assignee": "did:mailchain:app-example%40mailchain.com",
+                "assigner": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+                "effect": "Allow",
+                "resources": [
+                  "*",
+                ],
+                "type": "HolderPolicy",
+              },
+            ],
+            "type": [
+              "VerifiableCredential",
+              "MailchainMessagingKeyCredential",
+            ],
+          },
+        ],
+      },
+    },
+    "policies": {
+      "exp": undefined,
+      "iat": undefined,
+      "nbf": undefined,
+    },
+    "signer": {
+      "controller": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com/messaging-key",
+      "publicKeyHex": "723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+      "type": "ED25519SignatureVerification",
+    },
+    "verifiablePresentation": {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+      ],
+      "expirationDate": "2020-02-02T00:10:00.000Z",
+      "holder": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "issuanceDate": "2020-02-02T00:00:00.000Z",
+      "nonce": "1234",
+      "proof": {
+        "jwt": "eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJuYmYiOjE1ODA2MDE2MDAsIm5vbmNlIjoiMTIzNCIsInZwIjp7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZVByZXNlbnRhdGlvbiJdLCJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiXSwiY3JlZGVudGlhbFN1YmplY3QiOlt7Im93bmVyT2YiOnsiYWRkcmVzcyI6IjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNkBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwidHlwZSI6Ik1haWxjaGFpbk1lc3NhZ2luZ0tleSJ9fV0sImlzc3VhbmNlRGF0ZSI6IjIwMjAtMDItMDJUMDA6MDA6MDAuMDAwWiIsImlzc3VlciI6eyJpZCI6ImRpZDptYWlsY2hhaW46ZXRoZXJldW06MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2In0sInByb29mIjp7ImFkZHJlc3NIZXgiOiJkNWFiNGNlMzYwNWNkNTkwZGI2MDliNmI1Yzg5MDFmZGIyZWY3ZmU2IiwiaWRlbnRpdHlLZXlIZXgiOiJlMTAyNjlkOTA4NTEwZTM1NWJlYjFkNWJmMmRmODEyOWU1YjY0MDFlMTk2OTg5MWU4MDE2YTBiMjMwMDczOWJiYjAwNiIsImxvY2FsZSI6ImxvY2FsZSIsIm1lc3NhZ2VWYXJpYW50IjoidjEiLCJtZXNzYWdpbmdLZXlIZXgiOiJlMjcyM2NhYTIzYTViNTExYWY1YWQ3YjdlZjYwNzZlNDE0YWI3ZTc1YTlkYzkxMGVhNjBlNDE3YTJiNzcwYTU2NzEiLCJuZXR3b3JrIjoiIiwibm9uY2UiOjEsInByb3RvY29sIjoiZXRoZXJldW0iLCJzaWduYXR1cmVIZXgiOiIwMTAyMDMwNCIsInNpZ25hdHVyZU1ldGhvZCI6ImV0aGVyZXVtX3BlcnNvbmFsX21lc3NhZ2UiLCJzb3VyY2UiOiJNYWlsY2hhaW5SZWdpc3RyeSIsInR5cGUiOiJNYWlsY2hhaW4tRWQyNTUxOVNpZ25hdHVyZTIwMjAifSwidGVybXNPZlVzZSI6W3siYWN0aW9ucyI6WyJBdXRoZW50aWNhdGUiLCJKb2luIE1lZXRpbmciXSwiYXNzaWduZWUiOiJkaWQ6bWFpbGNoYWluOmFwcC1leGFtcGxlJTQwbWFpbGNoYWluLmNvbSIsImFzc2lnbmVyIjoiZGlkOm1haWxjaGFpbjoweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTYlNDBldGhlcmV1bS5tYWlsY2hhaW4uY29tIiwiZWZmZWN0IjoiQWxsb3ciLCJyZXNvdXJjZXMiOlsiKiJdLCJ0eXBlIjoiSG9sZGVyUG9saWN5In1dLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiTWFpbGNoYWluTWVzc2FnaW5nS2V5Q3JlZGVudGlhbCJdfV19fQ.o7gpQmN0WAE1yeSNR5xT0YnXfuC5E5tvfFVGipHV8FwRdkvAzKG5OOWRc8jRCsn5QT4Qu9bl55OGkuxjmNoHCQ",
+        "type": "JwtProof2020",
+      },
+      "type": [
+        "VerifiablePresentation",
+      ],
+      "verifiableCredential": [
+        {
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1",
+          ],
+          "credentialSubject": {
+            "0": {
+              "ownerOf": {
+                "address": "0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+                "type": "MailchainMessagingKey",
+              },
+            },
+          },
+          "issuanceDate": "2020-02-02T00:00:00.000Z",
+          "issuer": {
+            "id": "did:mailchain:ethereum:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6",
+          },
+          "proof": {
+            "addressHex": "d5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6",
+            "identityKeyHex": "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006",
+            "locale": "locale",
+            "messageVariant": "v1",
+            "messagingKeyHex": "e2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+            "network": "",
+            "nonce": 1,
+            "protocol": "ethereum",
+            "signatureHex": "01020304",
+            "signatureMethod": "ethereum_personal_message",
+            "source": "MailchainRegistry",
+            "type": "Mailchain-Ed25519Signature2020",
+          },
+          "termsOfUse": [
+            {
+              "actions": [
+                "Authenticate",
+                "Join Meeting",
+              ],
+              "assignee": "did:mailchain:app-example%40mailchain.com",
+              "assigner": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+              "effect": "Allow",
+              "resources": [
+                "*",
+              ],
+              "type": "HolderPolicy",
+            },
+          ],
+          "type": [
+            "VerifiableCredential",
+            "MailchainMessagingKeyCredential",
+          ],
+        },
+      ],
+      "verifier": [
+        "did:mailchain:app-example%40mailchain.com",
+      ],
+    },
+    "verified": true,
+  },
+}
+`;
+
+exports[`verify mailchain-address-alice: presentation 1`] = `"eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJqdGkiOiIxMjM0IiwibmJmIjoxNTgwNjAxNjAwLCJub25jZSI6IjEyMzQiLCJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlt7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sImNyZWRlbnRpYWxTdWJqZWN0IjpbeyJvd25lck9mIjp7ImFkZHJlc3MiOiIweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTZAZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsInR5cGUiOiJNYWlsY2hhaW5NZXNzYWdpbmdLZXkifX1dLCJpc3N1YW5jZURhdGUiOiIyMDIwLTAyLTAyVDAwOjAwOjAwLjAwMFoiLCJpc3N1ZXIiOnsiaWQiOiJkaWQ6bWFpbGNoYWluOmV0aGVyZXVtOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiJ9LCJwcm9vZiI6eyJhZGRyZXNzSGV4IjoiZDVhYjRjZTM2MDVjZDU5MGRiNjA5YjZiNWM4OTAxZmRiMmVmN2ZlNiIsImlkZW50aXR5S2V5SGV4IjoiZTEwMjY5ZDkwODUxMGUzNTViZWIxZDViZjJkZjgxMjllNWI2NDAxZTE5Njk4OTFlODAxNmEwYjIzMDA3MzliYmIwMDYiLCJsb2NhbGUiOiJsb2NhbGUiLCJtZXNzYWdlVmFyaWFudCI6InYxIiwibWVzc2FnaW5nS2V5SGV4IjoiZTI3MjNjYWEyM2E1YjUxMWFmNWFkN2I3ZWY2MDc2ZTQxNGFiN2U3NWE5ZGM5MTBlYTYwZTQxN2EyYjc3MGE1NjcxIiwibmV0d29yayI6IiIsIm5vbmNlIjoxLCJwcm90b2NvbCI6ImV0aGVyZXVtIiwic2lnbmF0dXJlSGV4IjoiMDEwMjAzMDQiLCJzaWduYXR1cmVNZXRob2QiOiJldGhlcmV1bV9wZXJzb25hbF9tZXNzYWdlIiwic291cmNlIjoiTWFpbGNoYWluUmVnaXN0cnkiLCJ0eXBlIjoiTWFpbGNoYWluLUVkMjU1MTlTaWduYXR1cmUyMDIwIn0sInRlcm1zT2ZVc2UiOlt7ImFjdGlvbnMiOlsiQXV0aGVudGljYXRlIiwiSm9pbiBNZWV0aW5nIl0sImFzc2lnbmVlIjoiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iLCJhc3NpZ25lciI6ImRpZDptYWlsY2hhaW46MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2JTQwZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsImVmZmVjdCI6IkFsbG93IiwicmVzb3VyY2VzIjpbIioiXSwidHlwZSI6IkhvbGRlclBvbGljeSJ9XSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIk1haWxjaGFpbk1lc3NhZ2luZ0tleUNyZWRlbnRpYWwiXX1dfX0.2VmS1Q9X7IiR-tELDsKEWzBaP5cNuOzl3NJO2qaDO5Vh_vBcsftQ90EO7V4z7vWHE44pGXjSg7-fwKuGFxvpCw"`;
+
+exports[`verify mailchain-address-alice: result 1`] = `
+{
+  "data": {
+    "didResolutionResult": {
+      "didDocument": {
+        "authentication": [
+          {
+            "controller": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+            "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com/messaging-key",
+            "publicKeyHex": "723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+            "type": "ED25519SignatureVerification",
+          },
+        ],
+        "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+        "verificationMethod": [],
+      },
+      "didDocumentMetadata": {
+        "canonicalId": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      },
+      "didResolutionMetadata": {
+        "contentType": "application/did+ld+json",
+      },
+    },
+    "issuer": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+    "jwt": "eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJqdGkiOiIxMjM0IiwibmJmIjoxNTgwNjAxNjAwLCJub25jZSI6IjEyMzQiLCJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlt7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sImNyZWRlbnRpYWxTdWJqZWN0IjpbeyJvd25lck9mIjp7ImFkZHJlc3MiOiIweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTZAZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsInR5cGUiOiJNYWlsY2hhaW5NZXNzYWdpbmdLZXkifX1dLCJpc3N1YW5jZURhdGUiOiIyMDIwLTAyLTAyVDAwOjAwOjAwLjAwMFoiLCJpc3N1ZXIiOnsiaWQiOiJkaWQ6bWFpbGNoYWluOmV0aGVyZXVtOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiJ9LCJwcm9vZiI6eyJhZGRyZXNzSGV4IjoiZDVhYjRjZTM2MDVjZDU5MGRiNjA5YjZiNWM4OTAxZmRiMmVmN2ZlNiIsImlkZW50aXR5S2V5SGV4IjoiZTEwMjY5ZDkwODUxMGUzNTViZWIxZDViZjJkZjgxMjllNWI2NDAxZTE5Njk4OTFlODAxNmEwYjIzMDA3MzliYmIwMDYiLCJsb2NhbGUiOiJsb2NhbGUiLCJtZXNzYWdlVmFyaWFudCI6InYxIiwibWVzc2FnaW5nS2V5SGV4IjoiZTI3MjNjYWEyM2E1YjUxMWFmNWFkN2I3ZWY2MDc2ZTQxNGFiN2U3NWE5ZGM5MTBlYTYwZTQxN2EyYjc3MGE1NjcxIiwibmV0d29yayI6IiIsIm5vbmNlIjoxLCJwcm90b2NvbCI6ImV0aGVyZXVtIiwic2lnbmF0dXJlSGV4IjoiMDEwMjAzMDQiLCJzaWduYXR1cmVNZXRob2QiOiJldGhlcmV1bV9wZXJzb25hbF9tZXNzYWdlIiwic291cmNlIjoiTWFpbGNoYWluUmVnaXN0cnkiLCJ0eXBlIjoiTWFpbGNoYWluLUVkMjU1MTlTaWduYXR1cmUyMDIwIn0sInRlcm1zT2ZVc2UiOlt7ImFjdGlvbnMiOlsiQXV0aGVudGljYXRlIiwiSm9pbiBNZWV0aW5nIl0sImFzc2lnbmVlIjoiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iLCJhc3NpZ25lciI6ImRpZDptYWlsY2hhaW46MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2JTQwZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsImVmZmVjdCI6IkFsbG93IiwicmVzb3VyY2VzIjpbIioiXSwidHlwZSI6IkhvbGRlclBvbGljeSJ9XSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIk1haWxjaGFpbk1lc3NhZ2luZ0tleUNyZWRlbnRpYWwiXX1dfX0.2VmS1Q9X7IiR-tELDsKEWzBaP5cNuOzl3NJO2qaDO5Vh_vBcsftQ90EO7V4z7vWHE44pGXjSg7-fwKuGFxvpCw",
+    "payload": {
+      "aud": [
+        "did:mailchain:app-example%40mailchain.com",
+      ],
+      "exp": 1580602200,
+      "iss": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "jti": "1234",
+      "nbf": 1580601600,
+      "nonce": "1234",
+      "vp": {
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+        ],
+        "type": [
+          "VerifiablePresentation",
+        ],
+        "verifiableCredential": [
+          {
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+            ],
+            "credentialSubject": [
+              {
+                "ownerOf": {
+                  "address": "0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+                  "type": "MailchainMessagingKey",
+                },
+              },
+            ],
+            "issuanceDate": "2020-02-02T00:00:00.000Z",
+            "issuer": {
+              "id": "did:mailchain:ethereum:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6",
+            },
+            "proof": {
+              "addressHex": "d5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6",
+              "identityKeyHex": "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006",
+              "locale": "locale",
+              "messageVariant": "v1",
+              "messagingKeyHex": "e2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+              "network": "",
+              "nonce": 1,
+              "protocol": "ethereum",
+              "signatureHex": "01020304",
+              "signatureMethod": "ethereum_personal_message",
+              "source": "MailchainRegistry",
+              "type": "Mailchain-Ed25519Signature2020",
+            },
+            "termsOfUse": [
+              {
+                "actions": [
+                  "Authenticate",
+                  "Join Meeting",
+                ],
+                "assignee": "did:mailchain:app-example%40mailchain.com",
+                "assigner": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+                "effect": "Allow",
+                "resources": [
+                  "*",
+                ],
+                "type": "HolderPolicy",
+              },
+            ],
+            "type": [
+              "VerifiableCredential",
+              "MailchainMessagingKeyCredential",
+            ],
+          },
+        ],
+      },
+    },
+    "policies": {
+      "exp": undefined,
+      "iat": undefined,
+      "nbf": undefined,
+    },
+    "signer": {
+      "controller": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "id": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com/messaging-key",
+      "publicKeyHex": "723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+      "type": "ED25519SignatureVerification",
+    },
+    "verifiablePresentation": {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+      ],
+      "expirationDate": "2020-02-02T00:10:00.000Z",
+      "holder": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+      "id": "1234",
+      "issuanceDate": "2020-02-02T00:00:00.000Z",
+      "nonce": "1234",
+      "proof": {
+        "jwt": "eyJhbGciOiJFZDI1NTE5IiwidHlwIjoiSldUIn0.eyJhdWQiOlsiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iXSwiZXhwIjoxNTgwNjAyMjAwLCJpc3MiOiJkaWQ6bWFpbGNoYWluOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiU0MGV0aGVyZXVtLm1haWxjaGFpbi5jb20iLCJqdGkiOiIxMjM0IiwibmJmIjoxNTgwNjAxNjAwLCJub25jZSI6IjEyMzQiLCJ2cCI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVQcmVzZW50YXRpb24iXSwidmVyaWZpYWJsZUNyZWRlbnRpYWwiOlt7IkBjb250ZXh0IjpbImh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzL3YxIl0sImNyZWRlbnRpYWxTdWJqZWN0IjpbeyJvd25lck9mIjp7ImFkZHJlc3MiOiIweEQ1YWI0Q0UzNjA1Q2Q1OTBEYjYwOWI2YjVDODkwMWZkQjJlZjdGRTZAZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsInR5cGUiOiJNYWlsY2hhaW5NZXNzYWdpbmdLZXkifX1dLCJpc3N1YW5jZURhdGUiOiIyMDIwLTAyLTAyVDAwOjAwOjAwLjAwMFoiLCJpc3N1ZXIiOnsiaWQiOiJkaWQ6bWFpbGNoYWluOmV0aGVyZXVtOjB4RDVhYjRDRTM2MDVDZDU5MERiNjA5YjZiNUM4OTAxZmRCMmVmN0ZFNiJ9LCJwcm9vZiI6eyJhZGRyZXNzSGV4IjoiZDVhYjRjZTM2MDVjZDU5MGRiNjA5YjZiNWM4OTAxZmRiMmVmN2ZlNiIsImlkZW50aXR5S2V5SGV4IjoiZTEwMjY5ZDkwODUxMGUzNTViZWIxZDViZjJkZjgxMjllNWI2NDAxZTE5Njk4OTFlODAxNmEwYjIzMDA3MzliYmIwMDYiLCJsb2NhbGUiOiJsb2NhbGUiLCJtZXNzYWdlVmFyaWFudCI6InYxIiwibWVzc2FnaW5nS2V5SGV4IjoiZTI3MjNjYWEyM2E1YjUxMWFmNWFkN2I3ZWY2MDc2ZTQxNGFiN2U3NWE5ZGM5MTBlYTYwZTQxN2EyYjc3MGE1NjcxIiwibmV0d29yayI6IiIsIm5vbmNlIjoxLCJwcm90b2NvbCI6ImV0aGVyZXVtIiwic2lnbmF0dXJlSGV4IjoiMDEwMjAzMDQiLCJzaWduYXR1cmVNZXRob2QiOiJldGhlcmV1bV9wZXJzb25hbF9tZXNzYWdlIiwic291cmNlIjoiTWFpbGNoYWluUmVnaXN0cnkiLCJ0eXBlIjoiTWFpbGNoYWluLUVkMjU1MTlTaWduYXR1cmUyMDIwIn0sInRlcm1zT2ZVc2UiOlt7ImFjdGlvbnMiOlsiQXV0aGVudGljYXRlIiwiSm9pbiBNZWV0aW5nIl0sImFzc2lnbmVlIjoiZGlkOm1haWxjaGFpbjphcHAtZXhhbXBsZSU0MG1haWxjaGFpbi5jb20iLCJhc3NpZ25lciI6ImRpZDptYWlsY2hhaW46MHhENWFiNENFMzYwNUNkNTkwRGI2MDliNmI1Qzg5MDFmZEIyZWY3RkU2JTQwZXRoZXJldW0ubWFpbGNoYWluLmNvbSIsImVmZmVjdCI6IkFsbG93IiwicmVzb3VyY2VzIjpbIioiXSwidHlwZSI6IkhvbGRlclBvbGljeSJ9XSwidHlwZSI6WyJWZXJpZmlhYmxlQ3JlZGVudGlhbCIsIk1haWxjaGFpbk1lc3NhZ2luZ0tleUNyZWRlbnRpYWwiXX1dfX0.2VmS1Q9X7IiR-tELDsKEWzBaP5cNuOzl3NJO2qaDO5Vh_vBcsftQ90EO7V4z7vWHE44pGXjSg7-fwKuGFxvpCw",
+        "type": "JwtProof2020",
+      },
+      "type": [
+        "VerifiablePresentation",
+      ],
+      "verifiableCredential": [
+        {
+          "@context": [
+            "https://www.w3.org/2018/credentials/v1",
+          ],
+          "credentialSubject": {
+            "0": {
+              "ownerOf": {
+                "address": "0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6@ethereum.mailchain.com",
+                "type": "MailchainMessagingKey",
+              },
+            },
+          },
+          "issuanceDate": "2020-02-02T00:00:00.000Z",
+          "issuer": {
+            "id": "did:mailchain:ethereum:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6",
+          },
+          "proof": {
+            "addressHex": "d5ab4ce3605cd590db609b6b5c8901fdb2ef7fe6",
+            "identityKeyHex": "e10269d908510e355beb1d5bf2df8129e5b6401e1969891e8016a0b2300739bbb006",
+            "locale": "locale",
+            "messageVariant": "v1",
+            "messagingKeyHex": "e2723caa23a5b511af5ad7b7ef6076e414ab7e75a9dc910ea60e417a2b770a5671",
+            "network": "",
+            "nonce": 1,
+            "protocol": "ethereum",
+            "signatureHex": "01020304",
+            "signatureMethod": "ethereum_personal_message",
+            "source": "MailchainRegistry",
+            "type": "Mailchain-Ed25519Signature2020",
+          },
+          "termsOfUse": [
+            {
+              "actions": [
+                "Authenticate",
+                "Join Meeting",
+              ],
+              "assignee": "did:mailchain:app-example%40mailchain.com",
+              "assigner": "did:mailchain:0xD5ab4CE3605Cd590Db609b6b5C8901fdB2ef7FE6%40ethereum.mailchain.com",
+              "effect": "Allow",
+              "resources": [
+                "*",
+              ],
+              "type": "HolderPolicy",
+            },
+          ],
+          "type": [
+            "VerifiableCredential",
+            "MailchainMessagingKeyCredential",
+          ],
+        },
+      ],
+      "verifier": [
+        "did:mailchain:app-example%40mailchain.com",
+      ],
+    },
+    "verified": true,
+  },
+}
+`;
