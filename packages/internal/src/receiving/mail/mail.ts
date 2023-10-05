@@ -1,5 +1,8 @@
 import { KeyRingDecrypter } from '@mailchain/keyring';
 import axios, { AxiosInstance } from 'axios';
+import { encodeUtf8 } from '@mailchain/encoding';
+import { validateVerifiablePresentationRequest } from '../../verifiableCredentials/verifiableMailchainAddressOwner/factory';
+import { parseVerifiablePresentationRequest } from '../../verifiableCredentials';
 import { Payload } from '../../transport';
 import { PayloadReceiver, UndeliveredPayloadOk } from '../payload';
 import { Configuration } from '../../configuration';
@@ -42,6 +45,7 @@ export class MailReceiver {
 		private readonly deliveryRequests: DeliveryRequests,
 		private readonly mailerReceiver: MailerContentResolver,
 		private readonly payloadReceiver: PayloadReceiver,
+		private readonly mailchainAddressDomain: string,
 	) {}
 
 	static create(
@@ -53,6 +57,7 @@ export class MailReceiver {
 			DeliveryRequests.create(configuration, receiverMessagingKeyDecrypter),
 			MailerContentResolver.create(configuration, axiosInstance),
 			PayloadReceiver.create(configuration, receiverMessagingKeyDecrypter, axiosInstance),
+			configuration.mailchainAddressDomain,
 		);
 	}
 
@@ -115,6 +120,14 @@ export class MailReceiver {
 				return payload;
 			case 'message/x.mailchain-mailer':
 				return await this.mailerReceiver.get(payload);
+			case 'application/vnd.mailchain.verified-credential-request':
+				const validationError = validateVerifiablePresentationRequest(
+					parseVerifiablePresentationRequest(encodeUtf8(payload.Content)),
+					this.mailchainAddressDomain,
+				);
+				if (validationError)
+					throw new Error(`Invalid Verifiable Presentation Request`, { cause: validationError });
+				return payload;
 			default:
 				throw new Error(`Unsupported content type: ${payload.Headers.ContentType}`);
 		}

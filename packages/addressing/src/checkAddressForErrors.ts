@@ -21,6 +21,7 @@ export function checkAddressForErrors(
 	mailchainDomain = DEFAULT_MAILCHAIN_DOMAIN,
 ): ValidateAddressError | undefined {
 	address = address.trim();
+
 	if (!address.endsWith(`${mailchainDomain}`)) {
 		return new BadlyFormattedAddressError();
 	}

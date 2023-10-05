@@ -7,18 +7,19 @@ import {
 	createAxiosConfiguration,
 	getAxiosWithSigner,
 } from '@mailchain/api';
-import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
-import { decodeBase64, encodeBase64, encodeHex } from '@mailchain/encoding';
+import { publicKeyFromBytes, publicKeyToBytes, secureRandom } from '@mailchain/crypto';
+import { decodeBase64, encodeBase64, encodeHex, encodeUtf8 } from '@mailchain/encoding';
 import { InboxKey, KeyRing } from '@mailchain/keyring';
 import striptags from 'striptags';
 import { Configuration } from '..';
-import { parseMimeText } from '../formatters/parse';
+import { ParseMimeTextResult, parseMimeText } from '../formatters/parse';
 import { IdentityKeys } from '../identityKeys';
 import { MailboxRuleEngine } from '../mailboxRuleEngine/mailboxRuleEngine';
 import * as protoInbox from '../protobuf/inbox/inbox';
 import { MailData, Payload } from '../transport';
 import { encodeMailbox } from '../user';
 import { UserMailbox } from '../user/types';
+import { VerifiablePresentationRequest, parseVerifiablePresentationRequest } from '../verifiableCredentials';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
 import { MessageCrypto, createMailchainMessageCrypto } from './messageCrypto';
@@ -276,12 +277,19 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			.then((res) => res.data as ArrayBuffer);
 
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
-		const { mailData } = await parseMimeText(messageData.Content);
-
-		return {
-			replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
-			body: mailData.message,
-		};
+		switch (messageData.Headers.ContentType) {
+			case 'application/vnd.mailchain.verified-credential-request':
+				return { body: encodeUtf8(messageData.Content) };
+			case 'message/x.mailchain':
+			case 'message/x.mailchain-mailer':
+				const { mailData } = await this.extractPayloadInfo(messageData);
+				return {
+					replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
+					body: mailData.message,
+				};
+			default:
+				throw new Error(`Unsupported content type of full message: ${messageData.Headers.ContentType}`);
+		}
 	}
 
 	async getMessagesOverview(mailboxes: UserMailbox[]): Promise<MessagesOverview> {
@@ -339,12 +347,50 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		return this.saveMessage(messageId, params.payload, params.content, params.userMailbox, owner, 'outbox');
 	}
 
+	async extractPayloadInfo(payload: Payload): Promise<ParseMimeTextResult> {
+		switch (payload.Headers.ContentType) {
+			case 'message/x.mailchain':
+			case 'message/x.mailchain-mailer':
+				return parseMimeText(payload.Content);
+			case 'application/vnd.mailchain.verified-credential-request':
+				// FIXME: VC Request is not considered a mail so fitting it into the MailData is not correct. This is a temporary solution.
+				const jsonStr = encodeUtf8(payload.Content);
+				const vcRequest: VerifiablePresentationRequest = parseVerifiablePresentationRequest(jsonStr);
+				const vcMailData: MailData = {
+					id: encodeBase64(secureRandom()),
+					subject: 'Verifiable Presentation Request',
+					from: {
+						address: vcRequest.from,
+						name: vcRequest.from,
+					},
+					date: payload.Headers.Created,
+					recipients: [
+						{
+							address: vcRequest.to,
+							name: vcRequest.to,
+						},
+					],
+					carbonCopyRecipients: [],
+					blindCarbonCopyRecipients: [],
+					message: jsonStr,
+					plainTextMessage: jsonStr,
+				};
+
+				return {
+					mailData: vcMailData,
+					addressIdentityKeys: new Map(),
+				};
+			default:
+				throw new Error(`Unsupported content type: ${payload.Headers.ContentType}`);
+		}
+	}
+
 	async saveReceivedMessage({
 		userMailbox,
 		receivedTransportPayload,
 	}: SaveReceivedMessageParam): Promise<[MessagePreview, ...MessagePreview[]]> {
 		const payload = receivedTransportPayload;
-		const { mailData, addressIdentityKeys } = await parseMimeText(payload.Content);
+		const { mailData, addressIdentityKeys } = await this.extractPayloadInfo(payload);
 		const owners = await this.messageMailboxOwnerMatcher
 			.withMessageIdentityKeys(addressIdentityKeys)
 			.findMatches(mailData, userMailbox);
@@ -389,7 +435,10 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const encryptedProtoMessagePreview = await this.messagePreviewCrypto.encrypt(encodedProtoMessagePreview);
 
 		const messagePreview: MessagePreview = {
-			kind: 'mail',
+			kind:
+				payload.Headers.ContentType === 'application/vnd.mailchain.verified-credential-request'
+					? 'vc-request'
+					: 'mail',
 			mailbox: userMailbox.identityKey,
 			messageId,
 			from: protoMessagePreview.from,
