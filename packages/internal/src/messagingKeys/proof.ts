@@ -1,6 +1,7 @@
 import { ProtocolType } from '@mailchain/addressing';
 import { ContractCall, GetMsgKeyResponseBody, getAddressFromApiResponse, ApiKeyConvert } from '@mailchain/api';
 import { PublicKey } from '@mailchain/crypto';
+import { KindRawED25519, KindEthereumPersonalMessage, KindTezos } from '@mailchain/signatures';
 import { decodeHexZeroX } from '@mailchain/encoding';
 
 export function messagingKeyProofFromApi(response: GetMsgKeyResponseBody): MailchainRegistryMessagingKeyProof {
@@ -15,7 +16,10 @@ export function messagingKeyProofFromApi(response: GetMsgKeyResponseBody): Mailc
 		nonce: response.proof.nonce,
 		protocol: response.proof.address.protocol as ProtocolType,
 		signature: decodeHexZeroX(response.proof.signature),
-		signatureMethod: response.proof.signingMethod as SignatureMethod,
+		signatureMethod: response.proof.signingMethod as
+			| typeof KindEthereumPersonalMessage
+			| typeof KindTezos
+			| typeof KindRawED25519,
 	};
 }
 
@@ -29,11 +33,9 @@ export type MailchainRegistryMessagingKeyProof = {
 	messageVariant: string;
 	nonce: number;
 	signature: Uint8Array;
-	signatureMethod: SignatureMethod;
+	signatureMethod: typeof KindEthereumPersonalMessage | typeof KindTezos | typeof KindRawED25519;
 	messagingKey: PublicKey;
 };
-
-export type SignatureMethod = 'ethereum_personal_message' | 'tezos_signed_message_micheline';
 
 export type ContractCallProof = {
 	source: 'ContractCall';

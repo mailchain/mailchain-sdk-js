@@ -2,17 +2,22 @@ import { publicKeyToBytes, isPublicKeyEqual, PublicKey } from '@mailchain/crypto
 import { encodeHexZeroX } from '@mailchain/encoding';
 import {
 	checkAddressForErrors,
-	createNameServiceAddress,
 	formatAddress,
 	isTokenAddress,
-	NameServiceAddress,
 	parseNameServiceAddress,
+	createNameServiceAddress,
+	ETHEREUM,
+	NameServiceAddress,
+	SOLANA,
+	TEZOS,
 } from '@mailchain/addressing';
 import { NAMESERVICE_DESCRIPTIONS } from '@mailchain/addressing/nameservices';
 import { IdentityKeysApiFactory, IdentityKeysApiInterface, createAxiosConfiguration } from '@mailchain/api';
 import { Configuration } from '../configuration';
 import { IdentityKeys } from '../identityKeys';
 import { UserMailbox } from '../user';
+
+export const PROTOCOLS_SUPPORTING_NAMESERVICE = [ETHEREUM, TEZOS, SOLANA] as const;
 
 export type ResolvedName = {
 	kind: 'name' | 'token';

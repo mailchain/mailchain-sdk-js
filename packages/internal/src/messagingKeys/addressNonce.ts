@@ -4,6 +4,7 @@ import {
 	NEAR,
 	ProtocolNotSupportedError,
 	ProtocolType,
+	SOLANA,
 	TEZOS,
 	isBlockchainProtocolEnabled,
 } from '@mailchain/addressing';
@@ -34,6 +35,7 @@ export class AddressNonce {
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[ETHEREUM, mailchainKeyRegistryResolver],
 				[TEZOS, mailchainKeyRegistryResolver],
+				[SOLANA, mailchainKeyRegistryResolver],
 			]),
 		);
 	}
@@ -52,7 +54,6 @@ export class AddressNonce {
 		if (protocol === MAILCHAIN) {
 			return { data: 1 }; // currently mailchain accounts do not support incrementing nonces
 		}
-
 		const resolver = this.resolvers.get(protocol);
 		if (!resolver) {
 			return { error: new ProtocolNotSupportedError(protocol) };

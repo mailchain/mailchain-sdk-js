@@ -61,4 +61,9 @@ export const NAMESERVICE_DESCRIPTIONS: NameserviceDescription[] = [
 		domains: ['x', 'twitter'],
 		supportsSubdomains: false,
 	},
+	{
+		name: 'sol',
+		domains: ['sol'],
+		supportsSubdomains: true,
+	},
 ];

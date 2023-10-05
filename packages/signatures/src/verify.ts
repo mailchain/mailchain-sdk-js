@@ -19,6 +19,6 @@ export function verify(
 		case KindTezos:
 			return verifyTezosSignedMessage(verifyingKey, message, signature);
 		default:
-			throw new Error();
+			throw new Error(`Signing method ${signingMethod} not supported`);
 	}
 }

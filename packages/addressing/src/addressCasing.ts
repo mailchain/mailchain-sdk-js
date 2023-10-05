@@ -1,4 +1,4 @@
-import { ALGORAND, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE, TEZOS } from './protocols';
+import { ALGORAND, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SOLANA, SUBSTRATE, TEZOS } from './protocols';
 
 export function casingByProtocol(value: string, protocol: ProtocolType): string {
 	switch (protocol) {
@@ -6,6 +6,7 @@ export function casingByProtocol(value: string, protocol: ProtocolType): string 
 			return value.toLowerCase(); // case insensitive
 		case ETHEREUM:
 			return value.toLowerCase(); // case insensitive
+		case SOLANA:
 		case SUBSTRATE:
 		case TEZOS:
 			return value; // substrate&tezos encoding is case sensitive

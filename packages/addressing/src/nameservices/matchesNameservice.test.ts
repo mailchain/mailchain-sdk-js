@@ -10,6 +10,12 @@ describe('matchesNameservice', () => {
 			expectedMatch: 'eth',
 		},
 		{
+			testName: "match 'sol' domain for address",
+			address: createNameServiceAddress('alice.sol', 'sol.mailchain.test'),
+			nsDescription: { name: 'sol', domains: ['sol'] },
+			expectedMatch: 'sol',
+		},
+		{
 			testName: "should not match because the domain doesn't start with NS name",
 			address: createNameServiceAddress('alice.eth', 'unstoppable.mailchain.test'),
 			nsDescription: { name: 'ens', domains: ['eth'] },

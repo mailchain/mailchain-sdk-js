@@ -9,6 +9,7 @@ import { validateTezosAddress } from './protocols/tezos/address';
 import { validateFilecoinAddress } from './protocols/filecoin/address';
 import { validateNearImplicitAccount } from './protocols/near/address';
 import { validateEthereumAddress } from './protocols/ethereum/address';
+import { validateSolanaAddress } from './protocols/solana/address';
 
 export function isMailchainAccountAddress(address: NameServiceAddress): boolean {
 	const isMailchainUsername = address.username.match(/(^[a-zA-Z0-9][_\-a-zA-Z0-9]{0,18}[a-zA-Z0-9])$/) != null;
@@ -62,4 +63,10 @@ export function isTokenAddress(address: MailchainAddress): boolean {
 		default:
 			return false;
 	}
+}
+export function isSolanaAddress(address: MailchainAddress): boolean {
+	const domainParts = address.domain.split('.');
+
+	if (domainParts[0] !== 'solana') return false;
+	return validateSolanaAddress(address.username);
 }

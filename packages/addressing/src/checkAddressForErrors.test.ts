@@ -157,4 +157,23 @@ describe('checkAddressForErrors', () => {
 			).toEqual(new IdentityProviderAddressInvalidError());
 		});
 	});
+
+	describe('solana', () => {
+		it('should return undefined when address is valid - tz1', () => {
+			expect(
+				checkAddressForErrors('4Cx77LP3sKEC3Cq6BPmYqTkoN2n6BJMjKuxHfwASe5eG@solana.mailchain.com'),
+			).toBeUndefined();
+		});
+
+		it('should return error when address is invalid - incorrect length', () => {
+			expect(checkAddressForErrors('2deK9EpoamYBERkDcUZJNVv6stfJ@solana.mailchain.com')).toEqual(
+				new IdentityProviderAddressInvalidError(),
+			);
+		});
+		it('should return error when address is invalid - invalid base58', () => {
+			expect(checkAddressForErrors('rCx77LP3sKEC3Cq6BPmYqTkoN2n6BJMjKuxHfwASe5eG@solana.mailchain.com')).toEqual(
+				new IdentityProviderAddressInvalidError(),
+			);
+		});
+	});
 });

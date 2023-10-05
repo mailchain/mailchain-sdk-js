@@ -1,4 +1,4 @@
-import { ETHEREUM, NEAR } from '@mailchain/addressing/protocols';
+import { ETHEREUM, NEAR, SOLANA } from '@mailchain/addressing/protocols';
 import { GetProtocolAddressNonceResponseBody, MessagingKeysApiInterface } from '@mailchain/api';
 import { AxiosResponse } from 'axios';
 import { mock, MockProxy } from 'jest-mock-extended';
@@ -10,6 +10,7 @@ describe('getAddressNonce', () => {
 	let mockMessagingKeysApi: MockProxy<MessagingKeysApiInterface>;
 	let mockEthereumResolver: MockProxy<ContractCallLatestNonce>;
 	let mockNearResolver: MockProxy<ContractCallLatestNonce>;
+	let mockSolanaResolver: MockProxy<ContractCallLatestNonce>;
 
 	let messagingKeyNonces: AddressNonce;
 
@@ -21,12 +22,14 @@ describe('getAddressNonce', () => {
 
 		mockEthereumResolver = mock();
 		mockNearResolver = mock();
+		mockSolanaResolver = mock();
 
 		messagingKeyNonces = new AddressNonce(
 			mockMessagingKeysApi,
 			new Map([
 				[ETHEREUM, mockEthereumResolver],
 				[NEAR, mockNearResolver],
+				[SOLANA, mockSolanaResolver],
 			]),
 		);
 	});
@@ -63,6 +66,24 @@ describe('getAddressNonce', () => {
 		expect(mockMessagingKeysApi.getProtocolAddressNonce).toHaveBeenCalledWith('alice.near', NEAR);
 		expect(mockEthereumResolver.latestNonce).not.toHaveBeenCalled();
 		expect(mockNearResolver.latestNonce).toHaveBeenCalled();
+		expect(resultNonce).toEqual(9);
+	});
+
+	it('should return nonce for Solana address based on resolution', async () => {
+		mockSolanaResolver.latestNonce.mockResolvedValue(9);
+
+		const { data: resultNonce, error } = await messagingKeyNonces.getMessagingKeyLatestNonce(
+			'p15udbdMXUHXpXRJSSiVtU7jkeEZovZqPHMzaesrK4u',
+			SOLANA,
+		);
+
+		expect(error).toBeUndefined();
+		expect(mockMessagingKeysApi.getProtocolAddressNonce).toHaveBeenCalledWith(
+			'p15udbdMXUHXpXRJSSiVtU7jkeEZovZqPHMzaesrK4u',
+			SOLANA,
+		);
+		expect(mockEthereumResolver.latestNonce).not.toHaveBeenCalled();
+		expect(mockNearResolver.latestNonce).not.toHaveBeenCalled();
 		expect(resultNonce).toEqual(9);
 	});
 

@@ -1,5 +1,15 @@
 import { EncodingTypes, EncodingType, decode, encode } from '@mailchain/encoding';
-import { ALGORAND, ALL_PROTOCOLS, ETHEREUM, MAILCHAIN, NEAR, ProtocolType, SUBSTRATE, TEZOS } from './protocols';
+import {
+	ALGORAND,
+	ALL_PROTOCOLS,
+	ETHEREUM,
+	MAILCHAIN,
+	NEAR,
+	ProtocolType,
+	SOLANA,
+	SUBSTRATE,
+	TEZOS,
+} from './protocols';
 import { casingByProtocol } from './addressCasing';
 
 /**
@@ -39,6 +49,7 @@ export function encodingByProtocol(protocol: ProtocolType): EncodingType {
 			return EncodingTypes.Hex0xPrefix;
 		case SUBSTRATE:
 		case TEZOS:
+		case SOLANA:
 			return EncodingTypes.Base58;
 		case MAILCHAIN:
 		case NEAR:

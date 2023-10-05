@@ -9,7 +9,7 @@ import { ETHEREUM, NEAR, TEZOS, ProtocolType } from '@mailchain/addressing';
 import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { PublicKey } from '@mailchain/crypto';
-import { MAILCHAIN, ProtocolNotSupportedError } from '@mailchain/addressing/protocols';
+import { MAILCHAIN, ProtocolNotSupportedError, SOLANA } from '@mailchain/addressing/protocols';
 import { Configuration, MailchainResult } from '../';
 import { UnexpectedMailchainError } from '../errors';
 import { NearContractCallResolver } from './contractResolvers/near';
@@ -39,6 +39,7 @@ export class MessagingKeyContractCall {
 				[MAILCHAIN, mailchainKeyRegistryResolver],
 				[NEAR, NearContractCallResolver.create(configuration, axiosInstance)],
 				[TEZOS, mailchainKeyRegistryResolver],
+				[SOLANA, mailchainKeyRegistryResolver],
 			]),
 			MessagingKeysApiFactory(createAxiosConfiguration(configuration.apiPath)),
 			MessagingKeyVerifier.create(configuration),
