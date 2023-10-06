@@ -61,6 +61,12 @@
 			],
 			"sending/mail": [
 				"./types/sending/mail/index.d.ts"
+			],
+			"sending/verifiablePresentationRequest": [
+				"./types/sending/verifiablePresentationRequest/index.d.ts"
+			],
+			"verifiableCredentials": [
+				"./types/verifiableCredentials/index.d.ts"
 			]
 		}
 	}
