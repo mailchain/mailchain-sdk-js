@@ -42,8 +42,16 @@ export class VerifiableMailchainAddressOwnerCreator {
 				error: validationError,
 			};
 		}
-		const { from, to, actions, resources, signedCredentialExpiresAfter, signedCredentialExpiresAt, nonce } =
-			request;
+		const {
+			requestId,
+			from,
+			to,
+			actions,
+			resources,
+			signedCredentialExpiresAfter,
+			signedCredentialExpiresAt,
+			nonce,
+		} = request;
 
 		return this.mailchainAddressOwnershipIssuer.createVerifiableMailchainAddressOwnership({
 			address: to,
@@ -52,6 +60,7 @@ export class VerifiableMailchainAddressOwnerCreator {
 			resources,
 			signer: this.signer,
 			options: {
+				requestId,
 				expiresAt: signedCredentialExpiresAt,
 				expiresIn: signedCredentialExpiresAfter,
 				nonce,
@@ -81,6 +90,10 @@ export function validateVerifiablePresentationRequest(
 
 	if (request.version !== '1.0') {
 		return new ValidationError(`invalid version ${request.version}`);
+	}
+
+	if (request.requestId == null || request.requestId.length === 0) {
+		throw new ValidationError('requestId is empty');
 	}
 
 	if (requestExpiresAfter && signedCredentialExpiresAt && requestExpiresAfter > signedCredentialExpiresAt) {

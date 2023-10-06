@@ -4,6 +4,7 @@ import { createPresentationPayload } from './presentation';
 describe('createPresentationPayload', () => {
 	it('create', () => {
 		const actual = createPresentationPayload({
+			requestId: 'request-id',
 			holder: 'did:mailchain:holder',
 			issuanceDate: new Date(2020, 1, 1),
 			verifiableCredential: {

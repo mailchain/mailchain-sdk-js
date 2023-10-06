@@ -15,6 +15,7 @@ describe('VerifiableMailchainAddressOwnerCreator', () => {
 			'mailchain.test',
 		);
 		const result = await target.createVerifiableMailchainAddressOwner({
+			requestId: 'request-id',
 			from: 'app@mailchain.test',
 			to: 'alice@mailchain.test',
 			actions: ['Authenticate', 'Join Meeting'],
@@ -36,6 +37,7 @@ describe('VerifiableMailchainAddressOwnerCreator', () => {
 			resources: ['*'],
 			signer: AliceED25519PrivateKey,
 			options: {
+				requestId: 'request-id',
 				expiresAt: undefined,
 				expiresIn: 600,
 				nonce: '1234',

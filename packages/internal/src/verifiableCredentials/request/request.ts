@@ -1,6 +1,28 @@
 import { CredentialPayloadType } from '..';
 export type VerifiablePresentationRequest = {
 	type: CredentialPayloadType;
+	version: '1.0';
+
+	/**
+	 * A identifier for the request that is unique to the application making the request.
+	 */
+	requestId: string;
+
+	/**
+	 * Mailchain address of who the request is being made by.
+	 * @example
+	 * 	example-app@mailchain.com
+	 *  example-app.eth@ens.mailchain.com
+	 */
+	from: string;
+	/**
+	 * Mailchain address of who the request is being made to.
+	 *
+	 * @example
+	 * 	alice@mailchain.com
+	 *  {ethereumAddress}@ethereum.mailchain.com
+	 */
+	to: string;
 
 	/**
 	 * The actions that the holder is allowed to perform against the resources. Actions should be human readable, yet interpretable by the application.
@@ -19,23 +41,6 @@ export type VerifiablePresentationRequest = {
 	 *  ['meeting/1234', 'meeting/5678'] - meeting ids 1234 and 5678
 	 */
 	resources: string[];
-	/**
-	 * Mailchain address of who the request is being made by.
-	 * @example
-	 * 	example-app@mailchain.com
-	 *  example-app.eth@ens.mailchain.com
-	 */
-	from: string;
-	/**
-	 * Mailchain address of who the request is being made to.
-	 *
-	 * @example
-	 * 	alice@mailchain.com
-	 *  {ethereumAddress}@ethereum.mailchain.com
-	 */
-	to: string;
-
-	version: '1.0';
 
 	/**
 	 * Once signed the credential expires after this date.

@@ -7,10 +7,11 @@ import {
 	createAxiosConfiguration,
 	getAxiosWithSigner,
 } from '@mailchain/api';
-import { publicKeyFromBytes, publicKeyToBytes, secureRandom } from '@mailchain/crypto';
-import { decodeBase64, encodeBase64, encodeHex, encodeUtf8 } from '@mailchain/encoding';
+import { publicKeyFromBytes, publicKeyToBytes } from '@mailchain/crypto';
+import { decodeBase64, decodeHex, encodeBase64, encodeHex, encodeUtf8 } from '@mailchain/encoding';
 import { InboxKey, KeyRing } from '@mailchain/keyring';
 import striptags from 'striptags';
+import { sha3_256 } from '@noble/hashes/sha3';
 import { Configuration } from '..';
 import { ParseMimeTextResult, parseMimeText } from '../formatters/parse';
 import { IdentityKeys } from '../identityKeys';
@@ -355,9 +356,17 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			case 'application/vnd.mailchain.verified-credential-request':
 				// FIXME: VC Request is not considered a mail so fitting it into the MailData is not correct. This is a temporary solution.
 				const jsonStr = encodeUtf8(payload.Content);
+				const messageId = encodeHex(
+					sha3_256(
+						Uint8Array.from([
+							...payload.Content,
+							...decodeHex(payload.Headers.Created.getTime().toString()),
+						]),
+					),
+				);
 				const vcRequest: VerifiablePresentationRequest = parseVerifiablePresentationRequest(jsonStr);
 				const vcMailData: MailData = {
-					id: encodeBase64(secureRandom()),
+					id: messageId,
 					subject: 'Verifiable Presentation Request',
 					from: {
 						address: vcRequest.from,
@@ -373,7 +382,9 @@ export class MailchainMailboxOperations implements MailboxOperations {
 					carbonCopyRecipients: [],
 					blindCarbonCopyRecipients: [],
 					message: jsonStr,
-					plainTextMessage: jsonStr,
+					plainTextMessage: `Request for ${vcRequest.resources.join(
+						', ',
+					)} to perform ${vcRequest.actions.join(', ')}).`,
 				};
 
 				return {

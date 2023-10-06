@@ -3,7 +3,7 @@ import { DecentralizedIdentifier, MailchainDecentralizedIdentifier } from './did
 import { W3C_CREDENTIALS_CONTEXT } from './context';
 
 type CreatePresentationPayloadParams = {
-	id?: string;
+	requestId: string;
 	verifiableCredential: VerifiableCredential;
 	verifier: DecentralizedIdentifier;
 	issuanceDate: Date;
@@ -20,12 +20,12 @@ type CreatePresentationPayloadParams = {
  * @returns
  */
 export function createPresentationPayload(params: CreatePresentationPayloadParams): PresentationPayload {
-	const { verifiableCredential, verifier, issuanceDate, expirationDate, holder, id } = params;
+	const { verifiableCredential, verifier, issuanceDate, expirationDate, holder, requestId } = params;
 
 	return {
 		'@context': [W3C_CREDENTIALS_CONTEXT],
 		type: ['VerifiablePresentation'],
-		id,
+		requestId,
 		holder,
 		verifiableCredential: [verifiableCredential],
 		verifier,

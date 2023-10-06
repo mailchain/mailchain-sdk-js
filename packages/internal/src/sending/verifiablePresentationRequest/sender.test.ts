@@ -63,6 +63,7 @@ describe('VerifiablePresentationRequestSender.send', () => {
 
 	it('should send mail', async () => {
 		const actual = await sender.sendVerifiablePresentationRequest({
+			requestId: 'vc-request-id',
 			to: 'bob@mailchain.com',
 			from: 'alice@mailchain.com',
 			actions: ['action-1'],
@@ -101,7 +102,7 @@ describe('VerifiablePresentationRequestSender.send', () => {
 			'application/vnd.mailchain.verified-credential-request',
 		);
 		expect(encodeUtf8(mockCreatePayload.mock.calls[0][1])).toMatchInlineSnapshot(
-			`"{"actions":["action-1"],"approvedCallback":{"url":"https://example.com"},"from":"alice@mailchain.com","resources":["resource-1"],"signedCredentialExpiresAt":"2020-01-01T00:00:00.000Z","to":"bob@mailchain.com","type":"MailchainMessagingKeyCredential","version":"1.0"}"`,
+			`"{"actions":["action-1"],"approvedCallback":{"url":"https://example.com"},"from":"alice@mailchain.com","requestId":"vc-request-id","resources":["resource-1"],"signedCredentialExpiresAt":"2020-01-01T00:00:00.000Z","to":"bob@mailchain.com","type":"MailchainMessagingKeyCredential","version":"1.0"}"`,
 		);
 	});
 });

@@ -20,6 +20,8 @@ import { CreateMailchainMessagingKeyIssuerError, MailchainMessagingKeyIssuer } f
 import { VerifiablePresentationJWT } from '../jwt';
 import { createVerifiableCredential } from '../payload';
 import { createOwnerOfMessagingKeySubject } from '../subject';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { VerifiablePresentationRequest } from '../request';
 
 export type CreateVerifiableMailchainAddressOwnerError =
 	| CreateMailchainMessagingKeyIssuerError
@@ -27,10 +29,6 @@ export type CreateVerifiableMailchainAddressOwnerError =
 	| ResolveAddressError;
 
 export type CreateVerifiableMailchainAddressOwnerParams = {
-	/**
-	 * Uniquely identify request.
-	 */
-	id?: string;
 	/**
 	 * Recipient Mailchain address.
 	 */
@@ -48,6 +46,10 @@ export type CreateVerifiableMailchainAddressOwnerParams = {
 
 	resources: string[];
 	options: {
+		/**
+		 * @see {@link VerifiablePresentationRequest.requestId}
+		 */
+		requestId: string;
 		/**
 		 * The number of seconds from the current time that the credential will expire.
 		 */
@@ -127,7 +129,7 @@ export class MailchainAddressOwnershipIssuer {
 	async createVerifiableMailchainAddressOwnership(
 		params: CreateVerifiableMailchainAddressOwnerParams,
 	): Promise<MailchainResult<VerifiablePresentationJWT, CreateVerifiableMailchainAddressOwnerError>> {
-		const { address, signer, requester, options, actions, resources, id } = params;
+		const { address, signer, requester, options, actions, resources } = params;
 		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolve(address);
 		if (resolveAddressError) {
 			return {
@@ -141,11 +143,11 @@ export class MailchainAddressOwnershipIssuer {
 			};
 		}
 
-		const { expiresIn, expiresAt, nonce } = options;
+		const { requestId, expiresIn, expiresAt, nonce } = options;
 		const issuanceDate = new Date();
 
 		const presentationPayload = createPresentationPayload({
-			id,
+			requestId,
 			issuanceDate,
 			verifiableCredential: createCredentialPayloadMailchainAddressOwner(
 				resolvedAddress,

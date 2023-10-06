@@ -87,10 +87,10 @@ describe('verify', () => {
 		const verifier = new MailchainAddressOwnershipVerifier(mockMailchainDIDMessagingKeyResolver);
 
 		const presentationResult = await issuer.createVerifiableMailchainAddressOwnership({
-			id: '1234',
 			address: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			signer: AliceED25519PrivateKey,
 			options: {
+				requestId: 'request-id',
 				expiresIn: 600,
 				nonce: '1234',
 			},
@@ -122,6 +122,7 @@ describe('verify', () => {
 			address: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			signer: AliceED25519PrivateKey,
 			options: {
+				requestId: 'request-id',
 				expiresIn: 600,
 				nonce: '1234',
 			},
