@@ -17,8 +17,8 @@ export type VerifyMailchainAddressOwnershipParams = {
 };
 
 export class VerificationError extends Error {
-	constructor() {
-		super('presentation failed to verify');
+	constructor(cause?: Error) {
+		super('presentation failed to verify', { cause });
 	}
 }
 
@@ -39,15 +39,18 @@ export class MailchainAddressOwnershipVerifier {
 			challenge: nonce,
 			proofPurpose: 'authentication',
 			audience: mailchainAddressDecentralizedIdentifier(verifier),
+		}).catch((e) => {
+			return {
+				verified: false,
+				error: e,
+			} as const;
 		});
 
-		const { verified, verifiablePresentation } = result;
-
-		if (!verified) {
-			return {
-				error: new VerificationError(),
-			};
+		if (!result.verified) {
+			return { error: new VerificationError(result.error) };
 		}
+
+		const { verifiablePresentation } = result;
 
 		if (verifiablePresentation.holder != mailchainAddressDecentralizedIdentifier(address)) {
 			return {
