@@ -2,7 +2,7 @@ import { KeyRingDecrypter } from '@mailchain/keyring';
 import axios, { AxiosInstance } from 'axios';
 import { encodeUtf8 } from '@mailchain/encoding';
 import { validateVerifiablePresentationRequest } from '../../verifiableCredentials/verifiableMailchainAddressOwner/factory';
-import { parseVerifiablePresentationRequest } from '../../verifiableCredentials';
+import { parseVerifiablePresentationRequest } from '../../verifiableCredentials/parseVerifiablePresentationRequest';
 import { Payload } from '../../transport';
 import { PayloadReceiver, UndeliveredPayloadOk } from '../payload';
 import { Configuration } from '../../configuration';

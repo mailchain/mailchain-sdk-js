@@ -1,6 +1,7 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten';
-import { Configuration, MailchainResult, partitionMailchainResults } from '../..';
+import { Configuration } from '../../configuration';
+import { MailchainResult, partitionMailchainResults } from '../../mailchainResult';
 import {
 	DeliveryRequests,
 	SentManyDeliveryRequests,

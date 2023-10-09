@@ -5,7 +5,7 @@ import { decodeUtf8 } from '@mailchain/encoding';
 import { MessagingKeys, ResolveManyAddressesError } from '../../messagingKeys';
 import { UnexpectedMailchainError } from '../../errors';
 import { Distribution, SenderVerifier } from '../../transport';
-import { VerifiablePresentationRequest } from '../../verifiableCredentials';
+import type { VerifiablePresentationRequest } from '../../verifiableCredentials/request';
 import { defaultConfiguration } from '../../configuration';
 import { Configuration, MailchainResult } from '../..';
 import { DistributePayloadError, PayloadDistributor, SentPayloadDistributionRequests } from '../distributor';

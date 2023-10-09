@@ -23,7 +23,7 @@ import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { isAxiosError } from 'axios';
 import { Configuration } from '../configuration';
-import { MailchainResult, partitionMailchainResults } from '../';
+import { MailchainResult, partitionMailchainResults } from '../mailchainResult';
 import { UnexpectedMailchainError } from '../errors';
 import {
 	MessagingKeyContactError,

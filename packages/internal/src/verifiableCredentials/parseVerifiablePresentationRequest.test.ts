@@ -4,6 +4,7 @@ import { VerifiablePresentationRequest } from './request';
 
 const originalVcRequest: VerifiablePresentationRequest = {
 	type: 'MailchainMessagingKeyCredential',
+	requestId: 'request-id',
 	version: '1.0',
 	from: 'example-app@mailchain.test',
 	to: 'alice@mailhain.test',

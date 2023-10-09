@@ -1,5 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import { Configuration, MailchainResult, partitionMailchainResults } from '../..';
+import { Configuration } from '../../configuration';
+import { MailchainResult, partitionMailchainResults } from '../../mailchainResult';
 import { ResolvedAddress } from '../../messagingKeys';
 import { Distribution } from '../../transport';
 import { SentPayloadDistributionRequest } from '../deliveryRequests';

@@ -91,6 +91,7 @@ describe('issuer', () => {
 			address: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			signer: AliceED25519PrivateKey,
 			options: {
+				requestId: 'request-id',
 				expiresIn: 600,
 				nonce: '1234',
 			},
@@ -116,6 +117,7 @@ describe('issuer', () => {
 			address: `${BobSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			signer: BobED25519PrivateKey,
 			options: {
+				requestId: 'request-id',
 				expiresIn: 600,
 				nonce: '1234',
 			},
