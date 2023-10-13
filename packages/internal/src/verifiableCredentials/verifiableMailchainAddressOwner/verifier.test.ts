@@ -84,7 +84,7 @@ describe('verify', () => {
 
 	it('mailchain-address-alice', async () => {
 		const issuer = new MailchainAddressOwnershipIssuer(mockMessagingKeys, mockMailchainMessagingKeyIssuer);
-		const verifier = new MailchainAddressOwnershipVerifier(mockMailchainDIDMessagingKeyResolver);
+		const verifier = new MailchainAddressOwnershipVerifier(mockMailchainDIDMessagingKeyResolver, mockMessagingKeys);
 
 		const presentationResult = await issuer.createVerifiableMailchainAddressOwnership({
 			address: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
@@ -117,7 +117,7 @@ describe('verify', () => {
 
 	it('mailchain address alice nonce not checked', async () => {
 		const issuer = new MailchainAddressOwnershipIssuer(mockMessagingKeys, mockMailchainMessagingKeyIssuer);
-		const verifier = new MailchainAddressOwnershipVerifier(mockMailchainDIDMessagingKeyResolver);
+		const verifier = new MailchainAddressOwnershipVerifier(mockMailchainDIDMessagingKeyResolver, mockMessagingKeys);
 		const presentation = await issuer.createVerifiableMailchainAddressOwnership({
 			address: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			signer: AliceED25519PrivateKey,

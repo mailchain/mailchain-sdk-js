@@ -1,4 +1,5 @@
 import { VerifiedPresentation, verifyPresentation } from 'did-jwt-vc';
+import { MessagingKeys, ResolveAddressError, ResolvedAddress } from '../../messagingKeys';
 import { defaultConfiguration } from '../../configuration';
 import { ValidationError } from '../../errors/validation';
 import { MailchainDIDMessagingKeyResolver } from '../resolver';
@@ -22,18 +23,28 @@ export class VerificationError extends Error {
 	}
 }
 
-export type VerifyMailchainAddressOwnershipError = VerificationError | ValidationError;
+export type VerifyMailchainAddressOwnershipError = VerificationError | ValidationError | ResolveAddressError;
+
+export type VerifiedMailchainAddressOwner = {
+	resolvedAddress: ResolvedAddress;
+} & VerifiedPresentation;
 
 export class MailchainAddressOwnershipVerifier {
-	constructor(private readonly mailchainDidResolver: MailchainDIDMessagingKeyResolver) {}
+	constructor(
+		private readonly mailchainDidResolver: MailchainDIDMessagingKeyResolver,
+		private readonly messagingKeys: MessagingKeys,
+	) {}
 
 	static create(configuration: Configuration = defaultConfiguration) {
-		return new MailchainAddressOwnershipVerifier(MailchainDIDMessagingKeyResolver.create(configuration));
+		return new MailchainAddressOwnershipVerifier(
+			MailchainDIDMessagingKeyResolver.create(configuration),
+			MessagingKeys.create(configuration),
+		);
 	}
 
 	async verifyMailchainAddressOwnership(
 		params: VerifyMailchainAddressOwnershipParams,
-	): Promise<MailchainResult<VerifiedPresentation, VerifyMailchainAddressOwnershipError>> {
+	): Promise<MailchainResult<VerifiedMailchainAddressOwner, VerifyMailchainAddressOwnershipError>> {
 		const { presentation, verifier, nonce, address, actions, resources } = params;
 		const result = await verifyPresentation(presentation, this.mailchainDidResolver, {
 			challenge: nonce,
@@ -124,7 +135,12 @@ export class MailchainAddressOwnershipVerifier {
 			return { error: verifyTermsOfUseError };
 		}
 
-		return { data: result };
+		const { data: resolvedAddress, error: resolverAddressError } = await this.messagingKeys.resolve(address);
+		if (resolverAddressError) {
+			return { error: resolverAddressError };
+		}
+
+		return { data: { ...result, resolvedAddress } };
 	}
 }
 
