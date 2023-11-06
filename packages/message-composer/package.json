@@ -25,5 +25,11 @@
 		"test": "run -T jest",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
+	},
+	"engines": {
+		"node": ">=15.x"
+	},
+	"devDependencies": {
+		"@types/node": "18.11.18"
 	}
 }

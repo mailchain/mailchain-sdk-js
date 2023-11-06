@@ -9,8 +9,8 @@ export type MessageComposerContext = {
 export function defaultMessageComposerContext(): MessageComposerContext {
 	return {
 		random: (len) =>
-			typeof crypto !== 'undefined'
-				? Promise.resolve(crypto.getRandomValues(new Uint8Array(len)))
+			globalThis.crypto != null
+				? Promise.resolve(globalThis.crypto.getRandomValues(new Uint8Array(len)))
 				: import('crypto').then(({ webcrypto }) => webcrypto.getRandomValues(new Uint8Array(len))),
 		decodeUtf8: (content) => Promise.resolve(decodeUtf8(content)),
 		encodeBase64: (content, urlSafe) =>
