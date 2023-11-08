@@ -112,6 +112,11 @@ describe('mailbox', () => {
 				ContentType: 'message/x.mailchain',
 				ContentEncoding: EncodingTypes.Base64,
 				ContentEncryption: KindNaClSecretKey,
+				PluginHeaders: {
+					customPlugin: {
+						value: 'value',
+					},
+				},
 			},
 			Content: Buffer.from((await createMimeMessage(dummyMailData, new Map())).original),
 		};
@@ -220,6 +225,7 @@ describe('mailbox', () => {
 
 		expect(message.replyTo).toEqual(dummyMailData.replyTo?.address);
 		expect(message.body).toMatchSnapshot('fullMessageBody');
+		expect(message.payloadHeaders).toEqual(payload.Headers);
 	});
 
 	it('should encrypt and post sent message', async () => {

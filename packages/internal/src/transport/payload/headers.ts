@@ -50,4 +50,10 @@ export type PayloadHeaders<CT extends ContentType = ContentType> = {
 	 * Indicates an alternate location for the contents if not contained in this object.
 	 */
 	ContentLocation?: string;
+	/**
+	 * Custom set of headers used by plugins.
+	 */
+	PluginHeaders?: {
+		[x: string]: unknown;
+	};
 };

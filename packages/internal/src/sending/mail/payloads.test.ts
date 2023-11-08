@@ -12,6 +12,12 @@ const mockMimeMessageResult = {
 	})),
 };
 
+const dummyPayloadPluginHeaders = {
+	customPlugin: {
+		value: 'value',
+	},
+};
+
 const mockCreateMimeMessage = jest.fn();
 jest.mock('@mailchain/internal/formatters/generate', () => ({
 	createMimeMessage: (...params: any[]) => mockCreateMimeMessage(...params),
@@ -34,6 +40,7 @@ describe('createMailPayloads', () => {
 			keyRing.accountMessagingKey(),
 			dummyMailDataResolvedAddresses,
 			dummyMailData,
+			dummyPayloadPluginHeaders,
 		);
 
 		expect(mockCreateMimeMessage).toHaveBeenCalledWith(dummyMailData, dummyMailDataResolvedAddresses);
@@ -46,6 +53,7 @@ describe('createMailPayloads', () => {
 			keyRing.accountMessagingKey(),
 			dummyMailDataResolvedAddresses,
 			dummyMailData,
+			dummyPayloadPluginHeaders,
 		);
 
 		expect(mockCreateMimeMessage).toHaveBeenCalledWith(dummyMailData, dummyMailDataResolvedAddresses);
@@ -62,6 +70,7 @@ describe('createMailPayloads', () => {
 			keyRing.accountMessagingKey(),
 			dummyMailDataResolvedAddresses,
 			dummyMailData,
+			dummyPayloadPluginHeaders,
 		);
 
 		expect(mockCreateMimeMessage).toHaveBeenCalledWith(dummyMailData, dummyMailDataResolvedAddresses);

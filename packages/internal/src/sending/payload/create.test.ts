@@ -16,13 +16,19 @@ describe('createPayload', () => {
 				AliceED25519PrivateKey,
 				content,
 				'application/vnd.mailchain.verified-credential-request',
+				{ plugin: { value: 'value' } },
 			),
 		).toMatchSnapshot();
 	});
 
 	it('should create a payload - bob key', async () => {
 		expect(
-			await createPayload(BobED25519PrivateKey, content, 'application/vnd.mailchain.verified-credential-request'),
+			await createPayload(
+				BobED25519PrivateKey,
+				content,
+				'application/vnd.mailchain.verified-credential-request',
+				{ plugin: { value: 'value' } },
+			),
 		).toMatchSnapshot();
 	});
 });

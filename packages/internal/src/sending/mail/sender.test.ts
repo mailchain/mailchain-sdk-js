@@ -64,16 +64,48 @@ describe('MailSender.sendMail', () => {
 				text: 'plain',
 			},
 			subject: 'subject',
+			payloadPluginHeaders: {
+				customPlugin: {
+					value: 'value',
+				},
+			},
 		});
 
 		expect(actual.error).toBeUndefined();
-
 		expect(actual).toEqual({
 			data: {
 				sentMailDeliveryRequests: [
 					{ deliveryRequestId: 'delivery-request-id', recipientMessageKey: AliceED25519PublicKey },
 				],
 			},
+		});
+		expect(mockMailPreparer.prepareMail).toHaveBeenCalledWith({
+			message: expect.objectContaining({
+				blindCarbonCopyRecipients: [],
+				carbonCopyRecipients: [],
+				date: expect.any(Date),
+				from: {
+					address: 'bob@mailchain.local',
+					name: 'bob',
+				},
+				id: expect.any(String),
+				message: 'HTML',
+				plainTextMessage: 'plain',
+				recipients: [
+					{
+						address: 'alice@mailchain.local',
+						name: 'alice',
+					},
+				],
+				replyTo: undefined,
+				subject: 'subject',
+			}),
+			payloadPluginHeaders: {
+				customPlugin: {
+					value: 'value',
+				},
+			},
+			senderMessagingKey: AliceED25519PrivateKey,
 		});
 	});
 });

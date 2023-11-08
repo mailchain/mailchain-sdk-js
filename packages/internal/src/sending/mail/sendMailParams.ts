@@ -60,6 +60,13 @@ export type SendMailParams = {
 	 *
 	 * Note: any custom header that has property defined in the standard set of the {@link SendMessageParams} will get overwritten.
 	 */
-
 	headers?: { [key: string]: string | undefined };
+	/**
+	 * Custom set of headers that are to be used for and by Mailchain plugins. If there is no plugin defined for handling the header value, it will be ignored.
+	 *
+	 * Note: plugin headers are serialized and deserialized as JSON, so the value must be JSON serializable.
+	 * This also applies for `Date` objects, which are serialized as ISO strings but the deserialized value is a `string` and not a `Date` object.
+	 * Because of this it is recommended to use `number` with unix timestamp instead of `Date` objects.
+	 */
+	payloadPluginHeaders?: Record<string, unknown>;
 };

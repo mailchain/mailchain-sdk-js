@@ -143,6 +143,11 @@ exports[`createMailPayloads create correct payload for blinded recipients of the
       ],
       "curve": "ed25519",
     },
+    "PluginHeaders": {
+      "customPlugin": {
+        "value": "value",
+      },
+    },
   },
 }
 `;
@@ -291,6 +296,11 @@ exports[`createMailPayloads create correct payload for blinded recipients of the
       ],
       "curve": "ed25519",
     },
+    "PluginHeaders": {
+      "customPlugin": {
+        "value": "value",
+      },
+    },
   },
 }
 `;
@@ -419,6 +429,11 @@ exports[`createMailPayloads create correct payload for sender of the message: or
       ],
       "curve": "ed25519",
     },
+    "PluginHeaders": {
+      "customPlugin": {
+        "value": "value",
+      },
+    },
   },
 }
 `;
@@ -545,6 +560,11 @@ exports[`createMailPayloads create correct payload for visible recipients of the
         155,
       ],
       "curve": "ed25519",
+    },
+    "PluginHeaders": {
+      "customPlugin": {
+        "value": "value",
+      },
     },
   },
 }

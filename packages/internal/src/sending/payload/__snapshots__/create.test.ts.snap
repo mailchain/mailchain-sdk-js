@@ -123,6 +123,11 @@ exports[`createPayload should create a payload - alice key 1`] = `
       ],
       "curve": "ed25519",
     },
+    "PluginHeaders": {
+      "plugin": {
+        "value": "value",
+      },
+    },
   },
 }
 `;
@@ -249,6 +254,11 @@ exports[`createPayload should create a payload - bob key 1`] = `
         232,
       ],
       "curve": "ed25519",
+    },
+    "PluginHeaders": {
+      "plugin": {
+        "value": "value",
+      },
     },
   },
 }

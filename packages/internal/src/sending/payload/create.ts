@@ -8,7 +8,8 @@ export async function createPayload<C extends ContentType>(
 	signerMessagingKey: SignerWithPublicKey,
 	content: Buffer | Uint8Array,
 	contentType: C,
-): Promise<Payload<{ ContentType: C } & PayloadHeaders>> {
+	pluginHeaders?: Record<string, unknown>,
+): Promise<Payload<PayloadHeaders<C>>> {
 	return {
 		Headers: {
 			Origin: signerMessagingKey.publicKey,
@@ -18,6 +19,7 @@ export async function createPayload<C extends ContentType>(
 			ContentType: contentType,
 			ContentEncoding: EncodingTypes.Base64,
 			ContentEncryption: KindNaClSecretKey,
+			PluginHeaders: pluginHeaders,
 		},
 		Content: isArrayBuffer(content) ? Buffer.from(content) : content,
 	};

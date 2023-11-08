@@ -8,6 +8,7 @@ import { createMailPayloads } from './payloads';
 
 export type PrepareMailParams = {
 	message: MailData;
+	payloadPluginHeaders?: Record<string, unknown>;
 	senderMessagingKey: SignerWithPublicKey;
 };
 
@@ -20,7 +21,10 @@ export type PreparedMail = {
 export type PrepareMailError = PreflightCheckError | ProvidedMessagingKeyIncorrectError | ResoleAddressesFailuresError;
 
 export class MailPreparer {
-	constructor(private readonly messagingKeys: MessagingKeys, private readonly senderVerifier: SenderVerifier) {}
+	constructor(
+		private readonly messagingKeys: MessagingKeys,
+		private readonly senderVerifier: SenderVerifier,
+	) {}
 
 	static create(configuration: Configuration) {
 		return new MailPreparer(MessagingKeys.create(configuration), SenderVerifier.create(configuration));
@@ -71,7 +75,12 @@ export class MailPreparer {
 		}
 
 		// Separate payloads are sent to each recipient in the case of bcc recipients.
-		const messagePayloads = await createMailPayloads(params.senderMessagingKey, resolvedAddresses, message);
+		const messagePayloads = await createMailPayloads(
+			params.senderMessagingKey,
+			resolvedAddresses,
+			message,
+			params.payloadPluginHeaders,
+		);
 
 		return {
 			data: {

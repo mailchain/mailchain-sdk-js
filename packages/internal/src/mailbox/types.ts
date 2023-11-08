@@ -1,4 +1,5 @@
-import { PublicKey } from '@mailchain/crypto';
+import type { PublicKey } from '@mailchain/crypto';
+import type { PayloadHeaders } from '../transport/payload/headers';
 
 export type MessagesOverview = {
 	total: number;
@@ -36,9 +37,10 @@ export type MessagePreview = {
 	bcc: string[];
 };
 
-export type Message = {
+export type Message<H extends PayloadHeaders = PayloadHeaders> = {
 	replyTo?: string;
 	body: string;
+	payloadHeaders: H;
 };
 
 /** Copy from services/inbox/internal/datastore/labels.go */

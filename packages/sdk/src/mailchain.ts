@@ -121,6 +121,7 @@ export class Mailchain {
 
 		const { data: preparedMail, error: preparedMailError } = await preparer.prepareMail({
 			message: mailData,
+			payloadPluginHeaders: params.payloadPluginHeaders,
 			senderMessagingKey,
 		});
 

@@ -280,13 +280,14 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
 		switch (messageData.Headers.ContentType) {
 			case 'application/vnd.mailchain.verified-credential-request':
-				return { body: encodeUtf8(messageData.Content) };
+				return { body: encodeUtf8(messageData.Content), payloadHeaders: messageData.Headers };
 			case 'message/x.mailchain':
 			case 'message/x.mailchain-mailer':
 				const { mailData } = await this.extractPayloadInfo(messageData);
 				return {
 					replyTo: mailData.replyTo ? mailData.replyTo.address : undefined,
 					body: mailData.message,
+					payloadHeaders: messageData.Headers,
 				};
 			default:
 				throw new Error(`Unsupported content type of full message: ${messageData.Headers.ContentType}`);

@@ -45,6 +45,7 @@ export class MailSender {
 	async sendMail(params: SendMailParams): Promise<MailchainResult<SentMail, SendMailError>> {
 		const { data: preparedMail, error: prepareMailError } = await this.mailPreparer.prepareMail({
 			message: toMailData(params),
+			payloadPluginHeaders: params.payloadPluginHeaders,
 			senderMessagingKey: this.senderMessagingKey,
 		});
 

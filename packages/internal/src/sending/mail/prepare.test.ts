@@ -61,6 +61,11 @@ describe('MailPreparer', () => {
 		const { data, error } = await mailPreparer.prepareMail({
 			message: dummyMailData,
 			senderMessagingKey: aliceKeyRing.accountMessagingKey(),
+			payloadPluginHeaders: {
+				customPlugin: {
+					value: 'value',
+				},
+			},
 		});
 
 		expect(error).toBeUndefined();
@@ -68,10 +73,15 @@ describe('MailPreparer', () => {
 		expect(data?.distributions).toEqual(dummyDistributions);
 		expect(data?.resolvedAddresses).toEqual(dummyMailDataResolvedAddresses);
 
-		const [calledAccountMessagingKey, calledAddressIdentityKeys, calledMailData] =
+		const [calledAccountMessagingKey, calledAddressIdentityKeys, calledMailData, calledPayloadPluginHeaders] =
 			mockCreateMailPayloads.mock.calls[0];
 		expect(calledAccountMessagingKey.publicKey).toEqual(aliceKeyRing.accountMessagingKey().publicKey);
 		expect(calledAddressIdentityKeys).toEqual(dummyMailDataResolvedAddresses);
 		expect(calledMailData).toEqual(dummyMailData);
+		expect(calledPayloadPluginHeaders).toEqual({
+			customPlugin: {
+				value: 'value',
+			},
+		});
 	});
 });
