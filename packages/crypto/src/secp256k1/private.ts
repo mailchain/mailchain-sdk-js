@@ -1,9 +1,11 @@
-import { privateKeyVerify, publicKeyCreate, ecdsaSign } from 'secp256k1';
+import secp256k1 from 'secp256k1';
 import { RandomFunction, secureRandom } from '../rand';
 import { KindSECP256K1 } from '../keys';
 import { PrivateKey } from '../private';
 import { SECP256K1PublicKey } from './public';
 export const PrivateKeyLen = 32;
+
+const { privateKeyVerify, publicKeyCreate, ecdsaSign } = secp256k1;
 
 export class SECP256K1PrivateKey implements PrivateKey {
 	bytes: Uint8Array;

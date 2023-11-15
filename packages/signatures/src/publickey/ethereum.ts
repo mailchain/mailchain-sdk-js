@@ -1,6 +1,6 @@
 import { SECP256K1PublicKey } from '@mailchain/crypto';
 import { encodeHex } from '@mailchain/encoding';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 import { ETHEREUM, addressFromPublicKey } from '@mailchain/addressing';
 import { getMessageHash } from '../eth_personal';
 

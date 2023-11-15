@@ -1,7 +1,7 @@
 import { decodeUtf8 } from '@mailchain/encoding';
 import { decodeBase32, encodeBase32 } from '@mailchain/encoding/base32';
 import { blake2b } from '@noble/hashes/blake2b';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 import { PublicKey } from '@mailchain/crypto';
 import { addressFromPublicKey as ethereumAddressFromPublicKey } from '../ethereum/address';
 import { FilecoinAddressType } from './types';

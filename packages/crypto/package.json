@@ -16,7 +16,7 @@
 	},
 	"devDependencies": {
 		"@types/bn.js": "^5.1.0",
-		"@types/ed2curve": "^0.2.2",
+		"@types/ed2curve": "^0.2.3",
 		"@types/secp256k1": "^4.0.2"
 	},
 	"repository": {
@@ -31,7 +31,7 @@
 		"node": ">=15.0.0"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"build": "run -T tsup",
 		"test": "run -T jest",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"

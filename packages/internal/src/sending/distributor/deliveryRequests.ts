@@ -1,5 +1,5 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash/flatten.js';
 import { Configuration } from '../../configuration';
 import { MailchainResult, partitionMailchainResults } from '../../mailchainResult';
 import {

@@ -1,5 +1,5 @@
 import { decodeUtf8, encodeBase64UrlSafe } from '@mailchain/encoding';
-import isArrayBuffer from 'lodash/isArrayBuffer';
+import isArrayBuffer from 'lodash/isArrayBuffer.js';
 import { sha3_256 } from '@noble/hashes/sha3';
 
 export type TokenPayload = {

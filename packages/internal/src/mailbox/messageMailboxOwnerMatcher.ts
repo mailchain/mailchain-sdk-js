@@ -1,6 +1,6 @@
 import { MailchainAddress, parseNameServiceAddress } from '@mailchain/addressing';
 import { isPublicKeyEqual } from '@mailchain/crypto';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 import { IdentityKeys } from '../identityKeys';
 import { Configuration } from '../configuration';
 import { MailData } from '../transport';

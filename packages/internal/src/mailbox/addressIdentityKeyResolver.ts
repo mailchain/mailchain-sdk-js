@@ -6,7 +6,7 @@ import {
 	addressFromPublicKey,
 } from '@mailchain/addressing';
 import { PublicKey } from '@mailchain/crypto';
-import isEqual from 'lodash/isEqual';
+import isEqual from 'lodash/isEqual.js';
 import { IdentityKeys } from '../identityKeys';
 import { ParseMimeTextResult } from '../formatters/parse';
 

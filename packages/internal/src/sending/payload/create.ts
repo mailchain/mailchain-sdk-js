@@ -1,6 +1,6 @@
 import { KindNaClSecretKey, SignerWithPublicKey } from '@mailchain/crypto';
 import { EncodingTypes } from '@mailchain/encoding';
-import isArrayBuffer from 'lodash/isArrayBuffer';
+import isArrayBuffer from 'lodash/isArrayBuffer.js';
 import { PayloadHeaders } from '../../transport/payload/headers';
 import { ContentType, Payload } from '../../transport';
 

@@ -1,4 +1,4 @@
-import { scalarMult } from 'tweetnacl';
+import nacl from 'tweetnacl';
 import ed2curve from 'ed2curve';
 import { KeyExchange } from '../';
 import { RandomFunction, secureRandom } from '../../rand';
@@ -25,7 +25,7 @@ export class ED25519KeyExchange implements KeyExchange {
 		const publicKeyBytes = ED25519KeyExchange.publicKeyToCurve25519(publicKey);
 		const privateKeyBytes = ED25519KeyExchange.privateKeyToCurve25519(asED25519PrivateKey(privateKey));
 
-		return scalarMult(privateKeyBytes, publicKeyBytes);
+		return nacl.scalarMult(privateKeyBytes, publicKeyBytes);
 	}
 
 	static privateKeyToCurve25519(privateKey: ED25519PrivateKey): Uint8Array {

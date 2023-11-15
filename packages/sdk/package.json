@@ -28,19 +28,12 @@
 		"node": ">=15.0.0"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"build": "run -T tsup",
 		"test": "run -T jest --passWithNoTests",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
 	},
 	"devDependencies": {
 		"@peculiar/webcrypto": "^1.4.0"
-	},
-	"typesVersions": {
-		"*": {
-			"internal": [
-				"./types/internal/index.d.ts"
-			]
-		}
 	}
 }

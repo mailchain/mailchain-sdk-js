@@ -1,4 +1,4 @@
-import { secretbox } from 'tweetnacl';
+import nacl from 'tweetnacl';
 import { RandomFunction } from '../../rand';
 
 const nonceSize = 24;
@@ -13,7 +13,7 @@ export function easySeal(message: Uint8Array | Buffer, secretKey: Uint8Array, ra
 
 	const nonce = rand(nonceSize);
 
-	const encrypted = secretbox(messagePrivate, nonce, secretKey);
+	const encrypted = nacl.secretbox(messagePrivate, nonce, secretKey);
 	const out = new Uint8Array(nonceSize + encrypted.length);
 	out.set(nonce, 0);
 	out.set(new Uint8Array(encrypted), nonceSize);
@@ -35,7 +35,7 @@ export function easyOpen(sealedBox: Uint8Array, secretKey: Uint8Array): Uint8Arr
 	const nonce = sealedBoxPrivate.slice(0, nonceSize);
 	const seal = sealedBoxPrivate.slice(nonceSize);
 
-	const ret = secretbox.open(seal, nonce, secretKey);
+	const ret = nacl.secretbox.open(seal, nonce, secretKey);
 	if (ret === null) {
 		throw new Error('secretbox: could not decrypt data with private key');
 	}

@@ -10,7 +10,7 @@ import {
 	getAxiosWithSigner,
 } from '@mailchain/api';
 import { KeyRing } from '@mailchain/keyring';
-import uniqBy from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy.js';
 import { encodeAddressByProtocol } from '@mailchain/addressing';
 import { IdentityKeys } from '../identityKeys';
 import { Configuration } from '..';

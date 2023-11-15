@@ -33,41 +33,16 @@
 		"emailjs-mime-parser": "^2.0.7",
 		"lodash": "^4.17.21",
 		"long": "^5.2.1",
-		"protobufjs": "7.2.4",
+		"protobufjs": "^7.2.5",
 		"striptags": "^3.2.0"
 	},
 	"devDependencies": {
 		"jest-mock-extended": "^3.0.1"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"build": "run -T tsup",
 		"test": "run -T jest",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"
-	},
-	"typesVersions": {
-		"*": {
-			"configuration": [
-				"./types/configuration.d.ts"
-			],
-			"identityKeys": [
-				"./types/identityKeys/index.d.ts"
-			],
-			"messagingKeys": [
-				"./types/messagingKeys/index.d.ts"
-			],
-			"sending": [
-				"./types/sending/index.d.ts"
-			],
-			"sending/mail": [
-				"./types/sending/mail/index.d.ts"
-			],
-			"sending/verifiablePresentationRequest": [
-				"./types/sending/verifiablePresentationRequest/index.d.ts"
-			],
-			"verifiableCredentials": [
-				"./types/verifiableCredentials/index.d.ts"
-			]
-		}
 	}
 }

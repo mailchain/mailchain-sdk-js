@@ -30,7 +30,7 @@
 		"@mailchain/keyring": "0.29.0"
 	},
 	"scripts": {
-		"build": "cross-env NODE_ENV=production rollup -c --bundleConfigAsCjs",
+		"build": "run -T tsup",
 		"test": "run -T jest",
 		"lint:test": "yarn run -T eslint --ext js,ts,tsx src",
 		"lint:fix": "yarn run -T eslint --fix --ext js,ts,tsx src"

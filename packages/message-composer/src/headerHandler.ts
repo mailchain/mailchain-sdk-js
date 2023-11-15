@@ -1,5 +1,5 @@
-import formatDate from 'date-fns/format';
-import enUS from 'date-fns/locale/en-US';
+import formatDate from 'date-fns/format/index.js';
+import enUS from 'date-fns/locale/en-US/index.js';
 import { hasOnlyPrintableUsAscii } from './hasOnlyAscii';
 import { contentAppendWithFolding, semanticLineFold, simpleHardFold } from './folding';
 import {

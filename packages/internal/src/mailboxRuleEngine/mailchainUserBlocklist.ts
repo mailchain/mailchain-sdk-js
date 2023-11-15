@@ -1,4 +1,4 @@
-import uniq from 'lodash/uniq';
+import uniq from 'lodash/uniq.js';
 import { UserProfile } from '../user';
 import { ConditionIsFromAddress, conditionIsFromAddress, conditionOperationOr } from './conditions';
 import { MailboxRule, MailboxRuleAction, MailboxRuleCondition } from './rule';

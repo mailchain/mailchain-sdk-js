@@ -1,6 +1,8 @@
-import { publicKeyVerify, publicKeyConvert, ecdsaVerify } from 'secp256k1';
+import secp256k1 from 'secp256k1';
 import { PublicKey } from '../public';
 import { KindSECP256K1 } from '../keys';
+
+const { publicKeyVerify, publicKeyConvert, ecdsaVerify } = secp256k1;
 
 export const SECP256K1PublicKeyLength = 33;
 

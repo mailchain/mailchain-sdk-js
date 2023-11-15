@@ -1,5 +1,5 @@
 import { isSameAddress } from '@mailchain/addressing';
-import uniqWith from 'lodash/unionWith';
+import uniqWith from 'lodash/unionWith.js';
 import { Alias } from './types';
 import { NewUserMailbox } from './userProfile';
 

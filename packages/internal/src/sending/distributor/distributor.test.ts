@@ -2,7 +2,7 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
-import flatten from 'lodash/flatten';
+import flatten from 'lodash/flatten.js';
 import { ProtocolNotSupportedError } from '@mailchain/addressing';
 import { MessagingKeys } from '../../messagingKeys';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
