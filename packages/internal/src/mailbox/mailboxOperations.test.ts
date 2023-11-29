@@ -22,18 +22,19 @@ import { Payload } from '../transport';
 import { AliceAccountMailbox, AliceWalletMailbox, BobAccountMailbox } from '../user/test.const';
 import { AddressesHasher } from './addressHasher';
 import { MailboxOperations, MailchainMailboxOperations } from './mailboxOperations';
-import { createMailchainMessageCrypto } from './messageCrypto';
 import { createMailchainMessageIdCreator } from './messageId';
 import { AddressMatch, MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { MessagePreviewMigrationRule } from './migrations';
 import { SystemMessageLabel } from './types';
 import { UserMailboxHasher } from './userMailboxHasher';
+import { MailboxStorage } from './mailboxStorage';
 
 describe('mailbox', () => {
 	const keyRing = KeyRing.fromPrivateKey(AliceED25519PrivateKey);
 	const messagePreviewCrypto = keyRing.inboxKey();
-	const messageCrypto = createMailchainMessageCrypto(keyRing);
 	const mockRuleEngine = mock<MailboxRuleEngine>();
+	const mockMailboxStorage = mock<MailboxStorage>();
+	mockMailboxStorage.storePayload.mockResolvedValue('resourceId');
 
 	const mockAddressHasher: AddressesHasher = (addresses) =>
 		Promise.resolve(
@@ -91,7 +92,7 @@ describe('mailbox', () => {
 		mailboxOperations = new MailchainMailboxOperations(
 			mockInboxApi,
 			messagePreviewCrypto,
-			messageCrypto,
+			mockMailboxStorage,
 			mockOwnerMatcher,
 			mockAddressHasher,
 			createMailchainMessageIdCreator(keyRing),
@@ -218,10 +219,9 @@ describe('mailbox', () => {
 	);
 
 	it('should decrypt full message body', async () => {
-		const encryptedPayload = await messageCrypto.encrypt(payload);
-		mockInboxApi.getEncryptedMessageBody.mockResolvedValue({ data: encryptedPayload } as AxiosResponse<object>);
+		mockMailboxStorage.getPayload.mockResolvedValue(payload);
 
-		const message = await mailboxOperations.getFullMessage('messageId');
+		const message = await mailboxOperations.getFullMessage('messageId', 'resourceId');
 
 		expect(message.replyTo).toEqual(dummyMailData.replyTo?.address);
 		expect(message.body).toMatchSnapshot('fullMessageBody');
@@ -271,9 +271,7 @@ describe('mailbox', () => {
 		expect(requestBody.hashedFrom).toMatchSnapshot('hashedFrom');
 		expect(requestBody.hashedTo).toMatchSnapshot('hashedTo');
 		expect(requestBody.mailbox).toEqual(Array.from(sha256(AliceAccountMailbox.identityKey.bytes)));
-		expect(
-			await messageCrypto.decrypt(mockInboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array),
-		).toEqual(payload);
+		expect(mockMailboxStorage.storePayload).toHaveBeenCalledWith(payload);
 	});
 
 	it('should encrypt and post received message', async () => {
@@ -332,9 +330,7 @@ describe('mailbox', () => {
 			expect(requestBody.hashedOwner).toMatchSnapshot('hashedOwner');
 			expect(requestBody.hashedFrom).toMatchSnapshot('hashedFrom');
 			expect(requestBody.hashedTo).toMatchSnapshot('hashedTo');
-			expect(
-				await messageCrypto.decrypt(mockInboxApi.postEncryptedMessageBody.mock.calls[0][0] as Uint8Array),
-			).toEqual(payload);
+			expect(mockMailboxStorage.storePayload).toHaveBeenCalledWith(payload);
 		}
 	});
 

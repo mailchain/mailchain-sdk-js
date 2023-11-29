@@ -7,7 +7,7 @@ import { MailData, Payload } from '@mailchain/internal/transport';
 import { Configuration, MailchainResult } from '@mailchain/internal';
 import { toMailData } from '@mailchain/internal/sending/mail/convertSendMailParams';
 import { MailchainUserProfile, UserProfile } from '@mailchain/internal/user';
-import { MailboxOperations, MailchainMailboxOperations } from '@mailchain/internal/mailbox';
+import { MailboxOperations, MailchainMailboxOperations, MailboxStorage } from '@mailchain/internal/mailbox';
 import { UserMailbox } from '@mailchain/internal/user/types';
 import { defaultConfiguration } from '@mailchain/internal/configuration';
 import { DistributePayloadError, DistributedPayload, PayloadDistributor } from '@mailchain/internal/sending';
@@ -23,7 +23,8 @@ export class Mailchain {
 			keyRing.userSettingsCrypto(),
 		);
 
-		this._mailboxOperations = MailchainMailboxOperations.create(config, keyRing, null);
+		const mailboxStorage = MailboxStorage.create(config, keyRing);
+		this._mailboxOperations = MailchainMailboxOperations.create(config, keyRing, null, mailboxStorage);
 	}
 
 	static fromAccountSeed(seed: Uint8Array | string, config: Configuration = defaultConfiguration) {

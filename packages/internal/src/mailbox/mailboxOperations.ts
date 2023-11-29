@@ -23,7 +23,6 @@ import { UserMailbox } from '../user/types';
 import { VerifiablePresentationRequest, parseVerifiablePresentationRequest } from '../verifiableCredentials';
 import { AddressesHasher, getAddressHash, getMailAddressesHashes, mailchainAddressHasher } from './addressHasher';
 import { createMailchainApiAddressIdentityKeyResolver } from './addressIdentityKeyResolver';
-import { MessageCrypto, createMailchainMessageCrypto } from './messageCrypto';
 import { MessageIdCreator, createMailchainMessageIdCreator } from './messageId';
 import { MessageMailboxOwnerMatcher } from './messageMailboxOwnerMatcher';
 import { MessagePreviewMigrationRule, getAllMessagePreviewMigrations } from './migrations';
@@ -36,6 +35,7 @@ import {
 	UserMessageLabel,
 } from './types';
 import { UserMailboxHasher, createMailchainUserMailboxHasher } from './userMailboxHasher';
+import { MailboxStorage } from './mailboxStorage';
 
 export type GetMessagesViewParams = {
 	offset: number;
@@ -79,8 +79,15 @@ export interface MailboxOperations {
 	getSpamMessages_unstable(params?: GetMessagesViewParams): Promise<MessagePreview[]>;
 	/**  Get overview of mailboxes*/
 
-	/** Get the full contents of the single message for the provided ID (same as the {@link MessagePreview.id}) */
-	getFullMessage(messageId: string): Promise<Message>;
+	/**
+	 * Get the full contents of the single message for the provided IDs
+	 *
+	 * Note: This method accepts both parameters of `messageId` and `resourceId` for simplicity reasons. More info in description of: https://github.com/mailchain/monorepo/pull/2326
+	 *
+	 * @param messageId The ID of the message to get, this is same ID as the one in {@link MessagePreview.messageId}.
+	 * @param resourceId The ID of the message body resource, this is same ID as the one in {@link MessagePreview.messageBodyResourceId}.
+	 */
+	getFullMessage(messageId: string, resourceId: string): Promise<Message>;
 
 	getMessagesOverview(mailboxes: UserMailbox[]): Promise<MessagesOverview>;
 
@@ -111,8 +118,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		private readonly inboxApi: InboxApiInterface,
 		/** Cryptography service for encrypting the message preview content when the message is being saved. It is decrypting the same content when the message preview is being read. */
 		private readonly messagePreviewCrypto: InboxKey,
-		/** Cryptography service for encrypting the full message content when the message is being saved. It is decrypting the same content when the message is being read. */
-		private readonly messageCrypto: MessageCrypto,
+		private readonly mailboxStorage: MailboxStorage,
 		/** Service for matching the user mailboxes to the message recipients. The case could be that single message send to a single identity belongs to multiple mailbox aliases. */
 		private readonly messageMailboxOwnerMatcher: MessageMailboxOwnerMatcher,
 		/** Hasher for the addresses of the participants in a given message. Used for hashing each of the participants so at later stage the user is able to use the hashed address to search for messages without reveling the real address that is being searched for. */
@@ -132,12 +138,12 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		sdkConfig: Configuration,
 		keyRing: KeyRing,
 		mailboxRuleEngine: MailboxRuleEngine | null,
+		mailboxStorage: MailboxStorage,
 	): MailboxOperations {
 		const axiosConfig = createAxiosConfiguration(sdkConfig.apiPath);
 		const axiosClient = getAxiosWithSigner(keyRing.accountMessagingKey());
 		const inboxApi = InboxApiFactory(axiosConfig, undefined, axiosClient);
 		const messagePreviewCrypto = keyRing.inboxKey();
-		const messageMessageCrypto = createMailchainMessageCrypto(keyRing);
 		const messageMailboxOwnerMatcher = MessageMailboxOwnerMatcher.create(sdkConfig);
 		const addressHasher = mailchainAddressHasher(
 			createMailchainApiAddressIdentityKeyResolver(IdentityKeys.create(sdkConfig)),
@@ -149,7 +155,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const mailboxOperations = new MailchainMailboxOperations(
 			inboxApi,
 			messagePreviewCrypto,
-			messageMessageCrypto,
+			mailboxStorage,
 			messageMailboxOwnerMatcher,
 			addressHasher,
 			messageHasher,
@@ -258,6 +264,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			kind: apiMessage.kind,
 			mailbox: publicKeyFromBytes(messagePreview.mailbox),
 			messageId: apiMessage.messageId,
+			messageBodyResourceId: apiMessage.messageBodyResourceId,
 			owner: messagePreview.owner,
 			to: messagePreview.to,
 			bcc: messagePreview.bcc,
@@ -272,12 +279,8 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		};
 	}
 
-	async getFullMessage(messageId: string): Promise<Message> {
-		const encryptedMessage = await this.inboxApi
-			.getEncryptedMessageBody(messageId, { responseType: 'arraybuffer' })
-			.then((res) => res.data as ArrayBuffer);
-
-		const messageData = await this.messageCrypto.decrypt(new Uint8Array(encryptedMessage));
+	async getFullMessage(messageId: string, resourceId: string): Promise<Message> {
+		const messageData = await this.mailboxStorage.getPayload(messageId, resourceId);
 		switch (messageData.Headers.ContentType) {
 			case 'application/vnd.mailchain.verified-credential-request':
 				return { body: encodeUtf8(messageData.Content), payloadHeaders: messageData.Headers };
@@ -446,6 +449,13 @@ export class MailchainMailboxOperations implements MailboxOperations {
 		const encodedProtoMessagePreview = protoInbox.preview.MessagePreview.encode(protoMessagePreview).finish();
 		const encryptedProtoMessagePreview = await this.messagePreviewCrypto.encrypt(encodedProtoMessagePreview);
 
+		const { recipients: to, carbonCopyRecipients: cc, blindCarbonCopyRecipients: bcc } = content;
+		const addresses = [content.from, ...to, ...cc, ...bcc].map((a) => a.address);
+		addresses.push(ownerAddress);
+		const addressHashes = await this.addressHasher(addresses);
+
+		const resourceId = await this.mailboxStorage.storePayload(payload);
+
 		const messagePreview: MessagePreview = {
 			kind:
 				payload.Headers.ContentType === 'application/vnd.mailchain.verified-credential-request'
@@ -453,6 +463,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 					: 'mail',
 			mailbox: userMailbox.identityKey,
 			messageId,
+			messageBodyResourceId: resourceId,
 			from: protoMessagePreview.from,
 			to: protoMessagePreview.to,
 			cc: protoMessagePreview.cc,
@@ -465,15 +476,6 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			hasAttachment: false,
 			timestamp: new Date(protoMessagePreview.timestamp * 1000),
 		};
-
-		const encryptedMessage = await this.messageCrypto.encrypt(payload);
-
-		const { recipients: to, carbonCopyRecipients: cc, blindCarbonCopyRecipients: bcc } = content;
-		const addresses = [content.from, ...to, ...cc, ...bcc].map((a) => a.address);
-		addresses.push(ownerAddress);
-		const addressHashes = await this.addressHasher(addresses);
-
-		const { resourceId } = await this.inboxApi.postEncryptedMessageBody(encryptedMessage).then((res) => res.data);
 
 		await this.inboxApi.putEncryptedMessage(messageId, {
 			kind: messagePreview.kind,
@@ -492,7 +494,7 @@ export class MailchainMailboxOperations implements MailboxOperations {
 			hashedCc: getMailAddressesHashes(addressHashes, cc).map((h) => Array.from(h)),
 			hashedBcc: getMailAddressesHashes(addressHashes, bcc).map((h) => Array.from(h)),
 			encryptedPreview: encodeBase64(encryptedProtoMessagePreview),
-			messageBodyResourceId: resourceId,
+			messageBodyResourceId: messagePreview.messageBodyResourceId,
 		});
 
 		return messagePreview;

@@ -24,6 +24,7 @@ export type MessagePreview = {
 	kind: MessageKind;
 	mailbox: PublicKey;
 	messageId: string;
+	messageBodyResourceId: string;
 	from: string;
 	owner: string;
 	subject: string;
