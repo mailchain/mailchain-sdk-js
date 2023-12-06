@@ -192,7 +192,7 @@ export class Mailchain {
 	): Promise<UserMailbox> {
 		const mailboxes = await config.userProfile.mailboxes();
 
-		const { data, error } = await config.messagingKeys.resolve(fromAddress);
+		const { data, error } = await config.messagingKeys.resolveIndividual(fromAddress);
 		if (error) {
 			throw error;
 		}

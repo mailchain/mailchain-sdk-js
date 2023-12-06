@@ -18,52 +18,56 @@ import { MailchainMessagingKeyIssuer, createIssuerFromSigner } from '../issuer';
 import { MailchainAddressOwnershipIssuer, resolveExpirationDate } from './issuer';
 
 const mockMessagingKeys = mock<MessagingKeys>();
-mockMessagingKeys.resolve.calledWith(`${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`).mockResolvedValue({
-	data: {
-		mailchainAddress: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
-		messagingKey: AliceED25519PublicKey,
-		protocol: 'ethereum',
-		protocolAddress: AliceSECP256K1PublicAddressStr,
-		type: 'registered',
-		identityKey: AliceSECP256K1PublicKey,
-		proof: {
-			address: AliceSECP256K1PublicAddress,
-			identityKey: AliceSECP256K1PublicKey,
-			locale: 'locale',
-			messageVariant: 'v1',
+mockMessagingKeys.resolveIndividual
+	.calledWith(`${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`)
+	.mockResolvedValue({
+		data: {
+			mailchainAddress: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			messagingKey: AliceED25519PublicKey,
-			nonce: 1,
-			network: '',
 			protocol: 'ethereum',
-			signature: Uint8Array.from([1, 2, 3, 4]),
-			signatureMethod: 'ethereum_personal_message',
-			source: 'MailchainRegistry',
+			protocolAddress: AliceSECP256K1PublicAddressStr,
+			type: 'registered',
+			identityKey: AliceSECP256K1PublicKey,
+			proof: {
+				address: AliceSECP256K1PublicAddress,
+				identityKey: AliceSECP256K1PublicKey,
+				locale: 'locale',
+				messageVariant: 'v1',
+				messagingKey: AliceED25519PublicKey,
+				nonce: 1,
+				network: '',
+				protocol: 'ethereum',
+				signature: Uint8Array.from([1, 2, 3, 4]),
+				signatureMethod: 'ethereum_personal_message',
+				source: 'MailchainRegistry',
+			},
 		},
-	},
-});
-mockMessagingKeys.resolve.calledWith(`${BobSECP256K1PublicAddressStr}@ethereum.mailchain.com`).mockResolvedValue({
-	data: {
-		mailchainAddress: `${BobSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
-		messagingKey: BobED25519PublicKey,
-		protocol: 'ethereum',
-		protocolAddress: BobSECP256K1PublicAddressStr,
-		type: 'registered',
-		identityKey: BobSECP256K1PublicKey,
-		proof: {
-			address: BobSECP256K1PublicAddress,
-			identityKey: BobSECP256K1PublicKey,
-			locale: 'locale',
-			messageVariant: 'v1',
+	});
+mockMessagingKeys.resolveIndividual
+	.calledWith(`${BobSECP256K1PublicAddressStr}@ethereum.mailchain.com`)
+	.mockResolvedValue({
+		data: {
+			mailchainAddress: `${BobSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 			messagingKey: BobED25519PublicKey,
-			nonce: 1,
-			network: '',
 			protocol: 'ethereum',
-			signature: Uint8Array.from([1, 2, 3, 4]),
-			signatureMethod: 'ethereum_personal_message',
-			source: 'MailchainRegistry',
+			protocolAddress: BobSECP256K1PublicAddressStr,
+			type: 'registered',
+			identityKey: BobSECP256K1PublicKey,
+			proof: {
+				address: BobSECP256K1PublicAddress,
+				identityKey: BobSECP256K1PublicKey,
+				locale: 'locale',
+				messageVariant: 'v1',
+				messagingKey: BobED25519PublicKey,
+				nonce: 1,
+				network: '',
+				protocol: 'ethereum',
+				signature: Uint8Array.from([1, 2, 3, 4]),
+				signatureMethod: 'ethereum_personal_message',
+				source: 'MailchainRegistry',
+			},
 		},
-	},
-});
+	});
 
 const mockMailchainMessagingKeyIssuer = mock<MailchainMessagingKeyIssuer>();
 

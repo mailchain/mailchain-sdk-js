@@ -5,6 +5,7 @@ import {
 	checkAddressForErrors,
 	encodeAddressByProtocol,
 	IdentityProviderAddressInvalidError,
+	isSameAddress,
 	ProtocolNotSupportedError,
 	ProtocolType,
 } from '@mailchain/addressing';
@@ -23,7 +24,7 @@ import { convertPublic } from '@mailchain/api/helpers/apiKeyToCryptoKey';
 import { MessagingKeyVerificationError } from '@mailchain/signatures';
 import { isAxiosError } from 'axios';
 import { Configuration } from '../configuration';
-import { MailchainResult, partitionMailchainResults } from '../mailchainResult';
+import { MailchainResult, partitionMailchainResults, ResultsWithParams } from '../mailchainResult';
 import { UnexpectedMailchainError } from '../errors';
 import {
 	MessagingKeyContactError,
@@ -31,6 +32,7 @@ import {
 	IdentityProviderUnsupportedError,
 	IdentityProviderAddressUnsupportedError,
 	IdentityExpiredError,
+	GroupAddressNotSupportedError,
 } from './errors';
 import { MailchainRegistryMessagingKeyProof, Proof } from './proof';
 import { MessagingKeyContractCall } from './messagingKeyContract';
@@ -62,10 +64,11 @@ export type VendedResolvedAddress = BaseResolvedAddress & {
 	identityKey?: PublicKey;
 };
 
+export type ResolvedAddressItem = RegisteredResolvedAddress | VendedResolvedAddress;
 /**
  * Resolved address response containing a proven messaging key.
  */
-export type ResolvedAddress = RegisteredResolvedAddress | VendedResolvedAddress;
+export type ResolvedAddress = ResolvedAddressItem[];
 export type ResolveAddressError =
 	| UnexpectedMailchainError
 	| BadlyFormattedAddressError
@@ -77,7 +80,9 @@ export type ResolveAddressError =
 	| MessagingKeyVerificationError
 	| ProtocolNotSupportedError
 	| IdentityProviderAddressInvalidError;
+export type ResolveIndividualAddressError = ResolveAddressError | GroupAddressNotSupportedError;
 export type ResolveAddressResult = MailchainResult<ResolvedAddress, ResolveAddressError>;
+export type ResolveIndividualAddressResult = MailchainResult<ResolvedAddressItem, ResolveIndividualAddressError>;
 
 export type ResolvedManyAddresses = Map<string, ResolvedAddress>;
 export type ResolvedManyAddressesResult = MailchainResult<ResolvedManyAddresses>;
@@ -127,28 +132,75 @@ export class MessagingKeys {
 	 *
 	 */
 	async resolve(address: string, at?: Date): Promise<ResolveAddressResult> {
+		if (address === '1337@mailchain.local') {
+			// THIS IS MOCK, REMOVE!
+			const rs = await Promise.all([
+				this.resolve('pojiahubsdjaosdinj@mailchain.local'),
+				this.resolve('tz1P1xs3qkYNk6cBW273W2UbEVhpWYbwxwZ6@tezos.mailchain.local'),
+			]);
+			return { data: rs.flatMap((r) => r.data!) };
+		}
+
 		const validateAddressError = checkAddressForErrors(address, this.mailchainAddressDomain);
 		if (validateAddressError != null) {
 			return { error: validateAddressError };
 		}
-		const { data: addressMessagingKeyResponse, error: addressMessagingKeyError } =
-			await this.getAddressMessagingKey(address, at);
+		const { data, error: addressMessagingKeyError } = await this.getAddressMessagingKey(address, at);
 		if (addressMessagingKeyError != null) {
 			return { error: addressMessagingKeyError };
 		}
+		const { resolutionType, resolutions: addressMessagingKeyResponses } = data;
 
-		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeyContractCall.resolve(
-			addressMessagingKeyResponse.contractCall,
-			addressMessagingKeyResponse.identityKey
-				? convertPublic(addressMessagingKeyResponse.identityKey)
-				: undefined,
+		const results = await Promise.all(
+			addressMessagingKeyResponses.map(async (addressMessagingKeyResponse) => {
+				const { data: resolvedAddress, error: resolveAddressError } =
+					await this.messagingKeyContractCall.resolve(
+						addressMessagingKeyResponse.contractCall,
+						addressMessagingKeyResponse.identityKey
+							? convertPublic(addressMessagingKeyResponse.identityKey)
+							: undefined,
+					);
+
+				if (resolveAddressError) {
+					return { params: addressMessagingKeyResponse, result: { error: resolveAddressError } };
+				}
+
+				const result: ResolveAddressResult = {
+					data: [
+						{
+							...resolvedAddress,
+							mailchainAddress:
+								resolutionType === 'group' ? addressMessagingKeyResponse.fullAddress : address,
+						},
+					],
+				};
+
+				return { params: addressMessagingKeyResponse, result };
+			}),
 		);
 
-		if (resolveAddressError) {
-			return { error: resolveAddressError };
+		const { successes, failures } = partitionMailchainResults(results);
+		if (failures.length > 0) {
+			// TODO: return all failures
+			return { error: failures[0].error };
 		}
 
-		return { data: { ...resolvedAddress, mailchainAddress: address } };
+		return { data: successes.flatMap((s) => s.data) };
+	}
+
+	/**
+	 * Resolve the messaging key for the given address. Besides the possible exceptions resulting from the {@link resolve} method,
+	 * this method will also throw an exception if the resolved address is a group address.
+	 */
+	async resolveIndividual(address: string, at?: Date): Promise<ResolveIndividualAddressResult> {
+		const { data, error } = await this.resolve(address, at);
+		if (error) return { error };
+
+		if (data.length !== 1 || !isSameAddress(data[0].mailchainAddress, address)) {
+			return { error: new GroupAddressNotSupportedError(address) };
+		}
+
+		return { data: data[0] };
 	}
 
 	async resolveMany(
@@ -199,7 +251,7 @@ export class MessagingKeys {
 		at?: Date,
 	): Promise<
 		MailchainResult<
-			GetAddressMessagingKeyResponseBody,
+			{ resolutionType: 'individual' | 'group'; resolutions: GetAddressMessagingKeyResponseBody[] },
 			| IdentityProviderAddressInvalidError
 			| BadlyFormattedAddressError
 			| IdentityExpiredError
@@ -212,14 +264,34 @@ export class MessagingKeys {
 	> {
 		try {
 			const atDate: number | undefined = at ? Math.round(at.getTime() / 1000) : undefined;
-			const { data } = await this.addressApi.getAddressMessagingKey(address, atDate);
+			const { data } = await this.addressApi.getAddressMessagingKeys(address, atDate);
 
-			const protocol = data.contractCall.protocol as ProtocolType;
-			if (!ALL_PROTOCOLS.includes(protocol)) {
-				return { error: new ProtocolNotSupportedError(protocol) };
+			const results = await Promise.all<
+				ResultsWithParams<GetAddressMessagingKeyResponseBody, ProtocolNotSupportedError, string>
+			>(
+				data.map((d) => {
+					const protocol = d.contractCall.protocol as ProtocolType;
+					if (!ALL_PROTOCOLS.includes(protocol)) {
+						return { result: { error: new ProtocolNotSupportedError(protocol) }, params: d.fullAddress };
+					}
+
+					return { result: { data: d }, params: d.fullAddress };
+				}),
+			);
+
+			const { successes, failures } = partitionMailchainResults(results);
+			if (failures.length > 0) {
+				// TODO: return all failures
+				return failures[0];
 			}
 
-			return { data };
+			// TODO: add check for resolutionType implemented in https://github.com/mailchain/monorepo/issues/2337
+			return {
+				data: {
+					resolutionType: successes.length === 1 ? 'individual' : 'group',
+					resolutions: successes.map((s) => s.data),
+				},
+			};
 		} catch (e) {
 			if (isAxiosError(e)) {
 				switch (e.response?.data?.code) {

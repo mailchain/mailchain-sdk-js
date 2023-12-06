@@ -44,3 +44,11 @@ export class AddressNotRegisteredError extends Error {
 		super('Address is not registered. Register address, then try again.');
 	}
 }
+
+export class GroupAddressNotSupportedError extends Error {
+	readonly type = 'group_address_not_supported';
+	readonly docs = 'https://docs.mailchain.com/developer/errors/codes#group_address_not_supported';
+	constructor(public readonly address: string) {
+		super(`Group addresses are not supported, the provided ${address} is a group address.`);
+	}
+}

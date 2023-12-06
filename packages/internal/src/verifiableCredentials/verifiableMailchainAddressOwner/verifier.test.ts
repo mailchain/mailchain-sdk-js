@@ -17,9 +17,13 @@ describe('verify', () => {
 	const mockMailchainMessagingKeyIssuer = mock<MailchainMessagingKeyIssuer>();
 	const mockMailchainDIDMessagingKeyResolver = mock<MailchainDIDMessagingKeyResolver>();
 
-	beforeEach(() => {
+	beforeAll(() => {
 		jest.useFakeTimers().setSystemTime(new Date(2020, 1, 2));
-		mockMessagingKeys.resolve.mockResolvedValue({
+	});
+
+	beforeEach(() => {
+		jest.clearAllMocks();
+		mockMessagingKeys.resolveIndividual.mockResolvedValue({
 			data: {
 				mailchainAddress: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 				messagingKey: AliceED25519PublicKey,
@@ -76,10 +80,6 @@ describe('verify', () => {
 				},
 			),
 		);
-	});
-
-	afterEach(() => {
-		jest.clearAllMocks();
 	});
 
 	it('mailchain-address-alice', async () => {

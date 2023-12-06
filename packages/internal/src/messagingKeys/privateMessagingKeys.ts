@@ -5,13 +5,14 @@ import { MailchainResult } from '..';
 import { Configuration } from '../configuration';
 import { AddressNonce, GetMessagingKeyLatestNonceError } from './addressNonce';
 import { MessagingKeys, ResolveAddressError } from './messagingKeys';
-import { AddressNotRegisteredError } from './errors';
+import { AddressNotRegisteredError, GroupAddressNotSupportedError } from './errors';
 
 export type GetExportablePrivateMessagingKeyError =
 	| ResolveAddressError
 	| GetMessagingKeyLatestNonceError
 	| ProvidedMessagingKeyIncorrectError
-	| AddressNotRegisteredError;
+	| AddressNotRegisteredError
+	| GroupAddressNotSupportedError;
 
 export class PrivateMessagingKeys {
 	constructor(private readonly messagingKeys: MessagingKeys, private readonly addressNonce: AddressNonce) {}
@@ -24,10 +25,16 @@ export class PrivateMessagingKeys {
 		address: string,
 		keyRing: KeyRing,
 	): Promise<MailchainResult<PrivateKey, GetExportablePrivateMessagingKeyError>> {
-		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolve(address);
+		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolveIndividual(
+			address,
+		);
 
 		if (resolveAddressError != null) {
 			return { error: resolveAddressError };
+		}
+
+		if (resolvedAddress.type === 'vended') {
+			return { error: new AddressNotRegisteredError() };
 		}
 
 		const { data: getMessagingKeyLatestNonce, error: getMessagingKeyLatestNonceError } =
@@ -38,10 +45,6 @@ export class PrivateMessagingKeys {
 
 		if (getMessagingKeyLatestNonceError != null) {
 			return { error: getMessagingKeyLatestNonceError };
-		}
-
-		if (resolvedAddress.type === 'vended') {
-			return { error: new AddressNotRegisteredError() };
 		}
 
 		const privateMessagingKey = keyRing.addressExportableMessagingKey(

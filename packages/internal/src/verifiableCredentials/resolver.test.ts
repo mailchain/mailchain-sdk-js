@@ -8,7 +8,7 @@ import { MailchainDIDMessagingKeyResolver } from './resolver';
 describe('MailchainDIDMessagingKeyResolver', () => {
 	it('should resolve', async () => {
 		const mockMessagingKeys = mock<MessagingKeys>();
-		mockMessagingKeys.resolve.mockResolvedValue({
+		mockMessagingKeys.resolveIndividual.mockResolvedValue({
 			data: {
 				mailchainAddress: `${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 				messagingKey: AliceED25519PublicKey,
@@ -23,7 +23,7 @@ describe('MailchainDIDMessagingKeyResolver', () => {
 		const target = new MailchainDIDMessagingKeyResolver(mockMessagingKeys);
 		const result = await target.resolve(`did:mailchain:${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`);
 		expect(result).toMatchSnapshot('result');
-		expect(mockMessagingKeys.resolve).toHaveBeenCalledWith(
+		expect(mockMessagingKeys.resolveIndividual).toHaveBeenCalledWith(
 			`${AliceSECP256K1PublicAddressStr}@ethereum.mailchain.com`,
 		);
 	});

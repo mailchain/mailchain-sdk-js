@@ -16,11 +16,11 @@ export class SenderVerifier {
 	 * @returns
 	 */
 	async verifySenderOwnsFromAddress(fromAddress: string, senderMessagingKey: PublicKey, at?: Date): Promise<boolean> {
-		const { data: resolvedSenderMessagingKey, error } = await this.messagingKeys.resolve(fromAddress, at);
+		const { data, error } = await this.messagingKeys.resolveIndividual(fromAddress, at);
 		if (error != null) {
 			return false;
 		}
 
-		return isPublicKeyEqual(resolvedSenderMessagingKey.messagingKey, senderMessagingKey);
+		return isPublicKeyEqual(data.messagingKey, senderMessagingKey);
 	}
 }

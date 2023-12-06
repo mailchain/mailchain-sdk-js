@@ -1,4 +1,4 @@
-import { MessagingKeys, ResolveAddressResult } from '@mailchain/internal/messagingKeys';
+import { MessagingKeys, ResolveIndividualAddressResult } from '@mailchain/internal/messagingKeys';
 import { Configuration, defaultConfiguration } from '@mailchain/internal/configuration';
 
 /**
@@ -17,6 +17,6 @@ import { Configuration, defaultConfiguration } from '@mailchain/internal/configu
 export async function resolveAddress(
 	address: string,
 	config: Configuration = defaultConfiguration,
-): Promise<ResolveAddressResult> {
-	return MessagingKeys.create(config).resolve(address);
+): Promise<ResolveIndividualAddressResult> {
+	return MessagingKeys.create(config).resolveIndividual(address);
 }

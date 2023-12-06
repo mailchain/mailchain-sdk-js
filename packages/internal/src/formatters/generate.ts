@@ -29,7 +29,9 @@ export const createMimeMessage = async (
 	const visibleIdentityKeyAddresses = [mailData.from, ...mailData.recipients, ...mailData.carbonCopyRecipients];
 	if (mailData.replyTo) {
 		msg.replyTo(mailData.replyTo);
-		visibleIdentityKeyAddresses.push(mailData.replyTo);
+		if (visibleIdentityKeyAddresses.every((x) => x.address !== mailData.replyTo!.address)) {
+			visibleIdentityKeyAddresses.push(mailData.replyTo);
+		}
 	}
 
 	const msgWithIdentityAttributes = addAllIdentityKeyAttr(
@@ -71,9 +73,9 @@ function addAllIdentityKeyAttr(
 	const allBlindIdentityKeyAttrs: HeaderAttribute[] = [];
 	for (const { address } of blindCarbonCopyRecipients) {
 		const bccIdentityKeyAttrs = [...visibleIdentityKeyAttrs];
-		const putAttr = putIdentityKeyAttr(address, resolvedAddresses, bccIdentityKeyAttrs);
-		if (putAttr) {
-			allBlindIdentityKeyAttrs.push(putAttr);
+		const putAttrs = putIdentityKeyAttr(address, resolvedAddresses, bccIdentityKeyAttrs);
+		if (putAttrs) {
+			allBlindIdentityKeyAttrs.push(...putAttrs);
 			msg.overrideBccHeader(address, X_IDENTITY_KEYS, '', ['v', '1'], ...bccIdentityKeyAttrs);
 		}
 	}
@@ -96,14 +98,20 @@ function putIdentityKeyAttr(
 	address: string,
 	resolvedAddresses: Map<string, ResolvedAddress>,
 	attrs: HeaderAttribute[],
-): HeaderAttribute | undefined {
-	const lookupResult = resolvedAddresses.get(address);
-	if (!lookupResult) return undefined;
-	if (lookupResult.identityKey == null) return undefined;
+): HeaderAttribute[] | undefined {
+	const lookupResults = resolvedAddresses.get(address);
+	if (!lookupResults || lookupResults.length === 0) return undefined;
 
-	const { identityKey, protocol } = lookupResult;
-	const attrValue = `${encodeHexZeroX(publicKeyToBytes(identityKey))}:${protocol}`;
-	const attr: HeaderAttribute = [address, attrValue];
-	attrs.push(attr);
-	return attr;
+	const putAttrs: HeaderAttribute[] = [];
+	for (const lookupResult of lookupResults) {
+		if (lookupResult.identityKey == null) return undefined;
+
+		const { identityKey, protocol } = lookupResult;
+		const attrValue = `${encodeHexZeroX(publicKeyToBytes(identityKey))}:${protocol}`;
+		const attr: HeaderAttribute = [lookupResult.mailchainAddress, attrValue];
+		putAttrs.push(attr);
+	}
+
+	attrs.push(...putAttrs);
+	return putAttrs;
 }

@@ -1,5 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten.js';
+import { UnexpectedMailchainError } from '@mailchain/internal/errors';
 import { Configuration } from '../../configuration';
 import { MailchainResult, partitionMailchainResults } from '../../mailchainResult';
 import {
@@ -57,9 +58,12 @@ export class PayloadDeliveryRequests {
 		// for each distribution, send the payload to the recipients
 		const sendResults = await Promise.all(
 			distributionRequests.map(async (distributionRequest) => {
-				const recipients = distributionRequest.distribution.recipients.map(
-					(address) => resolvedAddresses.get(address)!.messagingKey,
-				);
+				const recipients = distributionRequest.distribution.recipients.flatMap((address) => {
+					const resolutions = resolvedAddresses.get(address);
+					if (resolutions == null)
+						throw new UnexpectedMailchainError(`unexpected error, no resolutions for ${address}`);
+					return resolutions.map((r) => r.messagingKey);
+				});
 				const sendManyDeliveryRequestsParams = {
 					recipients,
 					...distributionRequest.storedPayload,

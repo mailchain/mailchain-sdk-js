@@ -5,6 +5,7 @@ import { encodeHex } from '@mailchain/encoding';
 import { defaultConfiguration } from '../../configuration';
 import {
 	AddressNotRegisteredError,
+	GroupAddressNotSupportedError,
 	MessagingKeys,
 	RegisteredResolvedAddress,
 	ResolveAddressError,
@@ -26,7 +27,8 @@ import type { VerifiablePresentationRequest } from '../request';
 export type CreateVerifiableMailchainAddressOwnerError =
 	| CreateMailchainMessagingKeyIssuerError
 	| AddressNotRegisteredError
-	| ResolveAddressError;
+	| ResolveAddressError
+	| GroupAddressNotSupportedError;
 
 export type CreateVerifiableMailchainAddressOwnerParams = {
 	/**
@@ -130,18 +132,12 @@ export class MailchainAddressOwnershipIssuer {
 		params: CreateVerifiableMailchainAddressOwnerParams,
 	): Promise<MailchainResult<VerifiablePresentationJWT, CreateVerifiableMailchainAddressOwnerError>> {
 		const { address, signer, requester, options, actions, resources } = params;
-		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolve(address);
-		if (resolveAddressError) {
-			return {
-				error: resolveAddressError,
-			};
-		}
+		const { data: resolvedAddress, error: resolveAddressError } = await this.messagingKeys.resolveIndividual(
+			address,
+		);
+		if (resolveAddressError) return { error: resolveAddressError };
 
-		if (resolvedAddress.type !== 'registered') {
-			return {
-				error: new AddressNotRegisteredError(),
-			};
-		}
+		if (resolvedAddress.type !== 'registered') return { error: new AddressNotRegisteredError() };
 
 		const { requestId, expiresIn, expiresAt, nonce } = options;
 		const issuanceDate = new Date();

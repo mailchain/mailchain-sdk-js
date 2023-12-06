@@ -1,5 +1,5 @@
 import { VerifiedPresentation, verifyPresentation } from 'did-jwt-vc';
-import { MessagingKeys, ResolveAddressError, ResolvedAddress } from '../../messagingKeys';
+import { MessagingKeys, ResolveAddressError, ResolvedAddressItem } from '../../messagingKeys';
 import { defaultConfiguration } from '../../configuration';
 import { ValidationError } from '../../errors/validation';
 import { MailchainDIDMessagingKeyResolver } from '../resolver';
@@ -26,7 +26,7 @@ export class VerificationError extends Error {
 export type VerifyMailchainAddressOwnershipError = VerificationError | ValidationError | ResolveAddressError;
 
 export type VerifiedMailchainAddressOwner = {
-	resolvedAddress: ResolvedAddress;
+	resolvedAddress: ResolvedAddressItem;
 } & VerifiedPresentation;
 
 export class MailchainAddressOwnershipVerifier {
@@ -135,10 +135,10 @@ export class MailchainAddressOwnershipVerifier {
 			return { error: verifyTermsOfUseError };
 		}
 
-		const { data: resolvedAddress, error: resolverAddressError } = await this.messagingKeys.resolve(address);
-		if (resolverAddressError) {
-			return { error: resolverAddressError };
-		}
+		const { data: resolvedAddress, error: resolverAddressError } = await this.messagingKeys.resolveIndividual(
+			address,
+		);
+		if (resolverAddressError) return { error: resolverAddressError };
 
 		return { data: { ...result, resolvedAddress } };
 	}

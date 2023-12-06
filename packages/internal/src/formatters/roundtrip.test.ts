@@ -1,4 +1,4 @@
-import { formatAddress } from '@mailchain/addressing';
+import { MAILCHAIN } from '@mailchain/addressing';
 import { aliceKeyRing, bobKeyRing } from '@mailchain/keyring/test.const';
 import {
 	dummyMailData,
@@ -6,6 +6,7 @@ import {
 	dummyMailDataResolvedAddressesWithoutMessagingKey,
 } from '../test.const';
 import { MailData } from '../transport';
+import { ResolvedAddressItem } from '../messagingKeys';
 import { createMimeMessage } from './generate';
 import { parseMimeText } from './parse';
 
@@ -85,19 +86,28 @@ describe('roundtrip createMimeMessage -> parseMimeText', () => {
 			recipients: [unicodeBob],
 		};
 		const identityKeys = new Map(dummyMailDataResolvedAddresses);
-		identityKeys.set(
-			unicodeAlice.address,
-			dummyMailDataResolvedAddresses.get(formatAddress({ domain: 'mailchain.test', username: 'alice' }, 'mail'))!,
-		);
-		identityKeys.set(
-			unicodeBob.address,
-			dummyMailDataResolvedAddresses.get(formatAddress({ domain: 'mailchain.test', username: 'bob' }, 'mail'))!,
-		);
+		identityKeys.set(unicodeAlice.address, [
+			{
+				mailchainAddress: unicodeAlice.address,
+				messagingKey: aliceKeyRing.accountMessagingKey().publicKey,
+				identityKey: aliceKeyRing.accountIdentityKey().publicKey,
+				protocol: MAILCHAIN,
+			} as ResolvedAddressItem,
+		]);
+		identityKeys.set(unicodeBob.address, [
+			{
+				mailchainAddress: unicodeBob.address,
+				messagingKey: bobKeyRing.accountMessagingKey().publicKey,
+				identityKey: bobKeyRing.accountIdentityKey().publicKey,
+				protocol: MAILCHAIN,
+			} as ResolvedAddressItem,
+		]);
 
 		const { original } = await createMimeMessage(mailData, identityKeys);
 		const parsed = await parseMimeText(Buffer.from(original));
 
 		expect(parsed.mailData).toEqual(mailData);
+
 		expect(parsed.addressIdentityKeys.get(unicodeAlice.address)?.identityKey).toEqual(
 			aliceKeyRing.accountIdentityKey().publicKey,
 		);

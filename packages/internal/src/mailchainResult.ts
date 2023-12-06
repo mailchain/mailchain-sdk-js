@@ -9,7 +9,7 @@ export type ErrorMailchainResult<E extends Error> = {
 
 export type MailchainResult<D, E extends Error = Error> = SuccessMailchainResult<D> | ErrorMailchainResult<E>;
 
-type ResultsWithParams<T, E extends Error, P> = {
+export type ResultsWithParams<T, E extends Error, P> = {
 	result: MailchainResult<T, E>;
 	params: P;
 };

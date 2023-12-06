@@ -55,8 +55,8 @@ describe('MessageMailboxOwnerMatcher', () => {
 				matchBy: 'mailchain-api',
 			},
 		]);
-		expect(apiResolver1).toHaveBeenCalledTimes(7);
-		expect(apiResolver2).toHaveBeenCalledTimes(5);
+		expect(apiResolver1).toHaveBeenCalledTimes(8);
+		expect(apiResolver2).toHaveBeenCalledTimes(6);
 	});
 
 	it('should match additional withMessageIdentityKeys', async () => {
@@ -90,17 +90,17 @@ describe('MessageMailboxOwnerMatcher', () => {
 				matchBy: 'mailchain-api',
 			},
 		]);
-		expect(mockMessageHeaderResolver).toHaveBeenCalledTimes(7);
-		expect(apiResolver1).toHaveBeenCalledTimes(5);
-		expect(apiResolver2).toHaveBeenCalledTimes(4);
+		expect(mockMessageHeaderResolver).toHaveBeenCalledTimes(8);
+		expect(apiResolver1).toHaveBeenCalledTimes(6);
+		expect(apiResolver2).toHaveBeenCalledTimes(5);
 	});
 
 	it('should match message with default mailbox alias when no address got matched', async () => {
 		const matches = await ownerMatcher.findMatches(dummyMailData, AliceWalletMailbox);
 
 		expect(matches).toEqual([{ address: AliceWalletMailbox.aliases[0].address, matchBy: 'fallback' }]);
-		expect(apiResolver1).toHaveBeenCalledTimes(7);
-		expect(apiResolver2).toHaveBeenCalledTimes(7);
+		expect(apiResolver1).toHaveBeenCalledTimes(8);
+		expect(apiResolver2).toHaveBeenCalledTimes(8);
 	});
 
 	it('should fail matching addresses when error is thrown by address resolver', async () => {

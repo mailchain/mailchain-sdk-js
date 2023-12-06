@@ -2,12 +2,10 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { AliceED25519PrivateKey } from '@mailchain/crypto/ed25519/test.const';
 import { ED25519ExtendedPrivateKey, secureRandom } from '@mailchain/crypto';
 import { encodeBase64 } from '@mailchain/encoding';
-import flatten from 'lodash/flatten.js';
 import { ProtocolNotSupportedError } from '@mailchain/addressing';
 import { MessagingKeys } from '../../messagingKeys';
 import { dummyMailData, dummyMailDataResolvedAddresses } from '../../test.const';
 import { Distribution, Payload } from '../../transport';
-import { SentPayloadDistributionRequest } from '../deliveryRequests';
 import { PayloadStorer, StoredPayload } from '../payload';
 import {
 	PayloadDeliveryRequests,
@@ -69,17 +67,15 @@ describe('MailDistributor', () => {
 		mockPayloadDeliveryRequests.sendPayloadDistributionRequests.mockImplementation(
 			async (params: SendPayloadDistributionRequestsParams) => {
 				return {
-					data: flatten(
-						params.distributionRequests.map((distribution) =>
-							distribution.distribution.recipients.map((recipient) => {
-								return {
+					data: params.distributionRequests.flatMap((distribution) =>
+						distribution.distribution.recipients.flatMap((recipient) => {
+							return (
+								params.resolvedAddresses.get(recipient)?.map((r) => ({
 									deliveryRequestId: encodeBase64(secureRandom()),
-									recipientMessageKey:
-										params.resolvedAddresses.get(recipient)?.messagingKey ??
-										fail(`invalid mock call with address [${recipient}]`),
-								} as SentPayloadDistributionRequest;
-							}),
-						),
+									recipientMessageKey: r.messagingKey,
+								})) ?? fail(`invalid mock call with address [${recipient}]`)
+							);
+						}),
 					) as SentPayloadDistributionRequests,
 				};
 			},
@@ -93,10 +89,10 @@ describe('MailDistributor', () => {
 		expect(error).toBeUndefined();
 
 		expect(mockPayloadDeliveryRequests.sendPayloadDistributionRequests).toHaveBeenCalledTimes(1);
-		expect(deliveries).toHaveLength(7);
+		expect(deliveries).toHaveLength(9);
 
 		for (const delivery of deliveries!) {
-			expect([...dummyMailDataResolvedAddresses.values()].map((r) => r.messagingKey)).toContain(
+			expect([...dummyMailDataResolvedAddresses.values()].flatMap((r) => r.map((x) => x.messagingKey))).toContain(
 				delivery.recipientMessageKey,
 			);
 			expect(delivery.deliveryRequestId).toBeDefined();
