@@ -1,4 +1,4 @@
-import { Payload } from '@mailchain/internal/transport';
+import { Payload } from '../../transport';
 
 export interface PayloadStorage {
 	/**

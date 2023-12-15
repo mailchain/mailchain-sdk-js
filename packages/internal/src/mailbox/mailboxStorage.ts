@@ -1,5 +1,5 @@
-import { Payload } from '@mailchain/internal/transport';
 import { KeyRing } from '@mailchain/keyring';
+import { Payload } from '../transport';
 import { PayloadHeaders } from '../transport/payload/headers';
 import { Configuration } from '../configuration';
 import { type PayloadStorage } from './payloadStorage';

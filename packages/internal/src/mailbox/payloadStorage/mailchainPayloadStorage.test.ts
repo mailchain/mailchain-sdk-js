@@ -1,7 +1,7 @@
 import { mock } from 'jest-mock-extended';
 import { InboxApiInterface, PostPayloadResponseBody } from '@mailchain/api';
-import { Payload } from '@mailchain/internal/transport';
 import { AxiosResponse } from 'axios';
+import { Payload } from '../../transport';
 import { MessageCrypto } from '../messageCrypto';
 import { MailchainPayloadStorage } from './mailchainPayloadStorage';
 

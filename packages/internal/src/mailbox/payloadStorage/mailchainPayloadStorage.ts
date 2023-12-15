@@ -1,8 +1,8 @@
-import { Payload } from '@mailchain/internal/transport';
-import { PayloadHeaders } from '@mailchain/internal/transport/payload/headers';
 import { InboxApiFactory, InboxApiInterface, createAxiosConfiguration, getAxiosWithSigner } from '@mailchain/api';
 import { isHex } from '@mailchain/encoding';
 import { KeyRing } from '@mailchain/keyring';
+import { PayloadHeaders } from '../../transport/payload/headers';
+import { Payload } from '../../transport';
 import { Configuration } from '../../configuration';
 import { MessageCrypto, createMailchainMessageCrypto } from '../messageCrypto';
 import { PayloadStorage } from './payloadStorage';

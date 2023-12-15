@@ -1,6 +1,6 @@
 import { SignerWithPublicKey } from '@mailchain/crypto';
 import flatten from 'lodash/flatten.js';
-import { UnexpectedMailchainError } from '@mailchain/internal/errors';
+import { UnexpectedMailchainError } from '../../errors';
 import { Configuration } from '../../configuration';
 import { MailchainResult, partitionMailchainResults } from '../../mailchainResult';
 import {

@@ -1,7 +1,7 @@
 import {
 	AddressesApiInterface,
 	CryptoKeyConvert,
-	GetAddressMessagingKeyResponseBody,
+	GetAddressMessagingKeysResponseBody,
 	IdentityKeysApiInterface,
 } from '@mailchain/api';
 import { ED25519PrivateKey } from '@mailchain/crypto';
@@ -34,16 +34,19 @@ describe('MessagingKeys', () => {
 
 	it('should resolve individual address', async () => {
 		mockAddressesApiInterface.getAddressMessagingKeys.mockResolvedValue({
-			data: [
-				{
-					contractCall: {
-						protocol: MAILCHAIN,
+			data: {
+				resolutionType: 'individual',
+				resolutions: [
+					{
+						contractCall: {
+							protocol: MAILCHAIN,
+						},
+						identityKey: CryptoKeyConvert.public(AliceED25519PublicKey),
+						fullAddress: 'alice@mailchain.test',
 					},
-					identityKey: CryptoKeyConvert.public(AliceED25519PublicKey),
-					fullAddress: 'alice@mailchain.test',
-				},
-			],
-		} as AxiosResponse<GetAddressMessagingKeyResponseBody[]>);
+				],
+			},
+		} as AxiosResponse<GetAddressMessagingKeysResponseBody>);
 		mockContractCallResolvers.resolve.mockResolvedValueOnce({
 			data: {
 				protocol: MAILCHAIN,
@@ -80,23 +83,26 @@ describe('MessagingKeys', () => {
 
 	it('should resolve near group address', async () => {
 		mockAddressesApiInterface.getAddressMessagingKeys.mockResolvedValue({
-			data: [
-				{
-					contractCall: {
-						protocol: 'near',
+			data: {
+				resolutionType: 'group',
+				resolutions: [
+					{
+						contractCall: {
+							protocol: 'near',
+						},
+						identityKey: CryptoKeyConvert.public(AliceED25519PublicKey),
+						fullAddress: 'alice.near@near.mailchain.test',
 					},
-					identityKey: CryptoKeyConvert.public(AliceED25519PublicKey),
-					fullAddress: 'alice.near@near.mailchain.test',
-				},
-				{
-					contractCall: {
-						protocol: 'near',
+					{
+						contractCall: {
+							protocol: 'near',
+						},
+						identityKey: CryptoKeyConvert.public(BobED25519PublicKey),
+						fullAddress: 'bob.near@near.mailchain.test',
 					},
-					identityKey: CryptoKeyConvert.public(BobED25519PublicKey),
-					fullAddress: 'bob.near@near.mailchain.test',
-				},
-			],
-		} as AxiosResponse<GetAddressMessagingKeyResponseBody[]>);
+				],
+			},
+		} as AxiosResponse<GetAddressMessagingKeysResponseBody>);
 		mockContractCallResolvers.resolve
 			.mockResolvedValueOnce({
 				data: {

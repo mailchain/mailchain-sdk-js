@@ -264,12 +264,14 @@ export class MessagingKeys {
 	> {
 		try {
 			const atDate: number | undefined = at ? Math.round(at.getTime() / 1000) : undefined;
-			const { data } = await this.addressApi.getAddressMessagingKeys(address, atDate);
+			const {
+				data: { resolutionType, resolutions },
+			} = await this.addressApi.getAddressMessagingKeys(address, atDate);
 
 			const results = await Promise.all<
 				ResultsWithParams<GetAddressMessagingKeyResponseBody, ProtocolNotSupportedError, string>
 			>(
-				data.map((d) => {
+				resolutions.map((d) => {
 					const protocol = d.contractCall.protocol as ProtocolType;
 					if (!ALL_PROTOCOLS.includes(protocol)) {
 						return { result: { error: new ProtocolNotSupportedError(protocol) }, params: d.fullAddress };
@@ -279,16 +281,21 @@ export class MessagingKeys {
 				}),
 			);
 
+			if (!isResolutionType(resolutionType)) {
+				return {
+					error: new UnexpectedMailchainError(`Unexpected resolution type ${resolutionType}`),
+				};
+			}
+
 			const { successes, failures } = partitionMailchainResults(results);
 			if (failures.length > 0) {
 				// TODO: return all failures
 				return failures[0];
 			}
 
-			// TODO: add check for resolutionType implemented in https://github.com/mailchain/monorepo/issues/2337
 			return {
 				data: {
-					resolutionType: successes.length === 1 ? 'individual' : 'group',
+					resolutionType,
 					resolutions: successes.map((s) => s.data),
 				},
 			};
@@ -344,4 +351,8 @@ export class MessagingKeys {
 			};
 		}
 	}
+}
+
+function isResolutionType(resolutionType: string): resolutionType is 'individual' | 'group' {
+	return ['individual', 'group'].includes(resolutionType);
 }
